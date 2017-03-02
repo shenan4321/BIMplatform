@@ -32,6 +32,20 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import org.codehaus.jackson.JsonNode;
+import org.eclipse.emf.common.util.ECollections;
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.EAttribute;
+import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EClassifier;
+import org.eclipse.emf.ecore.EReference;
+import org.eclipse.emf.ecore.EStructuralFeature;
+import org.eclipse.emf.ecore.EcorePackage;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+
 import cn.dlb.bim.emf.IdEObject;
 import cn.dlb.bim.emf.IdEObjectImpl;
 import cn.dlb.bim.emf.IdEObjectImpl.State;
@@ -62,19 +76,6 @@ import cn.dlb.bim.models.ifc2x3tc1.IfcRoot;
 import cn.dlb.bim.models.ifc2x3tc1.IfcStructuralActivityAssignmentSelect;
 import cn.dlb.bim.models.ifc2x3tc1.IfcStructuralItem;
 import cn.dlb.bim.models.ifc2x3tc1.IfcTerminatorSymbol;
-import org.eclipse.emf.common.util.ECollections;
-import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.ecore.EAttribute;
-import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.EClassifier;
-import org.eclipse.emf.ecore.EReference;
-import org.eclipse.emf.ecore.EStructuralFeature;
-import org.eclipse.emf.ecore.EcorePackage;
-import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 
 public abstract class IfcModel implements IfcModelInterface {
 
@@ -1080,6 +1081,6 @@ public abstract class IfcModel implements IfcModelInterface {
 	}
 	
 	@Override
-	public void query(ObjectNode query) {
+	public void query(JsonNode query) {
 	}
 }

@@ -22,10 +22,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.codehaus.jackson.JsonNode;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EStructuralFeature;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.BiMap;
 
 import cn.dlb.bim.models.ifc2x3tc1.IfcRoot;
@@ -224,7 +224,7 @@ public interface IfcModelInterface extends Iterable<IdEObject>, ObjectFactory {
 
 	Set<EClass> getUsedClasses();
 
-	void query(ObjectNode query);
+	void query(JsonNode query);
 
 	<T extends IdEObject> T createAndAdd(EClass eClass, long oid) throws IfcModelInterfaceException;
 

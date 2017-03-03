@@ -1,2 +1,4 @@
 /bin/
 /target/
+WebContent/WEB-INF/logs/
+temp/

@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 
 import cn.dlb.bim.emf.MetaDataManager;
 
-@Component("CommonContext")
-public class CommonContext {
+@Component("PlatformContext")
+public class PlatformContext {
 	private static final String tempPathStr = "temp";
 	
 	private Path rootPath;
@@ -20,7 +20,7 @@ public class CommonContext {
 	
 	private MetaDataManager metaDataManager;
 	
-	public CommonContext() {
+	public PlatformContext() {
 		init();
 	}
 	

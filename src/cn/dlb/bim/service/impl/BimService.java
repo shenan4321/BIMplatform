@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import cn.dlb.bim.common.BimFactory;
-import cn.dlb.bim.common.CommonContext;
+import cn.dlb.bim.common.PlatformContext;
 import cn.dlb.bim.common.GeometryGenerator;
 import cn.dlb.bim.deserializers.DeserializeException;
 import cn.dlb.bim.deserializers.IfcStepDeserializer;
@@ -18,6 +18,8 @@ import cn.dlb.bim.emf.Schema;
 import cn.dlb.bim.engine.IRenderEngine;
 import cn.dlb.bim.engine.IRenderEngineFactory;
 import cn.dlb.bim.engine.RenderEngineException;
+import cn.dlb.bim.models.geometry.GeometryInfo;
+import cn.dlb.bim.models.ifc2x3tc1.IfcProduct;
 import cn.dlb.bim.serializers.IfcStepSerializer;
 import cn.dlb.bim.service.IBimService;
 
@@ -25,8 +27,8 @@ import cn.dlb.bim.service.IBimService;
 public class BimService implements IBimService {
 
 	@Autowired
-	@Qualifier("CommonContext")
-	private CommonContext commonContext;
+	@Qualifier("PlatformContext")
+	private PlatformContext commonContext;
 	
 	@Autowired
 	@Qualifier("BimFactory")
@@ -67,6 +69,46 @@ public class BimService implements IBimService {
 			
 		}
 		return modelList;
+	}
+	
+	@Override
+	public List<GeometryInfo> queryGeometryInfo() {
+		
+		Schema schema = Schema.IFC2X3TC1;
+		File[] ifcFiles = getIfcFileList();
+		
+		List<GeometryInfo> geometryList = new ArrayList<>();
+		
+		if (ifcFiles == null) {
+			return geometryList;
+		}
+		
+		IfcStepDeserializer deserializer = bimFactory.createIfcStepDeserializer(schema);
+		IfcStepSerializer serializer = bimFactory.createIfcStepSerializer(schema);
+		
+		try {
+			deserializer.read(ifcFiles[0]);
+			IfcModelInterface model = deserializer.getModel();
+			
+			IRenderEngine renderEngine = renderEngineFactory.createRenderEngine(schema.getEPackageName());
+			
+			GeometryGenerator generator = new GeometryGenerator(model, serializer, renderEngine);
+			generator.generateForAllElements();
+		
+			for (IfcProduct ifcProduct : model.getAllWithSubTypes(IfcProduct.class)) {
+				if (ifcProduct.getRepresentation() != null && ifcProduct.getRepresentation().getRepresentations().size() != 0) {
+					
+					GeometryInfo info = ifcProduct.getGeometry();
+					geometryList.add(info);
+				}
+			}
+		} catch (DeserializeException e) {
+			e.printStackTrace();
+		} catch (RenderEngineException e) {
+			e.printStackTrace();
+		}
+		
+		return geometryList;
 	}
 
 	public File[] getIfcFileList() {

@@ -17,8 +17,8 @@ import cn.dlb.bim.serializers.IfcStepSerializer;
 public class BimFactory {
 	
 	@Autowired
-	@Qualifier("CommonContext")
-	private CommonContext commonContext;
+	@Qualifier("PlatformContext")
+	private PlatformContext commonContext;
 	
 	public IfcStepSerializer createIfcStepSerializer(Schema schema) {
 		IfcStepSerializer serializer = null;

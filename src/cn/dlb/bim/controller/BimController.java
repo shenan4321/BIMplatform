@@ -37,7 +37,17 @@ public class BimController {
 		LOGGER.info("call queryAllIfcModel");
 		Map<String, Object> resMap = new HashMap<String, Object>();
 		resMap.put("success", "true");
-		resMap.put("buildings", bimService.queryAllIfcModel());
+		resMap.put("models", bimService.queryAllIfcModel());
+		return resMap;
+	}
+	
+	@RequestMapping(value = "queryGeometryInfo", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> queryGeometryInfo() {
+		LOGGER.info("call queryGeometryInfo");
+		Map<String, Object> resMap = new HashMap<String, Object>();
+		resMap.put("success", "true");
+		resMap.put("geometries", bimService.queryGeometryInfo());
 		return resMap;
 	}
 

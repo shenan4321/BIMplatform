@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
-import cn.dlb.bim.common.CommonContext;
+import cn.dlb.bim.common.PlatformContext;
 import cn.dlb.bim.emf.PackageMetaData;
 import cn.dlb.bim.engine.IRenderEngine;
 import cn.dlb.bim.engine.IRenderEngineFactory;
@@ -22,7 +22,7 @@ public class JvmRenderEngineFactory implements IRenderEngineFactory {
 	
 	private Path nativeFolder;
 	private Path schemaFile;
-	CommonContext commonContext;
+	PlatformContext commonContext;
 	
 	public static JvmRenderEngineFactory getInstance() {
 		if (factory == null) {
@@ -31,7 +31,7 @@ public class JvmRenderEngineFactory implements IRenderEngineFactory {
 		return factory;
 	}
 	
-	public void init(CommonContext commonContext) {
+	public void init(PlatformContext commonContext) {
 		try {
 			this.commonContext = commonContext;
 			String os = System.getProperty("os.name").toLowerCase();

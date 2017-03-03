@@ -33,8 +33,8 @@ public class JvmRenderEngineFactory implements IRenderEngineFactory, Initializin
 	private Path schemaFile;
 	
 	@Autowired
-	@Qualifier("CommonContext")
-	private CommonContext commonContext;
+	@Qualifier("PlatformContext")
+	private PlatformContext commonContext;
 	
 	
 	@Override
@@ -44,7 +44,7 @@ public class JvmRenderEngineFactory implements IRenderEngineFactory, Initializin
 	}
 	
 	
-	public void init(CommonContext commonContext) {
+	public void init(PlatformContext commonContext) {
 		try {
 			this.commonContext = commonContext;
 			String os = System.getProperty("os.name").toLowerCase();

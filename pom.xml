@@ -6,7 +6,6 @@
 	<groupId>BIMplatform</groupId>
 	<artifactId>BIMplatform</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>war</packaging>
 
 	<properties>
 		<!-- spring版本号 -->
@@ -17,6 +16,7 @@
 		<spring.version>3.0.5.RELEASE</spring.version>
 		<junit.version>4.11</junit.version>
 		<jdk.version>1.8</jdk.version>
+		<jetty.version>9.3.0.RC1</jetty.version>
 	</properties>
 
 	<build>
@@ -35,6 +35,28 @@
 			</resource>
 		</resources>
 		<plugins>
+
+			<plugin>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-maven-plugin</artifactId>
+				<version>${jetty.version}</version>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.4</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<classpathPrefix>lib/</classpathPrefix>
+							<mainClass>cn.dlb.common.PlatformServer</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -62,19 +84,38 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!-- 修改webapp目录为WebContent -->
+
+			<!-- 解决资源文件的编码问题 -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-war-plugin</artifactId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.4</version>
 				<configuration>
-					<!-- 设置WebContent目录为Web目录 -->
-					<webappDirectory>${basedir}/WebContent</webappDirectory>
-					<warSourceDirectory>${basedir}/WebContent</warSourceDirectory>
+					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
+
 		</plugins>
 	</build>
 	<dependencies>
+
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>3.1.0</version>
+		</dependency>
+
+		<!-- jetty 配置 -->
+		<dependency>  
+            <groupId>org.eclipse.jetty.aggregate</groupId>  
+            <artifactId>jetty-all</artifactId>  
+            <version>8.0.4.v20111024</version>  
+        </dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-jsp</artifactId>
+			<version>9.2.13.v20150730</version>
+		</dependency>
 
 		<!-- spring核心包 -->
 		<!-- springframe start -->

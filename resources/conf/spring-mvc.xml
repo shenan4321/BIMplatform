@@ -20,7 +20,11 @@
 			</list>
 		</property>
 	</bean>
-	<!-- 对模型视图添加前后缀 -->
-	<bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver"
-		p:prefix="/WEB-INF/jsp/" p:suffix=".jsp" />
+	<!-- ViewResolver， 视图解析器，框架提供了好多解析器，这里举例其中的一种 -->  
+    <bean  
+        class="org.springframework.web.servlet.view.InternalResourceViewResolver">  
+        <property name="prefix" value="/jsp/"></property>  
+        <property name="suffix" value=".jsp"></property>  
+        <!--prefix+ view + suffix -->  
+    </bean>  
 </beans>

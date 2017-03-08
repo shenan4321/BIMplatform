@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import cn.dlb.bim.adaptors.GeometryInfoAdaptor;
 import cn.dlb.bim.common.BimFactory;
 import cn.dlb.bim.common.PlatformContext;
 import cn.dlb.bim.common.GeometryGenerator;
@@ -72,12 +73,12 @@ public class BimService implements IBimService {
 	}
 	
 	@Override
-	public List<GeometryInfo> queryGeometryInfo() {
+	public List<GeometryInfoAdaptor> queryGeometryInfo() {
 		
 		Schema schema = Schema.IFC2X3TC1;
 		File[] ifcFiles = getIfcFileList();
 		
-		List<GeometryInfo> geometryList = new ArrayList<>();
+		List<GeometryInfoAdaptor> geometryList = new ArrayList<>();
 		
 		if (ifcFiles == null) {
 			return geometryList;
@@ -99,7 +100,9 @@ public class BimService implements IBimService {
 				if (ifcProduct.getRepresentation() != null && ifcProduct.getRepresentation().getRepresentations().size() != 0) {
 					
 					GeometryInfo info = ifcProduct.getGeometry();
-					geometryList.add(info);
+					GeometryInfoAdaptor adaptor = new GeometryInfoAdaptor();
+					adaptor.adapt(info);
+					geometryList.add(adaptor);
 				}
 			}
 		} catch (DeserializeException e) {

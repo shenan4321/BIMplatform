@@ -300,8 +300,13 @@ public abstract class IfcStepSerializer extends IfcSerializer {
 	private void writeList(IdEObject object, EStructuralFeature feature) throws SerializerException, IOException {
 		List<?> list = (List<?>) object.eGet(feature);
 		List<?> doubleStingList = null;
+		boolean listElementDouble = false;//linfujun, i change the code here to fix the bug
 		if (feature.getEType() == EcorePackage.eINSTANCE.getEDouble() && model.isUseDoubleStrings()) {
 			EStructuralFeature doubleStringFeature = feature.getEContainingClass().getEStructuralFeature(feature.getName() + "AsString");
+			if (doubleStringFeature == null) {//linfujun,i changed it
+				doubleStringFeature = feature.getEContainingClass().getEStructuralFeature(feature.getFeatureID());
+				listElementDouble = true;
+			}
 			if (doubleStringFeature == null) {
 				throw new SerializerException("Field " + feature.getName() + "AsString" + " not found");
 			}
@@ -370,7 +375,10 @@ public abstract class IfcStepSerializer extends IfcSerializer {
 						} else {
 							if (doubleStingList != null) {
 								if (index < doubleStingList.size()) {
-									String val = (String)doubleStingList.get(index);
+									String val = null;//linfujun, i fix bug here
+									if (!listElementDouble) {
+										val = (String)doubleStingList.get(index);
+									}
 									if (val == null) {
 										IfcParserWriterUtils.writePrimitive(listObject, outputStream);
 									} else {

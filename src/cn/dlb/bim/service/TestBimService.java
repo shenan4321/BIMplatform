@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import cn.dlb.bim.adaptors.GeometryInfoAdaptor;
 import cn.dlb.bim.emf.IfcModelInterface;
 import cn.dlb.bim.models.geometry.GeometryInfo;
 
@@ -29,7 +30,7 @@ public class TestBimService {
 	    
 	    @Test
 	    public void queryGeometryInfo(){
-	    	List<GeometryInfo> geos = service.queryGeometryInfo();
+	    	List<GeometryInfoAdaptor> geos = service.queryGeometryInfo();
 	    	System.out.println();
 	    	
 	    }

@@ -28,6 +28,9 @@
 		var positions = geometryInfo.vertices;
 		var indices = geometryInfo.indices;
 		var normals = geometryInfo.normals;
+		var typeName = geometryInfo.typeName;
+		
+		var material = Ifc.Constants.materials[typeName];
 //		var transformation = geometryInfo.base64Transformation;
 
 //		var positionsArray = convertBase64ToFloat32Array(basePositions);
@@ -60,15 +63,22 @@
             aspect: jQuery(this.getScene().getCanvas()).width() / jQuery(this.getScene().getCanvas()).height(),
             fovy: 37.8493
         });
+        
+        var ifcModelNode = {
+        		type : "material",
+				baseColor: material,
+				alpha: material.a,
+        		nodes: [{
+        			type : "geometry",
+        			coreId : coreId,
+        			primitive : params.wire ? "lines" : "triangles",
+                    positions:new Float32Array(positions),
+                    indices:new Uint16Array(indices),
+                    normals:new Float32Array(normals)
+        		}]
+    		};
 		
-		return {
-			type : "geometry",
-			coreId : coreId,
-			primitive : params.wire ? "lines" : "triangles",
-            positions:new Float32Array(positions),
-            indices:new Uint16Array(indices),
-            normals:new Float32Array(normals)
-		};
+		return ifcModelNode;
 	}
 	
 	function convertBase64ToArrayBuffer(base64) {

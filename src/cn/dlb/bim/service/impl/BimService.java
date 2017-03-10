@@ -99,9 +99,9 @@ public class BimService implements IBimService {
 			for (IfcProduct ifcProduct : model.getAllWithSubTypes(IfcProduct.class)) {
 				if (ifcProduct.getRepresentation() != null && ifcProduct.getRepresentation().getRepresentations().size() != 0) {
 					
-					GeometryInfo info = ifcProduct.getGeometry();
+//					GeometryInfo info = ifcProduct.getGeometry();
 					GeometryInfoAdaptor adaptor = new GeometryInfoAdaptor();
-					adaptor.adapt(info);
+					adaptor.adapt(ifcProduct);
 					geometryList.add(adaptor);
 				}
 			}

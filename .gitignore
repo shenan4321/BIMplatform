@@ -2,3 +2,4 @@
 /target/
 WebContent/WEB-INF/logs/
 temp/
+WebContent/.idea/

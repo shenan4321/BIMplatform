@@ -7,6 +7,7 @@ import java.nio.IntBuffer;
 
 import cn.dlb.bim.models.geometry.GeometryInfo;
 import cn.dlb.bim.models.geometry.Vector3f;
+import cn.dlb.bim.models.ifc2x3tc1.IfcProduct;
 
 public class GeometryInfoAdaptor implements IAdaptor<GeometryInfo> {
 
@@ -20,7 +21,7 @@ public class GeometryInfoAdaptor implements IAdaptor<GeometryInfo> {
 	private float[] vertices;
 	private float[] normals;
 	private Bound bound;
-	
+	private String typeName;
 	
 //	@Override
 //	public void adapt(GeometryInfo geometryInfo) {
@@ -38,7 +39,6 @@ public class GeometryInfoAdaptor implements IAdaptor<GeometryInfo> {
 		init();
 	}
 	
-	
 	public class Bound {
 		public Vector3f max;
 		public Vector3f min;
@@ -50,6 +50,19 @@ public class GeometryInfoAdaptor implements IAdaptor<GeometryInfo> {
 	
 	@Override
 	public void adapt(GeometryInfo geometryInfo) {
+		indices = byteArrayToIntArray(geometryInfo.getData().getIndices());
+		vertices = byteArrayToFloatArray(geometryInfo.getData().getVertices());
+		normals = byteArrayToFloatArray(geometryInfo.getData().getNormals());
+		bound.max = geometryInfo.getMaxBounds();
+		bound.min = geometryInfo.getMinBounds();
+	}
+	
+	public void adapt(IfcProduct ifcProduct) {//IfcProduct
+		GeometryInfo geometryInfo = ifcProduct.getGeometry();
+		typeName = ifcProduct.getClass().getSimpleName();
+		if (typeName.endsWith("Impl")) {
+			typeName = typeName.substring(0, typeName.indexOf("Impl"));
+		}
 		indices = byteArrayToIntArray(geometryInfo.getData().getIndices());
 		vertices = byteArrayToFloatArray(geometryInfo.getData().getVertices());
 		normals = byteArrayToFloatArray(geometryInfo.getData().getNormals());
@@ -107,6 +120,14 @@ public class GeometryInfoAdaptor implements IAdaptor<GeometryInfo> {
 
 	public void setBound(Bound bound) {
 		this.bound = bound;
+	}
+
+	public String getTypeName() {
+		return typeName;
+	}
+
+	public void setTypeName(String typeName) {
+		this.typeName = typeName;
 	}
 	
 }

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+        <!-- 命名空间 -->
+    <typeAliases>
+
+         <typeAlias alias="IfcStoreModel" type="cn.dlb.bim.dao.IfcStoreModel"/>
+         
+    </typeAliases>
+   
+    <!-- 映射map -->
+    <mappers>
+    </mappers>
+    
+    
+    
+</configuration>

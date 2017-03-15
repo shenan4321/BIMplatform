@@ -7,31 +7,32 @@ import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import cn.dlb.bim.adaptors.GeometryInfoAdaptor;
 import cn.dlb.bim.emf.IfcModelInterface;
-import cn.dlb.bim.models.geometry.GeometryInfo;
+import cn.dlb.bim.service.impl.BimService;
 
 public class TestBimService {
 	
-		private IBimService service;
+		private IIfcStoreService ifcStoreService;
+		
+		private BimService bimService;
 	     
 	    @Before
 	    public void before(){                                                                   
-	        ApplicationContext context = new ClassPathXmlApplicationContext(new String[]{"classpath:conf/spring.xml"});
-	        service = (IBimService) context.getBean("BimService");
+	    	ApplicationContext context = new ClassPathXmlApplicationContext(new String[]{"classpath:conf/spring.xml"
+	        		,"classpath:conf/spring-mybatis.xml"});
+	    	ifcStoreService = (IIfcStoreService) context.getBean("IfcStoreService");
+	    	bimService = (BimService) context.getBean("BimService");
 	    }
 	     
 	    @Test
-	    public void queryModel(){
-	    	List<IfcModelInterface> models = service.queryAllIfcModel();
+	    public void insert(){
+	    	List<IfcModelInterface> modelList = bimService.queryAllIfcModel();
+	    	if (modelList.size() > 0) {
+	    		ifcStoreService.insert(modelList.get(0));
+	    	}
+	    	
 	    	System.out.println();
 	    	
 	    }
 	    
-	    @Test
-	    public void queryGeometryInfo(){
-	    	List<GeometryInfoAdaptor> geos = service.queryGeometryInfo();
-	    	System.out.println();
-	    	
-	    }
 }

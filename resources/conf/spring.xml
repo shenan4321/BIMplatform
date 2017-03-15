@@ -7,8 +7,8 @@
       http://www.springframework.org/schema/context
       http://www.springframework.org/schema/context/spring-context.xsd">
  
-<!--     引入jdbc配置文件 -->
-<!--     <context:property-placeholder location="classpath:conf/jdbc.properties"/> -->
+	<!--     引入jdbc配置文件 -->
+	<context:property-placeholder location="classpath:conf/jdbc.properties"/>
      
     <!-- 扫描文件（自动将service层注入） -->
     <context:component-scan base-package="cn.dlb.bim.service"/>

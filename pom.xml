@@ -17,6 +17,7 @@
 		<junit.version>4.11</junit.version>
 		<jdk.version>1.8</jdk.version>
 		<jetty.version>9.3.0.RC1</jetty.version>
+		<mybatis.version>3.2.4</mybatis.version>
 	</properties>
 
 	<build>
@@ -173,6 +174,33 @@
 			<version>${spring.version}</version>
 		</dependency>
 		<!-- springframe end -->
+		
+		<!-- mybatis核心包 -->
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis</artifactId>
+            <version>${mybatis.version}</version>
+        </dependency>
+        <!-- mybatis/spring包 -->
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis-spring</artifactId>
+            <version>1.2.2</version>
+        </dependency>
+        
+        <!-- 阿里巴巴数据源包 -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid</artifactId>
+            <version>1.0.2</version>
+        </dependency>
+        
+        <!-- postgresql驱动包 -->
+        <dependency>
+        	<groupId>org.postgresql</groupId>
+        	<artifactId>postgresql</artifactId>
+        	<version>9.4-1201-jdbc4</version>
+        </dependency>
 
 		<!-- json数据 -->
 		<dependency>

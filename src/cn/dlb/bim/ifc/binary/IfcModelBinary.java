@@ -44,14 +44,14 @@ public class IfcModelBinary {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(IfcModelBinary.class);
 	
-	private IdClassMapper idClassMapper;
+	private IfcDataBase ifcDataBase;
 	
 	private final ObjectCache objectCache = new ObjectCache();
 	
 	public static final int STORE_PROJECT_ID = 1;
 	
-	public IfcModelBinary(IdClassMapper idClassMapper) {
-		this.idClassMapper = idClassMapper;
+	public IfcModelBinary(IfcDataBase ifcDataBase) {
+		this.ifcDataBase = ifcDataBase;
 	}
 	
 	public void convertModelToByte(IfcModelInterface model, PackageMetaData packageMetaData) {
@@ -134,7 +134,7 @@ public class IfcModelBinary {
 											// null, do nothing
 										} else if (cid < 0) {
 											// non minus one and negative cid means value is embedded in record
-											EClass referenceClass = idClassMapper.getEClassForCid((short) (-cid));
+											EClass referenceClass = ifcDataBase.getEClassForCid((short) (-cid));
 											if (feature.getEAnnotation("dbembed") != null) {
 												newValue = readEmbeddedValue(feature, buffer, referenceClass, query);
 											} else {
@@ -142,7 +142,7 @@ public class IfcModelBinary {
 											}
 										} else if (cid > 0) {
 											// positive cid means value is reference to other record
-											EClass referenceClass = idClassMapper.getEClassForCid(cid);
+											EClass referenceClass = ifcDataBase.getEClassForCid(cid);
 											if (referenceClass == null) {
 												throw new IfcModelBinaryException("No eClass found for cid " + cid);
 											}
@@ -347,7 +347,7 @@ public class IfcModelBinary {
 							// negative cid means value is
 							// embedded
 							// in record
-							EClass referenceClass = idClassMapper.getEClassForCid((short) (-cid));
+							EClass referenceClass = ifcDataBase.getEClassForCid((short) (-cid));
 							if (referenceClass == null) {
 								throw new IfcModelBinaryException("No class found for cid " + (-cid));
 							}
@@ -356,7 +356,7 @@ public class IfcModelBinary {
 							// positive cid means value is a
 							// reference
 							// to another record
-							EClass referenceClass = idClassMapper.getEClassForCid(cid);
+							EClass referenceClass = ifcDataBase.getEClassForCid(cid);
 							if (referenceClass == null) {
 								throw new IfcModelBinaryException("Cannot find class with cid " + cid);
 							}
@@ -590,7 +590,7 @@ public class IfcModelBinary {
 	private void writeEmbeddedValue(int pid, int rid, Object value, ByteBuffer buffer, PackageMetaData packageMetaData) throws IfcModelBinaryException {
 		IdEObject wrappedValue = (IdEObject) value;
 
-		Short cid = idClassMapper.getCidOfEClass(wrappedValue.eClass());
+		Short cid = ifcDataBase.getCidOfEClass(wrappedValue.eClass());
 		buffer.order(ByteOrder.LITTLE_ENDIAN);
 		buffer.putShort((short) -cid);
 		buffer.order(ByteOrder.BIG_ENDIAN);
@@ -719,7 +719,7 @@ public class IfcModelBinary {
 	private void writeWrappedValue(int pid, int rid, Object value, ByteBuffer buffer, PackageMetaData packageMetaData) throws IfcModelBinaryException {
 		IdEObject wrappedValue = (IdEObject) value;
 		EStructuralFeature eStructuralFeature = wrappedValue.eClass().getEStructuralFeature("wrappedValue");
-		Short cid = idClassMapper.getCidOfEClass(wrappedValue.eClass());
+		Short cid = ifcDataBase.getCidOfEClass(wrappedValue.eClass());
 		buffer.order(ByteOrder.LITTLE_ENDIAN);
 		buffer.putShort((short) -cid);
 		buffer.order(ByteOrder.BIG_ENDIAN);
@@ -731,7 +731,7 @@ public class IfcModelBinary {
 		if (wrappedValue.eClass().getName().equals("IfcGloballyUniqueId")) {
 			EClass eClass = packageMetaData.getEClass("IfcGloballyUniqueId");
 			if (wrappedValue.getOid() == -1) {//TODO
-//				((IdEObjectImpl) wrappedValue).setOid(newOid(eClass));
+				((IdEObjectImpl) wrappedValue).setOid(ifcDataBase.newOid(eClass));
 			}
 			ByteBuffer valueBuffer = convertObjectToByteArray(wrappedValue, ByteBuffer.allocate(getExactSize(wrappedValue, packageMetaData, true)), packageMetaData);
 			ByteBuffer keyBuffer = createKeyBuffer(pid, wrappedValue.getOid(), rid);

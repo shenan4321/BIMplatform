@@ -7,7 +7,6 @@ import cn.dlb.bim.dao.IIfcObjectDao;
 import cn.dlb.bim.dao.entity.IfcStoreModel;
 import cn.dlb.bim.ifc.emf.IfcModelInterface;
 import cn.dlb.bim.service.IIfcStoreService;
-import cn.dlb.bim.utils.ByteUtil;
 
 @Service("IfcStoreService")
 public class IfcStoreServiceImpl implements IIfcStoreService {
@@ -19,9 +18,6 @@ public class IfcStoreServiceImpl implements IIfcStoreService {
 	public void insert(IfcModelInterface model) {
 		IfcStoreModel ifcStoreModel = new IfcStoreModel();
 		ifcStoreModel.setGid(1l);
-		byte[] ifcObjectBytes = ByteUtil.toByteArray(model);
-		ifcStoreModel.setIfcObjectBytes(ifcObjectBytes);
-		ifcObjectDao.insertIfcStoreModel(ifcStoreModel);
 	}
 
 	@Override

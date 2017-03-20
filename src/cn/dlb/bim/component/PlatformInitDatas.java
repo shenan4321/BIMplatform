@@ -16,15 +16,16 @@ import org.springframework.stereotype.Component;
 
 import cn.dlb.bim.dao.IIfcClassLookupDAO;
 import cn.dlb.bim.dao.entity.IfcClassLookup;
-import cn.dlb.bim.ifc.binary.IdClassMapper;
+import cn.dlb.bim.ifc.binary.IfcDataBase;
 import cn.dlb.bim.ifc.engine.jvm.JvmRenderEngineFactory;
+import cn.dlb.bim.utils.IdentifyUtil;
 
 /**
  * @author shenan4321
  *
  */
 @Component("PlatformInitDatas")
-public class PlatformInitDatas implements InitializingBean, IdClassMapper {
+public class PlatformInitDatas implements InitializingBean, IfcDataBase {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(JvmRenderEngineFactory.class);
 	
@@ -83,6 +84,14 @@ public class PlatformInitDatas implements InitializingBean, IdClassMapper {
 	
 	public EClass getEClassForCid(short cid) {
 		return cidToEclass[cid];
+	}
+
+	@Override
+	public long newOid(EClass eClass) {
+		Short cid = getCidOfEClass(eClass);
+		long rawId = IdentifyUtil.nextId();
+		String oid = "" + cid + rawId;
+		return Long.valueOf(oid);
 	}
 	
 }

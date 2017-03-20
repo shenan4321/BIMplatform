@@ -66,7 +66,6 @@ public class TestBimService {
     			TodoList todoList = new TodoList();
     			OldQuery query = new OldQuery(packageMetaData, true);
     			IdEObject idEObject = ifcModelBinary.convertByteArrayToObject(null, obj.eClass(), -1, byteBuffer, newModel, query, todoList);
-    			String byStr = byteBuffer.toString();
     		}
     	}
     }

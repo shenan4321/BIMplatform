@@ -6,8 +6,8 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
         <!-- 命名空间 -->
     <typeAliases>
 
-         <typeAlias alias="IfcStoreModel" type="cn.dlb.bim.model.IfcStoreModel"/>
-         <typeAlias alias="IfcClassLookup" type="cn.dlb.bim.model.IfcClassLookup"/>
+         <typeAlias alias="IfcStoreModel" type="cn.dlb.bim.dao.entity.IfcStoreModel"/>
+         <typeAlias alias="IfcClassLookup" type="cn.dlb.bim.dao.entity.IfcClassLookup"/>
          
     </typeAliases>
    

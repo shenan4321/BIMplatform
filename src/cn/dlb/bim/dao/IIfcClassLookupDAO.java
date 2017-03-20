@@ -3,7 +3,7 @@ package cn.dlb.bim.dao;
 
 import java.util.List;
 
-import cn.dlb.bim.model.IfcClassLookup;
+import cn.dlb.bim.dao.entity.IfcClassLookup;
 
 public interface IIfcClassLookupDAO {
 	public int insertIfcClassLookup(IfcClassLookup ifcClassLookup);

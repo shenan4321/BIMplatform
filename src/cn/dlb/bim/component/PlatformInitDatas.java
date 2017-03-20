@@ -15,9 +15,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import cn.dlb.bim.dao.IIfcClassLookupDAO;
+import cn.dlb.bim.dao.entity.IfcClassLookup;
 import cn.dlb.bim.ifc.binary.IdClassMapper;
 import cn.dlb.bim.ifc.engine.jvm.JvmRenderEngineFactory;
-import cn.dlb.bim.model.IfcClassLookup;
 
 /**
  * @author shenan4321

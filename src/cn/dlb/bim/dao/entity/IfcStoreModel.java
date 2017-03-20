@@ -1,4 +1,4 @@
-package cn.dlb.bim.model;
+package cn.dlb.bim.dao.entity;
 
 public class IfcStoreModel {
 	private Long gid;

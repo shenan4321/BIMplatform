@@ -18,7 +18,7 @@ package cn.dlb.bim.models.store;
 
 import java.util.Date;
 
-import cn.dlb.bim.emf.IdEObject;
+import cn.dlb.bim.ifc.emf.IdEObject;
 import cn.dlb.bim.models.log.AccessMethod;
 
 /**

@@ -18,7 +18,7 @@ package cn.dlb.bim.models.ifc4.impl;
 
 import org.eclipse.emf.ecore.EClass;
 
-import cn.dlb.bim.emf.IdEObjectImpl;
+import cn.dlb.bim.ifc.emf.IdEObjectImpl;
 import cn.dlb.bim.models.ifc4.Ifc4Package;
 import cn.dlb.bim.models.ifc4.IfcReference;
 import cn.dlb.bim.models.ifc4.IfcTableColumn;

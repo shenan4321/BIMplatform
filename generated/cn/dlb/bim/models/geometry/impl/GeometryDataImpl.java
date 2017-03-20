@@ -18,7 +18,7 @@ package cn.dlb.bim.models.geometry.impl;
 
 import org.eclipse.emf.ecore.EClass;
 
-import cn.dlb.bim.emf.IdEObjectImpl;
+import cn.dlb.bim.ifc.emf.IdEObjectImpl;
 import cn.dlb.bim.models.geometry.GeometryData;
 import cn.dlb.bim.models.geometry.GeometryPackage;
 

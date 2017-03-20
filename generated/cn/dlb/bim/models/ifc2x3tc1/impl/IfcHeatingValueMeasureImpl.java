@@ -18,7 +18,7 @@ package cn.dlb.bim.models.ifc2x3tc1.impl;
 
 import org.eclipse.emf.ecore.EClass;
 
-import cn.dlb.bim.emf.IdEObjectImpl;
+import cn.dlb.bim.ifc.emf.IdEObjectImpl;
 import cn.dlb.bim.models.ifc2x3tc1.Ifc2x3tc1Package;
 import cn.dlb.bim.models.ifc2x3tc1.IfcHeatingValueMeasure;
 

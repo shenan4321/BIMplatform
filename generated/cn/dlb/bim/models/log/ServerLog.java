@@ -18,7 +18,7 @@ package cn.dlb.bim.models.log;
 
 import org.eclipse.emf.common.util.EList;
 
-import cn.dlb.bim.emf.IdEObject;
+import cn.dlb.bim.ifc.emf.IdEObject;
 
 /**
  * <!-- begin-user-doc -->

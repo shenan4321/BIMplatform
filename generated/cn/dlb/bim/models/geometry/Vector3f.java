@@ -16,7 +16,7 @@
  */
 package cn.dlb.bim.models.geometry;
 
-import cn.dlb.bim.emf.IdEObject;
+import cn.dlb.bim.ifc.emf.IdEObject;
 
 /**
  * <!-- begin-user-doc -->

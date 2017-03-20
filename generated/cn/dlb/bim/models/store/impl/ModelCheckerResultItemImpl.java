@@ -18,7 +18,7 @@ package cn.dlb.bim.models.store.impl;
 
 import org.eclipse.emf.ecore.EClass;
 
-import cn.dlb.bim.emf.IdEObjectImpl;
+import cn.dlb.bim.ifc.emf.IdEObjectImpl;
 import cn.dlb.bim.models.store.ModelCheckerResultItem;
 import cn.dlb.bim.models.store.StorePackage;
 

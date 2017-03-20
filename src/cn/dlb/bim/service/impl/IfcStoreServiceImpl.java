@@ -4,8 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import cn.dlb.bim.dao.IIfcObjectDao;
-import cn.dlb.bim.dao.IfcStoreModel;
-import cn.dlb.bim.emf.IfcModelInterface;
+import cn.dlb.bim.ifc.emf.IfcModelInterface;
+import cn.dlb.bim.model.IfcStoreModel;
 import cn.dlb.bim.service.IIfcStoreService;
 import cn.dlb.bim.utils.ByteUtil;
 
@@ -20,7 +20,7 @@ public class IfcStoreServiceImpl implements IIfcStoreService {
 		IfcStoreModel ifcStoreModel = new IfcStoreModel();
 		ifcStoreModel.setGid(1l);
 		byte[] ifcObjectBytes = ByteUtil.toByteArray(model);
-		ifcStoreModel.setIfcObjectBytes(ifcObjectBytes);;
+		ifcStoreModel.setIfcObjectBytes(ifcObjectBytes);
 		ifcObjectDao.insertIfcStoreModel(ifcStoreModel);
 	}
 

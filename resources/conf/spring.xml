@@ -14,5 +14,5 @@
     <context:component-scan base-package="cn.dlb.bim.service"/>
     
     <!-- 扫描文件（自动将component注入） -->
-    <context:component-scan base-package="cn.dlb.bim.common"/>
+    <context:component-scan base-package="cn.dlb.bim.component"/>
 </beans>

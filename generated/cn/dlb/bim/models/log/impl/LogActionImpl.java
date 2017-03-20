@@ -20,7 +20,7 @@ import java.util.Date;
 
 import org.eclipse.emf.ecore.EClass;
 
-import cn.dlb.bim.emf.IdEObjectImpl;
+import cn.dlb.bim.ifc.emf.IdEObjectImpl;
 import cn.dlb.bim.models.log.AccessMethod;
 import cn.dlb.bim.models.log.LogAction;
 import cn.dlb.bim.models.log.LogPackage;

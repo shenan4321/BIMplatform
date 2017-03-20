@@ -19,7 +19,7 @@ package cn.dlb.bim.models.log.impl;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 
-import cn.dlb.bim.emf.IdEObjectImpl;
+import cn.dlb.bim.ifc.emf.IdEObjectImpl;
 import cn.dlb.bim.models.log.LogAction;
 import cn.dlb.bim.models.log.LogPackage;
 import cn.dlb.bim.models.log.ServerLog;

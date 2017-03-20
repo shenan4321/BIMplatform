@@ -18,7 +18,7 @@ package cn.dlb.bim.models.store;
 
 import javax.activation.DataHandler;
 
-import cn.dlb.bim.emf.IdEObject;
+import cn.dlb.bim.ifc.emf.IdEObject;
 
 /**
  * <!-- begin-user-doc -->

@@ -16,7 +16,7 @@
  */
 package cn.dlb.bim.models.ifc4;
 
-import cn.dlb.bim.emf.IdEObject;
+import cn.dlb.bim.ifc.emf.IdEObject;
 
 /**
  * <!-- begin-user-doc -->

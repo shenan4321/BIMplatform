@@ -20,7 +20,7 @@ import javax.activation.DataHandler;
 
 import org.eclipse.emf.ecore.EClass;
 
-import cn.dlb.bim.emf.IdEObjectImpl;
+import cn.dlb.bim.ifc.emf.IdEObjectImpl;
 import cn.dlb.bim.models.store.DownloadResult;
 import cn.dlb.bim.models.store.StorePackage;
 

@@ -1,6 +1,6 @@
 package cn.dlb.bim.service;
 
-import cn.dlb.bim.emf.IfcModelInterface;
+import cn.dlb.bim.ifc.emf.IfcModelInterface;
 
 public interface IIfcStoreService {
 

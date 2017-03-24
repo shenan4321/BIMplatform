@@ -32,8 +32,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import javax.json.JsonObject;
-
 import org.eclipse.emf.common.util.ECollections;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EAttribute;
@@ -44,17 +42,19 @@ import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.EcorePackage;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
 import cn.dlb.bim.ifc.emf.IdEObject;
 import cn.dlb.bim.ifc.emf.IdEObjectImpl;
+import cn.dlb.bim.ifc.emf.IdEObjectImpl.State;
 import cn.dlb.bim.ifc.emf.IfcModelInterface;
 import cn.dlb.bim.ifc.emf.IfcModelInterfaceException;
 import cn.dlb.bim.ifc.emf.ModelMetaData;
 import cn.dlb.bim.ifc.emf.OidProvider;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
-import cn.dlb.bim.ifc.emf.IdEObjectImpl.State;
+import cn.dlb.bim.ifc.idm.ObjectIDM;
 import cn.dlb.bim.models.ifc2x3tc1.IfcAnnotation;
 import cn.dlb.bim.models.ifc2x3tc1.IfcAnnotationCurveOccurrence;
 import cn.dlb.bim.models.ifc2x3tc1.IfcDimensionCurve;
@@ -201,24 +201,24 @@ public abstract class IfcModel implements IfcModelInterface {
 		}
 	}
 
-//	@SuppressWarnings("unchecked")
-//	public void sortAllAggregates(ObjectIDM objectIDM, IfcRoot ifcRoot) {
-//		for (EStructuralFeature eStructuralFeature : ifcRoot.eClass().getEAllStructuralFeatures()) {
-//			if (objectIDM.shouldFollowReference(ifcRoot.eClass(), ifcRoot.eClass(), eStructuralFeature)) {
-//				if (eStructuralFeature.getUpperBound() == -1 || eStructuralFeature.getUpperBound() > 1) {
-//					if (eStructuralFeature.getEType() instanceof EClass) {
-//						if (eStructuralFeature.getEType().getEAnnotation("wrapped") != null) {
-//							EList<IdEObject> list = (EList<IdEObject>) ifcRoot.eGet(eStructuralFeature);
-//							sortPrimitiveList(list);
-//						} else {
-//							EList<IdEObject> list = (EList<IdEObject>) ifcRoot.eGet(eStructuralFeature);
-//							sortComplexList(objectIDM, ifcRoot.eClass(), list, eStructuralFeature);
-//						}
-//					}
-//				}
-//			}
-//		}
-//	}
+	@SuppressWarnings("unchecked")
+	public void sortAllAggregates(ObjectIDM objectIDM, IfcRoot ifcRoot) {
+		for (EStructuralFeature eStructuralFeature : ifcRoot.eClass().getEAllStructuralFeatures()) {
+			if (objectIDM.shouldFollowReference(ifcRoot.eClass(), ifcRoot.eClass(), eStructuralFeature)) {
+				if (eStructuralFeature.getUpperBound() == -1 || eStructuralFeature.getUpperBound() > 1) {
+					if (eStructuralFeature.getEType() instanceof EClass) {
+						if (eStructuralFeature.getEType().getEAnnotation("wrapped") != null) {
+							EList<IdEObject> list = (EList<IdEObject>) ifcRoot.eGet(eStructuralFeature);
+							sortPrimitiveList(list);
+						} else {
+							EList<IdEObject> list = (EList<IdEObject>) ifcRoot.eGet(eStructuralFeature);
+							sortComplexList(objectIDM, ifcRoot.eClass(), list, eStructuralFeature);
+						}
+					}
+				}
+			}
+		}
+	}
 
 	private void sortPrimitiveList(EList<IdEObject> list) {
 		ECollections.sort(list, new Comparator<IdEObject>() {
@@ -229,33 +229,33 @@ public abstract class IfcModel implements IfcModelInterface {
 		});
 	}
 
-//	private void sortComplexList(final ObjectIDM objectIDM, final EClass originalQueryClass, EList<IdEObject> list, EStructuralFeature eStructuralFeature) {
-//		final EClass type = (EClass) eStructuralFeature.getEType();
-//		ECollections.sort(list, new Comparator<IdEObject>() {
-//			@Override
-//			public int compare(IdEObject o1, IdEObject o2) {
-//				int i = 1;
-//				for (EStructuralFeature eStructuralFeature : type.getEAllStructuralFeatures()) {
-//					if (objectIDM.shouldFollowReference(originalQueryClass, type, eStructuralFeature)) {
-//						Object val1 = o1.eGet(eStructuralFeature);
-//						Object val2 = o2.eGet(eStructuralFeature);
-//						if (val1 != null && val2 != null) {
-//							if (eStructuralFeature.getEType() instanceof EClass) {
-//								if (eStructuralFeature.getEType().getEAnnotation("wrapped") != null) {
-//									int compare = comparePrimitives((IdEObject) val1, (IdEObject) val2);
-//									if (compare != 0) {
-//										return compare * i;
-//									}
-//								}
-//							}
-//						}
-//						i++;
-//					}
-//				}
-//				return 0;
-//			}
-//		});
-//	}
+	private void sortComplexList(final ObjectIDM objectIDM, final EClass originalQueryClass, EList<IdEObject> list, EStructuralFeature eStructuralFeature) {
+		final EClass type = (EClass) eStructuralFeature.getEType();
+		ECollections.sort(list, new Comparator<IdEObject>() {
+			@Override
+			public int compare(IdEObject o1, IdEObject o2) {
+				int i = 1;
+				for (EStructuralFeature eStructuralFeature : type.getEAllStructuralFeatures()) {
+					if (objectIDM.shouldFollowReference(originalQueryClass, type, eStructuralFeature)) {
+						Object val1 = o1.eGet(eStructuralFeature);
+						Object val2 = o2.eGet(eStructuralFeature);
+						if (val1 != null && val2 != null) {
+							if (eStructuralFeature.getEType() instanceof EClass) {
+								if (eStructuralFeature.getEType().getEAnnotation("wrapped") != null) {
+									int compare = comparePrimitives((IdEObject) val1, (IdEObject) val2);
+									if (compare != 0) {
+										return compare * i;
+									}
+								}
+							}
+						}
+						i++;
+					}
+				}
+				return 0;
+			}
+		});
+	}
 
 	private int comparePrimitives(IdEObject o1, IdEObject o2) {
 		EClass eClass = o1.eClass();
@@ -1075,6 +1075,6 @@ public abstract class IfcModel implements IfcModelInterface {
 	}
 	
 	@Override
-	public void query(JsonObject query) {
+	public void query(JsonNode query) {
 	}
 }

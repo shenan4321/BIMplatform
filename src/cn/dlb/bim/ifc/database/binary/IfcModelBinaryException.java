@@ -1,4 +1,4 @@
-package cn.dlb.bim.ifc.binary;
+package cn.dlb.bim.ifc.database.binary;
 
 public class IfcModelBinaryException extends Exception {
 

@@ -5,8 +5,8 @@ import java.util.List;
 
 import cn.dlb.bim.dao.entity.IfcClassLookup;
 
-public interface IIfcClassLookupDAO {
-	public int insertIfcClassLookup(IfcClassLookup ifcClassLookup);
+public interface IIfcClassLookupDao {
+	public void insertIfcClassLookup(IfcClassLookup ifcClassLookup);
 
 	public List<IfcClassLookup> queryAllIfcClassLookup();
 

@@ -1,18 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
- xmlns:context="http://www.springframework.org/schema/context"
- xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
- xsi:schemaLocation="http://www.springframework.org/schema/beans
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
       http://www.springframework.org/schema/context
-      http://www.springframework.org/schema/context/spring-context.xsd">
- 
-	<!--     引入jdbc配置文件 -->
-	<context:property-placeholder location="classpath:conf/jdbc.properties"/>
-     
-    <!-- 扫描文件（自动将service层注入） -->
-    <context:component-scan base-package="cn.dlb.bim.service"/>
-    
-    <!-- 扫描文件（自动将component注入） -->
-    <context:component-scan base-package="cn.dlb.bim.component"/>
+      http://www.springframework.org/schema/context/spring-context.xsd
+      http://www.springframework.org/schema/data/mongo
+      http://www.springframework.org/schema/data/mongo/spring-mongo-1.7.xsd">
+
+	<!-- 引入jdbc配置文件 -->
+	<context:property-placeholder location="classpath:conf/jdbc.properties" />
+
+	<!-- 扫描文件（自动将service层注入） -->
+	<context:component-scan base-package="cn.dlb.bim.service" />
+
+	<!-- 扫描文件（自动将component注入） -->
+	<context:component-scan base-package="cn.dlb.bim.component" />
+	
+	<!-- 扫描文件（自动将service层注入） -->
+	<context:component-scan base-package="cn.dlb.bim.dao.impl" />
+
+	<!-- spring连接mongodb数据库的配置 -->
+	<mongo:mongo-client host="${mongo.host}" port="${mongo.port}"
+		credentials="${mongo.username}:${mongo.password}@${mongo.dbname}" id="mongo">
+		<mongo:client-options write-concern="SAFE" />
+	</mongo:mongo-client>
+
+	<mongo:db-factory id="mongoDbFactory" mongo-ref="mongo" />
+
+	<!-- mongo模板操作对象 -->
+	<bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
+		<constructor-arg name="mongoDbFactory" ref="mongoDbFactory" />
+		<property name="writeResultChecking" value="EXCEPTION" />
+	</bean>
+
+	<!-- 映射转换器，扫描back-package目录下的文件，根据注释，把它们作为mongodb的一个collection的映射 -->
+	<mongo:mapping-converter base-package="cn.dlb.bim.dao.entity" />
+
+	<!-- mongodb bean的仓库目录，会自动扫描扩展了MongoRepository接口的接口进行注入 -->
+	<mongo:repositories base-package="cn.dlb.bim.dao.impl" />
+
+	<context:annotation-config />
+
 </beans>

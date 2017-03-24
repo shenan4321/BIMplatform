@@ -1,4 +1,4 @@
-package cn.dlb.bim.ifc.binary;
+package cn.dlb.bim.ifc.database;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;

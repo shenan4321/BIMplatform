@@ -1,4 +1,4 @@
-package cn.dlb.bim.ifc.binary;
+package cn.dlb.bim.ifc.database.binary;
 
 import java.nio.BufferOverflowException;
 import java.nio.BufferUnderflowException;
@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Charsets;
 
+import cn.dlb.bim.ifc.database.ObjectCache;
 import cn.dlb.bim.ifc.emf.IdEObject;
 import cn.dlb.bim.ifc.emf.IdEObjectImpl;
 import cn.dlb.bim.ifc.emf.IdEObjectImpl.State;

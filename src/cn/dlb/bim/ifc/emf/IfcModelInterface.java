@@ -19,14 +19,12 @@ package cn.dlb.bim.ifc.emf;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-
-import javax.json.JsonObject;
 
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EStructuralFeature;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.BiMap;
 
 import cn.dlb.bim.models.ifc2x3tc1.IfcRoot;
@@ -224,7 +222,7 @@ public interface IfcModelInterface extends Iterable<IdEObject>, ObjectFactory {
 
 	Set<EClass> getUsedClasses();
 
-	void query(JsonObject query);
+	void query(JsonNode query);
 
 	<T extends IdEObject> T createAndAdd(EClass eClass, long oid) throws IfcModelInterfaceException;
 

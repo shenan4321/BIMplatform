@@ -1,4 +1,4 @@
-package cn.dlb.bim.ifc.binary;
+package cn.dlb.bim.ifc.database.binary;
 
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EClassifier;

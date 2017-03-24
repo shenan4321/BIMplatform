@@ -5,7 +5,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class IdentifyUtil {
 
-	/** 开始时间截 (2015-01-01) */
+	//2015
 	private static final long startTime = 1420041600000L;
 	
 	private static final long ONE_STEP = 100;

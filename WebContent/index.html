@@ -21,12 +21,12 @@
     queryData();
     
 	function queryData() {
-	    var params = {};
+	    var params = {rid:1};
 	    
 	    $.ajax ({
 	        async:false,
 	        type: "GET",
-	        url: "queryGeometryInfo.do",
+	        url: "queryDbGeometryInfo.do",
 	        data: params,
 	       	dataType:"json",
 	        success:function(data) {

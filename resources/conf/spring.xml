@@ -8,6 +8,9 @@
       http://www.springframework.org/schema/context/spring-context.xsd
       http://www.springframework.org/schema/data/mongo
       http://www.springframework.org/schema/data/mongo/spring-mongo-1.7.xsd">
+      
+    <!-- 支持上传文件 -->  
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"/>  
 
 	<!-- 引入jdbc配置文件 -->
 	<context:property-placeholder location="classpath:conf/jdbc.properties" />

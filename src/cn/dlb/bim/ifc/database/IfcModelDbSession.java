@@ -26,6 +26,7 @@ import cn.dlb.bim.ifc.emf.IfcModelInterfaceException;
 import cn.dlb.bim.ifc.emf.MetaDataManager;
 import cn.dlb.bim.ifc.emf.ModelMetaData;
 import cn.dlb.bim.ifc.emf.QueryInterface;
+import cn.dlb.bim.models.geometry.GeometryData;
 import cn.dlb.bim.models.geometry.GeometryInfo;
 import cn.dlb.bim.models.ifc2x3tc1.IfcProduct;
 
@@ -62,6 +63,10 @@ public class IfcModelDbSession extends IfcModelBinary {
 			GeometryInfo geometryInfo = ifcProduct.getGeometry();
 			if (geometryInfo != null) {
 				addToObjectsToSave(geometryInfo);
+				GeometryData geometryData = geometryInfo.getData();
+				if (geometryData != null) {
+					addToObjectsToSave(geometryData);
+				}
 			}
 		}
 		commit();
@@ -105,7 +110,7 @@ public class IfcModelDbSession extends IfcModelBinary {
 		for (Long oid : modelEntity.getObjectOids()) {
 			get(oid, model, query, todoList);
 		}
-		processTodoList(model, todoList, query);
+		processTodoList(model, todoList, query, 2);//read into 2 deep level, i put geometryinfo and its child geometrydata in it;
 		model.setModelMetaDataValue(modelEntity.getModelMetaData());
 		return true;
 	}
@@ -133,12 +138,14 @@ public class IfcModelDbSession extends IfcModelBinary {
 		return convertByteArrayToObject;
 	}
 	
-	private void processTodoList(IfcModelInterface model, TodoList todoList, QueryInterface query) throws IfcModelDbException {
-		List<Long> remainOids = new ArrayList<>();
-		remainOids.addAll(todoList.keySet());
-		for (Long oid : remainOids) {
-			IdEObject idEObject = todoList.get(oid);
-			get(idEObject.getOid(), model, query, todoList);
+	public void processTodoList(IfcModelInterface model, TodoList todoList, QueryInterface query, int deepLevel) throws IfcModelDbException {
+		for (int i = deepLevel; i >= 0; i--) {
+			List<Long> remainOids = new ArrayList<>();
+			remainOids.addAll(todoList.keySet());
+			for (Long oid : remainOids) {
+				IdEObject idEObject = todoList.get(oid);
+				get(idEObject.getOid(), model, query, todoList);
+			}
 		}
 	}
 

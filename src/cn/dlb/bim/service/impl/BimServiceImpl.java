@@ -9,15 +9,23 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import cn.dlb.bim.PlatformContext;
+import cn.dlb.bim.component.PlatformInitDatas;
 import cn.dlb.bim.component.PlatformServer;
+import cn.dlb.bim.dao.IfcModelDao;
 import cn.dlb.bim.ifc.GeometryGenerator;
+import cn.dlb.bim.ifc.database.IfcModelDbException;
+import cn.dlb.bim.ifc.database.IfcModelDbSession;
+import cn.dlb.bim.ifc.database.OldQuery;
 import cn.dlb.bim.ifc.deserializers.DeserializeException;
 import cn.dlb.bim.ifc.deserializers.IfcStepDeserializer;
 import cn.dlb.bim.ifc.emf.IfcModelInterface;
+import cn.dlb.bim.ifc.emf.IfcModelInterfaceException;
+import cn.dlb.bim.ifc.emf.PackageMetaData;
 import cn.dlb.bim.ifc.emf.Schema;
 import cn.dlb.bim.ifc.engine.IRenderEngine;
 import cn.dlb.bim.ifc.engine.IRenderEngineFactory;
 import cn.dlb.bim.ifc.engine.RenderEngineException;
+import cn.dlb.bim.ifc.model.BasicIfcModel;
 import cn.dlb.bim.ifc.serializers.IfcStepSerializer;
 import cn.dlb.bim.models.ifc2x3tc1.IfcProduct;
 import cn.dlb.bim.service.IBimService;
@@ -29,6 +37,42 @@ public class BimServiceImpl implements IBimService {
 	@Autowired
 	@Qualifier("PlatformServer")
 	private PlatformServer server;
+	
+	@Autowired
+	@Qualifier("PlatformInitDatas")
+	private PlatformInitDatas platformInitDatas;
+	
+	@Autowired
+	@Qualifier("IfcModelDaoImpl")
+	private IfcModelDao ifcModelDao;
+	
+	@Override
+	public List<GeometryInfoVo> queryDbGeometryInfo(Integer rid) {
+		PackageMetaData packageMetaData = server.getMetaDataManager()
+				.getPackageMetaData(Schema.IFC2X3TC1.getEPackageName());
+		IfcModelDbSession session = new IfcModelDbSession(ifcModelDao, server.getMetaDataManager(), platformInitDatas);
+		BasicIfcModel model = new BasicIfcModel(packageMetaData);
+		try {
+			session.get(rid, model, new OldQuery(packageMetaData, true));
+		} catch (IfcModelDbException e) {
+			e.printStackTrace();
+		} catch (IfcModelInterfaceException e) {
+			e.printStackTrace();
+		}
+		
+		List<GeometryInfoVo> geometryList = new ArrayList<>();
+		
+		for (IfcProduct ifcProduct : model.getAllWithSubTypes(IfcProduct.class)) {
+			if (ifcProduct.getRepresentation() != null && ifcProduct.getRepresentation().getRepresentations().size() != 0) {
+				
+				GeometryInfoVo adaptor = new GeometryInfoVo();
+				adaptor.adapt(ifcProduct);
+				geometryList.add(adaptor);
+			}
+		}
+		
+		return geometryList;
+	}
 	
 	@Override
 	public List<IfcModelInterface> queryAllIfcModel() {

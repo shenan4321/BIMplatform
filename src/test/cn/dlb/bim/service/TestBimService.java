@@ -33,6 +33,7 @@ import cn.dlb.bim.ifc.model.BasicIfcModel;
 import cn.dlb.bim.ifc.model.SplitIfcModel;
 import cn.dlb.bim.ifc.serializers.IfcStepSerializer;
 import cn.dlb.bim.ifc.serializers.SerializerException;
+import cn.dlb.bim.models.geometry.GeometryInfo;
 import cn.dlb.bim.models.ifc2x3tc1.Ifc2x3tc1Package;
 import cn.dlb.bim.models.ifc2x3tc1.IfcProduct;
 import cn.dlb.bim.service.IIfcStoreService;
@@ -90,6 +91,34 @@ public class TestBimService {
 				System.out.println(idEObject.getExpressId());
 			}
 			System.out.println();
+		}
+	}
+	
+	@Test
+	public void testConvertGeometryInfo() throws IfcModelDbException {
+		List<IfcModelInterface> modelList = bimService.queryAllIfcModel();
+		if (modelList.size() > 0) {
+			IfcModelInterface model = modelList.get(0);
+			Collection<IdEObject> values = model.getValues();
+			PackageMetaData packageMetaData = server.getMetaDataManager()
+					.getPackageMetaData(Schema.IFC2X3TC1.getEPackageName());
+			TodoList todoList = new TodoList();
+			model.fixOids(datas);
+			for (IfcProduct ifcProduct : model.getAllWithSubTypes(IfcProduct.class)) {
+				if (ifcProduct.getRepresentation() != null && ifcProduct.getRepresentation().getRepresentations().size() != 0) {
+					GeometryInfo geometryInfo = ifcProduct.getGeometry();
+					ByteBuffer byteBuffer = ByteBuffer.allocate(16);
+					IfcModelBinary ifcModelBinary = new IfcModelBinary(datas);
+					byteBuffer = ifcModelBinary.convertObjectToByteArray(geometryInfo, byteBuffer, packageMetaData);
+					byteBuffer.flip();
+					BasicIfcModel newModel = new BasicIfcModel(packageMetaData);
+
+					OldQuery query = new OldQuery(packageMetaData, true);
+					IdEObject idEObject = ifcModelBinary.convertByteArrayToObject(null, ifcProduct.eClass(), -1, byteBuffer,
+							newModel, -1, query, todoList);
+					System.out.println(idEObject.getExpressId());
+				}
+			}
 		}
 	}
 

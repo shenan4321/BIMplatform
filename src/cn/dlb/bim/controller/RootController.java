@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import cn.dlb.bim.ifc.GeometryGenerator;
@@ -48,6 +49,16 @@ public class RootController {
 		Map<String, Object> resMap = new HashMap<String, Object>();
 		resMap.put("success", "true");
 		resMap.put("geometries", bimService.queryGeometryInfo());
+		return resMap;
+	}
+	
+	@RequestMapping(value = "queryDbGeometryInfo", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> queryDbGeometryInfo(@RequestParam("rid")Integer rid) {
+		LOGGER.info("call queryGeometryInfo");
+		Map<String, Object> resMap = new HashMap<String, Object>();
+		resMap.put("success", "true");
+		resMap.put("geometries", bimService.queryDbGeometryInfo(rid));
 		return resMap;
 	}
 

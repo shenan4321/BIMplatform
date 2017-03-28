@@ -6,7 +6,6 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 import cn.dlb.bim.models.geometry.GeometryInfo;
-import cn.dlb.bim.models.geometry.Vector3f;
 import cn.dlb.bim.models.ifc2x3tc1.IfcProduct;
 
 public class GeometryInfoVo implements ITransformer<GeometryInfo> {
@@ -24,6 +23,10 @@ public class GeometryInfoVo implements ITransformer<GeometryInfo> {
 	public class Bound {
 		public Vector3f max;
 		public Vector3f min;
+		public Bound() {
+			max = new Vector3f(0, 0, 0);
+			min = new Vector3f(0, 0, 0);
+		}
 	}
 	
 	public void init() {
@@ -35,8 +38,14 @@ public class GeometryInfoVo implements ITransformer<GeometryInfo> {
 		indices = byteArrayToIntArray(geometryInfo.getData().getIndices());
 		vertices = byteArrayToFloatArray(geometryInfo.getData().getVertices());
 		normals = byteArrayToFloatArray(geometryInfo.getData().getNormals());
-		bound.max = geometryInfo.getMaxBounds();
-		bound.min = geometryInfo.getMinBounds();
+		double maxX = geometryInfo.getMaxBounds().getX();
+		double maxY = geometryInfo.getMaxBounds().getY();
+		double maxZ = geometryInfo.getMaxBounds().getZ();
+		double minX = geometryInfo.getMinBounds().getX();
+		double minY = geometryInfo.getMinBounds().getY();
+		double minZ = geometryInfo.getMinBounds().getZ();
+		bound.max.set(maxX, maxY, maxZ);
+		bound.min.set(minX, minY, minZ);
 	}
 	
 	public void adapt(IfcProduct ifcProduct) {//IfcProduct
@@ -48,8 +57,14 @@ public class GeometryInfoVo implements ITransformer<GeometryInfo> {
 		indices = byteArrayToIntArray(geometryInfo.getData().getIndices());
 		vertices = byteArrayToFloatArray(geometryInfo.getData().getVertices());
 		normals = byteArrayToFloatArray(geometryInfo.getData().getNormals());
-		bound.max = geometryInfo.getMaxBounds();
-		bound.min = geometryInfo.getMinBounds();
+		double maxX = geometryInfo.getMaxBounds().getX();
+		double maxY = geometryInfo.getMaxBounds().getY();
+		double maxZ = geometryInfo.getMaxBounds().getZ();
+		double minX = geometryInfo.getMinBounds().getX();
+		double minY = geometryInfo.getMinBounds().getY();
+		double minZ = geometryInfo.getMinBounds().getZ();
+		bound.max.set(maxX, maxY, maxZ);
+		bound.min.set(minX, minY, minZ);
 	}
 	
 	private int[] byteArrayToIntArray(byte[] byteArray) {

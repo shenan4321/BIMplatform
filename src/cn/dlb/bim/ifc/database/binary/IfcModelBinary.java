@@ -296,9 +296,10 @@ public class IfcModelBinary {
 		}
 		objectCache.put(oid, newObject);
 		if (query.isDeep() && object.eClass().getEAnnotation("wrapped") == null) {
-			if (feature.getEAnnotation("nolazyload") == null) {
+			//TODO do it lazyload
+//			if (feature.getEAnnotation("nolazyload") == null) {
 				todoList.put(oid, newObject);
-			}
+//			}
 		} else {
 			if (object.eClass().getEAnnotation("wrapped") == null) {
 				try {

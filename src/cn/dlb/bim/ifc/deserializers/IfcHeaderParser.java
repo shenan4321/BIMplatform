@@ -3,19 +3,18 @@ package cn.dlb.bim.ifc.deserializers;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-import cn.dlb.bim.models.store.IfcHeader;
-import cn.dlb.bim.models.store.StoreFactory;
+import cn.dlb.bim.ifc.model.IfcHeader;
 
 public class IfcHeaderParser {
 
 	public IfcHeader parseFileName(String line) throws DeserializeException, ParseException {
-		IfcHeader ifcHeader = StoreFactory.eINSTANCE.createIfcHeader();
+		IfcHeader ifcHeader = new IfcHeader();
 		parseFileName(line, ifcHeader);
 		return ifcHeader;
 	}
 	
 	public IfcHeader parseDescription(String line) throws DeserializeException, ParseException {
-		IfcHeader ifcHeader = StoreFactory.eINSTANCE.createIfcHeader();
+		IfcHeader ifcHeader = new IfcHeader();
 		parseDescription(line, ifcHeader);
 		return ifcHeader;
 	}

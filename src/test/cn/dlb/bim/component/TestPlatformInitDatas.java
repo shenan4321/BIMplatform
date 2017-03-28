@@ -12,9 +12,9 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import cn.dlb.bim.component.PlatformInitDatas;
 import cn.dlb.bim.component.PlatformServer;
+import cn.dlb.bim.ifc.database.IfcModelDbException;
 import cn.dlb.bim.ifc.database.OldQuery;
 import cn.dlb.bim.ifc.database.binary.IfcModelBinary;
-import cn.dlb.bim.ifc.database.binary.IfcModelBinaryException;
 import cn.dlb.bim.ifc.database.binary.TodoList;
 import cn.dlb.bim.ifc.emf.IdEObject;
 import cn.dlb.bim.ifc.emf.IfcModelInterface;

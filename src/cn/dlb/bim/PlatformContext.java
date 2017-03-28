@@ -6,6 +6,9 @@ import java.net.URLDecoder;
 import java.nio.file.Path;
 
 public class PlatformContext {
+	
+	private final static String platformVersion = "0.1";
+	
 	private final static String tempPathStr = "temp";
 	
 	private final static Path classRootPath;
@@ -34,6 +37,10 @@ public class PlatformContext {
 		tempPath = new File(tempPathStr).toPath();
 	}
 	
+	public static String getPlatformVersion() {
+		return platformVersion;
+	}
+
 	public static String getClasslocation() {
 		return classLocation;
 	}

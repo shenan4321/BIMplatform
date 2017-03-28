@@ -171,6 +171,7 @@ public interface IfcModelInterface extends Iterable<IdEObject>, ObjectFactory {
 	 * @return The ModelMetaData of this model
 	 */
 	ModelMetaData getModelMetaData();
+	void setModelMetaDataValue(ModelMetaData modelMetaData);
 	
 	void fixOids(OidProvider oidProvider);
 	void fixOidsFlat(OidProvider oidProvider);

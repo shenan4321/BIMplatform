@@ -3,8 +3,8 @@ package cn.dlb.bim.dao.entity;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "IfcClassLookup")
-public class IfcClassLookup {
+@Document(collection = "IfcClassLookupEntity")
+public class IfcClassLookupEntity {
 	
 	@Id
 	private Short cid;

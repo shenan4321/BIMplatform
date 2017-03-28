@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Charsets;
 
+import cn.dlb.bim.ifc.database.IfcModelDbException;
 import cn.dlb.bim.ifc.database.ObjectCache;
 import cn.dlb.bim.ifc.emf.IdEObject;
 import cn.dlb.bim.ifc.emf.IdEObjectImpl;
@@ -45,9 +46,9 @@ public class IfcModelBinary {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(IfcModelBinary.class);
 	
-	private IfcDataBase ifcDataBase;
+	protected IfcDataBase ifcDataBase;
 	
-	private final ObjectCache objectCache = new ObjectCache();
+	protected final ObjectCache objectCache = new ObjectCache();
 	
 	public static final int STORE_PROJECT_ID = 1;
 	
@@ -55,27 +56,25 @@ public class IfcModelBinary {
 		this.ifcDataBase = ifcDataBase;
 	}
 	
-	public void convertModelToByte(IfcModelInterface model, PackageMetaData packageMetaData) {
-		
-	}
-	
-	public IdEObject convertByteArrayToObject(EClass originalQueryClass, EClass eClass, long oid, ByteBuffer buffer, IfcModelInterface model, QueryInterface query, TodoList todoList) throws IfcModelBinaryException {
+	public IdEObject convertByteArrayToObject(EClass originalQueryClass, EClass eClass, long oid, ByteBuffer buffer, IfcModelInterface model, Integer rid, QueryInterface query, TodoList todoList) throws IfcModelDbException {
 		try {
-//			if (idEObject == null) {
-			IdEObject idEObject = createInternal(eClass, query);
-
-			((IdEObjectImpl) idEObject).setOid(oid);
-			((IdEObjectImpl) idEObject).setPid(query.getPid());
-				
-//			}
+			IdEObject idEObject = todoList.get(oid);
+			todoList.remove(oid);
+			
+			if (idEObject == null) {
+				idEObject = createInternal(eClass, query);
+				((IdEObjectImpl) idEObject).setOid(oid);
+				((IdEObjectImpl) idEObject).setPid(query.getPid());
+			} 
+			
 			if (idEObject.eClass().getEAnnotation("wrapped") == null) {
 				try {
 					model.addAllowMultiModel(oid, idEObject);
 				} catch (IfcModelInterfaceException e) {
-					throw new IfcModelBinaryException(e);
+					throw new IfcModelDbException(e);
 				}
 			}
-//			((IdEObjectImpl) idEObject).setRid(rid);
+			((IdEObjectImpl) idEObject).setRid(rid);
 			((IdEObjectImpl) idEObject).useInverses(false);
 
 			
@@ -145,7 +144,7 @@ public class IfcModelBinary {
 											// positive cid means value is reference to other record
 											EClass referenceClass = ifcDataBase.getEClassForCid(cid);
 											if (referenceClass == null) {
-												throw new IfcModelBinaryException("No eClass found for cid " + cid);
+												throw new IfcModelDbException("No eClass found for cid " + cid);
 											}
 											// readReference is going to read a long, which includes the 2 bytes for the cid
 											buffer.position(buffer.position() - 2);
@@ -168,11 +167,11 @@ public class IfcModelBinary {
 						fieldCounter++;
 					}
 				} catch (StringIndexOutOfBoundsException e) {
-					throw new IfcModelBinaryException("Reading " + eClass.getName() + "(" + oid + ")." + feature.getName(), e);
+					throw new IfcModelDbException("Reading " + eClass.getName() + "(" + oid + ")." + feature.getName(), e);
 				} catch (BufferUnderflowException e) {
-					throw new IfcModelBinaryException("Reading " + eClass.getName() + "(" + oid + ")." + feature.getName(), e);
+					throw new IfcModelDbException("Reading " + eClass.getName() + "(" + oid + ")." + feature.getName(), e);
 				} catch (BufferOverflowException e) {
-					throw new IfcModelBinaryException("Reading " + eClass.getName() + "(" + oid + ")." + feature.getName(), e);
+					throw new IfcModelDbException("Reading " + eClass.getName() + "(" + oid + ")." + feature.getName(), e);
 				}
 			}
 			((IdEObjectImpl) idEObject).setLoaded();
@@ -182,13 +181,13 @@ public class IfcModelBinary {
 			}
 			return idEObject;
 		} catch (BufferUnderflowException e) {
-			throw new IfcModelBinaryException("Reading " + eClass.getName(), e);
+			throw new IfcModelDbException("Reading " + eClass.getName(), e);
 		} catch (BufferOverflowException e) {
-			throw new IfcModelBinaryException("Reading " + eClass.getName(), e);
+			throw new IfcModelDbException("Reading " + eClass.getName(), e);
 		}
 	}
 
-	public ByteBuffer convertObjectToByteArray(IdEObject object, ByteBuffer buffer, PackageMetaData packageMetaData) throws IfcModelBinaryException {
+	public ByteBuffer convertObjectToByteArray(IdEObject object, ByteBuffer buffer, PackageMetaData packageMetaData) throws IfcModelDbException {
 		int bufferSize = getExactSize(object, packageMetaData, true);
 		if (bufferSize > buffer.capacity()) {
 			LOGGER.debug("Buffer too small (" + bufferSize + ")");
@@ -209,6 +208,11 @@ public class IfcModelBinary {
 			}
 		}
 		buffer.put(unsetted);
+		
+		EClass eClass = getEClassForOid(object.getOid());
+		if (!eClass.isSuperTypeOf(object.eClass())) {
+			throw new IfcModelDbException("Object with oid " + object.getOid() + " is a " + object.eClass().getName() + " but it's cid-part says it's a " + eClass.getName());
+		}
 		
 		for (EStructuralFeature feature : object.eClass().getEAllStructuralFeatures()) {
 			if (packageMetaData.useForDatabaseStorage(object.eClass(), feature)) {
@@ -254,14 +258,14 @@ public class IfcModelBinary {
 			}
 		}
 		if (buffer.position() != bufferSize) {
-			throw new IfcModelBinaryException("Value buffer sizes do not match for " + object.eClass().getName() + " " + buffer.position() + "/" + bufferSize);
+			throw new IfcModelDbException("Value buffer sizes do not match for " + object.eClass().getName() + " " + buffer.position() + "/" + bufferSize);
 		}
 		
 		return buffer;
 	}
 	
-	private IdEObject readReference(ByteBuffer buffer, IfcModelInterface model, IdEObject object, EStructuralFeature feature, EClass eClass,
-			QueryInterface query, TodoList todoList) throws IfcModelBinaryException {
+	protected IdEObject readReference(ByteBuffer buffer, IfcModelInterface model, IdEObject object, EStructuralFeature feature, EClass eClass,
+			QueryInterface query, TodoList todoList) throws IfcModelDbException {
 		// TODO next bit seems to make no sense, why detect a deleted record when reading a reference??
 		if (buffer.capacity() == 1 && buffer.get(0) == -1) {
 			buffer.position(buffer.position() + 1);
@@ -293,14 +297,14 @@ public class IfcModelBinary {
 		objectCache.put(oid, newObject);
 		if (query.isDeep() && object.eClass().getEAnnotation("wrapped") == null) {
 			if (feature.getEAnnotation("nolazyload") == null) {
-				todoList.add(newObject);
+				todoList.put(oid, newObject);
 			}
 		} else {
 			if (object.eClass().getEAnnotation("wrapped") == null) {
 				try {
 					model.addAllowMultiModel(oid, newObject);
 				} catch (IfcModelInterfaceException e) {
-					throw new IfcModelBinaryException(e);
+					throw new IfcModelDbException(e);
 				}
 			}
 		}
@@ -308,8 +312,8 @@ public class IfcModelBinary {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private Object readList(IdEObject idEObject, ByteBuffer buffer, IfcModelInterface model, QueryInterface query, TodoList todoList,
-			EStructuralFeature feature) throws IfcModelBinaryException {
+	protected Object readList(IdEObject idEObject, ByteBuffer buffer, IfcModelInterface model, QueryInterface query, TodoList todoList,
+			EStructuralFeature feature) throws IfcModelDbException {
 		if (feature.getEType() instanceof EEnum) {
 		} else if (feature.getEType() instanceof EClass) {
 			if (buffer.capacity() == 1 && buffer.get(0) == -1) {
@@ -350,7 +354,7 @@ public class IfcModelBinary {
 							// in record
 							EClass referenceClass = ifcDataBase.getEClassForCid((short) (-cid));
 							if (referenceClass == null) {
-								throw new IfcModelBinaryException("No class found for cid " + (-cid));
+								throw new IfcModelDbException("No class found for cid " + (-cid));
 							}
 							referencedObject = readWrappedValue(feature, buffer, referenceClass, query);
 						} else if (cid > 0) {
@@ -359,14 +363,14 @@ public class IfcModelBinary {
 							// to another record
 							EClass referenceClass = ifcDataBase.getEClassForCid(cid);
 							if (referenceClass == null) {
-								throw new IfcModelBinaryException("Cannot find class with cid " + cid);
+								throw new IfcModelDbException("Cannot find class with cid " + cid);
 							}
 							buffer.position(buffer.position() - 2);
 							referencedObject = readReference(buffer, model, idEObject, feature, referenceClass, query, todoList);
 						}
 						if (referencedObject != null) {
 							if (!feature.getEType().isInstance(referencedObject)) {
-								throw new IfcModelBinaryException(referencedObject.getClass().getSimpleName() + " cannot be stored in list of type "
+								throw new IfcModelDbException(referencedObject.getClass().getSimpleName() + " cannot be stored in list of type "
 										+ feature.getEType().getName() + " for feature " + feature.getName());
 							}
 							if (feature.isUnique()) {
@@ -392,7 +396,7 @@ public class IfcModelBinary {
 		return null;
 	}
 	
-	private IdEObject readEmbeddedValue(EStructuralFeature feature, ByteBuffer buffer, EClass eClass, QueryInterface query) {
+	protected IdEObject readEmbeddedValue(EStructuralFeature feature, ByteBuffer buffer, EClass eClass, QueryInterface query) {
 		IdEObject eObject = createInternal(eClass, query);
 		for (EStructuralFeature eStructuralFeature : eClass.getEAllStructuralFeatures()) {
 			if (eStructuralFeature.isMany()) {
@@ -406,7 +410,7 @@ public class IfcModelBinary {
 		return eObject;
 	}
 	
-	private IdEObject readWrappedValue(EStructuralFeature feature, ByteBuffer buffer, EClass eClass, QueryInterface query) {
+	protected IdEObject readWrappedValue(EStructuralFeature feature, ByteBuffer buffer, EClass eClass, QueryInterface query) {
 		EStructuralFeature eStructuralFeature = eClass.getEStructuralFeature("wrappedValue");
 		Object primitiveValue = readPrimitiveValue(eStructuralFeature.getEType(), buffer, query);
 		IdEObject eObject = createInternal(eClass, query);
@@ -421,7 +425,7 @@ public class IfcModelBinary {
 		return eObject;
 	}
 	
-	public void fakeRead(ByteBuffer buffer, EStructuralFeature feature) throws IfcModelBinaryException {
+	public void fakeRead(ByteBuffer buffer, EStructuralFeature feature) throws IfcModelDbException {
 		boolean wrappedValue = feature.getEType().getEAnnotation("wrapped") != null;
 		if (feature.isMany()) {
 			if (feature.getEType() instanceof EEnum) {
@@ -474,7 +478,7 @@ public class IfcModelBinary {
 		}
 	}
 	
-	private void fakePrimitiveRead(EClassifier classifier, ByteBuffer buffer) throws IfcModelBinaryException {
+	protected void fakePrimitiveRead(EClassifier classifier, ByteBuffer buffer) throws IfcModelDbException {
 		if (classifier == EcorePackage.eINSTANCE.getEString()) {
 			int length = buffer.getInt();
 			if (length != -1) {
@@ -498,7 +502,7 @@ public class IfcModelBinary {
 				buffer.position(buffer.position() + length);
 			}
 		} else {
-			throw new IfcModelBinaryException("Unimplemented " + classifier);
+			throw new IfcModelDbException("Unimplemented " + classifier);
 		}
 	}
 	
@@ -588,7 +592,7 @@ public class IfcModelBinary {
 		}
 	}
 	
-	private void writeEmbeddedValue(int pid, int rid, Object value, ByteBuffer buffer, PackageMetaData packageMetaData) throws IfcModelBinaryException {
+	protected void writeEmbeddedValue(int pid, int rid, Object value, ByteBuffer buffer, PackageMetaData packageMetaData) throws IfcModelDbException {
 		IdEObject wrappedValue = (IdEObject) value;
 
 		Short cid = ifcDataBase.getCidOfEClass(wrappedValue.eClass());
@@ -605,7 +609,7 @@ public class IfcModelBinary {
 		}
 	}
 	
-	private void writeList(IdEObject object, ByteBuffer buffer, PackageMetaData packageMetaData, EStructuralFeature feature) throws IfcModelBinaryException {
+	protected void writeList(IdEObject object, ByteBuffer buffer, PackageMetaData packageMetaData, EStructuralFeature feature) throws IfcModelDbException {
 		if (feature.getEType() instanceof EEnum) {
 			// Aggregate relations to enums never occur... at this
 			// moment
@@ -638,7 +642,7 @@ public class IfcModelBinary {
 		}
 	}
 	
-	private void writePrimitiveValue(EStructuralFeature feature, Object value, ByteBuffer buffer) throws IfcModelBinaryException {
+	protected void writePrimitiveValue(EStructuralFeature feature, Object value, ByteBuffer buffer) throws IfcModelDbException {
 		EClassifier type = feature.getEType();
 		if (type == EcorePackage.eINSTANCE.getEString()) {
 			if (value == null) {
@@ -647,7 +651,7 @@ public class IfcModelBinary {
 				String stringValue = (String) value;
 				byte[] bytes = stringValue.getBytes(Charsets.UTF_8);
 				if (bytes.length > Integer.MAX_VALUE) {
-					throw new IfcModelBinaryException("String value too long (max length is " + Integer.MAX_VALUE + ")");
+					throw new IfcModelDbException("String value too long (max length is " + Integer.MAX_VALUE + ")");
 				}
 				buffer.putInt(bytes.length);
 				buffer.put(bytes);
@@ -707,17 +711,17 @@ public class IfcModelBinary {
 		}
 	}
 	
-	private void writeReference(IdEObject object, Object value, ByteBuffer buffer, EStructuralFeature feature) throws IfcModelBinaryException {
+	protected void writeReference(IdEObject object, Object value, ByteBuffer buffer, EStructuralFeature feature) throws IfcModelDbException {
 		IdEObject idEObject = (IdEObject) value;
 		if (idEObject.getOid() < 0) {
-			throw new IfcModelBinaryException("Writing a reference with oid " + idEObject.getOid() + ", this is not supposed to happen, referenced: " + idEObject.getOid() + " " + value + " from " + object.getOid() + " " + object);
+			throw new IfcModelDbException("Writing a reference with oid " + idEObject.getOid() + ", this is not supposed to happen, referenced: " + idEObject.getOid() + " " + value + " from " + object.getOid() + " " + object);
 		}
 		buffer.order(ByteOrder.LITTLE_ENDIAN);
 		buffer.putLong(idEObject.getOid());
 		buffer.order(ByteOrder.BIG_ENDIAN);
 	}
 	
-	private void writeWrappedValue(int pid, int rid, Object value, ByteBuffer buffer, PackageMetaData packageMetaData) throws IfcModelBinaryException {
+	protected void writeWrappedValue(int pid, int rid, Object value, ByteBuffer buffer, PackageMetaData packageMetaData) throws IfcModelDbException {
 		IdEObject wrappedValue = (IdEObject) value;
 		EStructuralFeature eStructuralFeature = wrappedValue.eClass().getEStructuralFeature("wrappedValue");
 		Short cid = ifcDataBase.getCidOfEClass(wrappedValue.eClass());
@@ -746,7 +750,7 @@ public class IfcModelBinary {
 		}
 	}
 	
-	private int getExactSize(IdEObject idEObject, PackageMetaData packageMetaData, boolean useUnsetBits) {
+	protected int getExactSize(IdEObject idEObject, PackageMetaData packageMetaData, boolean useUnsetBits) {
 		int size = 0;
 		int bits = 0;
 		
@@ -787,7 +791,7 @@ public class IfcModelBinary {
 		return size;
 	}
 	
-	private boolean useUnsetBit(EStructuralFeature feature, IdEObject object) {
+	protected boolean useUnsetBit(EStructuralFeature feature, IdEObject object) {
 		// TODO non-unsettable boolean values can also be stored in these bits
 		Object value = object.eGet(feature);
 		if (feature.isUnsettable()) {
@@ -808,7 +812,7 @@ public class IfcModelBinary {
 		return false;
 	}
 	
-	private int getPrimitiveSize(EDataType eDataType, Object val) {
+	protected int getPrimitiveSize(EDataType eDataType, Object val) {
 		if (eDataType == EcorePackage.eINSTANCE.getEInt() || eDataType == EcorePackage.eINSTANCE.getEIntegerObject()) {
 			return 4;
 		} else if (eDataType == EcorePackage.eINSTANCE.getEFloat() || eDataType == EcorePackage.eINSTANCE.getEFloatObject()) {
@@ -837,7 +841,7 @@ public class IfcModelBinary {
 		throw new RuntimeException("Unimplemented: " + eDataType);
 	}
 	
-	private int getWrappedValueSize(Object val, EReference eReference, PackageMetaData packageMetaData) {
+	protected int getWrappedValueSize(Object val, EReference eReference, PackageMetaData packageMetaData) {
 		if (val == null) {
 			return 2;
 		}
@@ -878,21 +882,25 @@ public class IfcModelBinary {
 		}
 	}
 	
-	private IdEObjectImpl createInternal(EClass eClass, QueryInterface queryInterface) {
+	protected IdEObjectImpl createInternal(EClass eClass, QueryInterface queryInterface) {
 		IdEObjectImpl object = (IdEObjectImpl) eClass.getEPackage().getEFactoryInstance().create(eClass);
 		object.setQueryInterface(queryInterface);
 		return object;
 	}
 	
+	public EClass getEClassForOid(long oid) throws IfcModelDbException {
+		return ifcDataBase.getEClassForOid(oid);
+	}
+	
 	@SuppressWarnings("unused")
-	private ByteBuffer fillKeyBuffer(ByteBuffer buffer, IdEObject object) {
+	protected ByteBuffer fillKeyBuffer(ByteBuffer buffer, IdEObject object) {
 		if (object.getRid() > 100000 || object.getRid() < -100000) {
 			LOGGER.debug("Improbable rid: " + object.getRid() + " - " + object);
 		}
 		return fillKeyBuffer(buffer, object.getPid(), object.getOid(), object.getRid());
 	}
 
-	private ByteBuffer fillKeyBuffer(ByteBuffer buffer, int pid, long oid, int rid) {
+	protected ByteBuffer fillKeyBuffer(ByteBuffer buffer, int pid, long oid, int rid) {
 		buffer.position(0);
 		buffer.putInt(pid);
 		buffer.putLong(oid);
@@ -900,19 +908,19 @@ public class IfcModelBinary {
 		return buffer;
 	}
 
-	private ByteBuffer createKeyBuffer(int pid, long oid, int rid) {
+	protected ByteBuffer createKeyBuffer(int pid, long oid, int rid) {
 		ByteBuffer keyBuffer = ByteBuffer.allocate(16);
 		fillKeyBuffer(keyBuffer, pid, oid, rid);
 		return keyBuffer;
 	}
 
-	private ByteBuffer createKeyBuffer(int pid, long oid) {
+	protected ByteBuffer createKeyBuffer(int pid, long oid) {
 		ByteBuffer keyBuffer = ByteBuffer.allocate(12);
 		fillKeyBuffer(keyBuffer, pid, oid);
 		return keyBuffer;
 	}
 
-	private ByteBuffer fillKeyBuffer(ByteBuffer buffer, int pid, long oid) {
+	protected ByteBuffer fillKeyBuffer(ByteBuffer buffer, int pid, long oid) {
 		buffer.position(0);
 		buffer.putInt(pid);
 		buffer.putLong(oid);

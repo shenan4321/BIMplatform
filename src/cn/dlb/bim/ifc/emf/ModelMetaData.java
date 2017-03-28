@@ -19,7 +19,7 @@ package cn.dlb.bim.ifc.emf;
 
 import java.util.Date;
 
-import cn.dlb.bim.models.store.IfcHeader;
+import cn.dlb.bim.ifc.model.IfcHeader;
 
 public class ModelMetaData {
 	private String authorizedUser;

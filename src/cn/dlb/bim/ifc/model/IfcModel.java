@@ -854,7 +854,17 @@ public abstract class IfcModel implements IfcModelInterface {
 	public ModelMetaData getModelMetaData() {
 		return modelMetaData;
 	}
-
+	
+	@Override
+	public void setModelMetaDataValue(ModelMetaData modelMetaData) {
+		this.modelMetaData.setAuthorizedUser(modelMetaData.getAuthorizedUser());
+		this.modelMetaData.setChecksum(modelMetaData.getChecksum());
+		this.modelMetaData.setDate(modelMetaData.getDate());
+		this.modelMetaData.setIfcHeader(modelMetaData.getIfcHeader());
+		this.modelMetaData.setName(modelMetaData.getName());
+		this.modelMetaData.setRevisionId(modelMetaData.getRevisionId());
+	}
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends IdEObject> T create(EClass eClass) throws IfcModelInterfaceException {

@@ -50,18 +50,12 @@ import cn.dlb.bim.ifc.emf.IdEObjectImpl;
 import cn.dlb.bim.ifc.emf.IfcModelInterface;
 import cn.dlb.bim.ifc.emf.IfcModelInterfaceException;
 import cn.dlb.bim.ifc.emf.MetaDataException;
-import cn.dlb.bim.ifc.emf.MetaDataManager;
-import cn.dlb.bim.ifc.emf.PackageMetaData;
 import cn.dlb.bim.ifc.emf.Schema;
 import cn.dlb.bim.ifc.model.BasicIfcModel;
-import cn.dlb.bim.ifc.serializers.Ifc2x3tc1StepSerializer;
-import cn.dlb.bim.ifc.serializers.IfcStepSerializer;
-import cn.dlb.bim.ifc.serializers.ProgressReporter;
-import cn.dlb.bim.ifc.serializers.SerializerException;
+import cn.dlb.bim.ifc.model.IfcHeader;
 import cn.dlb.bim.ifc.shared.ListWaitingObject;
 import cn.dlb.bim.ifc.shared.SingleWaitingObject;
 import cn.dlb.bim.ifc.shared.WaitingList;
-import cn.dlb.bim.models.store.IfcHeader;
 import cn.dlb.bim.models.store.StoreFactory;
 import cn.dlb.bim.utils.FakeClosingInputStream;
 import cn.dlb.bim.utils.StringUtils;
@@ -238,6 +232,10 @@ public abstract class IfcStepDeserializer extends EmfDeserializer {
 			}
 			break;
 		case DONE:
+			int revisionId = model.getModelMetaData().getRevisionId();
+			if (revisionId <= 0) {
+				model.getModelMetaData().setRevisionId(revisionId);
+			}
 		}
 		return true;
 	}
@@ -246,7 +244,7 @@ public abstract class IfcStepDeserializer extends EmfDeserializer {
 		try {
 			IfcHeader ifcHeader = model.getModelMetaData().getIfcHeader();
 			if (ifcHeader == null) {
-				ifcHeader = StoreFactory.eINSTANCE.createIfcHeader();
+				ifcHeader = new IfcHeader();
 				model.getModelMetaData().setIfcHeader(ifcHeader);
 			}
 			

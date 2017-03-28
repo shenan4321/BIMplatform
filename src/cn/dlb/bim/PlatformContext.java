@@ -33,7 +33,7 @@ public class PlatformContext {
 		classRootPath = new File(classRootPathStr).toPath();
 		userPath = new File(System.getProperty("user.dir")).toPath();
 		resourceBase = userPath.resolve("WebContent/").toString();
-		descriptor = userPath.resolve("WEB-INF/web.xml").toString();
+		descriptor = userPath.resolve("WebContent/WEB-INF/web.xml").toString();
 		tempPath = new File(tempPathStr).toPath();
 	}
 	
@@ -72,5 +72,5 @@ public class PlatformContext {
 	public static int getServerPort() {
 		return serverPort;
 	}
-	
+
 }

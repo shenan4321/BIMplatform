@@ -55,6 +55,16 @@
 	<listener>
 		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
 	</listener>
+	<servlet> 
+        <servlet-name>default</servlet-name> 
+        <!-- <servlet-class>org.mortbay.jetty.servlet.DefaultServlet</servlet-class> --> 
+        <servlet-class>org.eclipse.jetty.servlet.DefaultServlet</servlet-class> 
+        <init-param> 
+            <param-name>useFileMappedBuffer</param-name> 
+            <param-value>false</param-value> 
+        </init-param> 
+        <load-on-startup>0</load-on-startup> 
+    </servlet> 
 	<servlet>
 		<servlet-name>spring</servlet-name>
 		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>

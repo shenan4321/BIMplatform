@@ -33,19 +33,19 @@ import cn.dlb.bim.vo.GeometryInfoVo;
 
 @Service("BimService")
 public class BimServiceImpl implements IBimService {
-	
+
 	@Autowired
 	@Qualifier("PlatformServer")
 	private PlatformServer server;
-	
+
 	@Autowired
 	@Qualifier("PlatformInitDatas")
 	private PlatformInitDatas platformInitDatas;
-	
+
 	@Autowired
 	@Qualifier("IfcModelDaoImpl")
 	private IfcModelDao ifcModelDao;
-	
+
 	@Override
 	public List<GeometryInfoVo> queryDbGeometryInfo(Integer rid) {
 		PackageMetaData packageMetaData = server.getMetaDataManager()
@@ -59,82 +59,85 @@ public class BimServiceImpl implements IBimService {
 		} catch (IfcModelInterfaceException e) {
 			e.printStackTrace();
 		}
-		
+
 		List<GeometryInfoVo> geometryList = new ArrayList<>();
-		
+
 		for (IfcProduct ifcProduct : model.getAllWithSubTypes(IfcProduct.class)) {
-			if (ifcProduct.getRepresentation() != null && ifcProduct.getRepresentation().getRepresentations().size() != 0) {
-				
+			if (ifcProduct.getRepresentation() != null
+					&& ifcProduct.getRepresentation().getRepresentations().size() != 0) {
+
 				GeometryInfoVo adaptor = new GeometryInfoVo();
 				adaptor.adapt(ifcProduct);
 				geometryList.add(adaptor);
 			}
 		}
-		
+
 		return geometryList;
 	}
-	
+
 	@Override
 	public List<IfcModelInterface> queryAllIfcModel() {
 
 		Schema schema = Schema.IFC2X3TC1;
 		File[] ifcFiles = getIfcFileList();
-		
+
 		List<IfcModelInterface> modelList = new ArrayList<>();
-		
+
 		for (File file : ifcFiles) {
-			
+
 			IfcStepDeserializer deserializer = server.getSerializationManager().createIfcStepDeserializer(schema);
 			IfcStepSerializer serializer = server.getSerializationManager().createIfcStepSerializer(schema);
-			
+
 			try {
 				deserializer.read(file);
 				IfcModelInterface model = deserializer.getModel();
-				
-				IRenderEngine renderEngine = server.getRenderEngineFactory().createRenderEngine(schema.getEPackageName());
-				
+
+				IRenderEngine renderEngine = server.getRenderEngineFactory()
+						.createRenderEngine(schema.getEPackageName());
+
 				GeometryGenerator generator = new GeometryGenerator(model, serializer, renderEngine);
 				generator.generateForAllElements();
-				
+
 				modelList.add(model);
 			} catch (DeserializeException e) {
 				e.printStackTrace();
 			} catch (RenderEngineException e) {
 				e.printStackTrace();
 			}
-			
+
 		}
 		return modelList;
 	}
-	
+
 	@Override
 	public List<GeometryInfoVo> queryGeometryInfo() {
-		
+
 		Schema schema = Schema.IFC2X3TC1;
 		File[] ifcFiles = getIfcFileList();
-		
+
 		List<GeometryInfoVo> geometryList = new ArrayList<>();
-		
+
 		if (ifcFiles == null) {
 			return geometryList;
 		}
-		
+
 		IfcStepDeserializer deserializer = server.getSerializationManager().createIfcStepDeserializer(schema);
 		IfcStepSerializer serializer = server.getSerializationManager().createIfcStepSerializer(schema);
-		
+
 		try {
 			deserializer.read(ifcFiles[0]);
 			IfcModelInterface model = deserializer.getModel();
-			
+
 			IRenderEngine renderEngine = server.getRenderEngineFactory().createRenderEngine(schema.getEPackageName());
-			
+
 			GeometryGenerator generator = new GeometryGenerator(model, serializer, renderEngine);
 			generator.generateForAllElements();
-		
+
 			for (IfcProduct ifcProduct : model.getAllWithSubTypes(IfcProduct.class)) {
-				if (ifcProduct.getRepresentation() != null && ifcProduct.getRepresentation().getRepresentations().size() != 0) {
-					
-//					GeometryInfo info = ifcProduct.getGeometry();
+				if (ifcProduct.getRepresentation() != null
+						&& ifcProduct.getRepresentation().getRepresentations().size() != 0) {
+
+					// GeometryInfo info = ifcProduct.getGeometry();
 					GeometryInfoVo adaptor = new GeometryInfoVo();
 					adaptor.adapt(ifcProduct);
 					geometryList.add(adaptor);
@@ -145,16 +148,48 @@ public class BimServiceImpl implements IBimService {
 		} catch (RenderEngineException e) {
 			e.printStackTrace();
 		}
-		
+
 		return geometryList;
 	}
 
 	public File[] getIfcFileList() {
-		File dir = PlatformContext.getClassRootPath().resolve("file/").toAbsolutePath().toFile(); 
+		File dir = PlatformContext.getClassRootPath().resolve("file/").toAbsolutePath().toFile();
 		if (dir.isDirectory()) {
 			return dir.listFiles();
-		} 
+		}
 		return null;
 	}
-	
+
+	@Override
+	public int deserializeModelFileAndSave(File modelFile) {
+
+		Schema schema = Schema.IFC2X3TC1;
+
+		IfcStepDeserializer deserializer = server.getSerializationManager().createIfcStepDeserializer(schema);
+		IfcStepSerializer serializer = server.getSerializationManager().createIfcStepSerializer(schema);
+		int rid = -1;
+		try {
+			deserializer.read(modelFile);
+			IfcModelInterface model = deserializer.getModel();
+
+			IRenderEngine renderEngine = server.getRenderEngineFactory().createRenderEngine(schema.getEPackageName());
+
+			GeometryGenerator generator = new GeometryGenerator(model, serializer, renderEngine);
+			generator.generateForAllElements();
+			
+			model.fixOids(platformInitDatas);
+			IfcModelDbSession session = new IfcModelDbSession(ifcModelDao, server.getMetaDataManager(), platformInitDatas);
+			session.saveIfcModel(model);
+			rid = model.getModelMetaData().getRevisionId();
+		} catch (DeserializeException e) {
+			e.printStackTrace();
+		} catch (RenderEngineException e) {
+			e.printStackTrace();
+		} catch (IfcModelDbException e) {
+			e.printStackTrace();
+		}
+
+		return rid;
+	}
+
 }

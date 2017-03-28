@@ -9,11 +9,11 @@ public class PlatformServerStarter {
         try {  
             Server jettyServer = new Server(PlatformContext.getServerPort());  
             WebAppContext context = new WebAppContext();  
-            context.setContextPath(PlatformContext.getContextPath());  
-            context.setDescriptor(PlatformContext.getDescriptor()); // 指定web.xml配置文件  
+            context.setContextPath(PlatformContext.getContextPath());
+            context.setDescriptor(PlatformContext.getDescriptor()); // 指定web.xml配置文件 
             context.setResourceBase(PlatformContext.getResourceBase());// 指定webapp目录  
             context.setParentLoaderPriority(true);  
-  
+            
             jettyServer.setHandler(context);  
             jettyServer.start();  
             jettyServer.join();  

@@ -8,9 +8,10 @@
       http://www.springframework.org/schema/context/spring-context.xsd
       http://www.springframework.org/schema/data/mongo
       http://www.springframework.org/schema/data/mongo/spring-mongo-1.7.xsd">
-      
-    <!-- 支持上传文件 -->  
-    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"/>  
+
+	<!-- 支持上传文件 -->
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver" />
 
 	<!-- 引入jdbc配置文件 -->
 	<context:property-placeholder location="classpath:conf/jdbc.properties" />
@@ -20,7 +21,7 @@
 
 	<!-- 扫描文件（自动将component注入） -->
 	<context:component-scan base-package="cn.dlb.bim.component" />
-	
+
 	<!-- 扫描文件（自动将service层注入） -->
 	<context:component-scan base-package="cn.dlb.bim.dao.impl" />
 
@@ -38,8 +39,13 @@
 		<property name="writeResultChecking" value="EXCEPTION" />
 	</bean>
 
+	<bean id="gridFsTemplate" class="org.springframework.data.mongodb.gridfs.GridFsTemplate">
+		<constructor-arg ref="mongoDbFactory" />
+		<constructor-arg ref="mongoConverter" />
+	</bean>
+
 	<!-- 映射转换器，扫描back-package目录下的文件，根据注释，把它们作为mongodb的一个collection的映射 -->
-	<mongo:mapping-converter base-package="cn.dlb.bim.dao.entity" />
+	<mongo:mapping-converter id="mongoConverter" base-package="cn.dlb.bim.dao.entity" />
 
 	<!-- mongodb bean的仓库目录，会自动扫描扩展了MongoRepository接口的接口进行注入 -->
 	<mongo:repositories base-package="cn.dlb.bim.dao.impl" />

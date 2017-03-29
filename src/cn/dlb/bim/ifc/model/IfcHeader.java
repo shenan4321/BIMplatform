@@ -1,11 +1,17 @@
 package cn.dlb.bim.ifc.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class IfcHeader {
+public class IfcHeader implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2048900581931937675L;
+	
 	private List<String> description;
 	private String implementationLevel;
 	private String filename;

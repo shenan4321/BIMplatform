@@ -67,7 +67,8 @@ public class IfcModelBinary {
 				((IdEObjectImpl) idEObject).setPid(query.getPid());
 			} 
 			
-			if (idEObject.eClass().getEAnnotation("wrapped") == null) {
+			if (idEObject.eClass().getEAnnotation("wrapped") == null 
+					&& idEObject.eClass().getEAnnotation("hidden") == null) {
 				try {
 					model.addAllowMultiModel(oid, idEObject);
 				} catch (IfcModelInterfaceException e) {
@@ -296,7 +297,6 @@ public class IfcModelBinary {
 		}
 		objectCache.put(oid, newObject);
 		if (query.isDeep() && object.eClass().getEAnnotation("wrapped") == null) {
-			//TODO do it lazyload
 //			if (feature.getEAnnotation("nolazyload") == null) {
 				todoList.put(oid, newObject);
 //			}

@@ -73,6 +73,7 @@ public class RootController {
 	}
 
 	@RequestMapping(value = "uploadAndDeserializeSave", method = RequestMethod.POST)
+	@ResponseBody
 	public Map<String, Object> upload(@RequestParam(value = "file", required = false) MultipartFile file,
 			HttpServletRequest request// , ModelMap model
 	) {

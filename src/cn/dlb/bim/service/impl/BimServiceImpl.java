@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import cn.dlb.bim.PlatformContext;
+import cn.dlb.bim.component.MongoGridFs;
 import cn.dlb.bim.component.PlatformInitDatas;
 import cn.dlb.bim.component.PlatformServer;
 import cn.dlb.bim.dao.IfcModelDao;
@@ -43,14 +44,14 @@ public class BimServiceImpl implements IBimService {
 	private PlatformInitDatas platformInitDatas;
 
 	@Autowired
-	@Qualifier("IfcModelDaoImpl")
-	private IfcModelDao ifcModelDao;
+	@Qualifier("MongoGridFs")
+	private MongoGridFs mongoGridFs;
 
 	@Override
 	public List<GeometryInfoVo> queryDbGeometryInfo(Integer rid) {
 		PackageMetaData packageMetaData = server.getMetaDataManager()
 				.getPackageMetaData(Schema.IFC2X3TC1.getEPackageName());
-		IfcModelDbSession session = new IfcModelDbSession(ifcModelDao, server.getMetaDataManager(), platformInitDatas);
+		IfcModelDbSession session = new IfcModelDbSession(mongoGridFs, server.getMetaDataManager(), platformInitDatas);
 		BasicIfcModel model = new BasicIfcModel(packageMetaData);
 		try {
 			session.get(rid, model, new OldQuery(packageMetaData, true));
@@ -178,7 +179,7 @@ public class BimServiceImpl implements IBimService {
 			generator.generateForAllElements();
 			
 			model.fixOids(platformInitDatas);
-			IfcModelDbSession session = new IfcModelDbSession(ifcModelDao, server.getMetaDataManager(), platformInitDatas);
+			IfcModelDbSession session = new IfcModelDbSession(mongoGridFs, server.getMetaDataManager(), platformInitDatas);
 			session.saveIfcModel(model);
 			rid = model.getModelMetaData().getRevisionId();
 		} catch (DeserializeException e) {

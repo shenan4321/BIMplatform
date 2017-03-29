@@ -16,6 +16,7 @@ import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import cn.dlb.bim.component.MongoGridFs;
 import cn.dlb.bim.component.PlatformInitDatas;
 import cn.dlb.bim.component.PlatformServer;
 import cn.dlb.bim.dao.IfcModelDao;
@@ -45,7 +46,7 @@ public class TestBimService {
 	private BimServiceImpl bimService;
 	private PlatformServer server;
 	private PlatformInitDatas datas;
-	private IfcModelDao idEObjectDao;
+	private MongoGridFs mongoGridFs;
 
 	@Before
 	public void before() {
@@ -54,7 +55,7 @@ public class TestBimService {
 		bimService = (BimServiceImpl) context.getBean("BimService");
 		server = (PlatformServer) context.getBean("PlatformServer");
 		datas = (PlatformInitDatas) context.getBean("PlatformInitDatas");
-		idEObjectDao = (IfcModelDao) context.getBean("IfcModelDaoImpl");
+		mongoGridFs = (MongoGridFs) context.getBean("MongoGridFs");
 	}
 
 	@Test
@@ -128,7 +129,7 @@ public class TestBimService {
 		if (modelList.size() > 0) {
 			IfcModelInterface model = modelList.get(0);
 			model.fixOids(datas);
-			IfcModelDbSession session = new IfcModelDbSession(idEObjectDao, server.getMetaDataManager(), datas);
+			IfcModelDbSession session = new IfcModelDbSession(mongoGridFs, server.getMetaDataManager(), datas);
 			session.saveIfcModel(model);
 			System.out.println();
 		}
@@ -138,9 +139,9 @@ public class TestBimService {
 	public void testIfcModelDbSessionGet() throws IfcModelDbException, IfcModelInterfaceException, FileNotFoundException, SerializerException {
 		PackageMetaData packageMetaData = server.getMetaDataManager()
 				.getPackageMetaData(Schema.IFC2X3TC1.getEPackageName());
-		IfcModelDbSession session = new IfcModelDbSession(idEObjectDao, server.getMetaDataManager(), datas);
+		IfcModelDbSession session = new IfcModelDbSession(mongoGridFs, server.getMetaDataManager(), datas);
 		BasicIfcModel newModel = new BasicIfcModel(packageMetaData);
-		session.get(1, newModel, new OldQuery(packageMetaData, true));
+		session.get(3, newModel, new OldQuery(packageMetaData, true));
 		IfcStepSerializer serializer = server.getSerializationManager().createIfcStepSerializer(Schema.IFC2X3TC1);
 		serializer.init(newModel, null, true);
 		FileOutputStream fos = new FileOutputStream(new File("D:\\test.ifc"));
@@ -148,12 +149,6 @@ public class TestBimService {
 		System.out.println();
 	}
 	
-	@Test
-	public void testIdEObjectDao() throws IfcModelDbException, IfcModelInterfaceException {
-		idEObjectDao.queryIdEObjectEntityByOid(65593l);
-		System.out.println();
-	}
-
 	@Test
 	public void testSplite() {
 		List<IfcModelInterface> modelList = bimService.queryAllIfcModel();

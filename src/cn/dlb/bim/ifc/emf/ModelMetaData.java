@@ -1,5 +1,7 @@
 package cn.dlb.bim.ifc.emf;
 
+import java.io.Serializable;
+
 /******************************************************************************
  * Copyright (C) 2009-2016  BIMserver.org
  * 
@@ -21,7 +23,13 @@ import java.util.Date;
 
 import cn.dlb.bim.ifc.model.IfcHeader;
 
-public class ModelMetaData {
+public class ModelMetaData implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7626276093829345601L;
+	
 	private String authorizedUser;
 	private String name;
 	private byte[] checksum;

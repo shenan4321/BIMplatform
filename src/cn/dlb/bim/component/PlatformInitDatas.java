@@ -1,6 +1,7 @@
 package cn.dlb.bim.component;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +40,8 @@ public class PlatformInitDatas implements InitializingBean, IfcDataBase {
 	private final Map<EClass, AtomicLong> oidCounters;
 	private AtomicInteger revisionIdCounter;
 	
+	private final Map<EClass, Boolean> oidChanged;//recording witch eclass oidcounter changed
+	
 	@Autowired
 	@Qualifier("PlatformInitDatasDaoImpl")
 	private PlatformInitDatasDao platformInitDatasDao;
@@ -57,6 +60,7 @@ public class PlatformInitDatas implements InitializingBean, IfcDataBase {
 		this.cidToEclass = new EClass[Short.MAX_VALUE]; 
 		this.eClassToCid = new HashMap<EClass, Short>();
 		this.revisionIdCounter = new AtomicInteger(0);
+		this.oidChanged = new HashMap<EClass, Boolean>();
 	}
 	
 	private void initCounter(EClass eClass) {
@@ -137,6 +141,7 @@ public class PlatformInitDatas implements InitializingBean, IfcDataBase {
 
 	@Override
 	public long newOid(EClass eClass) {
+		oidChanged.put(eClass, true);
 		return oidCounters.get(eClass).addAndGet(65536);
 	}
 	
@@ -178,7 +183,7 @@ public class PlatformInitDatas implements InitializingBean, IfcDataBase {
 		platformInitDatasEntity.setRevisionId(revisionIdCounter.get());
 		platformInitDatasDao.updatePlatformInitDatasEntity(platformInitDatasEntity);
 		
-		for (EClass eclass : eClassToCid.keySet()) {
+		for (EClass eclass : oidChanged.keySet()) {
 			IfcClassLookupEntity ifcClassLookup = new IfcClassLookupEntity();
 			Short cid = eClassToCid.get(eclass);
 			AtomicLong oid = oidCounters.get(eclass);
@@ -186,7 +191,7 @@ public class PlatformInitDatas implements InitializingBean, IfcDataBase {
 			ifcClassLookup.setOid(oid.get());
 			platformInitDatasDao.updateOidInIfcClassLookup(ifcClassLookup);
 		}
-		
+		oidChanged.clear();
 	}
 
 }

@@ -8,6 +8,7 @@ import java.nio.file.Path;
 
 import cn.dlb.bim.ifc.emf.IfcModelInterface;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
+import cn.dlb.bim.ifc.shared.ByteProgressReporter;
 
 public abstract class EmfDeserializer implements Deserializer {
 

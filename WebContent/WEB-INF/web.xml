@@ -77,6 +77,8 @@
 	<servlet-mapping>
 		<servlet-name>spring</servlet-name>
 		<url-pattern>*.do</url-pattern>
+		<url-pattern>ws/*</url-pattern>
+		<url-pattern>ws/geometry/*</url-pattern>
 	</servlet-mapping>
 	<welcome-file-list>
 		<welcome-file>index.html</welcome-file>

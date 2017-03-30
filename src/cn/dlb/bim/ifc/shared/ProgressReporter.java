@@ -1,4 +1,4 @@
-package cn.dlb.bim.ifc.serializers;
+package cn.dlb.bim.ifc.shared;
 
 /******************************************************************************
  * Copyright (C) 2009-2015  BIMserver.org

@@ -53,6 +53,7 @@ import cn.dlb.bim.ifc.emf.MetaDataException;
 import cn.dlb.bim.ifc.emf.Schema;
 import cn.dlb.bim.ifc.model.BasicIfcModel;
 import cn.dlb.bim.ifc.model.IfcHeader;
+import cn.dlb.bim.ifc.shared.ByteProgressReporter;
 import cn.dlb.bim.ifc.shared.ListWaitingObject;
 import cn.dlb.bim.ifc.shared.SingleWaitingObject;
 import cn.dlb.bim.ifc.shared.WaitingList;

@@ -33,6 +33,7 @@ import cn.dlb.bim.ifc.emf.IdEObject;
 import cn.dlb.bim.ifc.emf.IdEObjectImpl;
 import cn.dlb.bim.ifc.emf.IfcModelInterface;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
+import cn.dlb.bim.ifc.shared.ProgressReporter;
 
 public abstract class EmfSerializer implements Serializer, StreamingReader {
 

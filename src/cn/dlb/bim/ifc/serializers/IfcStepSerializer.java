@@ -23,6 +23,7 @@ import com.google.common.base.Charsets;
 import cn.dlb.bim.ifc.deserializers.IfcParserWriterUtils;
 import cn.dlb.bim.ifc.emf.IdEObject;
 import cn.dlb.bim.ifc.model.IfcHeader;
+import cn.dlb.bim.ifc.shared.ProgressReporter;
 import cn.dlb.bim.utils.StringUtils;
 import nl.tue.buildingsmart.schema.EntityDefinition;
 

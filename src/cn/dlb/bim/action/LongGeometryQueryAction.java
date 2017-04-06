@@ -30,6 +30,7 @@ public class LongGeometryQueryAction extends LongAction {
 	private final PlatformServer server;
 	private final Integer rid;
 	private final String schemaName;
+	private int lastPercentProcess = 0;
 
 	public LongGeometryQueryAction(PlatformServer server, Integer rid, String schemaName,
 			WebSocketSession webSocketSession) {
@@ -112,13 +113,17 @@ public class LongGeometryQueryAction extends LongAction {
 		if (webSocketSession == null || !webSocketSession.isOpen()) {
 			return;
 		}
-		Gson gson = new Gson();
-		String jsonStr = gson.toJson(msg);
-		TextMessage message = new TextMessage(jsonStr);
-		try {
-			webSocketSession.sendMessage(message);
-		} catch (Exception e) {
-			e.printStackTrace();
+		int curPercent = (int) Math.floor(msg.getProgress() / msg.getProgress());
+		if (lastPercentProcess != curPercent) {
+			lastPercentProcess = curPercent;
+			Gson gson = new Gson();
+			String jsonStr = gson.toJson(msg);
+			TextMessage message = new TextMessage(jsonStr);
+			try {
+				webSocketSession.sendMessage(message);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 	}
 

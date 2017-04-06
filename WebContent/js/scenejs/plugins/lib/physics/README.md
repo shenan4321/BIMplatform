@@ -1,1 +1,0 @@
-Support libraries for SceneJS physics node type plugins

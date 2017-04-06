@@ -27,8 +27,7 @@
 			websocket = new MozWebSocket("ws://echo");
 		} else {
 			//alert("SockJS");
-			websocket = new SockJS(
-					"http://localhost:8080/BIMplatform/sockjs/websocket");
+			websocket = new SockJS("http://localhost:8080/BIMplatform/sockjs/websocket");
 		}
 		websocket.onopen = function(evnt) {
 			$("#tou").html("链接服务器成功!")

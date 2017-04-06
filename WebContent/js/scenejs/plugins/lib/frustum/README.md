@@ -1,1 +1,0 @@
-Support libraries for SceneJS frustum culling node type plugins

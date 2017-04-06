@@ -24,7 +24,7 @@
 
 	<!-- 扫描文件（自动将service层注入） -->
 	<context:component-scan base-package="cn.dlb.bim.dao.impl" />
-	
+
 	<!-- spring连接mongodb数据库的配置 -->
 	<mongo:mongo-client host="${mongo.host}" port="${mongo.port}"
 		credentials="${mongo.username}:${mongo.password}@${mongo.dbname}" id="mongo">
@@ -45,11 +45,19 @@
 	</bean>
 
 	<!-- 映射转换器，扫描back-package目录下的文件，根据注释，把它们作为mongodb的一个collection的映射 -->
-	<mongo:mapping-converter id="mongoConverter" base-package="cn.dlb.bim.dao.entity" />
+	<mongo:mapping-converter id="mongoConverter"
+		base-package="cn.dlb.bim.dao.entity" />
 
 	<!-- mongodb bean的仓库目录，会自动扫描扩展了MongoRepository接口的接口进行注入 -->
 	<mongo:repositories base-package="cn.dlb.bim.dao.impl" />
 
 	<context:annotation-config />
+
+	<bean id="taskExecutor"
+		class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<property name="corePoolSize" value="10" />
+		<property name="maxPoolSize" value="20" />
+		<property name="WaitForTasksToCompleteOnShutdown" value="true" />
+	</bean>
 
 </beans>

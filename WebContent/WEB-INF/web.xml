@@ -64,6 +64,7 @@
             <param-value>false</param-value> 
         </init-param> 
         <load-on-startup>0</load-on-startup> 
+        <async-supported>true</async-supported>
     </servlet> 
 	<servlet>
 		<servlet-name>spring</servlet-name>
@@ -73,6 +74,7 @@
 			<param-value>classpath:conf/spring-mvc.xml</param-value>
 		</init-param>
 		<load-on-startup>2</load-on-startup>
+		<async-supported>true</async-supported>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>spring</servlet-name>

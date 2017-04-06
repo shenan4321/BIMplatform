@@ -10,6 +10,7 @@ import java.io.ObjectOutputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.eclipse.emf.ecore.EClass;
 import org.slf4j.Logger;
@@ -31,6 +32,8 @@ import cn.dlb.bim.ifc.emf.IfcModelInterface;
 import cn.dlb.bim.ifc.emf.IfcModelInterfaceException;
 import cn.dlb.bim.ifc.emf.MetaDataManager;
 import cn.dlb.bim.ifc.emf.QueryInterface;
+import cn.dlb.bim.ifc.emf.Schema;
+import cn.dlb.bim.ifc.shared.ProgressReporter;
 import cn.dlb.bim.models.geometry.GeometryData;
 import cn.dlb.bim.models.geometry.GeometryInfo;
 import cn.dlb.bim.models.ifc2x3tc1.IfcProduct;
@@ -39,9 +42,16 @@ public class IfcModelDbSession extends IfcModelBinary {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(IfcModelDbSession.class);
 
-//	private IfcModelDao ifcModelDao;
-	private MongoGridFs mongoGridFs;
-	private MetaDataManager metaDataManager;
+	private final MongoGridFs mongoGridFs;
+	private final MetaDataManager metaDataManager;
+	private ProgressReporter progressReporter;
+	
+	public IfcModelDbSession(MongoGridFs mongoGridFs, MetaDataManager metaDataManager, IfcDataBase ifcDataBase, ProgressReporter progressReporter) {
+		super(ifcDataBase);
+		this.mongoGridFs = mongoGridFs;
+		this.metaDataManager = metaDataManager;
+		this.progressReporter = progressReporter;
+	}
 
 	public IfcModelDbSession(MongoGridFs mongoGridFs, MetaDataManager metaDataManager, IfcDataBase ifcDataBase) {
 		super(ifcDataBase);
@@ -86,8 +96,6 @@ public class IfcModelDbSession extends IfcModelBinary {
 			e.printStackTrace();
 		}
 		
-//		ifcModelDao.insertIfcModelEntity(ifcModelEntity);
-		
 	}
 
 	public void addObjectsToModelEntity(IdEObject idEObject, IfcModelEntity ifcModelEntity, boolean unidentified) throws IfcModelDbException {
@@ -108,34 +116,17 @@ public class IfcModelDbSession extends IfcModelBinary {
 		
 	}
 	
-//	public void commit() throws IfcModelDbException, ServiceException, IfcModelDbException {
-//		// This buffer is reused for the values, it's position must be reset at
-//		// the end of the loop, and the convertObjectToByteArray function is
-//		// responsible for setting the buffer's position to the end of the (used
-//		// part of the) buffer
-//		
-//		for (IdEObject object : objectsToSave) {
-//			if (object.getOid() == -1) {
-//				throw new IfcModelDbException("Cannot store object with oid -1");
-//			}
-//			ByteBuffer valueBuffer = ByteBuffer.allocate(16);
-//			valueBuffer = convertObjectToByteArray(object, valueBuffer,
-//					metaDataManager.getPackageMetaData(object.eClass().getEPackage().getName()));
-//			IdEObjectEntity idEObjectEntity = new IdEObjectEntity();
-//			idEObjectEntity.setOid(object.getOid());
-//			idEObjectEntity.setRid(object.getRid());
-//			idEObjectEntity.setObjectBytes(valueBuffer.array());
-//			ifcModelDao.insertIdEObjectEntity(idEObjectEntity);
-//		}
-//	}
-	
 	public boolean get(int rid, IfcModelInterface model, QueryInterface query) throws IfcModelDbException, IfcModelInterfaceException {
 		TodoList todoList = new TodoList();
-//		IfcModelEntity modelEntity = ifcModelDao.queryIfcModelEntityByRid(rid);
+		
+		progressReporterTitle("Querying ifcmodel ...");
+		
 		GridFSDBFile file = mongoGridFs.findIfcModel(rid);
 		if (file == null) {
 			return false;
 		}
+		
+		progressReporterTitle("Finded ifcmodel rid: " + rid + ", reading it.");
 		
 		InputStream inputStream = file.getInputStream();
 		ObjectInputStream ois = null;
@@ -145,30 +136,34 @@ public class IfcModelDbSession extends IfcModelBinary {
 			modelEntity = (IfcModelEntity) ois.readObject();
 			ois.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new IfcModelDbException(e);
 		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+			throw new IfcModelDbException(e);
 		}
 		
 		if (modelEntity == null) {
 			return false;
 		}
+		
+		Long total = Long.valueOf(modelEntity.getObjectEntities().size() + modelEntity.getUnidentifiedObjectEntities().size());
+		progressReporterTitle("Reading objects.");
+		progressReporterUpdate(0l, total);
+		
+		Long doneObjectCount = 0l;
 		for (IdEObjectEntity objectEntity : modelEntity.getObjectEntities()) {
 			get(objectEntity, model, query, todoList);
+			progressReporterUpdate(++doneObjectCount, total);
 		}
 		for (IdEObjectEntity unidentifiedObjectEntity : modelEntity.getUnidentifiedObjectEntities()) {
 			get(unidentifiedObjectEntity, model, query, todoList);
+			progressReporterUpdate(++doneObjectCount, total);
 		}
-//		processTodoList(model, todoList, query, 2);//read into 2 deep level, i put geometryinfo and its child geometrydata in it;
 		model.setModelMetaDataValue(modelEntity.getModelMetaData());
 		return true;
 	}
 	
 	@SuppressWarnings("unchecked")
 	public <T extends IdEObject> T get(IdEObjectEntity objectEntity, IfcModelInterface model, QueryInterface query, TodoList todoList) throws IfcModelDbException {
-//		if (objectsToCommit.containsOid(oid)) {
-//			return (T) objectsToCommit.getByOid(oid);
-//		}
 		IdEObjectImpl cachedObject = (IdEObjectImpl) objectCache.get(objectEntity.getOid());
 		if (cachedObject != null) {
 			if (cachedObject.getLoadingState() == State.LOADED && cachedObject.getRid() != Integer.MAX_VALUE) {
@@ -176,10 +171,6 @@ public class IfcModelDbSession extends IfcModelBinary {
 				return (T) cachedObject;
 			}
 		}
-//		IdEObjectEntity objectEntity = ifcModelDao.queryIdEObjectEntityByOid(oid);
-//		if (objectEntity == null) {
-//			return null;
-//		}
 		ByteBuffer valueBuffer = ByteBuffer.wrap(objectEntity.getObjectBytes());
 		EClass eClass = getEClassForOid(objectEntity.getOid());
 		int rid = model.getModelMetaData().getRevisionId();
@@ -188,15 +179,16 @@ public class IfcModelDbSession extends IfcModelBinary {
 		return convertByteArrayToObject;
 	}
 	
-//	public void processTodoList(IfcModelEntity modelEntity, IfcModelInterface model, TodoList todoList, QueryInterface query, int deepLevel) throws IfcModelDbException {
-//		for (int i = deepLevel; i >= 0; i--) {
-//			List<Long> remainOids = new ArrayList<>();
-//			remainOids.addAll(todoList.keySet());
-//			for (Long oid : remainOids) {
-//				IdEObject idEObject = todoList.get(oid);
-//				get(oid, model, query, todoList);
-//			}
-//		}
-//	}
-
+	public void progressReporterTitle(String title) {
+		if (progressReporter != null) {
+			progressReporter.setTitle(title);
+		}
+	}
+	
+	public void progressReporterUpdate(Long progress, Long max) {
+		if (progressReporter != null) {
+			progressReporter.update(progress, max);
+		}
+	}
+	
 }

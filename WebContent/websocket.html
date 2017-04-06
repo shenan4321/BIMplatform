@@ -20,7 +20,8 @@
 		var websocket;
 		if ('WebSocket' in window) {
 			//alert("WebSocket");
-			websocket = new WebSocket("ws://localhost:8080/BIMplatform/ws/geometry?rid=3");
+			websocket = new WebSocket(
+					"ws://localhost:8080/BIMplatform/ws/geometry?rid=4");
 		} else if ('MozWebSocket' in window) {
 			//alert("MozWebSocket");
 			websocket = new MozWebSocket("ws://echo");
@@ -51,6 +52,29 @@
 				alert('未与服务器链接.');
 			}
 		}
+
+// 		//监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常。  
+// 		window.onbeforeunload = function() {
+// 			closeWebSocket();
+// 		}
+
+// 		//关闭WebSocket连接  
+// 		function closeWebSocket() {
+// 			websocket.close();
+// 		}
+
+		function addOnBeforeUnload(e) {
+// 			websocket.close();
+// 					    var ev = e || event;
+// 					    ev && (ev.returnValue = '你确定要离开？');
+		}
+
+		if (window.attachEvent) {
+			window.attachEvent('onbeforeunload', addOnBeforeUnload);
+		} else {
+			window.addEventListener('beforeunload', addOnBeforeUnload, false);
+		}
+
 	});
 </script>
 
@@ -61,8 +85,8 @@
 	<div class="well" id="msg"></div>
 	<div class="col-lg">
 		<div class="input-group">
-			<input type="text" class="form-control" placeholder="发送信息..." id="message"> 
-			<span class="input-group-btn">
+			<input type="text" class="form-control" placeholder="发送信息..."
+				id="message"> <span class="input-group-btn">
 				<button class="btn btn-default" type="button" id="send">发送</button>
 			</span>
 		</div>

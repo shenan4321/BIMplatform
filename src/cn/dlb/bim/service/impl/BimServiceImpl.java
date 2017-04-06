@@ -170,13 +170,20 @@ public class BimServiceImpl implements IBimService {
 		IfcStepSerializer serializer = server.getSerializationManager().createIfcStepSerializer(schema);
 		int rid = -1;
 		try {
+			long startTime = System.currentTimeMillis();
 			deserializer.read(modelFile);
+			long endTime = System.currentTimeMillis();
+			
+			System.out.println("deserialize time : " + (endTime - startTime) + "millis");
+			
 			IfcModelInterface model = deserializer.getModel();
 
 			IRenderEngine renderEngine = server.getRenderEngineFactory().createRenderEngine(schema.getEPackageName());
 
 			GeometryGenerator generator = new GeometryGenerator(model, serializer, renderEngine);
 			generator.generateForAllElements();
+			long endTime1 = System.currentTimeMillis();
+			System.out.println("render time : " + (endTime1 - endTime) + "millis");
 			
 			model.fixOids(platformInitDatas);
 			IfcModelDbSession session = new IfcModelDbSession(mongoGridFs, server.getMetaDataManager(), platformInitDatas);

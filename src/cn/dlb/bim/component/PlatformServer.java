@@ -1,5 +1,6 @@
 package cn.dlb.bim.component;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import cn.dlb.bim.PlatformContext;
@@ -15,9 +16,16 @@ import cn.dlb.bim.ifc.engine.jvm.JvmRenderEngineFactory;
 @Component("PlatformServer")
 public class PlatformServer {
 
-	private MetaDataManager metaDataManager;
-	private SerializationManager serializationManager;
-	private IRenderEngineFactory renderEngineFactory;
+	private final MetaDataManager metaDataManager;
+	private final SerializationManager serializationManager;
+	private final IRenderEngineFactory renderEngineFactory;
+	
+	@Autowired
+	private MongoGridFs mongoGridFs;
+	@Autowired
+	private PlatformInitDatas platformInitDatas;
+	@Autowired
+	private LongActionManager longActionManager;
 	
 	public PlatformServer() {
 		metaDataManager = new MetaDataManager(PlatformContext.getTempPath());
@@ -44,4 +52,16 @@ public class PlatformServer {
 		return renderEngineFactory;
 	}
 
+	public MongoGridFs getMongoGridFs() {
+		return mongoGridFs;
+	}
+
+	public PlatformInitDatas getPlatformInitDatas() {
+		return platformInitDatas;
+	}
+
+	public LongActionManager getLongActionManager() {
+		return longActionManager;
+	}
+	
 }

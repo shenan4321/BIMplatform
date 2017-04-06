@@ -19,5 +19,5 @@ package cn.dlb.bim.ifc.shared;
 
 public interface ProgressReporter {
 	void update(long progress, long max);
-	void setTitle(String stage);
+	void setTitle(String title);
 }

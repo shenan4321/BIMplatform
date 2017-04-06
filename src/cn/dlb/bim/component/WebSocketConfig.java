@@ -19,7 +19,7 @@ import cn.dlb.bim.websocket.GeometrySocketHandler;
 public class WebSocketConfig implements WebSocketConfigurer {
 	
 	@Autowired
-	IBimService bimservice;
+	PlatformServer server;
 
 	@Override
 	public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
@@ -31,7 +31,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
         /** 
          * 如不支持websocket的connenction,采用sockjs 
          */  
-        registry.addHandler(new GeometrySocketHandler(bimservice),"/ws/geometry").setAllowedOrigins("*").addInterceptors(new GeometryInterceptor());
+        registry.addHandler(new GeometrySocketHandler(server),"/ws/geometry").setAllowedOrigins("*").addInterceptors(new GeometryInterceptor());
         //.withSockJS();
 	}
 

@@ -12,7 +12,6 @@ import cn.dlb.bim.ifc.emf.ModelMetaData;
  * @author shenan4321
  *
  */
-//@Document(collection = "IfcModelEntity")
 public class IfcModelEntity implements Serializable {
 
 	/**

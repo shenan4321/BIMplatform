@@ -47,7 +47,6 @@ public class IfcModelBinary {
 	private static final Logger LOGGER = LoggerFactory.getLogger(IfcModelBinary.class);
 	
 	protected IfcDataBase ifcDataBase;
-	
 	protected final ObjectCache objectCache = new ObjectCache();
 	
 	public static final int STORE_PROJECT_ID = 1;

@@ -113,7 +113,10 @@ public class LongGeometryQueryAction extends LongAction {
 		if (webSocketSession == null || !webSocketSession.isOpen()) {
 			return;
 		}
-		int curPercent = (int) Math.floor(msg.getProgress() / msg.getProgress());
+		int curPercent = 0;
+		if (msg.getMax() != 0) {
+			curPercent = (int) Math.floor(Double.valueOf(msg.getProgress()) / msg.getMax() * 100);
+		}
 		if (lastPercentProcess != curPercent) {
 			lastPercentProcess = curPercent;
 			Gson gson = new Gson();

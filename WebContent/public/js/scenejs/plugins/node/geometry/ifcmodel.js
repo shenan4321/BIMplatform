@@ -64,7 +64,6 @@
             aspect: jQuery(this.getScene().getCanvas()).width() / jQuery(this.getScene().getCanvas()).height(),
             fovy: 37.8493
         });
-        console.log(maincamera.getOptics());
        
         var hasTransparency = Math.random()>0.5?false:true;
        

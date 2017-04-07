@@ -178,7 +178,6 @@ SceneJS.Types.addType("cameras/orbit", {
 
             var eye3 = SceneJS_math_transformPoint3(pitchMat, eye);
             eye3 = SceneJS_math_transformPoint3(yawMat, eye3);
-            console.log(pitch);
             lookat.setEye({x: eye3[0], y: eye3[1], z: eye3[2] });
         }
 

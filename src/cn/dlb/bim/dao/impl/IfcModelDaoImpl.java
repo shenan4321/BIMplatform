@@ -18,8 +18,14 @@ public class IfcModelDaoImpl implements IfcModelDao {
 	@Autowired  
     private MongoTemplate mongoTemplate; 
 	
+	@Override
 	public void insertIdEObjectEntity(IdEObjectEntity idEObjectEntity) {
 		mongoTemplate.insert(idEObjectEntity);
+	}
+	
+	@Override
+	public void insertAllIdEObjectEntity(List<IdEObjectEntity> idEObjectEntitys) {
+		mongoTemplate.insertAll(idEObjectEntitys);
 	}
 
 	@Override
@@ -46,6 +52,13 @@ public class IfcModelDaoImpl implements IfcModelDao {
 		Query query = new Query();
 		query.addCriteria(Criteria.where("rid").is(rid));
 		return mongoTemplate.findOne(query, IfcModelEntity.class);
+	}
+
+	@Override
+	public List<IdEObjectEntity> queryAllIdEObjectEntityByOids(List<Long> oids) {
+		Query query = new Query();
+		query.addCriteria(Criteria.where("oid").in(oids));
+		return mongoTemplate.find(query, IdEObjectEntity.class);
 	}
 
 }

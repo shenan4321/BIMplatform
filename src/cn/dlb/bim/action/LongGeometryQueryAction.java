@@ -1,6 +1,10 @@
 package cn.dlb.bim.action;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +14,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import com.google.gson.Gson;
+import com.google.gson.stream.JsonWriter;
 
 import cn.dlb.bim.component.PlatformServer;
 import cn.dlb.bim.ifc.database.IfcModelDbException;
@@ -75,7 +80,7 @@ public class LongGeometryQueryAction extends LongAction {
 			}
 		};
 
-		IfcModelDbSession session = new IfcModelDbSession(server.getMongoGridFs(), server.getMetaDataManager(),
+		IfcModelDbSession session = new IfcModelDbSession(server.getIfcModelDao(), server.getMetaDataManager(),
 				server.getPlatformInitDatas(), progressReporter);
 		BasicIfcModel model = new BasicIfcModel(packageMetaData);
 
@@ -100,6 +105,15 @@ public class LongGeometryQueryAction extends LongAction {
 		}
 		Gson gson = new Gson();
 		String jsonStr = gson.toJson(msg);
+		//TODO
+//		try {
+//			JsonWriter w = new JsonWriter(new OutputStreamWriter(new FileOutputStream(new File(""))));
+//			w.beginArray();
+//			w.name("").va
+//		} catch (FileNotFoundException e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//		}
 		TextMessage message = new TextMessage(jsonStr);
 		try {
 			webSocketSession.sendMessage(message);

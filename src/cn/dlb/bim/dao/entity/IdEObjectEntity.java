@@ -1,15 +1,16 @@
 package cn.dlb.bim.dao.entity;
 
-import java.io.Serializable;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-public class IdEObjectEntity implements Serializable {
+@Document(collection = "IdEObjectEntity")
+public class IdEObjectEntity {
 	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -57438738805850482L;
-	
+	@Id
 	private Long oid;
+	@Indexed
+	private Integer rid;
 	private byte[] objectBytes;
 	
 	public Long getOid() {
@@ -17,6 +18,12 @@ public class IdEObjectEntity implements Serializable {
 	}
 	public void setOid(Long oid) {
 		this.oid = oid;
+	}
+	public Integer getRid() {
+		return rid;
+	}
+	public void setRid(Integer rid) {
+		this.rid = rid;
 	}
 	public byte[] getObjectBytes() {
 		return objectBytes;

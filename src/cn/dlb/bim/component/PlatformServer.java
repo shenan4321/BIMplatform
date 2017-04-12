@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import cn.dlb.bim.PlatformContext;
+import cn.dlb.bim.dao.IfcModelDao;
 import cn.dlb.bim.ifc.SerializationManager;
 import cn.dlb.bim.ifc.emf.MetaDataManager;
 import cn.dlb.bim.ifc.engine.IRenderEngineFactory;
@@ -26,6 +27,8 @@ public class PlatformServer {
 	private PlatformInitDatas platformInitDatas;
 	@Autowired
 	private LongActionManager longActionManager;
+	@Autowired
+	private IfcModelDao ifcModelDao;
 	
 	public PlatformServer() {
 		metaDataManager = new MetaDataManager(PlatformContext.getTempPath());
@@ -62,6 +65,10 @@ public class PlatformServer {
 
 	public LongActionManager getLongActionManager() {
 		return longActionManager;
+	}
+
+	public IfcModelDao getIfcModelDao() {
+		return ifcModelDao;
 	}
 	
 }

@@ -20,6 +20,7 @@ import cn.dlb.bim.component.MongoGridFs;
 import cn.dlb.bim.component.PlatformInitDatas;
 import cn.dlb.bim.component.PlatformServer;
 import cn.dlb.bim.dao.IfcModelDao;
+import cn.dlb.bim.dao.entity.IdEObjectEntity;
 import cn.dlb.bim.ifc.database.IfcModelDbException;
 import cn.dlb.bim.ifc.database.IfcModelDbSession;
 import cn.dlb.bim.ifc.database.OldQuery;
@@ -47,6 +48,7 @@ public class TestBimService {
 	private PlatformServer server;
 	private PlatformInitDatas datas;
 	private MongoGridFs mongoGridFs;
+	private IfcModelDao ifcModelDao;
 
 	@Before
 	public void before() {
@@ -129,7 +131,7 @@ public class TestBimService {
 		if (modelList.size() > 0) {
 			IfcModelInterface model = modelList.get(0);
 			model.fixOids(datas);
-			IfcModelDbSession session = new IfcModelDbSession(mongoGridFs, server.getMetaDataManager(), datas);
+			IfcModelDbSession session = new IfcModelDbSession(ifcModelDao, server.getMetaDataManager(), datas);
 			session.saveIfcModel(model);
 			System.out.println();
 		}
@@ -139,7 +141,7 @@ public class TestBimService {
 	public void testIfcModelDbSessionGet() throws IfcModelDbException, IfcModelInterfaceException, FileNotFoundException, SerializerException {
 		PackageMetaData packageMetaData = server.getMetaDataManager()
 				.getPackageMetaData(Schema.IFC2X3TC1.getEPackageName());
-		IfcModelDbSession session = new IfcModelDbSession(mongoGridFs, server.getMetaDataManager(), datas);
+		IfcModelDbSession session = new IfcModelDbSession(ifcModelDao, server.getMetaDataManager(), datas);
 		BasicIfcModel newModel = new BasicIfcModel(packageMetaData);
 		session.get(3, newModel, new OldQuery(packageMetaData, true));
 		IfcStepSerializer serializer = server.getSerializationManager().createIfcStepSerializer(Schema.IFC2X3TC1);

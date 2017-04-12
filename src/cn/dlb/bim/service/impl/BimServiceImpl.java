@@ -39,19 +39,12 @@ public class BimServiceImpl implements IBimService {
 	@Qualifier("PlatformServer")
 	private PlatformServer server;
 
-	@Autowired
-	@Qualifier("PlatformInitDatas")
-	private PlatformInitDatas platformInitDatas;
-
-	@Autowired
-	@Qualifier("MongoGridFs")
-	private MongoGridFs mongoGridFs;
-
 	@Override
 	public List<GeometryInfoVo> queryDbGeometryInfo(Integer rid) {
 		PackageMetaData packageMetaData = server.getMetaDataManager()
 				.getPackageMetaData(Schema.IFC2X3TC1.getEPackageName());
-		IfcModelDbSession session = new IfcModelDbSession(mongoGridFs, server.getMetaDataManager(), platformInitDatas);
+		PlatformInitDatas platformInitDatas = server.getPlatformInitDatas();
+		IfcModelDbSession session = new IfcModelDbSession(server.getIfcModelDao(), server.getMetaDataManager(), platformInitDatas);
 		BasicIfcModel model = new BasicIfcModel(packageMetaData);
 		try {
 			session.get(rid, model, new OldQuery(packageMetaData, true));
@@ -184,9 +177,9 @@ public class BimServiceImpl implements IBimService {
 			generator.generateForAllElements();
 			long endTime1 = System.currentTimeMillis();
 			System.out.println("render time : " + (endTime1 - endTime) + "millis");
-			
+			PlatformInitDatas platformInitDatas = server.getPlatformInitDatas();
 			model.fixOids(platformInitDatas);
-			IfcModelDbSession session = new IfcModelDbSession(mongoGridFs, server.getMetaDataManager(), platformInitDatas);
+			IfcModelDbSession session = new IfcModelDbSession(server.getIfcModelDao(), server.getMetaDataManager(), platformInitDatas);
 			session.saveIfcModel(model);
 			rid = model.getModelMetaData().getRevisionId();
 		} catch (DeserializeException e) {

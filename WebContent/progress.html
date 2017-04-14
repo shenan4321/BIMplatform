@@ -74,6 +74,7 @@
 	</style>
 </head>
 <body>
+<div id="infoDark"></div>
 <canvas id="mySceneCanvas" width="100%" height="100%"></canvas>
 <div class="content_wrap">
 	<div class="zTreeDemoBackground left">
@@ -83,7 +84,7 @@
 <script>
 var websocket = new WebsocketBim();
 websocket.init({
-	urlPath:"ws/geometry?rid=3",
+	urlPath:"ws/geometry?rid=2",
 	onopen:function(msg){
 		window.progress = $.progress();
 	},

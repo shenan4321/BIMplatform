@@ -32,11 +32,11 @@ function showView(data) {
             };
             nodes[i] = node;
         }
-        scene.getNode("my-lights",function(xxx){
+        SceneJS.getScene().getNode("my-lights",function(xxx){
 	   		xxx.addNode({type:"material",nodes: nodes})
 	   	});
-}
 
+}
 
 function sceneJsShow(sceneNodes) {
     var sceneViewObj = {
@@ -64,7 +64,7 @@ function sceneJsShow(sceneNodes) {
                         id:'cameras',
                         yaw:0,
                         pitch:115.89999999999996,
-                        zoom:-( Math.abs( sceneNodes[sceneNodes.length-1].bound.max.x - sceneNodes[sceneNodes.length-1].bound.min.x ))-10000,
+                        zoom:- (Math.abs( Math.max(0, sceneNodes[sceneNodes.length-1].bound.max.x) - Math.min(0, sceneNodes[sceneNodes.length-1].bound.min.x) )),
                         zoomSensitivity:2000,
                         eye:{ x:0, y:0, z:10 },
                         look:{ x:0, y:0, z:0 },
@@ -114,109 +114,8 @@ function sceneJsShow(sceneNodes) {
         }]
     };
     
-    scene =  SceneJS.createScene(sceneViewObj);
+    SceneJS.createScene(sceneViewObj);
     showView(sceneNodes);
-    var info = document.getElementById("infoTxt");
-    var hisPick = {}; //记录点过的东西
-    scene.on("pick",function (hit) {
-    		console.log(hit);	
-    	          scene.getNode(hit.name + "geometry",
-    	                  function (material) {
-    	        	  console.log(material);
-    	                      if(hisPick.name){
-    	                          scene.getNode(hisPick.name + "geometry", function (material) {
-    	                              material.setColor(hisPick.color);//之前点过的东西还原
-    	                          });
-    	                      }
-    	                      hisPick = {name:hit.name,color:material.getColor()}
-    	                      material.setColor({r: 0, g: 1, b: 0});
-    	                  });
-    	          info.innerHTML = "Pick hit: " + JSON.stringify(hit);
-
-    	          // To illustrate, these are the params to expect on the pick hit:
-    	          var name = hit.name; // Eg. "object1"
-    	          var path = hit.path; // Eg. "foo.object1"
-    	          var nodeId = hit.nodeId;
-    	          var canvasX = hit.canvasPos[0];
-    	          var canvasY = hit.canvasPos[1];
-
-    	      });
-    
-    
-  
-    var canvas = scene.getCanvas();
-
-    var downX;
-    var downY;
-    var lastX;
-    var lastY;
-    var dragging;
-    var yaw = 0;
-    var pitch =115.89999999999996;
-
-
-    function mouseDown(event) {
-        lastX = downX = event.clientX;
-        lastY = downY = event.clientY;
-        dragging = true;
-    }
-
-    function touchStart(event) {
-        lastX = downX = event.targetTouches[0].clientX;
-        lastY = downY = event.targetTouches[0].clientY;
-        dragging = true;
-    }
-
-    function mouseUp(event) {
-        if (dragging && closeEnough(event.clientX, downX) && closeEnough(event.clientY, downY)) {
-            pick(event.clientX, event.clientY);
-        }
-        dragging = false;
-    }
-
-    function closeEnough(x, y) {
-        return (x > y) ? (x - y < 5) : (y - x < 5);
-    }
-
-    function touchEnd(event) {
-        if (dragging && event.targetTouches[0].clientX == downX && event.targetTouches[0].clientY == downY) {
-            pick(event.targetTouches[0].clientX, event.targetTouches[0].clientY);
-        }
-        dragging = false;
-    }
-
-    function mouseMove(event) {
-        var posX = event.clientX;
-        var posY = event.clientY;
-        actionMove(posX, posY);
-    }
-
-    function touchMove(event) {
-        var posX = event.targetTouches[0].clientX;
-        var posY = event.targetTouches[0].clientY;
-        actionMove(posX, posY);
-    }
-
-    function actionMove(posX, posY) {
-        if (dragging) {
-            yaw += (posX - lastX) * 0.1;
-            pitch -= (posY - lastY) * 0.1;
-            orbiting = true;
-        }
-        lastX = posX;
-        lastY = posY;
-    }
-
-    canvas.addEventListener('mousedown', mouseDown, true);
-    canvas.addEventListener('mouseup', mouseUp, true);
-    canvas.addEventListener('touchstart', touchStart, true);
-    canvas.addEventListener('touchend', touchEnd, true);
-    canvas.addEventListener('mousemove', mouseMove, true);
-    canvas.addEventListener('touchmove', touchMove, true);
-
-    function pick(canvasX, canvasY) {
-        scene.pick(canvasX, canvasY, { rayPick: true });
-    }
 
 }
 

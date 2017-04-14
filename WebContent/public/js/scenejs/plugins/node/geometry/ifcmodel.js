@@ -76,15 +76,15 @@
 					type: "enable",
 					enabled: true,
 					nodes : [{
-						type : "name",
-						name : coreId,
+						type : "material",
+						baseColor: material,
 						alpha: 1,
 						nodes : [{
-							type : "material",
-							baseColor: material,
-							id:coreId+"geometry",
+							type : "name",
+							name : coreId,
 							nodes: [{
 			        			type : "geometry",
+			        			id:coreId+"geometry",
 			        			primitive : params.wire ? "lines" : "triangles",
 			                    positions:new Float32Array(positions),
 			                    indices:new Uint16Array(indices),

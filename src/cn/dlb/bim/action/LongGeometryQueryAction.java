@@ -89,10 +89,13 @@ public class LongGeometryQueryAction extends LongAction {
 		for (IfcProduct ifcProduct : model.getAllWithSubTypes(IfcProduct.class)) {
 			if (ifcProduct.getRepresentation() != null
 					&& ifcProduct.getRepresentation().getRepresentations().size() != 0) {
-
-				GeometryInfoVo adaptor = new GeometryInfoVo();
-				adaptor.adapt(ifcProduct);
-				geometryList.add(adaptor);
+				if (ifcProduct.getGeometry() != null) {
+					GeometryInfoVo adaptor = new GeometryInfoVo();
+					boolean flag = adaptor.adapt(ifcProduct);
+					if (flag) {
+						geometryList.add(adaptor);
+					}
+				}
 			}
 		}
 

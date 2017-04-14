@@ -36,14 +36,12 @@ public class IfcModelDbSession extends IfcModelBinary {
 	private static final Logger LOGGER = LoggerFactory.getLogger(IfcModelDbSession.class);
 
 	private final IfcModelDao ifcModelDao;
-	// private final MongoGridFs mongoGridFs;
 	private final MetaDataManager metaDataManager;
 	private ProgressReporter progressReporter;
 
 	public IfcModelDbSession(IfcModelDao ifcModelDao, MetaDataManager metaDataManager, IfcDataBase ifcDataBase,
 			ProgressReporter progressReporter) {
 		super(ifcDataBase);
-		// this.mongoGridFs = mongoGridFs;
 		this.ifcModelDao = ifcModelDao;
 		this.metaDataManager = metaDataManager;
 		this.progressReporter = progressReporter;
@@ -51,7 +49,6 @@ public class IfcModelDbSession extends IfcModelBinary {
 
 	public IfcModelDbSession(IfcModelDao ifcModelDao, MetaDataManager metaDataManager, IfcDataBase ifcDataBase) {
 		super(ifcDataBase);
-		// this.mongoGridFs = mongoGridFs;
 		this.ifcModelDao = ifcModelDao;
 		this.metaDataManager = metaDataManager;
 	}
@@ -63,8 +60,6 @@ public class IfcModelDbSession extends IfcModelBinary {
 		model.fixOids(ifcDataBase);
 		ifcModelEntity.setModelMetaData(model.getModelMetaData());
 		ifcModelEntity.setRid(revisionId);
-
-//		ifcModelEntity.getObjectOids().addAll(model.getObjects().keySet());
 
 		Map<Long, IdEObject> geometries = new HashMap<>();
 

@@ -1,8 +1,7 @@
 package cn.dlb.bim.ifc.serializers;
 
-import org.eclipse.core.internal.resources.ProjectInfo;
-
 import cn.dlb.bim.ifc.emf.IfcModelInterface;
+import cn.dlb.bim.ifc.emf.ProjectInfo;
 import nl.tue.buildingsmart.schema.SchemaDefinition;
 
 public abstract class IfcSerializer extends EmfSerializer {

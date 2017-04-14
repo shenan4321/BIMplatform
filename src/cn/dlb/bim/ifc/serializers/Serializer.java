@@ -2,9 +2,8 @@ package cn.dlb.bim.ifc.serializers;
 
 import java.io.OutputStream;
 
-import org.eclipse.core.internal.resources.ProjectInfo;
-
 import cn.dlb.bim.ifc.emf.IfcModelInterface;
+import cn.dlb.bim.ifc.emf.ProjectInfo;
 import cn.dlb.bim.ifc.shared.ProgressReporter;
 
 /**

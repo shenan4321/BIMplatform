@@ -44,6 +44,9 @@ public class GeometryGenerator {
 	private IRenderEngine renderEngine;
 	private IRenderEngineModel renderEngineModel;
 	private final Map<Integer, GeometryData> hashes = new ConcurrentHashMap<Integer, GeometryData>();
+	
+	private final RenderEngineFilter renderEngineFilter = new RenderEngineFilter();
+	private final RenderEngineFilter renderEngineFilterTransformed = new RenderEngineFilter(true);
 
 	public GeometryGenerator(IfcModelInterface model, Serializer serializer, IRenderEngine renderEngine) {
 		this.model = model;
@@ -87,6 +90,14 @@ public class GeometryGenerator {
 				IRenderEngineInstance renderEngineInstance = renderEngineModel.getInstanceFromExpressId(ifcProduct.getExpressId());
 				RenderEngineGeometry geometry = renderEngineInstance.generateGeometry();
 				boolean translate = true;
+				if (geometry == null || geometry.getIndices().length == 0) {
+					renderEngineModel.setFilter(renderEngineFilterTransformed);
+					geometry = renderEngineInstance.generateGeometry();
+					if (geometry != null) {
+						translate = false;
+					}
+					renderEngineModel.setFilter(renderEngineFilter);
+				}
 				if (geometry != null && geometry.getNrIndices() > 0) {
 					GeometryInfo geometryInfo = null;
 					geometryInfo = GeometryFactory.eINSTANCE.createGeometryInfo();

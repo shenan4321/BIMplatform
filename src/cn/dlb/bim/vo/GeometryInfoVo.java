@@ -7,6 +7,7 @@ import java.nio.IntBuffer;
 
 import cn.dlb.bim.models.geometry.GeometryInfo;
 import cn.dlb.bim.models.ifc2x3tc1.IfcProduct;
+import cn.dlb.bim.models.ifc2x3tc1.IfcSpace;
 
 public class GeometryInfoVo implements ITransformer<GeometryInfo> {
 
@@ -48,8 +49,11 @@ public class GeometryInfoVo implements ITransformer<GeometryInfo> {
 		bound.min.set(minX, minY, minZ);
 	}
 	
-	public void adapt(IfcProduct ifcProduct) {//IfcProduct
+	public boolean adapt(IfcProduct ifcProduct) {//IfcProduct
 		GeometryInfo geometryInfo = ifcProduct.getGeometry();
+		if (geometryInfo == null || ifcProduct instanceof IfcSpace) {
+			return false;
+		}
 		typeName = ifcProduct.getClass().getSimpleName();
 		if (typeName.endsWith("Impl")) {
 			typeName = typeName.substring(0, typeName.indexOf("Impl"));
@@ -65,6 +69,7 @@ public class GeometryInfoVo implements ITransformer<GeometryInfo> {
 		double minZ = geometryInfo.getMinBounds().getZ();
 		bound.max.set(maxX, maxY, maxZ);
 		bound.min.set(minX, minY, minZ);
+		return true;
 	}
 	
 	private int[] byteArrayToIntArray(byte[] byteArray) {

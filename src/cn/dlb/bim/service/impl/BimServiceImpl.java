@@ -9,10 +9,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import cn.dlb.bim.PlatformContext;
-import cn.dlb.bim.component.MongoGridFs;
 import cn.dlb.bim.component.PlatformInitDatas;
 import cn.dlb.bim.component.PlatformServer;
-import cn.dlb.bim.dao.IfcModelDao;
 import cn.dlb.bim.ifc.GeometryGenerator;
 import cn.dlb.bim.ifc.database.IfcModelDbException;
 import cn.dlb.bim.ifc.database.IfcModelDbSession;
@@ -24,10 +22,10 @@ import cn.dlb.bim.ifc.emf.IfcModelInterfaceException;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
 import cn.dlb.bim.ifc.emf.Schema;
 import cn.dlb.bim.ifc.engine.IRenderEngine;
-import cn.dlb.bim.ifc.engine.IRenderEngineFactory;
 import cn.dlb.bim.ifc.engine.RenderEngineException;
 import cn.dlb.bim.ifc.model.BasicIfcModel;
 import cn.dlb.bim.ifc.serializers.IfcStepSerializer;
+import cn.dlb.bim.models.geometry.GeometryInfo;
 import cn.dlb.bim.models.ifc2x3tc1.IfcProduct;
 import cn.dlb.bim.service.IBimService;
 import cn.dlb.bim.vo.GeometryInfoVo;
@@ -61,8 +59,10 @@ public class BimServiceImpl implements IBimService {
 					&& ifcProduct.getRepresentation().getRepresentations().size() != 0) {
 
 				GeometryInfoVo adaptor = new GeometryInfoVo();
-				adaptor.adapt(ifcProduct);
-				geometryList.add(adaptor);
+				boolean flag = adaptor.adapt(ifcProduct);
+				if (flag) {
+					geometryList.add(adaptor);
+				}
 			}
 		}
 
@@ -131,10 +131,11 @@ public class BimServiceImpl implements IBimService {
 				if (ifcProduct.getRepresentation() != null
 						&& ifcProduct.getRepresentation().getRepresentations().size() != 0) {
 
-					// GeometryInfo info = ifcProduct.getGeometry();
 					GeometryInfoVo adaptor = new GeometryInfoVo();
-					adaptor.adapt(ifcProduct);
-					geometryList.add(adaptor);
+					boolean flag = adaptor.adapt(ifcProduct);
+					if (flag) {
+						geometryList.add(adaptor);
+					}
 				}
 			}
 		} catch (DeserializeException e) {

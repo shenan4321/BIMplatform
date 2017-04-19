@@ -1,22 +1,5 @@
 package cn.dlb.bim.ifc.collada;
 
-/******************************************************************************
- * Copyright (C) 2009-2017  BIMserver.org
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- * 
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see {@literal<http://www.gnu.org/licenses/>}.
- *****************************************************************************/
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -58,7 +41,7 @@ public class KmzSerializer extends EmfSerializer {
 				writeKmlFile(zipOutputStream);
 				zipOutputStream.closeEntry();
 				zipOutputStream.putNextEntry(new ZipEntry("files/collada.dae"));
-				ifcToCollada.write(zipOutputStream, null);
+				ifcToCollada.writeToOutputStream(zipOutputStream, progressReporter);
 				zipOutputStream.closeEntry();
 				zipOutputStream.finish();
 				zipOutputStream.flush();
@@ -110,7 +93,7 @@ public class KmzSerializer extends EmfSerializer {
 		writer.println("			<z>1</z>");
 		writer.println("		</Scale>");
 		writer.println("		<Link>");
-		writer.println("			<href>vxvxcvcx (15).kmz/files/collada.dae</href>");
+		writer.println("			<href>files/collada.dae</href>");
 		writer.println("		</Link>");
 		writer.println("		<ResourceMap>");
 //		writer.println("			<Alias>");

@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Collada2GLTFThread implements Runnable {
+public class Collada2GLTFThread {
 	// Thread-related.
 	private Thread t;
 	private static final String threadName = "COLLADA2GLTF Export";
@@ -27,8 +27,7 @@ public class Collada2GLTFThread implements Runnable {
 		this.configuration = configuration;
 	}
 
-	@Override
-	public void run() {
+	public void run11() {
 		done = false;
 		crashed = false;
 		// Build the process.
@@ -52,15 +51,15 @@ public class Collada2GLTFThread implements Runnable {
 		done = true;
 	}
 
-	public void start ()
-	{
-		if (t == null)
-		{
-			// Passes in the run.
-			t = new Thread (this, threadName);
-			t.start ();
-		}
-	}
+//	public void start ()
+//	{
+//		if (t == null)
+//		{
+//			// Passes in the run.
+//			t = new Thread (this, threadName);
+//			t.start ();
+//		}
+//	}
 
 	public static class Collada2GLTFConfiguration {
 		// OpenGL Transformation Format settings.
@@ -108,7 +107,7 @@ public class Collada2GLTFThread implements Runnable {
 		{
 			ArrayList<String> list = new ArrayList<String>();
 			// Add the application.
-			list.add("collada2gltf");
+			list.add("D:\\collada2gltf-web-service-master\\collada2gltf\\win32\\collada2gltf.exe");
 			// Required parameters.
 			if (fileName != null)
 				list.addAll(Arrays.asList(new String[] {"-f", String.format("\"%s\"", fileName)}));

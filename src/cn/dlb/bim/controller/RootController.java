@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import cn.dlb.bim.component.PlatformInitDatas;
 import cn.dlb.bim.component.PlatformServer;
 import cn.dlb.bim.ifc.collada.ColladaSerializer;
+import cn.dlb.bim.ifc.collada.KmzSerializer;
 import cn.dlb.bim.ifc.collada.OpenGLTransmissionFormatSerializer;
 import cn.dlb.bim.ifc.database.IfcModelDbException;
 import cn.dlb.bim.ifc.database.IfcModelDbSession;
@@ -154,16 +155,16 @@ public class RootController {
 		} catch (IfcModelInterfaceException e) {
 			e.printStackTrace();
 		}
-//		OpenGLTransmissionFormatSerializer openGLTransmissionFormatSerializer = new OpenGLTransmissionFormatSerializer();
-//		ProjectInfo projectInfo = new ProjectInfo();
-//		projectInfo.setName("test");
-//		projectInfo.setAuthorName("linfujun");
-		ColladaSerializer colladaSerializer = new ColladaSerializer();
+		OpenGLTransmissionFormatSerializer openGLTransmissionFormatSerializer = new OpenGLTransmissionFormatSerializer();
+		ProjectInfo projectInfo = new ProjectInfo();
+		projectInfo.setName("test");
+		projectInfo.setAuthorName("linfujun");
+//		KmzSerializer kmzSerializer = new KmzSerializer();
 		try {
-//			openGLTransmissionFormatSerializer.init(model, projectInfo, true);
-//			openGLTransmissionFormatSerializer.writeToFile(new File("tttt.zip").toPath(), null);
-			colladaSerializer.init(model, null, true);
-			colladaSerializer.writeToFile(new File("linfujun.dae").toPath(), null);
+			openGLTransmissionFormatSerializer.init(model, projectInfo, true);
+			openGLTransmissionFormatSerializer.writeToFile(new File("tttt.glb").toPath(), null);
+//			kmzSerializer.init(model, null, true);
+//			kmzSerializer.writeToFile(new File("linfujun.kmz").toPath(), null);
 		} catch (SerializerException e) {
 			e.printStackTrace();
 		}

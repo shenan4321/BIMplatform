@@ -78,7 +78,7 @@
 					nodes : [{
 						type : "name",
 						name : coreId,
-						alpha: 1,
+						alpha: 1,//透明度
 						nodes : [{
 							type : "material",
 							baseColor: material,

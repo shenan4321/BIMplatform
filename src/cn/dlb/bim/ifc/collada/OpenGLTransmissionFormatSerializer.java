@@ -1,22 +1,5 @@
 package cn.dlb.bim.ifc.collada;
 
-/******************************************************************************
- * Copyright (C) 2009-2017  BIMserver.org
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- * 
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see {@literal<http://www.gnu.org/licenses/>}.
- *****************************************************************************/
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -25,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Locale;
@@ -36,6 +20,9 @@ import org.apache.commons.codec.binary.Base64OutputStream;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import cn.dlb.bim.PlatformContext;
 import cn.dlb.bim.ifc.collada.Collada2GLTFThread.Collada2GLTFConfiguration;
@@ -129,6 +116,8 @@ public class OpenGLTransmissionFormatSerializer extends EmfSerializer {
 					zipTheDirectory(outputStream, writeDirectory);
 				else if (returnType == ".json")
 					jsonTheDirectory(outputStream, writeDirectory);
+				else if (returnType == ".glb") 
+					glbTheDirectory(outputStream, writeDirectory);
 			} catch (IOException e) {
 				LOGGER.error("", e);
 			} finally {
@@ -204,21 +193,22 @@ public class OpenGLTransmissionFormatSerializer extends EmfSerializer {
 		// Prepare to write the Collada file.
 		OutputStream outputStream = Files.newOutputStream(colladaFile);
 		// Write into the Collada file.
-		colladaSerializer.write(outputStream, null);
+		colladaSerializer.writeToOutputStream(outputStream, null);
 		// Push the data into the stream.
 		outputStream.flush();
 		// Finalize the stream and close the file.
 		outputStream.close();
 		// Launch a thread to run the collada2gltf converter.
 		Collada2GLTFThread thread = new Collada2GLTFThread(colladaFile, writeDirectory);
-		synchronized (thread) {
-			thread.start();
-			// Force wait until the thread's subprocess is done running (i.e. the files have all been created).
-			while (thread.done == false)
-			{
-				// Intentional no operation.
-			}
-		}
+		thread.run11();
+//		synchronized (thread) {
+//			thread.start();
+//			// Force wait until the thread's subprocess is done running (i.e. the files have all been created).
+//			while (thread.done == false)
+//			{
+//				// Intentional no operation.
+//			}
+//		}
 	}
 
 	public void addToZipFile(Path file, ZipOutputStream outputStream) throws FileNotFoundException, IOException {
@@ -240,6 +230,23 @@ public class OpenGLTransmissionFormatSerializer extends EmfSerializer {
 		inputStream.close();
 		// Close the entry in the ZIP file.
 		outputStream.closeEntry();
+	}
+	
+	private void glbTheDirectory(OutputStream outputStream, Path writeDirectory) throws IOException, UnsupportedEncodingException {
+		ObjectMapper objMapper = new ObjectMapper(); 
+		Gltf2glbConvertor convertor = new Gltf2glbConvertor();
+		for (Path f : PathUtils.list(writeDirectory)) {
+			File file = f.toFile();
+			if (file.getName().endsWith("\\.gltf")) {
+				ObjectNode scene = (ObjectNode) objMapper.readTree(file);  
+				try {
+					ByteBuffer byteBuffer = convertor.convert(scene, writeDirectory, true, true);
+					outputStream.write(byteBuffer.array());
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 
 }

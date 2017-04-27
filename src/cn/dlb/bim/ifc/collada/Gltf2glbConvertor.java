@@ -14,8 +14,8 @@ import cn.dlb.bim.utils.SimpleImageInfo;
 
 public class Gltf2glbConvertor {
 	
-	private static final String BINARY_EXTENSION = "KHR_binary_glTF";
-	private static final String BINARY_BUFFER = "binary_glTF";
+	public static final String BINARY_EXTENSION = "KHR_binary_glTF";
+	public static final String BINARY_BUFFER = "binary_glTF";
 
 	private JsonNodeFactory jsonNodeFactory = new JsonNodeFactory(false);
 
@@ -70,7 +70,8 @@ public class Gltf2glbConvertor {
 			JsonNode bufferIdNode = bufferViewNode.get("buffer");
 			
 			String bufferId = bufferIdNode.asText();
-			JsonNode referencedBufferNode = scene.get(bufferId);
+			JsonNode buffersNode = scene.get("buffers");
+			JsonNode referencedBufferNode = buffersNode.get(bufferId);
 			if (referencedBufferNode == null) {
 				throw new Exception("buffer ID reference not found: " + bufferId); 
 			}
@@ -92,7 +93,7 @@ public class Gltf2glbConvertor {
 			Iterator<String> shadersFieldIter = shadersNode.fieldNames();
 			while (shadersFieldIter.hasNext()) {
 				String fieldKey = shadersFieldIter.next();
-				JsonNode shaderNode = scene.get(fieldKey);
+				JsonNode shaderNode = shadersNode.get(fieldKey);
 				JsonNode uriNode = shaderNode.get("uri");
 				String uri = uriNode.asText();
 				
@@ -120,7 +121,7 @@ public class Gltf2glbConvertor {
 				bufferViewValue.put("buffer", BINARY_BUFFER);
 				bufferViewValue.put("byteLength", part.buffer.capacity());
 				bufferViewValue.put("byteOffset", part.offset);
-				((ObjectNode) bufferViewsNode).set("bufferViewId", bufferViewValue);
+				((ObjectNode) bufferViewsNode).set(bufferViewId, bufferViewValue);
 			}
 		}
 		
@@ -163,13 +164,14 @@ public class Gltf2glbConvertor {
 				bufferViewValue.put("buffer", BINARY_BUFFER);
 				bufferViewValue.put("byteLength", part.buffer.capacity());
 				bufferViewValue.put("byteOffset", part.offset);
-				((ObjectNode) bufferViewsNode).set("bufferViewId", bufferViewValue);
+				((ObjectNode) bufferViewsNode).set(bufferViewId, bufferViewValue);
 			}
 		}
 		
 		// All buffer views now reference the "binary_glTF" buffer, so the original buffer objects are
 	    // no longer needed.
-		scene.set("buffers", jsonNodeFactory.nullNode());
+		ObjectNode emptyNode = jsonNodeFactory.objectNode(); 
+		scene.set("buffers", emptyNode);
 	    return body.createGlb(scene);
 	}
 }

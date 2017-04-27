@@ -17,39 +17,54 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.emf.common.util.EList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import cn.dlb.bim.ifc.emf.IdEObject;
 import cn.dlb.bim.ifc.emf.IfcModelInterface;
 import cn.dlb.bim.ifc.emf.ProjectInfo;
 import cn.dlb.bim.ifc.engine.RenderEngineException;
-import cn.dlb.bim.ifc.engine.cells.Matrix;
 import cn.dlb.bim.ifc.engine.cells.Vector3d;
 import cn.dlb.bim.ifc.serializers.SerializerException;
 import cn.dlb.bim.ifc.shared.ProgressReporter;
 import cn.dlb.bim.models.geometry.GeometryData;
 import cn.dlb.bim.models.geometry.GeometryInfo;
+import cn.dlb.bim.models.ifc2x3tc1.IfcBeam;
+import cn.dlb.bim.models.ifc2x3tc1.IfcBuildingElementPart;
 import cn.dlb.bim.models.ifc2x3tc1.IfcBuildingElementProxy;
 import cn.dlb.bim.models.ifc2x3tc1.IfcColumn;
+import cn.dlb.bim.models.ifc2x3tc1.IfcCovering;
 import cn.dlb.bim.models.ifc2x3tc1.IfcCurtainWall;
+import cn.dlb.bim.models.ifc2x3tc1.IfcDistributionElement;
+import cn.dlb.bim.models.ifc2x3tc1.IfcDistributionFlowElement;
 import cn.dlb.bim.models.ifc2x3tc1.IfcDoor;
 import cn.dlb.bim.models.ifc2x3tc1.IfcFeatureElementSubtraction;
+import cn.dlb.bim.models.ifc2x3tc1.IfcFlowController;
+import cn.dlb.bim.models.ifc2x3tc1.IfcFlowFitting;
 import cn.dlb.bim.models.ifc2x3tc1.IfcFlowSegment;
+import cn.dlb.bim.models.ifc2x3tc1.IfcFlowTerminal;
+import cn.dlb.bim.models.ifc2x3tc1.IfcFooting;
 import cn.dlb.bim.models.ifc2x3tc1.IfcFurnishingElement;
 import cn.dlb.bim.models.ifc2x3tc1.IfcMember;
+import cn.dlb.bim.models.ifc2x3tc1.IfcPile;
 import cn.dlb.bim.models.ifc2x3tc1.IfcPlate;
 import cn.dlb.bim.models.ifc2x3tc1.IfcProduct;
 import cn.dlb.bim.models.ifc2x3tc1.IfcProject;
+import cn.dlb.bim.models.ifc2x3tc1.IfcProxy;
 import cn.dlb.bim.models.ifc2x3tc1.IfcRailing;
+import cn.dlb.bim.models.ifc2x3tc1.IfcRamp;
 import cn.dlb.bim.models.ifc2x3tc1.IfcRoof;
 import cn.dlb.bim.models.ifc2x3tc1.IfcSIUnit;
+import cn.dlb.bim.models.ifc2x3tc1.IfcSite;
 import cn.dlb.bim.models.ifc2x3tc1.IfcSlab;
 import cn.dlb.bim.models.ifc2x3tc1.IfcSlabTypeEnum;
 import cn.dlb.bim.models.ifc2x3tc1.IfcSpace;
 import cn.dlb.bim.models.ifc2x3tc1.IfcStair;
 import cn.dlb.bim.models.ifc2x3tc1.IfcStairFlight;
+import cn.dlb.bim.models.ifc2x3tc1.IfcTransportElement;
 import cn.dlb.bim.models.ifc2x3tc1.IfcUnit;
 import cn.dlb.bim.models.ifc2x3tc1.IfcUnitAssignment;
 import cn.dlb.bim.models.ifc2x3tc1.IfcUnitEnum;
@@ -70,33 +85,47 @@ public class ColladaSerializer extends AbstractGeometrySerializer {
 	}
 
 	static {
-		addConvertor(new Convertor<IfcRoof>(IfcRoof.class, new double[] { 0.837255f, 0.203922f, 0.270588f }, 1.0f));
-		addConvertor(new Convertor<IfcSlab>(IfcSlab.class, new double[] { 0.637255f, 0.603922f, 0.670588f }, 1.0f) {
-			@Override
-			public String getMaterialName(Object ifcSlab) {
-				if (ifcSlab == null || !(ifcSlab instanceof IfcSlab) || ((IfcSlab) ifcSlab).getPredefinedType() != IfcSlabTypeEnum.ROOF) {
-					return "IfcSlab";
-				} else {
-					return "IfcRoof";
-				}
-			}
-		});
+		addConvertor(new Convertor<IfcRoof>(IfcRoof.class, new double[] { 153.0/255.0f, 0.0, 51.0/255.0f }, 1.0f));
+		addConvertor(new Convertor<IfcSlab>(IfcSlab.class, new double[] { 217.0/255.0f, 217.0/255.0f, 217.0/255.0f }, 1.0f));
+		
 		addConvertor(new Convertor<IfcWindow>(IfcWindow.class, new double[] { 0.2f, 0.2f, 0.8f }, 0.2f));
-		addConvertor(new Convertor<IfcSpace>(IfcSpace.class, new double[] { 0.5f, 0.4f, 0.1f }, 0.2f));
+		addConvertor(new Convertor<IfcSpace>(IfcSpace.class, new double[] { 0.5f, 0.4f, 0.1f }, 0.0f));
 		addConvertor(new Convertor<IfcDoor>(IfcDoor.class, new double[] { 0.637255f, 0.603922f, 0.670588f }, 1.0f));
 		addConvertor(new Convertor<IfcStair>(IfcStair.class, new double[] { 0.637255f, 0.603922f, 0.670588f }, 1.0f));
 		addConvertor(new Convertor<IfcStairFlight>(IfcStairFlight.class, new double[] { 0.637255f, 0.603922f, 0.670588f }, 1.0f));
 		addConvertor(new Convertor<IfcFlowSegment>(IfcFlowSegment.class, new double[] { 0.6f, 0.4f, 0.5f }, 1.0f));
-		addConvertor(new Convertor<IfcFurnishingElement>(IfcFurnishingElement.class, new double[] { 0.437255f, 0.603922f, 0.370588f }, 1.0f));
-		addConvertor(new Convertor<IfcPlate>(IfcPlate.class, new double[] { 0.437255f, 0.603922f, 0.370588f }, 1.0f));
-		addConvertor(new Convertor<IfcMember>(IfcMember.class, new double[] { 0.437255f, 0.603922f, 0.370588f }, 1.0f));
-		addConvertor(new Convertor<IfcWallStandardCase>(IfcWallStandardCase.class, new double[] { 0.537255f, 0.337255f, 0.237255f }, 1.0f));
-		addConvertor(new Convertor<IfcWall>(IfcWall.class, new double[] { 0.537255f, 0.337255f, 0.237255f }, 1.0f));
+		addConvertor(new Convertor<IfcFurnishingElement>(IfcFurnishingElement.class, new double[] { 205.0/255.0f, 104.0/255.0f, 57.0/255.0f }, 1.0f));
+		addConvertor(new Convertor<IfcPlate>(IfcPlate.class, new double[] { 0.437255f, 0.603922f, 0.370588f }, 0.4f));
+		addConvertor(new Convertor<IfcMember>(IfcMember.class, new double[] { 0.137255f, 0.203922f, 0.270588f }, 1.0f));
+		addConvertor(new Convertor<IfcWallStandardCase>(IfcWallStandardCase.class, new double[] { 217.0/255.0f, 217.0/255.0f, 217.0/255.0f }, 1.0f));
+		addConvertor(new Convertor<IfcWall>(IfcWall.class, new double[] { 217.0/255.0f, 217.0/255.0f, 217.0/255.0f }, 1.0f));
 		addConvertor(new Convertor<IfcCurtainWall>(IfcCurtainWall.class, new double[] { 0.5f, 0.5f, 0.5f }, 0.5f));
 		addConvertor(new Convertor<IfcRailing>(IfcRailing.class, new double[] { 0.137255f, 0.203922f, 0.270588f }, 1.0f));
 		addConvertor(new Convertor<IfcColumn>(IfcColumn.class, new double[] { 0.437255f, 0.603922f, 0.370588f, }, 1.0f));
-		addConvertor(new Convertor<IfcBuildingElementProxy>(IfcBuildingElementProxy.class, new double[] { 0.5f, 0.5f, 0.5f }, 1.0f));
-		addConvertor(new Convertor<IfcProduct>(IfcProduct.class, new double[] { 0.5f, 0.5f, 0.5f }, 1.0f));
+		addConvertor(new Convertor<IfcBuildingElementProxy>(IfcBuildingElementProxy.class, new double[] { 0.0f, 0.5f, 0.0f }, 1.0f));
+		addConvertor(new Convertor<IfcProduct>(IfcProduct.class, new double[] { 0.0, 102.0f/255.0f, 102.0f/255.0f }, 1.0f));
+		
+		addConvertor(new Convertor<IfcBeam>(IfcBeam.class, new double[] { 0.137255f, 0.403922f, 0.870588f }, 1.0f));
+//		addConvertor(new Convertor<IfcBeamStandardCase>(IfcBeamStandardCase.class, new double[] { 0.137255f, 0.403922f, 0.870588f }, 1.0f));
+		addConvertor(new Convertor<IfcFlowTerminal>(IfcFlowTerminal.class, new double[] { 0.137255f, 0.403922f, 0.870588f }, 1.0f));
+		addConvertor(new Convertor<IfcProxy>(IfcProxy.class, new double[] { 0.137255f, 0.403922f, 0.870588f }, 1.0f));
+		addConvertor(new Convertor<IfcSite>(IfcSite.class, new double[] { 0.0, 102.0f/255.0f, 102.0f/255.0f }, 1.0f));
+//		addConvertor(new Convertor<IfcLightFixture>(IfcLightFixture.class, new double[] { 0.137255f, 0.403922f, 0.870588f }, 1.0f));
+//		addConvertor(new Convertor<IfcDuctSegment>(IfcDuctSegment.class, new double[] { 0.137255f, 0.403922f, 0.870588f }, 1.0f));
+		addConvertor(new Convertor<IfcDistributionFlowElement>(IfcDistributionFlowElement.class, new double[] { 0.8470588235f, 0.427450980392f, 0.0f }, 1.0f));
+//		addConvertor(new Convertor<IfcDuctFitting>(IfcDuctFitting.class, new double[] { 0.137255f, 0.403922f, 0.870588f }, 1.0f));
+		addConvertor(new Convertor<IfcPile>(IfcPile.class, new double[] { 0.8470588235f, 0.427450980392f, 0.0f }, 1.0f));
+//		addConvertor(new Convertor<IfcAirTerminal>(IfcAirTerminal.class, new double[] { 0.8470588235f, 0.427450980392f, 0.0f }, 1.0f));
+		addConvertor(new Convertor<IfcCovering>(IfcCovering.class, new double[] { 0.8470588235f, 0.427450980392f, 0.0f }, 1.0f));
+		addConvertor(new Convertor<IfcTransportElement>(IfcTransportElement.class, new double[] { 0.8470588235f, 0.427450980392f, 0.0f }, 1.0f));
+		addConvertor(new Convertor<IfcFlowController>(IfcFlowController.class, new double[] { 0.8470588235f, 0.427450980392f, 0.0f }, 1.0f));
+		addConvertor(new Convertor<IfcFlowFitting>(IfcFlowFitting.class, new double[] { 0.8470588235f, 0.427450980392f, 0.0f }, 1.0f));
+		addConvertor(new Convertor<IfcRamp>(IfcRamp.class, new double[] { 0.8470588235f, 0.427450980392f, 0.0f }, 1.0f));
+//		addConvertor(new Convertor<IfcFurniture>(IfcFurniture.class, new double[] { 0.8470588235f, 0.427450980392f, 0.0f }, 1.0f));
+		addConvertor(new Convertor<IfcFooting>(IfcFooting.class, new double[] { 0.8470588235f, 0.427450980392f, 0.0f }, 1.0f));
+//		addConvertor(new Convertor<IfcSystemFurnitureElement>(IfcSystemFurnitureElement.class, new double[] { 0.8470588235f, 0.427450980392f, 0.0f }, 1.0f));
+		addConvertor(new Convertor<IfcBuildingElementPart>(IfcBuildingElementPart.class, new double[] { 1.0f, 0.5f, 0.5f }, 1.0f));
+		addConvertor(new Convertor<IfcDistributionElement>(IfcDistributionElement.class, new double[] { 1.0f, 0.5f, 0.5f }, 1.0f));
 	}
 
 	// Prepare a transformer for floating-point numbers into a strings, clipping extraneous zeros.
@@ -159,8 +188,8 @@ public class ColladaSerializer extends AbstractGeometrySerializer {
 		// Write the asset block.
 		out.println(" <asset>");
 		out.println("  <contributor>");
-		out.println("   <author>" + (getProjectInfo() == null ? "" : "shenan4321") + "</author>");
-		out.println("   <authoring_tool>BIMserver</authoring_tool>");
+		out.println("   <author>" + (getProjectInfo() == null ? "" : "linfujun") + "</author>");
+		out.println("   <authoring_tool>BIMplatform</authoring_tool>");
 		out.println("   <comments>" + (getProjectInfo() == null ? "" : getProjectInfo().getDescription()) + "</comments>");
 		out.println("   <copyright>Copyright</copyright>");
 		out.println("  </contributor>");
@@ -179,7 +208,7 @@ public class ColladaSerializer extends AbstractGeometrySerializer {
 		for (Class<? extends IfcProduct> cl : convertors.keySet()) {
 			Convertor<? extends IfcProduct> convertor = convertors.get(cl);
 			for (IfcProduct object : model.getAllWithSubTypes(cl)) {
-				if (!convertedObjects.contains(object)) {
+				if (!convertedObjects.contains(object) && !(object instanceof IfcSpace)) {
 					convertedObjects.add(object);
 					setGeometry(out, object, convertor.getMaterialName(object));
 				}
@@ -493,9 +522,23 @@ public class ColladaSerializer extends AbstractGeometrySerializer {
 		out.println("      <specular>");
 		out.println("       <color>0.5 0.5 0.5 1</color>");
 		out.println("      </specular>");
-		out.println("      <shininess>");
-		out.println("       <float>16</float>");
-		out.println("      </shininess>");
+		
+		if (transparency < 1.0) {
+			out.println("      <transparent opaque=\"RGB_ZERO\">");
+			out.println("       <color>0.4980392 0.4980392 0.4980392 0.4980392</color>");
+			out.println("      </transparent>");
+			out.println("      <transparency>");
+			out.println("       <float>1</float>");
+			out.println("      </transparency>");
+			out.println("      <shininess>");
+			out.println("       <float>64</float>");//max 128
+			out.println("      </shininess>");
+		} else {
+			out.println("      <shininess>");
+			out.println("       <float>16</float>");
+			out.println("      </shininess>");
+		}
+		
 		out.println("      <reflective>");
 		out.println("       <color>0 0 0 1</color>");
 		out.println("      </reflective>");

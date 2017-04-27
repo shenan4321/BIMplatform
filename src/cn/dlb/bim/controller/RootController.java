@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,24 +21,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import cn.dlb.bim.component.PlatformInitDatas;
 import cn.dlb.bim.component.PlatformServer;
-import cn.dlb.bim.ifc.collada.ColladaSerializer;
-import cn.dlb.bim.ifc.collada.KmzSerializer;
-import cn.dlb.bim.ifc.collada.OpenGLTransmissionFormatSerializer;
-import cn.dlb.bim.ifc.database.IfcModelDbException;
-import cn.dlb.bim.ifc.database.IfcModelDbSession;
-import cn.dlb.bim.ifc.database.OldQuery;
 import cn.dlb.bim.ifc.database.queries.om.JsonQueryObjectModelConverter;
 import cn.dlb.bim.ifc.database.queries.om.Query;
 import cn.dlb.bim.ifc.database.queries.om.QueryException;
-import cn.dlb.bim.ifc.emf.IfcModelInterfaceException;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
-import cn.dlb.bim.ifc.emf.ProjectInfo;
 import cn.dlb.bim.ifc.emf.Schema;
-import cn.dlb.bim.ifc.model.BasicIfcModel;
-import cn.dlb.bim.ifc.serializers.SerializerException;
 import cn.dlb.bim.service.IBimService;
+import cn.dlb.bim.vo.GlbVo;
 
 @Controller
 @RequestMapping("/")
@@ -140,36 +131,11 @@ public class RootController {
 		return resMap;
 	}
 	
-	@RequestMapping(value = "test", method = RequestMethod.POST)
+	@RequestMapping(value = "queryGlbByRid", method = RequestMethod.GET)
 	@ResponseBody
-	public Map<String, Object> test() {
-		PackageMetaData packageMetaData = server.getMetaDataManager()
-				.getPackageMetaData(Schema.IFC2X3TC1.getEPackageName());
-		PlatformInitDatas platformInitDatas = server.getPlatformInitDatas();
-		IfcModelDbSession session = new IfcModelDbSession(server.getIfcModelDao(), server.getMetaDataManager(), platformInitDatas);
-		BasicIfcModel model = new BasicIfcModel(packageMetaData);
-		try {
-			session.get(1, model, new OldQuery(packageMetaData, true));
-		} catch (IfcModelDbException e) {
-			e.printStackTrace();
-		} catch (IfcModelInterfaceException e) {
-			e.printStackTrace();
-		}
-		OpenGLTransmissionFormatSerializer openGLTransmissionFormatSerializer = new OpenGLTransmissionFormatSerializer();
-		ProjectInfo projectInfo = new ProjectInfo();
-		projectInfo.setName("test");
-		projectInfo.setAuthorName("linfujun");
-//		KmzSerializer kmzSerializer = new KmzSerializer();
-		try {
-			openGLTransmissionFormatSerializer.init(model, projectInfo, true);
-			openGLTransmissionFormatSerializer.writeToFile(new File("tttt.glb").toPath(), null);
-//			kmzSerializer.init(model, null, true);
-//			kmzSerializer.writeToFile(new File("linfujun.kmz").toPath(), null);
-		} catch (SerializerException e) {
-			e.printStackTrace();
-		}
-		Map<String, Object> resMap = new HashMap<String, Object>();
-		return resMap;
+	public GlbVo queryGlbByRid(@RequestParam("rid")Integer rid) {
+		GlbVo glbVo = bimService.queryGlbByRid(rid);
+		return glbVo;
 	}
 
 }

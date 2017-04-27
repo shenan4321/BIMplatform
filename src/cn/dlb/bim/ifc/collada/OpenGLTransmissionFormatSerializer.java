@@ -25,7 +25,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import cn.dlb.bim.PlatformContext;
-import cn.dlb.bim.ifc.collada.Collada2GLTFThread.Collada2GLTFConfiguration;
+import cn.dlb.bim.component.PlatformServer;
+import cn.dlb.bim.ifc.collada.ColladaProcess.Collada2GLTFConfiguration;
 import cn.dlb.bim.ifc.emf.IfcModelInterface;
 import cn.dlb.bim.ifc.emf.ProjectInfo;
 import cn.dlb.bim.ifc.serializers.EmfSerializer;
@@ -38,6 +39,7 @@ public class OpenGLTransmissionFormatSerializer extends EmfSerializer {
 	private static final Logger LOGGER = LoggerFactory.getLogger(OpenGLTransmissionFormatSerializer.class);
 	private ColladaSerializer colladaSerializer = null;
 	private ProjectInfo projectInfo = null;
+	private final PlatformServer server;
 	
 	// Export settings-related.
 	private String returnType = ".zip";
@@ -57,26 +59,30 @@ public class OpenGLTransmissionFormatSerializer extends EmfSerializer {
 	};
 	
 	//
-	public OpenGLTransmissionFormatSerializer() {
+	public OpenGLTransmissionFormatSerializer(PlatformServer server) {
 		super();
+		this.server = server;
 	}
 
-	public OpenGLTransmissionFormatSerializer(Collada2GLTFConfiguration configuration) {
+	public OpenGLTransmissionFormatSerializer(PlatformServer server, Collada2GLTFConfiguration configuration) {
 		super();
 		//
+		this.server = server;
 		this.configuration = configuration;
 	}
 
-	public OpenGLTransmissionFormatSerializer(Collada2GLTFConfiguration configuration, String returnType) {
+	public OpenGLTransmissionFormatSerializer(PlatformServer server, Collada2GLTFConfiguration configuration, String returnType) {
 		super();
 		//
+		this.server = server;
 		this.configuration = configuration;
 		this.returnType = returnType.toLowerCase(Locale.ENGLISH);
 	}
 
-	public OpenGLTransmissionFormatSerializer(String returnType) {
+	public OpenGLTransmissionFormatSerializer(PlatformServer server, String returnType) {
 		super();
 		//
+		this.server = server;
 		this.returnType = returnType.toLowerCase(Locale.ENGLISH);
 	}
 
@@ -199,8 +205,8 @@ public class OpenGLTransmissionFormatSerializer extends EmfSerializer {
 		// Finalize the stream and close the file.
 		outputStream.close();
 		// Launch a thread to run the collada2gltf converter.
-		Collada2GLTFThread thread = new Collada2GLTFThread(colladaFile, writeDirectory);
-		thread.run11();
+		ColladaProcess thread = server.getColladaProcessFactory().createColladaProcess(colladaFile, writeDirectory);
+		thread.process();
 //		synchronized (thread) {
 //			thread.start();
 //			// Force wait until the thread's subprocess is done running (i.e. the files have all been created).
@@ -237,7 +243,7 @@ public class OpenGLTransmissionFormatSerializer extends EmfSerializer {
 		Gltf2glbConvertor convertor = new Gltf2glbConvertor();
 		for (Path f : PathUtils.list(writeDirectory)) {
 			File file = f.toFile();
-			if (file.getName().endsWith("\\.gltf")) {
+			if (file.getName().endsWith(".gltf")) {
 				ObjectNode scene = (ObjectNode) objMapper.readTree(file);  
 				try {
 					ByteBuffer byteBuffer = convertor.convert(scene, writeDirectory, true, true);
@@ -247,6 +253,7 @@ public class OpenGLTransmissionFormatSerializer extends EmfSerializer {
 				}
 			}
 		}
+		outputStream.flush();
 	}
 
 }

@@ -2,12 +2,12 @@ package cn.dlb.bim.ifc.engine.cells;
 
 public class Colord {
 
-	public int r;
-	public int g;
-	public int b;
-	private int a;
+	public double r;
+	public double g;
+	public double b;
+	private double a;
 	
-	public Colord(int r, int g, int b, int a) {
+	public Colord(double r, double g, double b, double a) {
 		this.r = r;
 		this.g = g;
 		this.b = b;
@@ -15,7 +15,10 @@ public class Colord {
 	}
 
 	public Colord(double d) {
-		// TODO Auto-generated constructor stub
+		this.r = d;
+		this.g = d;
+		this.b = d;
+		this.a = d;
 	}
 
 	public double r() {

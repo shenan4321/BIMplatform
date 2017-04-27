@@ -180,13 +180,13 @@
 				]
 			};
 		}
-	    
+	    var params = {rid:1};
 	    $.ajax ({
 	        async:false,
-	        type: "POST",
-	        url: "test.do",
+	        type: "GET",
+	        url: "queryGlbByRid.do",
 	        contentType: "application/json",  
-// 	        data: JSON.stringify(preLoadQuery),
+ 	        data: params,
 	       	dataType:"json",
 	        success:function(data) {
 	        	alert("success");

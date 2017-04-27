@@ -1,18 +1,19 @@
 package cn.dlb.bim.ifc.collada;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import cn.dlb.bim.utils.Unsigned;
 
 public class GlbBody {
 
@@ -22,12 +23,12 @@ public class GlbBody {
 	}
 
 	private int length = 0;
-	private Map<Integer, Buffer> parts;
+	private List<Part> parts;
 	private Path containingFolder;
 
 	public GlbBody(Path containingFolder) {
 		this.containingFolder = containingFolder;
-		parts = new HashMap<>();
+		parts = new ArrayList<>();
 	}
 
 	public Part add(String uri, int len) throws IOException {
@@ -38,13 +39,12 @@ public class GlbBody {
 		buffer = buffer.slice();
 
 		int offset = length;
-		parts.put(offset, buffer);
 		this.length += len;
 
 		Part part = new Part();
 		part.offset = offset;
 		part.buffer = buffer;
-
+		parts.add(part);
 		return part;
 	}
 
@@ -57,7 +57,7 @@ public class GlbBody {
 	@SuppressWarnings("resource")
 	public ByteBuffer getBufferFromUri(String uri, Path containingFolder) throws IOException {
 		// 2.0以后只在外部存储bin文件
-		Path binPath = containingFolder;
+		Path binPath = containingFolder.resolve(uri);
 		FileInputStream fis = new FileInputStream(binPath.toFile());
 		FileChannel channel = fis.getChannel();
 		ByteBuffer byteBuffer = ByteBuffer.allocate((int) channel.size());
@@ -78,8 +78,9 @@ public class GlbBody {
 		ObjectNode binaryGlTFNode = factory.objectNode();
 		binaryGlTFNode.put("byteLength", bodyLength);
 		binaryGlTFNode.put("uri", "");
+		((ObjectNode) buffersNode).set(Gltf2glbConvertor.BINARY_BUFFER, binaryGlTFNode);
 
-		String newSceneStr = scene.asText();
+		String newSceneStr = scene.toString();
 
 		int contentLength = newSceneStr.getBytes().length;
 		// As body is 4-byte aligned, the scene length must be padded to have a
@@ -92,30 +93,41 @@ public class GlbBody {
 
 		// Let's create our GLB file!
 		ByteBuffer glbFile = ByteBuffer.allocate(fileLength);
-
+		
 		// Magic number (the ASCII string 'glTF').
-		glbFile.putInt(0, 0x676C5446);
-
+		Unsigned.putUnsignedInt(glbFile, 0, 0x676C5446);
+		
 		// Binary GLTF is little endian.
 		// Version of the Binary glTF container format as a uint32 (version 1).
-		glbFile.putInt(4, 1);
+		Unsigned.putUnsignedIntLE(glbFile, 4, 1);
 
 		// Total length of the generated file in bytes (uint32).
-		glbFile.putInt(8, fileLength);
+		Unsigned.putUnsignedIntLE(glbFile, 8, fileLength);
 
 		// Total length of the scene in bytes (uint32).
-		glbFile.putInt(12, paddedContentLength);
+		Unsigned.putUnsignedIntLE(glbFile, 12, paddedContentLength);
 
 		// Scene format as a uint32 (JSON is 0).
-		glbFile.putInt(16, 0);
+		Unsigned.putUnsignedIntLE(glbFile, 16, 0);
 
 		// Write the scene.
-		glbFile.put(newSceneStr.getBytes(), 20, contentLength);
-
+		glbFile.position(20);
+		glbFile.put(newSceneStr.getBytes(), 0, contentLength);
+		
+		// Add spaces as padding to ensure scene is a multiple of 4 bytes.
+	    for (int i = contentLength + 20; i < bodyOffset; ++i) glbFile.put(i, (byte) 0x20);
+		
+		// Write the body.
+	    for (Part part : parts) {
+	    	glbFile.position(part.offset + bodyOffset);
+	    	glbFile.put(part.buffer);
+	    }
+	    glbFile.flip();
 		return glbFile;
 	}
 
 	private int padTo4Bytes(int x) {
 		return (x + 3) & ~3;
 	}
+	
 }

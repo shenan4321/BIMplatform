@@ -33,6 +33,7 @@ import cn.dlb.bim.ifc.emf.ProjectInfo;
 import cn.dlb.bim.ifc.emf.Schema;
 import cn.dlb.bim.ifc.engine.IRenderEngine;
 import cn.dlb.bim.ifc.engine.RenderEngineException;
+import cn.dlb.bim.ifc.engine.cells.Vector3d;
 import cn.dlb.bim.ifc.model.BasicIfcModel;
 import cn.dlb.bim.ifc.serializers.IfcStepSerializer;
 import cn.dlb.bim.ifc.serializers.SerializerException;
@@ -214,43 +215,7 @@ public class BimServiceImpl implements IBimService {
 		if (glbVo != null) {
 			return glbVo;
 		}
-		
-		PackageMetaData packageMetaData = server.getMetaDataManager()
-				.getPackageMetaData(Schema.IFC2X3TC1.getEPackageName());
-		PlatformInitDatas platformInitDatas = server.getPlatformInitDatas();
-		IfcModelDbSession session = new IfcModelDbSession(server.getIfcModelDao(), server.getMetaDataManager(), platformInitDatas);
-		BasicIfcModel model = new BasicIfcModel(packageMetaData);
-		
-		try {
-			session.get(rid, model, new OldQuery(packageMetaData, true));
-		} catch (IfcModelDbException e) {
-			e.printStackTrace();
-		} catch (IfcModelInterfaceException e) {
-			e.printStackTrace();
-		}
-		GlbSerializer serializer = new GlbSerializer(server);
-		ProjectInfo projectInfo = new ProjectInfo();
-		projectInfo.setName("BIM");
-		projectInfo.setAuthorName("linfujun");
-		ByteArrayOutputStream glbOutput = new ByteArrayOutputStream();
-		try {
-			serializer.init(model, projectInfo, true);
-			serializer.writeToOutputStream(glbOutput, null);
-		} catch (SerializerException e) {
-			e.printStackTrace();
-		}
-		
-		double longitude = 0.0;
-		double latitude = 0.0;
-		List<IfcSite> IfcSiteList = model.getAllWithSubTypes(IfcSite.class);
-		if (IfcSiteList.size() > 0) {
-			IfcSite site = IfcSiteList.get(0);
-			longitude = getDegreeFromCompoundPlaneAngle(site.getRefLongitude());
-			latitude = getDegreeFromCompoundPlaneAngle(site.getRefLatitude());
-		}
-		
-		ByteArrayInputStream glbInput = new ByteArrayInputStream(glbOutput.toByteArray());
-		server.getColladaCacheManager().saveGlb(glbInput, rid.toString(), rid, longitude, latitude);
+		generateGlbAndCache(rid);
 		glbVo = queryGlbByRidFromCache(rid);
 		return glbVo;
 	}
@@ -297,6 +262,61 @@ public class BimServiceImpl implements IBimService {
 			}
 		}
 		return result;
+	}
+
+	@Override
+	public Vector3d queryGlbLonlatByRid(Integer rid) {
+		GridFSDBFile glbFile = server.getColladaCacheManager().getGlbCache(rid);
+		if (glbFile == null) {
+			generateGlbAndCache(rid);
+			glbFile = server.getColladaCacheManager().getGlbCache(rid);
+		}
+		if (glbFile == null) {
+			return new Vector3d(0, 0, 0);
+		}
+		DBObject metaData = glbFile.getMetaData();
+		double lon = (double) metaData.get("lon");
+		double lat = (double) metaData.get("lat");
+		return new Vector3d(lon, lat, 0);
+	}
+	
+	private void generateGlbAndCache(Integer rid) {
+		PackageMetaData packageMetaData = server.getMetaDataManager()
+				.getPackageMetaData(Schema.IFC2X3TC1.getEPackageName());
+		PlatformInitDatas platformInitDatas = server.getPlatformInitDatas();
+		IfcModelDbSession session = new IfcModelDbSession(server.getIfcModelDao(), server.getMetaDataManager(), platformInitDatas);
+		BasicIfcModel model = new BasicIfcModel(packageMetaData);
+		
+		try {
+			session.get(rid, model, new OldQuery(packageMetaData, true));
+		} catch (IfcModelDbException e) {
+			e.printStackTrace();
+		} catch (IfcModelInterfaceException e) {
+			e.printStackTrace();
+		}
+		GlbSerializer serializer = new GlbSerializer(server);
+		ProjectInfo projectInfo = new ProjectInfo();
+		projectInfo.setName("bim");
+		projectInfo.setAuthorName("linfujun");
+		ByteArrayOutputStream glbOutput = new ByteArrayOutputStream();
+		try {
+			serializer.init(model, projectInfo, true);
+			serializer.writeToOutputStream(glbOutput, null);
+		} catch (SerializerException e) {
+			e.printStackTrace();
+		}
+		
+		double longitude = 0.0;
+		double latitude = 0.0;
+		List<IfcSite> IfcSiteList = model.getAllWithSubTypes(IfcSite.class);
+		if (IfcSiteList.size() > 0) {
+			IfcSite site = IfcSiteList.get(0);
+			longitude = getDegreeFromCompoundPlaneAngle(site.getRefLongitude());
+			latitude = getDegreeFromCompoundPlaneAngle(site.getRefLatitude());
+		}
+		
+		ByteArrayInputStream glbInput = new ByteArrayInputStream(glbOutput.toByteArray());
+		server.getColladaCacheManager().saveGlb(glbInput, rid.toString(), rid, longitude, latitude);
 	}
 
 }

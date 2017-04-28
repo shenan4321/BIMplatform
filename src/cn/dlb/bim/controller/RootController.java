@@ -1,6 +1,8 @@
 package cn.dlb.bim.controller;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,12 +23,22 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import cn.dlb.bim.component.PlatformInitDatas;
 import cn.dlb.bim.component.PlatformServer;
+import cn.dlb.bim.ifc.collada.KmzSerializer;
+import cn.dlb.bim.ifc.database.IfcModelDbException;
+import cn.dlb.bim.ifc.database.IfcModelDbSession;
+import cn.dlb.bim.ifc.database.OldQuery;
 import cn.dlb.bim.ifc.database.queries.om.JsonQueryObjectModelConverter;
 import cn.dlb.bim.ifc.database.queries.om.Query;
 import cn.dlb.bim.ifc.database.queries.om.QueryException;
+import cn.dlb.bim.ifc.emf.IfcModelInterfaceException;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
+import cn.dlb.bim.ifc.emf.ProjectInfo;
 import cn.dlb.bim.ifc.emf.Schema;
+import cn.dlb.bim.ifc.engine.cells.Vector3d;
+import cn.dlb.bim.ifc.model.BasicIfcModel;
+import cn.dlb.bim.ifc.serializers.SerializerException;
 import cn.dlb.bim.service.IBimService;
 import cn.dlb.bim.vo.GlbVo;
 
@@ -132,10 +144,48 @@ public class RootController {
 	}
 	
 	@RequestMapping(value = "queryGlbByRid", method = RequestMethod.GET)
-	@ResponseBody
-	public GlbVo queryGlbByRid(@RequestParam("rid")Integer rid) {
+	public void queryGlbByRid(@RequestParam("rid")Integer rid, HttpServletResponse response) {
 		GlbVo glbVo = bimService.queryGlbByRid(rid);
-		return glbVo;
+		try {
+			OutputStream os = response.getOutputStream();
+			os.write(glbVo.getData());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@RequestMapping(value = "queryGlbLonlatByRid", method = RequestMethod.GET)
+	@ResponseBody
+	public Vector3d queryGlbLonlatByRid(@RequestParam("rid")Integer rid) {
+		return bimService.queryGlbLonlatByRid(rid);
+	}
+	
+	@RequestMapping(value = "kml", method = RequestMethod.GET)
+	@ResponseBody
+	public void kml(@RequestParam("rid")Integer rid) {
+		PackageMetaData packageMetaData = server.getMetaDataManager()
+				.getPackageMetaData(Schema.IFC2X3TC1.getEPackageName());
+		PlatformInitDatas platformInitDatas = server.getPlatformInitDatas();
+		IfcModelDbSession session = new IfcModelDbSession(server.getIfcModelDao(), server.getMetaDataManager(), platformInitDatas);
+		BasicIfcModel model = new BasicIfcModel(packageMetaData);
+		try {
+			session.get(rid, model, new OldQuery(packageMetaData, true));
+		} catch (IfcModelDbException e) {
+			e.printStackTrace();
+		} catch (IfcModelInterfaceException e) {
+			e.printStackTrace();
+		}
+		KmzSerializer serializer = new KmzSerializer();
+		ProjectInfo projectInfo = new ProjectInfo();
+		projectInfo.setName("bim");
+		projectInfo.setAuthorName("linfujun");
+		try {
+			serializer.init(model, projectInfo, true);
+			serializer.writeToFile(new File("test.kmz").toPath(), null);
+		} catch (SerializerException e) {
+			e.printStackTrace();
+		}
+		
 	}
 
 }

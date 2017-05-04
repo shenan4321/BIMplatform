@@ -42,7 +42,7 @@ import cn.dlb.bim.ifc.emf.Schema;
 import cn.dlb.bim.ifc.engine.cells.Vector3d;
 import cn.dlb.bim.ifc.model.BasicIfcModel;
 import cn.dlb.bim.ifc.serializers.SerializerException;
-import cn.dlb.bim.ifc.tree.ProjectTree2x3tc1;
+import cn.dlb.bim.ifc.tree.ProjectTree;
 import cn.dlb.bim.service.IBimService;
 import cn.dlb.bim.vo.GlbVo;
 
@@ -175,7 +175,7 @@ public class RootController {
 	}
 	
 	@RequestMapping(value = "queryProjectTree", method = RequestMethod.GET)
-	public void queryProjectTree(@RequestParam("pid")Long pid) {
+	public ProjectTree queryProjectTree(@RequestParam("pid")Long pid) {
 		BIMProject project = bimService.queryProjectByPid(pid);
 		String ifcSchema = project.getIfcSchema();
 		PackageMetaData packageMetaData = null;
@@ -194,8 +194,9 @@ public class RootController {
 		} catch (IfcModelInterfaceException e) {
 			e.printStackTrace();
 		}
-		ProjectTree2x3tc1 tree = new ProjectTree2x3tc1();
+		ProjectTree tree = new ProjectTree();
 		tree.buildProjectTree(model);
+		return tree;
 	}
 	
 	@RequestMapping(value = "queryAllProject", method = RequestMethod.GET)

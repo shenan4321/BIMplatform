@@ -17,7 +17,7 @@ import cn.dlb.bim.models.ifc2x3tc1.IfcRelContainedInSpatialStructure;
 import cn.dlb.bim.models.ifc2x3tc1.IfcRelDecomposes;
 import cn.dlb.bim.models.ifc2x3tc1.IfcSpatialStructureElement;
 
-public class ProjectTree2x3tc1 {
+public class ProjectTree {
 	
 	private List<TreeItem> treeRoots = new ArrayList<>();
 	

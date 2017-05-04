@@ -52,7 +52,7 @@ public class BimServiceImpl implements IBimService {
 	private PlatformServer server;
 
 	@Override
-	public List<GeometryInfoVo> queryDbGeometryInfo(Integer rid) {
+	public List<GeometryInfoVo> queryGeometryInfo(Integer rid) {
 		PackageMetaData packageMetaData = server.getMetaDataManager()
 				.getPackageMetaData(Schema.IFC2X3TC1.getEPackageName());
 		PlatformInitDatas platformInitDatas = server.getPlatformInitDatas();
@@ -84,92 +84,6 @@ public class BimServiceImpl implements IBimService {
 	}
 
 	@Override
-	public List<IfcModelInterface> queryAllIfcModel() {
-
-		Schema schema = Schema.IFC2X3TC1;
-		File[] ifcFiles = getIfcFileList();
-
-		List<IfcModelInterface> modelList = new ArrayList<>();
-
-		for (File file : ifcFiles) {
-
-			IfcStepDeserializer deserializer = server.getSerializationManager().createIfcStepDeserializer(schema);
-			IfcStepSerializer serializer = server.getSerializationManager().createIfcStepSerializer(schema);
-
-			try {
-				deserializer.read(file);
-				IfcModelInterface model = deserializer.getModel();
-
-				IRenderEngine renderEngine = server.getRenderEngineFactory()
-						.createRenderEngine(schema.getEPackageName());
-
-				GeometryGenerator generator = new GeometryGenerator(model, serializer, renderEngine);
-				generator.generateForAllElements();
-
-				modelList.add(model);
-			} catch (DeserializeException e) {
-				e.printStackTrace();
-			} catch (RenderEngineException e) {
-				e.printStackTrace();
-			}
-
-		}
-		return modelList;
-	}
-
-	@Override
-	public List<GeometryInfoVo> queryGeometryInfo() {
-
-		Schema schema = Schema.IFC2X3TC1;
-		File[] ifcFiles = getIfcFileList();
-
-		List<GeometryInfoVo> geometryList = new ArrayList<>();
-
-		if (ifcFiles == null) {
-			return geometryList;
-		}
-
-		IfcStepDeserializer deserializer = server.getSerializationManager().createIfcStepDeserializer(schema);
-		IfcStepSerializer serializer = server.getSerializationManager().createIfcStepSerializer(schema);
-
-		try {
-			deserializer.read(ifcFiles[0]);
-			IfcModelInterface model = deserializer.getModel();
-
-			IRenderEngine renderEngine = server.getRenderEngineFactory().createRenderEngine(schema.getEPackageName());
-
-			GeometryGenerator generator = new GeometryGenerator(model, serializer, renderEngine);
-			generator.generateForAllElements();
-
-			for (IfcProduct ifcProduct : model.getAllWithSubTypes(IfcProduct.class)) {
-				if (ifcProduct.getRepresentation() != null
-						&& ifcProduct.getRepresentation().getRepresentations().size() != 0) {
-
-					GeometryInfoVo adaptor = new GeometryInfoVo();
-					boolean flag = adaptor.adapt(ifcProduct);
-					if (flag) {
-						geometryList.add(adaptor);
-					}
-				}
-			}
-		} catch (DeserializeException e) {
-			e.printStackTrace();
-		} catch (RenderEngineException e) {
-			e.printStackTrace();
-		}
-
-		return geometryList;
-	}
-
-	public File[] getIfcFileList() {
-		File dir = PlatformContext.getClassRootPath().resolve("file/").toAbsolutePath().toFile();
-		if (dir.isDirectory()) {
-			return dir.listFiles();
-		}
-		return null;
-	}
-
-	@Override
 	public int deserializeModelFileAndSave(File modelFile) {
 
 		Schema schema = Schema.IFC2X3TC1;
@@ -178,11 +92,7 @@ public class BimServiceImpl implements IBimService {
 		IfcStepSerializer serializer = server.getSerializationManager().createIfcStepSerializer(schema);
 		int rid = -1;
 		try {
-			long startTime = System.currentTimeMillis();
 			deserializer.read(modelFile);
-			long endTime = System.currentTimeMillis();
-			
-			System.out.println("deserialize time : " + (endTime - startTime) + "millis");
 			
 			IfcModelInterface model = deserializer.getModel();
 
@@ -190,8 +100,7 @@ public class BimServiceImpl implements IBimService {
 
 			GeometryGenerator generator = new GeometryGenerator(model, serializer, renderEngine);
 			generator.generateForAllElements();
-			long endTime1 = System.currentTimeMillis();
-			System.out.println("render time : " + (endTime1 - endTime) + "millis");
+
 			PlatformInitDatas platformInitDatas = server.getPlatformInitDatas();
 			model.fixOids(platformInitDatas);
 			IfcModelDbSession session = new IfcModelDbSession(server.getIfcModelDao(), server.getMetaDataManager(), platformInitDatas);

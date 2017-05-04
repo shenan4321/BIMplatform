@@ -9,9 +9,7 @@ import cn.dlb.bim.vo.GeometryInfoVo;
 import cn.dlb.bim.vo.GlbVo;
 
 public interface IBimService {
-	public List<GeometryInfoVo> queryDbGeometryInfo(Integer rid);
-	public List<IfcModelInterface> queryAllIfcModel();
-	public List<GeometryInfoVo> queryGeometryInfo();
+	public List<GeometryInfoVo> queryGeometryInfo(Integer rid);
 	public int deserializeModelFileAndSave(File modelFile);
 	public GlbVo queryGlbByRid(Integer rid);
 	public Vector3d queryGlbLonlatByRid(Integer rid);

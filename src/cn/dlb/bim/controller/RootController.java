@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.alibaba.druid.sql.visitor.functions.Length;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import cn.dlb.bim.component.PlatformInitDatas;
@@ -39,6 +40,7 @@ import cn.dlb.bim.ifc.emf.Schema;
 import cn.dlb.bim.ifc.engine.cells.Vector3d;
 import cn.dlb.bim.ifc.model.BasicIfcModel;
 import cn.dlb.bim.ifc.serializers.SerializerException;
+import cn.dlb.bim.ifc.tree.ProjectTree2x3tc1;
 import cn.dlb.bim.service.IBimService;
 import cn.dlb.bim.vo.GlbVo;
 
@@ -67,52 +69,38 @@ public class RootController {
 		return "app/index.jsp";
 	}
 
-	@RequestMapping(value = "queryAllIfcModel", method = RequestMethod.GET)
-	@ResponseBody
-	public Map<String, Object> queryAllIfcModel() {
-		LOGGER.info("call queryAllIfcModel");
-		Map<String, Object> resMap = new HashMap<String, Object>();
-		resMap.put("success", "true");
-		resMap.put("models", bimService.queryAllIfcModel());
-		return resMap;
-	}
-
 	@RequestMapping(value = "queryGeometryInfo", method = RequestMethod.GET)
 	@ResponseBody
-	public Map<String, Object> queryGeometryInfo() {
-		LOGGER.info("call queryGeometryInfo");
+	public Map<String, Object> queryGeometryInfo(@RequestParam("rid") Integer rid) {
 		Map<String, Object> resMap = new HashMap<String, Object>();
 		resMap.put("success", "true");
-		resMap.put("geometries", bimService.queryGeometryInfo());
+		resMap.put("geometries", bimService.queryGeometryInfo(rid));
 		return resMap;
 	}
 
-	@RequestMapping(value = "queryDbGeometryInfo", method = RequestMethod.GET)
+	@RequestMapping(value = "uploadIfcFile", method = RequestMethod.POST)
 	@ResponseBody
-	public Map<String, Object> queryDbGeometryInfo(@RequestParam("rid") Integer rid) {
-		LOGGER.info("call queryDbGeometryInfo");
-		Map<String, Object> resMap = new HashMap<String, Object>();
-		resMap.put("success", "true");
-		resMap.put("geometries", bimService.queryDbGeometryInfo(rid));
-		return resMap;
-	}
-
-	@RequestMapping(value = "uploadAndDeserializeSave", method = RequestMethod.POST)
-	@ResponseBody
-	public Map<String, Object> upload(@RequestParam(value = "file", required = false) MultipartFile file,
+	public Map<String, Object> uploadIfcFile(@RequestParam(value = "file", required = false) MultipartFile file,
 			HttpServletRequest request// , ModelMap model
 	) {
-
-		LOGGER.info("upload file");
+		Map<String, Object> resMap = new HashMap<String, Object>();
 		String path = request.getSession().getServletContext().getRealPath("upload");
 		String fileName = file.getOriginalFilename();
-		LOGGER.info("file path: " + path);
+		String[] split = fileName.split(".");
+		String suffix = null;
+		if (split.length >= 2) {
+			suffix = split[split.length - 1];
+		}
+		if (suffix == null || suffix.equals("ifc")) {
+			resMap.put("success", "false");
+			return resMap;
+		} 
+		
 		File targetFile = new File(path, fileName);
 		if (!targetFile.exists()) {
 			targetFile.mkdirs();
 		}
 
-		// 保存
 		try {
 			file.transferTo(targetFile);
 		} catch (Exception e) {
@@ -120,10 +108,8 @@ public class RootController {
 		}
 
 		int rid = bimService.deserializeModelFileAndSave(targetFile);
-		// model.addAttribute("fileUrl", request.getContextPath() +
-		// "/upload/"+fileName);
-		Map<String, Object> resMap = new HashMap<String, Object>();
 		resMap.put("success", "true");
+		resMap.put("rid", rid);
 		return resMap;
 	}
 	
@@ -161,7 +147,6 @@ public class RootController {
 	}
 	
 	@RequestMapping(value = "kml", method = RequestMethod.GET)
-	@ResponseBody
 	public void kml(@RequestParam("rid")Integer rid) {
 		PackageMetaData packageMetaData = server.getMetaDataManager()
 				.getPackageMetaData(Schema.IFC2X3TC1.getEPackageName());
@@ -185,7 +170,24 @@ public class RootController {
 		} catch (SerializerException e) {
 			e.printStackTrace();
 		}
-		
+	}
+	
+	@RequestMapping(value = "queryTree", method = RequestMethod.GET)
+	public void queryTree(@RequestParam("rid")Integer rid) {
+		PackageMetaData packageMetaData = server.getMetaDataManager()
+				.getPackageMetaData(Schema.IFC2X3TC1.getEPackageName());
+		PlatformInitDatas platformInitDatas = server.getPlatformInitDatas();
+		IfcModelDbSession session = new IfcModelDbSession(server.getIfcModelDao(), server.getMetaDataManager(), platformInitDatas);
+		BasicIfcModel model = new BasicIfcModel(packageMetaData);
+		try {
+			session.get(rid, model, new OldQuery(packageMetaData, true));
+		} catch (IfcModelDbException e) {
+			e.printStackTrace();
+		} catch (IfcModelInterfaceException e) {
+			e.printStackTrace();
+		}
+		ProjectTree2x3tc1 tree = new ProjectTree2x3tc1();
+		tree.buildProjectTree(model);
 	}
 
 }

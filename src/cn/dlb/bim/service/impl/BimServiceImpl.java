@@ -1,8 +1,10 @@
 package cn.dlb.bim.service.impl;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -16,9 +18,10 @@ import org.springframework.stereotype.Service;
 import com.mongodb.DBObject;
 import com.mongodb.gridfs.GridFSDBFile;
 
-import cn.dlb.bim.PlatformContext;
 import cn.dlb.bim.component.PlatformInitDatas;
 import cn.dlb.bim.component.PlatformServer;
+import cn.dlb.bim.dao.ProjectDao;
+import cn.dlb.bim.dao.entity.BIMProject;
 import cn.dlb.bim.ifc.GeometryGenerator;
 import cn.dlb.bim.ifc.collada.GlbSerializer;
 import cn.dlb.bim.ifc.database.IfcModelDbException;
@@ -26,6 +29,7 @@ import cn.dlb.bim.ifc.database.IfcModelDbSession;
 import cn.dlb.bim.ifc.database.OldQuery;
 import cn.dlb.bim.ifc.deserializers.DeserializeException;
 import cn.dlb.bim.ifc.deserializers.IfcStepDeserializer;
+import cn.dlb.bim.ifc.deserializers.StepParser;
 import cn.dlb.bim.ifc.emf.IfcModelInterface;
 import cn.dlb.bim.ifc.emf.IfcModelInterfaceException;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
@@ -41,6 +45,7 @@ import cn.dlb.bim.models.ifc2x3tc1.IfcProduct;
 import cn.dlb.bim.models.ifc2x3tc1.IfcSite;
 import cn.dlb.bim.service.IBimService;
 import cn.dlb.bim.utils.BinUtils;
+import cn.dlb.bim.utils.IdentifyUtil;
 import cn.dlb.bim.vo.GeometryInfoVo;
 import cn.dlb.bim.vo.GlbVo;
 
@@ -50,6 +55,10 @@ public class BimServiceImpl implements IBimService {
 	@Autowired
 	@Qualifier("PlatformServer")
 	private PlatformServer server;
+	
+	@Autowired
+	@Qualifier("ProjectDaoImpl")
+	private ProjectDao projectDao;
 
 	@Override
 	public List<GeometryInfoVo> queryGeometryInfo(Integer rid) {
@@ -84,10 +93,22 @@ public class BimServiceImpl implements IBimService {
 	}
 
 	@Override
-	public int deserializeModelFileAndSave(File modelFile) {
+	public Integer newProject(BIMProject project, File modelFile) {
 
-		Schema schema = Schema.IFC2X3TC1;
-
+		Schema schema = null;
+		try {
+			schema = preReadSchema(modelFile);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (DeserializeException e) {
+			e.printStackTrace();
+		}
+		
+		if (schema == null) {
+			return -1;
+		}
+		project.setPid(IdentifyUtil.nextId());
+		
 		IfcStepDeserializer deserializer = server.getSerializationManager().createIfcStepDeserializer(schema);
 		IfcStepSerializer serializer = server.getSerializationManager().createIfcStepSerializer(schema);
 		int rid = -1;
@@ -106,6 +127,9 @@ public class BimServiceImpl implements IBimService {
 			IfcModelDbSession session = new IfcModelDbSession(server.getIfcModelDao(), server.getMetaDataManager(), platformInitDatas);
 			session.saveIfcModel(model);
 			rid = model.getModelMetaData().getRevisionId();
+			project.setRid(rid);
+			project.setIfcSchema(schema.getEPackageName());
+			projectDao.insertProject(project);
 		} catch (DeserializeException e) {
 			e.printStackTrace();
 		} catch (RenderEngineException e) {
@@ -226,6 +250,40 @@ public class BimServiceImpl implements IBimService {
 		
 		ByteArrayInputStream glbInput = new ByteArrayInputStream(glbOutput.toByteArray());
 		server.getColladaCacheManager().saveGlb(glbInput, rid.toString(), rid, longitude, latitude);
+	}
+	
+	@SuppressWarnings("unused")
+	private Schema preReadSchema(File file) throws IOException, DeserializeException {
+		BufferedReader br = new BufferedReader(new FileReader(file));
+		String line = null;
+		Schema result = null;
+		while ((line = br.readLine()) != null) {
+			if (line.startsWith("ENDSEC;")) {
+				break;
+			} else if (line.startsWith("FILE_SCHEMA")) {
+				String fileschema = line.substring("FILE_SCHEMA".length()).trim();
+				String innerLine = fileschema.substring(1, fileschema.length() - 2);
+				innerLine = innerLine.replace("\r\n", "");
+				StepParser stepParser = new StepParser(innerLine);
+				String schemaVersion = stepParser.readNextString();
+				if (schemaVersion.startsWith("IFC2X3")) {
+					result = Schema.IFC2X3TC1;
+				} else if (schemaVersion.startsWith("IFC4")) {
+					result = Schema.IFC4;
+				}
+			}
+		}
+		return result;
+	}
+
+	@Override
+	public BIMProject queryProjectByPid(Long pid) {
+		return projectDao.queryProject(pid);
+	}
+
+	@Override
+	public List<BIMProject> queryAllProject() {
+		return projectDao.queryAllProject();
 	}
 
 }

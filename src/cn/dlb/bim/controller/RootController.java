@@ -86,12 +86,12 @@ public class RootController {
 		Map<String, Object> resMap = new HashMap<String, Object>();
 		String path = request.getSession().getServletContext().getRealPath("upload");
 		String fileName = file.getOriginalFilename();
-		String[] split = fileName.split(".");
+		String[] split = fileName.split("\\.");
 		String suffix = null;
 		if (split.length >= 2) {
 			suffix = split[split.length - 1];
 		}
-		if (suffix == null || suffix.equals("ifc")) {
+		if (suffix == null || !suffix.equals("ifc")) {
 			resMap.put("success", "false");
 			return resMap;
 		} 

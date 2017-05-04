@@ -151,6 +151,7 @@ public class GlbSerializer extends EmfSerializer {
 		jsonOutputStream.write(String.format("}").getBytes());
 		// Push the data into the parent stream (gets returned to the server).
 		jsonOutputStream.flush();
+		jsonOutputStream.close();
 	}
 
 	public void encodeFileToBase64Stream(Path file, OutputStream base64OutputStream) throws IOException {
@@ -204,6 +205,7 @@ public class GlbSerializer extends EmfSerializer {
 			}
 		}
 		outputStream.flush();
+		outputStream.close();
 	}
 
 }

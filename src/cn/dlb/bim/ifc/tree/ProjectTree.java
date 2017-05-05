@@ -3,78 +3,97 @@ package cn.dlb.bim.ifc.tree;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EReference;
 
+import cn.dlb.bim.ifc.emf.IdEObject;
 import cn.dlb.bim.ifc.emf.IfcModelInterface;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
 import cn.dlb.bim.models.geometry.GeometryInfo;
-import cn.dlb.bim.models.ifc2x3tc1.IfcObjectDefinition;
-import cn.dlb.bim.models.ifc2x3tc1.IfcProduct;
-import cn.dlb.bim.models.ifc2x3tc1.IfcProject;
-import cn.dlb.bim.models.ifc2x3tc1.IfcRelAggregates;
-import cn.dlb.bim.models.ifc2x3tc1.IfcRelContainedInSpatialStructure;
-import cn.dlb.bim.models.ifc2x3tc1.IfcRelDecomposes;
-import cn.dlb.bim.models.ifc2x3tc1.IfcSpatialStructureElement;
 
 public class ProjectTree {
 	
+	private PackageMetaData packageMetaData;
 	private List<TreeItem> treeRoots = new ArrayList<>();
 	
+	public ProjectTree(PackageMetaData packageMetaData) {
+		this.packageMetaData = packageMetaData;
+	}
+	
 	public void buildProjectTree(IfcModelInterface ifcModel) {
-		List<IfcProject> projectList = ifcModel.getAllWithSubTypes(IfcProject.class);
-		PackageMetaData packageMetaData = ifcModel.getPackageMetaData();
-		for (IfcProject ifcProject : projectList) {
-			TreeItem root = buildTree(ifcProject, packageMetaData);
+		EClass productClass = (EClass) packageMetaData.getEClassifierCaseInsensitive("IfcProject");
+		List<IdEObject> projectList = ifcModel.getAllWithSubTypes(productClass);
+		
+		for (IdEObject ifcProject : projectList) {
+			TreeItem root = buildTree(ifcProject);
 			treeRoots.add(root);
 		}
 	}
 	
-	public TreeItem buildTree(IfcObjectDefinition object, PackageMetaData packageMetaData) {
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public TreeItem buildTree(IdEObject object) {
+		if (!isInstanceOf(object.eClass(), "IfcObjectDefinition")) {
+			return null;
+		}
 		TreeItem curTree = new TreeItem();
-		String objectName = object.getName();
+		String objectName = (String) object.eGet(object.eClass().getEStructuralFeature("Name"));
 		curTree.setName(objectName);
 		curTree.setOid(object.getOid());
-		EClass eclass = object.eClass();
-		curTree.setIfcClassType(eclass.getName());
+		curTree.setIfcClassType(object.eClass().getName());
 		curTree.setSelected(true);
-		if (isInstanceOf(packageMetaData, object.eClass(), "IfcProduct")) {
-			IfcProduct product = (IfcProduct) object;
-			GeometryInfo geometryInfo = product.getGeometry();
+		
+		if (isInstanceOf(object.eClass(), "IfcProduct")) {
+			EClass productClass = packageMetaData.getEClass("IfcProduct");
+			GeometryInfo geometryInfo = (GeometryInfo) object.eGet(productClass.getEStructuralFeature("geometry"));
 			if (geometryInfo != null) {
 				curTree.setGeometryOid(geometryInfo.getOid());
 			}
-			if (isInstanceOf(packageMetaData, product.eClass(), "IfcSpatialStructureElement")) {
-				IfcSpatialStructureElement ifcElement = (IfcSpatialStructureElement) product; //TODO IFC4
-				EList<IfcRelContainedInSpatialStructure> ifcRelContainedInSpatialStructureList = ifcElement.getContainsElements();
-				for (IfcRelContainedInSpatialStructure ifcRelContainedInSpatialStructure : ifcRelContainedInSpatialStructureList) {
-					EList<IfcProduct> ifcProductList = ifcRelContainedInSpatialStructure.getRelatedElements();
-					for (IfcProduct ifcProduct : ifcProductList) {
-						TreeItem subTree = buildTree(ifcProduct, packageMetaData);
+			
+			EReference containElementsReference = packageMetaData.getEReference(object.eClass().getName(), "ContainsElements");
+			
+			if (containElementsReference != null) {
+				List<IdEObject> ifcRelContainedInSpatialStructureList = (List<IdEObject>) object.eGet(containElementsReference.getEOpposite());
+				for (IdEObject ifcRelContainedInSpatialStructure : ifcRelContainedInSpatialStructureList) {
+					EReference relatedElementsReference = packageMetaData.getEReference(ifcRelContainedInSpatialStructure.eClass().getName(), "RelatedElements");
+					List<IdEObject> subIfcProductList = (List<IdEObject>) ifcRelContainedInSpatialStructure.eGet(relatedElementsReference.getEOpposite());
+					for (IdEObject subIfcProduct : subIfcProductList) {
+						TreeItem subTree = buildTree(subIfcProduct);
 						curTree.getContains().add(subTree);
 						subTree.setParent(curTree);
 					}
 				}
-			} 
-		}
-		EList<IfcRelDecomposes> isDecomposedBy = object.getIsDecomposedBy();
-		for (IfcRelDecomposes ifcRelDecomposes : isDecomposedBy) {
-			if (isInstanceOf(packageMetaData, ifcRelDecomposes.eClass(), "IfcRelAggregates")) {
-				IfcRelAggregates ifcRelAggregates = (IfcRelAggregates) ifcRelDecomposes;
-				EList<IfcObjectDefinition> ifcObjectDefinitionList = ifcRelAggregates.getRelatedObjects();
-				for (IfcObjectDefinition ifcObjectDefinition : ifcObjectDefinitionList) {
-					TreeItem subTree = buildTree(ifcObjectDefinition, packageMetaData);
-					curTree.getDecomposition().add(subTree);
-					subTree.setParent(curTree);
-				}
 			}
 		}
+			
+		EReference isDecomposedByReference = packageMetaData.getEReference(object.eClass().getName(), "IsDecomposedBy");
+		if (isDecomposedByReference != null) {
+			List ifcRelDecomposes = (List) object.eGet(isDecomposedByReference);
+			for (Object ifcRelDecompose : ifcRelDecomposes) {
+				if (ifcRelDecompose instanceof IdEObject) {
+					IdEObject ifcRelAggregates = (IdEObject) ifcRelDecompose;
+					if (isInstanceOf(ifcRelAggregates.eClass(), "IfcRelAggregates")) {
+						EReference relatedObjectsReference = packageMetaData.getEReference(ifcRelAggregates.eClass().getName(), "RelatedObjects");
+						List relatedObjects = (List) ifcRelAggregates.eGet(relatedObjectsReference);
+						for (Object relatedObject : relatedObjects) {
+							if (relatedObject instanceof IdEObject) {
+								IdEObject relatedIdEObject = (IdEObject) relatedObject;
+								TreeItem subTree = buildTree(relatedIdEObject);
+								curTree.getDecomposition().add(subTree);
+								subTree.setParent(curTree);
+							}
+						}
+					}
+				}
+				
+			}
+			
+		}
+				
 		return curTree;
 	}
 	
-	private Boolean isInstanceOf(PackageMetaData packageMetaData, EClass originClass, String type) {
-		EClass eClass = (EClass) packageMetaData.getEClassifierCaseInsensitive(type);
+	private Boolean isInstanceOf(EClass originClass, String type) {
+		EClass eClass = (EClass) packageMetaData.getEClass(type);
 		return eClass.isSuperTypeOf(originClass);
 	}
-	
 }

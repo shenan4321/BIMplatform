@@ -82,9 +82,13 @@ public class RootController {
 
 	@RequestMapping(value = "newProject", method = RequestMethod.POST)
 	@ResponseBody
-	public Map<String, Object> newProject(BIMProject project, @RequestParam(value = "file", required = false) MultipartFile file,
+	public Map<String, Object> newProject(@RequestParam(value = "file", required = false) MultipartFile file,
 			HttpServletRequest request// , ModelMap model
 	) {
+		BIMProject project = new BIMProject();
+		project.setAuthor("linfujun");
+		project.setTitle("test");
+		project.setStars(4);
 		Map<String, Object> resMap = new HashMap<String, Object>();
 		String path = request.getSession().getServletContext().getRealPath("upload");
 		String fileName = file.getOriginalFilename();
@@ -97,12 +101,13 @@ public class RootController {
 			resMap.put("success", "false");
 			return resMap;
 		} 
-		
-		File targetFile = new File(path, fileName);
+		String newFileName = fileName.substring(0, fileName.lastIndexOf("."));
+		newFileName += "-" + System.currentTimeMillis();
+		newFileName += "." + suffix;
+		File targetFile = new File(path, newFileName);
 		if (!targetFile.exists()) {
 			targetFile.mkdirs();
 		}
-
 		try {
 			file.transferTo(targetFile);
 		} catch (Exception e) {
@@ -194,7 +199,7 @@ public class RootController {
 		} catch (IfcModelInterfaceException e) {
 			e.printStackTrace();
 		}
-		ProjectTree tree = new ProjectTree();
+		ProjectTree tree = new ProjectTree(model.getPackageMetaData());
 		tree.buildProjectTree(model);
 		return tree;
 	}

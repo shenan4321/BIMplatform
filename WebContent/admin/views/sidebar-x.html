@@ -1,0 +1,209 @@
+<!-- sidebar: style can be found in sidebar.less -->
+<section class="sidebar">
+    <!-- Sidebar user panel -->
+    <div class="user-panel">
+        <div class="image-avatar image">
+        <img src="http://api.randomuser.me/portraits/thumb/men/22.jpg" class="img-circle" alt="User Image" />
+            <span><i class="fa fa-circle text-success"></i>
+            </span>
+        </div>
+        <div class="info">
+            <p class="text-center">
+                <span>Hello,
+                    <strong>Dave</strong>Mattew</span>
+            </p>
+            <ul class="profile-list">
+                <li>
+                    <a href="#!/" data-toggle="" data-placement="top" title="Profile">
+                        <span><i class="fontello-user-outline"></i>
+                        </span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#!/" data-toggle="" data-placement="top" title="Setting">
+                        <span><i class="fontello-wrench-outline"></i>
+                        </span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#!/" data-toggle="" data-placement="top" title="Logout">
+                        <span><i class="fontello-power-outline"></i>
+                        </span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- SIDEBAR MENU: : style can be found in sidebar.less -->
+
+    <ul id="menu" class="sidebar-menu">
+        <li class="active">
+            <a href="#!/dashboard" ng-class="{activeSmall:part == 'dashboard'}">
+                <i class="fa fontello-desktop-1"></i> 
+                <span>Dashboard</span>
+            </a>
+        </li>
+
+        <ul id="user-options" class="toolbar-icons" style="display: none;">
+            <li><a href="#"><i class="icon-user"></i>asem satu</a></li>
+            <li><a href="#"><i class="icon-star"></i>asem dua</a></li>
+            <li><a href="#"><i class="icon-edit"></i></a></li>
+            <li><a href="#"><i class="icon-trash"></i></a></li>
+            <li><a href="#"><i class="icon-ban-circle"></i></a></li>
+        </ul>
+
+        <li>
+            <a href="#!/mail" ng-class="{activeSmall:part == 'mail'}">
+                <i class="fa fontello-mail-1"></i> 
+                <span>Mailbox</span>
+                <small class="badge pull-right bg-yellow text-white">12</small>
+            </a>
+        </li>
+
+        <li class="treeview">
+            <a href="#!/">
+                <i class="fa fontello-inbox"></i> 
+                <span class="hide-menu">Special Pages</span>
+                <i class="fa fa-angle-left pull-right"></i>
+            </a>
+            <ul class="treeview-menu">
+                <li><a href="#!/invoice">Invoice</a>
+                </li>
+                <li><a href="pages/login.html">Login</a>
+                </li>
+                <li><a href="#!/masonry">Masonry</a>
+                </li>
+                <li><a href="pages/lockscreen.html">Lockscreen</a>
+                </li>
+                <li><a href="#!/404">404 Error</a>
+                </li>
+                <li><a href="#!/timeline">Timeline</a>
+                </li>
+                <li><a href="#!/blank">Blank Page</a>
+                </li>   
+                <li><a href="#!/shop">Shop Item<small class="badge pull-right bg-aqua text-white">New</small></a>
+                </li>  
+                <li><a href="#!/shop-list">Shop List<small class="badge pull-right bg-aqua text-white">New</small></a>
+                </li>   
+                <li><a href="#!/shop-detail">Shop Detail<small class="badge pull-right bg-aqua text-white">New</small></a>
+                </li>
+            </ul>
+        </li>
+        <li class="treeview">
+            <a href="#">
+                <i class="fa fontello-paper-plane"></i>
+                <span>UI Elements</span>
+                <i class="fa fa-angle-left pull-right"></i>
+            </a>
+            <ul class="treeview-menu">
+                <li><a href="#!/general" ng-class="{activeSmall:part == 'general'}">General</a>
+                </li>
+                <li><a href="#!/icons" ng-class="{activeSmall:part == 'icons'}">Icons</a>
+                </li>
+                <li><a href="#!/button" ng-class="{activeSmall:part == 'button'}">Buttons</a>
+                </li>
+           <!--      <li><a href="#!/map" ng-class="{activeSmall:part == 'map'}">Maps</a>
+                     </li>  -->
+                <li><a href="#!/calendar" ng-class="{activeSmall:part == 'calendar'}">Calendar</a>
+                </li>
+                <li><a href="#!/typhography" ng-class="{activeSmall:part == 'typhography'}">Typhography</a>
+                </li>
+              
+            </ul>
+        </li>
+        <li class="treeview">
+            <a href="#!/">
+                <i class="fa fontello-note"></i> 
+                <span>Forms</span>
+                <i class="fa fa-angle-left pull-right"></i>
+            </a>
+            <ul class="treeview-menu">
+                <li><a href="#!/general-element">General Elements</a>
+                </li>
+                <li><a href="#!/advanced">Advanced Elements</a>
+                </li>
+                <li><a href="#!/editors" ng-class="{activeSmall:part == 'editors'}">Editors</a>
+                </li>
+            </ul>
+        </li>
+        <li class="treeview">
+            <a href="#!/">
+                <i class="fa fontello-database-1"></i> 
+                <span>Tables</span>
+                <i class="fa fa-angle-left pull-right"></i>
+            </a>
+            <ul class="treeview-menu">
+                <li><a href="#!/table">Simple tables</a>
+                </li>
+                <li><a href="#!/data-table">Data tables</a>
+                </li>
+            </ul>
+        </li>
+
+        <li class="treeview">
+            <a href="#!/">
+                <i class="fa fontello-params"></i>
+                <span>Charts</span>
+                <i class="fa fa-angle-left pull-right"></i>
+            </a>
+            <ul class="treeview-menu">
+                <li><a href="#!/morris" ng-class="{activeSmall:part == 'morris'}">Morris</a>
+                </li>
+                <li><a href="#!/flot">Flot</a>
+                </li>
+
+            </ul>
+        </li>
+
+        <li class="treeview">
+            <a href="#!/">
+                <i class="fa fontello-pencil-1"></i>
+                <span>Blog</span>
+                <i class="fa fa-angle-left pull-right"></i>
+            </a>
+            <ul class="treeview-menu">
+                <li><a href="#!/blog-list">Blog List</a>
+                </li>
+                <li><a href="#!/blog-detail">Blog Detail</a>
+                </li>
+            </ul>
+        </li>
+    </ul>
+    <div class="info">
+        <small class="text-progess text-right clearfix">Profile Complete<b class="text-right pull-right">70 %</b>
+        </small>
+        <div class="progress xs progress-dark">
+            <div class="progress-bar progress-bar-blue" style="width: 70%;"></div>
+        </div>
+        <small class="text-progess text-right clearfix">Disk Usage<b class="text-right pull-right">37 %</b>
+        </small>
+        <div class="progress xs progress-dark">
+            <div class="progress-bar progress-bar-green" style="width: 37%;"></div>
+        </div>
+    </div>
+
+</section>
+<!-- /.sidebar -->
+<script>
+/* Sidebar tree view */
+(function($) {
+$(".sidebar .treeview").tree();
+})(jQuery);
+
+$('#menu').slicknav();
+//Activate tooltips
+$("[data-toggle='tooltip']").tooltip();
+function fix_sidebar() {
+    //Make sure the body tag has the .fixed class
+    if (!$("body").hasClass("fixed")) {
+        return;
+    }
+
+    //Add slimscroll
+    $(".sidebar").slimscroll({
+        height: ($(window).height() - $(".header").height()) + "px",
+        color: "rgba(0,0,0,0.3)"
+    });
+}
+</script>

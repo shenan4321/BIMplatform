@@ -1,0 +1,62 @@
+body > .header .navbar .sidebar-toggle {
+    background: transparent;
+}
+a {
+    color: #346185;
+}
+::-webkit-input-placeholder {
+    color: #fff;
+}
+:-moz-placeholder {
+    /* Firefox 18- */
+    color: #fff;
+}
+::-moz-placeholder {
+    /* Firefox 19+ */
+    color: #fff;
+}
+:-ms-input-placeholder {
+    color: #fff;
+}
+.main-theme .sidebar > .sidebar-menu > li > a:hover, .main-theme .sidebar > .sidebar-menu > li.active > a {
+    color: #fff;
+    background: #243f54;
+}
+.main-theme .sidebar a {
+    color: #ffffff;
+}
+.main-theme .leftmenu {
+    background: #346185;
+}
+.main-theme .navbar {
+    background: #ffffff;
+}
+.main-theme .logo {
+    color: #346185;
+}
+.main-theme .logo:hover {
+    cursor: pointer;
+    background: #346185;
+}
+.main-theme .sidebar-form input[type="text"], .main-theme .sidebar-form .btn {
+    background-color: transparent;
+    border: 1px solid transparent;
+}
+.main-theme .navbar .sidebar-toggle .icon-bar{
+    background:  #243F54;
+}
+.sidebar .sidebar-menu > li > a > .fa, .sidebar .sidebar-menu > li > a > .glyphicon, .sidebar .sidebar-menu > li > a > .ion {
+    color: #fff;
+}
+.text-progess {
+    color: #fff;
+}
+.profile-list li a span {
+    background: #E5E9EC;
+    color: #346185;
+}
+.profile-list li a span:hover {
+     cursor: pointer;
+     background: rgba(0,0,0,0.3)!important;
+     color: #ffffff;
+ }

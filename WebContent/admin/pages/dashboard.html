@@ -1,0 +1,937 @@
+<ol class="breadcrumb newcrumb">
+    <li>
+        <a href="#">
+            <span><i class="fa fontello-home-outline"></i>
+            </span>
+        </a>
+    </li>
+    <li class="active">Dashboard</li>
+</ol>
+<!-- Small boxes (Stat box) -->
+<div class="row">
+    <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-aqua">
+            <div class="inner">
+                <h3>
+                    74,531
+                </h3>
+                <p>
+                    Sales
+                </p>
+            </div>
+            <div class="icon">
+                <!-- Download -->
+                <span data-start='e003' data-frames='3' data-interval='500'>
+                </span>
+            </div>
+        </div>
+    </div>
+    <!-- ./col -->
+    <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-green">
+            <div class="inner">
+                <h3>
+                    53<sup style="font-size: 20px">%</sup>
+                </h3>
+                <p>
+                    Bounce Rate
+                </p>
+            </div>
+            <div class="icon">
+                <span data-start='e010' data-frames='4' data-index='0' data-interval='600'>
+                </span>
+            </div>
+
+        </div>
+    </div>
+    <!-- ./col -->
+    <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-blue">
+            <div class="inner">
+                <h3 style="font-size:22px">
+                    <small class="text-white">
+                        <strong>45%</strong>
+                    </small>/ 100%
+                </h3>
+                <p>
+                    Server Status
+                </p>
+            </div>
+            <div class="icon">
+                <span data-start='e02B' data-frames='2' data-index='0' data-interval='200'>
+                </span>
+            </div>
+
+        </div>
+    </div>
+    <!-- ./col -->
+    <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-red">
+            <div class="inner">
+                <h3>
+                    Good
+                </h3>
+                <p>
+                    Signal Status
+                </p>
+            </div>
+            <div class="icon">
+                <!-- Broadcast -->
+                <span data-start='e000' data-frames='3' data-interval='1000'>
+                </span>
+            </div>
+        </div>
+    </div>
+    <!-- ./col -->
+</div>
+<!-- /.row -->
+
+
+
+<!-- Main row -->
+<div class="row">
+    <!-- Left col -->
+    <section class="col-lg-8">
+        <!-- Box (with bar chart) -->
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="pad">
+                    <div id="world-map" style="height: 300px;"></div>
+                </div>
+                <!-- /.pad -->
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row - inside box -->
+
+        <!-- /.box -->
+
+
+    </section>
+    <!-- /.Left col -->
+    <!-- right col (We are only adding the ID to make the widgets sortable)-->
+    <section class="col-lg-4">
+        <!-- Map box -->
+        <div class="box bg-transparent">
+            <div class="box-header">
+                <h3 class="box-title">
+                    <i class="fa fa-map-marker"></i>&nbsp;Visitors
+                </h3>
+            </div>
+            <div class="box-body no-padding">
+                <div class="table-responsive">
+                    <!-- .table - Uses sparkline charts-->
+                    <table class="table">
+                        <tr class="text-right">
+                            <th>Country</th>
+                            <th>Visitors</th>
+                            <th>OS</th>
+                            <th>Status</th>
+                        </tr>
+                        <tr>
+                            <td><a class="text-green" href="#">USA</a>
+                            </td>
+                            <td>
+                                <div id="sparkline-1"></div>
+                            </td>
+                            <td>209</td>
+                            <td>
+                                <!-- Caution -->
+                                <span class="text-yellow" style="font-size:18px" data-start='e014' data-frames='2' data-index='0' data-interval='200'>
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><a class="text-green" href="#">India</a>
+                            </td>
+                            <td>
+                                <div id="sparkline-2"></div>
+                            </td>
+                            <td>131</td>
+                            <td>
+                                <span class="text-aqua" style="font-size:18px" data-start='e01A' data-frames='3' data-index='0' data-interval='1000'>
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><a class="text-green" href="#">Britain</a>
+                            </td>
+                            <td>
+                                <div id="sparkline-3"></div>
+                            </td>
+                            <td>19</td>
+                            <td>
+                                <!-- Dislike -->
+                                <span class="text-red" style="font-size:18px" data-start='e01D' data-frames='3' data-index='0' data-interval='1000'>
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><a class="text-green" href="#">Brazil</a>
+                            </td>
+                            <td>
+                                <div id="sparkline-4"></div>
+                            </td>
+                            <td>109</td>
+                            <td>
+                                <!-- Caution -->
+                                <span class="text-yellow" style="font-size:18px" data-start='e014' data-frames='2' data-index='0' data-interval='200'>
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><a class="text-green" href="#">China</a>
+                            </td>
+                            <td>
+
+
+
+                                <div id="sparkline-5"></div>
+                            </td>
+                            <td>192</td>
+                            <td>
+                                <span class="text-aqua" style="font-size:18px" data-start='e01A' data-frames='3' data-index='0' data-interval='1000'>
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><a class="text-green" href="#">Australia</a>
+                            </td>
+                            <td>
+                                <div id="sparkline-6"></div>
+                            </td>
+                            <td>1709</td>
+                            <td>
+                                <!-- Caution -->
+                                <span class="text-yellow" style="font-size:18px" data-start='e014' data-frames='2' data-index='0' data-interval='200'>
+                                </span>
+                            </td>
+                        </tr>
+                    </table>
+                    <!-- /.table -->
+                </div>
+            </div>
+            <!-- /.box-body-->
+            <div class="box-footer bg-transparent text-right">
+                <button class="btn bg-aqua"><i class="fa fontello-globe-1"></i> Share</button>
+                <button class="btn bg-blue"><i class="fa fontello-print"></i> Print</button>
+                <button class="btn bg-green"><i class="fa fontello-doc-text"></i> Full Report</button>
+            </div>
+        </div>
+        <!-- /.box -->
+    </section>
+
+    <div class="row">
+        <section class="col-lg-12">
+            <div class="row">
+                <!--   TIMELINE -->
+                <div class="col-lg-6">
+                    <div class="box bg-transparent">
+                        <div class="box-body no-padding">
+                            <ul class="timeline">
+                                <!-- timeline item -->
+                                <li>
+                                    <i class="fa fontello-chart bg-aqua"></i>
+                                    <span>
+                                        <strong>Sales Report</strong>from<i> Jacky Chan</i>
+                                        <small>25/6/2014</small>
+                                    </span>
+                                    <div class="timeline-item bg-aqua">
+
+                                        <h3 class="timeline-header text-aqua  no-border">
+                                            <span class="text-white"><i class="fontello-flow-parallel"></i>&nbsp;&nbsp;Activity</span>
+                                            <span class="text-white pull-right fa fa-cogs"></span>
+                                        </h3>
+
+                                        <div class="timeline-body pad-twenty">
+
+                                            <strong class="image">
+                                                <img src="img/animated-svg-ff.svg" alt="">
+                                            </strong>
+                                        </div>
+                                        <div class="timeline-footer">
+                                            <div class="row">
+                                                <div class="sm-lg-6">
+                                                    <span class="text-white pull-left">
+                                                        <p class="no-margin text-left">Last Week</p>
+                                                        <h2 style="margin-bottom:20px" class="no-margin">8,234,324</h2>
+                                                    </span>
+
+                                                </div>
+                                                <div class="sm-lg-6">
+                                                    <span class="text-white pull-right">
+                                                        <p class="no-margin text-right">Today</p>
+                                                        <h2 style="margin-bottom:20px!important" class="text-right no-margin">654</h2>
+                                                    </span>
+
+                                                </div>
+                                            </div>
+                                            <hr class="timeline-hr">
+                                            <span class="btn bg-opacity-one btn-lg fontello-note"></span>
+                                            <span class="btn bg-opacity-one btn-lg fontello-trash-2"></span>
+                                            <span style="font-size:36px" class="pull-right text-opacity"><i class="pw pw-maestro"></i><i class="pw pw-visa"></i><i class="pw pw-paypal"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </li>
+                                <!-- END timeline item -->
+                                <!-- timeline item -->
+                                <li>
+                                    <i class="fa fontello-clouds-flash-alt bg-green"></i>
+                                    <span>
+                                        <strong>Weather Report</strong>from<i> Budai Toma</i>
+                                        <small>23/6/2014</small>
+                                    </span>
+                                    <div class="timeline-item bg-green">
+
+                                        <h3 class="timeline-header text-green no-padding no-border"></h3>
+                                        <!--  <span class="time"><i class="fa fa-clock-o"></i> 5 mins ago</span> -->
+
+                                        <div class="timeline-body">
+                                            <div class="weather-wrap">
+                                                <div class="row">
+                                                    <div class="col-sm-12">
+                                                        <div class="temperature"><b>Monday</b>, 07:30 AM
+                                                            <span>F</span>
+                                                            <span><b>C</b>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-sm-4">
+                                                        <div class="weather-icon">
+                                                            <span>
+                                                                <canvas height="84" width="84" id="partly-cloudy-day"></canvas>
+                                                            </span>
+
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-8">
+                                                        <div class="weather-text">
+                                                            <h2>Texas
+                                                                <br><i>Partly Cloudy Day</i>
+                                                            </h2>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-sm-12">
+                                                        <div class="weather-text pull-right">
+                                                            <h3><i class="fontello-temperatire"></i>18<i class="fontello-fahrenheit"></i>
+                                                            </h3>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="weather-dash">
+                                                    <div class="row">
+                                                        <div class="col-sm-2">
+                                                            <div class="daily-weather">
+                                                                <h2>Mon</h2>
+                                                                <h3>85
+                                                                    <span><i class="fontello-fahrenheit"></i>
+                                                                    </span>
+                                                                </h3>
+                                                                <h4>
+                                                                    <span>
+                                                                        <canvas id="clear-day" width="32" height="32">
+                                                                        </canvas>
+
+                                                                    </span>
+                                                                </h4>
+                                                                <h5>15
+                                                                    <i>km/h</i>
+                                                                </h5>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-2">
+                                                            <div class="daily-weather">
+                                                                <h2>Tue</h2>
+                                                                <h3>65
+                                                                    <span><i class="fontello-fahrenheit"></i>
+                                                                    </span>
+                                                                </h3>
+                                                                <h4>
+                                                                    <canvas height="32" width="32" id="rain">
+                                                                    </canvas>
+                                                                </h4>
+                                                                <h5>12
+                                                                    <i>km/h</i>
+                                                                </h5>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-2">
+                                                            <div class="daily-weather">
+                                                                <h2>Wed</h2>
+                                                                <h3>83
+                                                                    <span><i class="fontello-fahrenheit"></i>
+                                                                    </span>
+                                                                </h3>
+                                                                <h4>
+                                                                    <canvas height="32" width="32" id="snow"></canvas>
+                                                                </h4>
+                                                                <h5>14
+                                                                    <i>km/h</i>
+                                                                </h5>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-2">
+                                                            <div class="daily-weather">
+                                                                <h2>Thu</h2>
+                                                                <h3>80
+                                                                    <span><i class="fontello-fahrenheit"></i>
+                                                                    </span>
+                                                                </h3>
+                                                                <h4>
+                                                                    <canvas height="32" width="32" id="sleet">
+                                                                    </canvas>
+                                                                </h4>
+                                                                <h5>15
+                                                                    <i>km/h</i>
+                                                                </h5>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-2">
+                                                            <div class="daily-weather">
+                                                                <h2>Fri</h2>
+                                                                <h3>79
+                                                                    <span><i class="fontello-fahrenheit"></i>
+                                                                    </span>
+                                                                </h3>
+                                                                <h4>
+                                                                    <canvas height="32" width="32" id="wind"></canvas>
+                                                                </h4>
+                                                                <h5>11
+                                                                    <i>km/h</i>
+                                                                </h5>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-2">
+                                                            <div class="daily-weather">
+                                                                <h2>Sat</h2>
+                                                                <h3>82
+                                                                    <span><i class="fontello-fahrenheit"></i>
+                                                                    </span>
+                                                                </h3>
+                                                                <h4>
+                                                                    <canvas height="32" width="32" id="cloudy"></canvas>
+                                                                </h4>
+                                                                <h5>10
+                                                                    <i>km/h</i>
+                                                                </h5>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <!-- END timeline item -->
+                                <!-- timeline item -->
+                                <li>
+                                    <i class="fa fontello-volume-high bg-blue"></i>
+                                    <span>
+                                        <strong>Now Playing</strong>from<i> Jennifer Paijo</i>
+                                        <small>25/6/2014</small>
+                                    </span>
+                                    <div class="timeline-item bg-blue">
+
+                                        <h3 style="padding: 15px 20px 0 20px;" class="timeline-header text-blue  no-border">
+                                            <span class="text-white"><i class="fontello-music-1"></i>&nbsp;&nbsp;Playlist</span>
+                                            <span class="text-white pull-right fa fa-cogs"></span>
+                                        </h3>
+                                        <div class="timeline-body padding-twenty">
+                                            <div class="row">
+                                                <div class="col-lg-4">
+                                                    <img class="img-responsive img-thumbnail" src="http://therain.blogdetik.com/files/2009/02/cover-album.jpg">
+                                                    <h5 class="text-white text-center"><i class="fa  fa-star-o"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
+                                                    </h5>
+                                                </div>
+                                                <div class="col-lg-8">
+                                                    <h4 style="margin:0 0 5px">
+                                                        <strong>The Rain</strong>
+                                                    </h4>
+                                                    <h6>Terlatih Patah Hati</h6>
+                                                    <div style="height:50px">
+
+                                                        <div class="progress vertical xxs bg-opacity-one">
+                                                            <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="height: 45%">
+                                                            </div>
+                                                        </div>
+                                                        <div class="progress vertical xxs bg-opacity-one">
+                                                            <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="height: 80%">
+
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="progress vertical xxs bg-opacity-one">
+                                                            <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="height: 60%">
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="progress vertical xxs bg-opacity-one">
+                                                            <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="height: 40%">
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="progress vertical xxs bg-opacity-one">
+                                                            <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="height: 20%">
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="progress vertical xxs bg-opacity-one">
+                                                            <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="height: 55%">
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="progress vertical xxs bg-opacity-one">
+                                                            <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="height: 60%">
+                                                            </div>
+                                                        </div>
+                                                        <div class="progress vertical xxs bg-opacity-one">
+                                                            <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="height: 23%">
+                                                            </div>
+                                                        </div>
+                                                        <div class="progress vertical xxs bg-opacity-one">
+                                                            <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="height: 75%">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <span class="pull-right"><i class="text-opacity fa fontello-loop"></i>&nbsp;&nbsp;<i class="text-opacity fa fa-random"></i>
+                                                    </span>
+                                                </div>
+                                            </div>
+
+
+                                        </div>
+                                        <div class="timeline-footer">
+
+
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <hr class="timeline-hr">
+                                                    <div class="clearfix">
+                                                        <span class="pull-left"><i class=" fontello-record"></i><i class="fontello-stop"></i><i class="fontello-pause"></i><i class="fontello-play"></i>
+                                                        </span>
+                                                        <small class="pull-right">01:23</small>
+                                                    </div>
+                                                    <div class="progress sm bg-opacity">
+                                                        <div class="progress-bar" style="width: 70%;"></div>
+                                                    </div>
+                                                    <span></span>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <!-- END timeline item -->
+
+
+                                <li>
+                                    <i class="fa fontello-volume-high bg-white"></i>
+                                    <span>
+                                        <strong>Now Playing</strong>from<i> Jennifer Paijo</i>
+                                        <small>25/6/2014</small>
+                                    </span>
+                                    <div class="timeline-item bg-white">
+
+                                        <h3 style="padding: 15px 20px 0 20px;" class="timeline-header text-white  no-border">
+                                            <span class="text-red"><i class="fontello-music-1"></i>&nbsp;&nbsp;Video</span>
+                                            <span class="text-red pull-right fa fa-cogs"></span>
+                                        </h3>
+                                        <div class="timeline-body no-pad">
+
+                                            <div class="embed-responsive embed-responsive-16by9">
+                                                <iframe class="embed-responsive-item" src="//player.vimeo.com/video/42552984?title=0&amp;byline=0&amp;portrait=0" width="500" height="281" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                </li>
+                                <!-- END timeline item -->
+
+
+
+
+                                <li>
+                                    <i class="fa fa-clock-o bg-time"></i>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <!--   ./TIMELINE -->
+
+
+                <!--  SOCIAL -->
+                <div class="col-lg-6">
+                    <div class="box bg-transparent">
+                        <div class="box-body no-padding">
+                            <form role="form" class="form-horizontal">
+                                <h4>What's New</h4>
+                                <div style="padding:14px;" class="form-group">
+                                    <textarea style="width:100%" placeholder="Update your status" rows="5"></textarea>
+                                </div>
+                                <div class="btn-group pull-right">
+                                    <button type="button" class="btn btn-info btn-lg dropdown-toggle" data-toggle="dropdown">Post
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu" role="menu">
+                                        <li>
+                                            <a href="#">
+                                                <span class="entypo-facebook-circled insta-color"></span>&nbsp;&nbsp;Facebook</a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                <span class="entypo-twitter-circled tweet-link"></span>&nbsp;&nbsp;Twitter</a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                <span class="entypo-instagrem insta-color"></span>&nbsp;&nbsp;Instagram</a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                <span class="entypo-gplus-circled gplus-textcolor"></span>&nbsp;&nbsp;Google Plus</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <ul class="list-inline">
+                                    <li><a href=""><i class="glyphicon glyphicon-upload"></i></a>
+                                    </li>
+                                    <li><a href=""><i class="glyphicon glyphicon-camera"></i></a>
+                                    </li>
+                                    <li><a href=""><i class="glyphicon glyphicon-map-marker"></i></a>
+                                    </li>
+                                    <li><a href=""><i class="glyphicon glyphicon-link"></i></a>
+                                    </li>
+                                </ul>
+                            </form>
+                        </div>
+                        <br>
+                    </div>
+
+
+                    <div class="box bg-transparent">
+                        <div class="box-body no-padding">
+                            <div class="panel panel-default">
+                                <div class="panel-fb">
+                                    <a href="#" class="link-post pull-right">
+                                        <span class="fontello-cog-outline"></span>
+                                    </a>
+                                    <a href="#" class="link-post pull-right">
+                                        <span class="fontello-thumbs-up-1"></span>
+                                    </a>
+                                    <a href="#" class="link-post pull-right">
+                                        <span class="fontello-link-outline"></span>
+                                    </a>
+
+                                    <h4>
+                                        <span class="fontello-facebook-circled"></span>&nbsp;
+
+                                    </h4>
+                                </div>
+                                <div class="panel-body">
+                                    <img class="img-circle pull-left" src="http://api.randomuser.me/portraits/thumb/women/21.jpg">
+                                    <div class="social-profile">
+                                        <h3> <a href="#">Sympo Nia</a>
+                                            <span><i class="fontello-globe-outline"></i>&nbsp;1 hours ago</span>
+                                        </h3>
+                                        <p>yang pawaii kelulusaaaannn
+                                            <br>jgn pecicilan dooooonnggg.....
+                                            <br>eman eman nyawamu</p>
+                                    </div>
+
+                                    <div class="clearfix"></div>
+                                    <hr>
+                                    <div class="social-content">
+
+                                        <div class="social-header">
+                                            <a href="#" class="">
+                                                <span class="fontello-thumbs-up-1"></span>2</a>People Like This
+                                        </div>
+                                        <ul>
+                                            <li>
+                                                <img class="img-social-content img-circle pull-left" src="http://api.randomuser.me/portraits/thumb/men/21.jpg">
+                                                <span><a href="#">Krida Riyanto</a> Sampluk buu...sampluk...
+                                                    <br>
+                                                    <b>5 Minute</b>
+                                                </span>
+                                            </li>
+
+                                            <li>
+                                                <img class="img-social-content img-circle pull-left" src="http://api.randomuser.me/portraits/thumb/men/22.jpg">
+                                                <span><a href="#">Srondeng Rimawan</a> Eee karang yo cah enom, cah tuo yo podo wae ding wkwkw
+                                                    <br>
+                                                    <b>13 Minute</b>
+                                                </span>
+                                            </li>
+
+                                            <li>
+                                                <img class="img-social-content img-circle pull-left" src="http://api.randomuser.me/portraits/thumb/men/23.jpg">
+                                                <span><a href="#">Setan Beras</a> Mesake bangsaku. jane ki yo bijine rasepiro tur mik kakehan geleleng.
+                                                    <br>
+                                                    <b>1 Hours</b>
+                                                </span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <hr>
+                                    <form>
+                                        <div class="input-group">
+                                            <div class="input-group-btn">
+                                                <button class="btn bg-aqua">+1</button>
+                                                <button class="btn bg-aqua"><i class="glyphicon glyphicon-share"></i>
+                                                </button>
+                                            </div>
+                                            <input type="text" placeholder="Add a comment.." class="form-control">
+                                        </div>
+                                    </form>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!--  todo list -->
+                    <br>
+
+                    <div class="box box-warning">
+                        <div class="box-header" style="cursor: move;">
+                            <div class="box-title"><i class="fa fa-calendar"></i> Calendar</div>
+                            <!-- tools box -->
+                            <div class="pull-right box-tools">
+                                <!-- button with a dropdown -->
+                                <div class="btn-group">
+                                    <button class="btn btn-success btn-sm dropdown-toggle" data-toggle="dropdown"><i class="fa fa-bars"></i>
+                                    </button>
+                                    <ul class="dropdown-menu pull-right" role="menu">
+                                        <li><a href="#">Add new event</a>
+                                        </li>
+                                        <li><a href="#">Clear events</a>
+                                        </li>
+                                        <li class="divider"></li>
+                                        <li><a href="#">View calendar</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <!-- /. tools -->
+                        </div>
+                        <!-- /.box-header -->
+                        <div class="box-body no-padding">
+                            <!--The calendar -->
+                            <div id="calendar" class="fc fc-ltr"></div>
+
+
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+                    <!--  /todo list -->
+
+                </div>
+                <!-- ./SOCIAL -->
+            </div>
+
+            <script>
+            //weather animation icon
+            var icons = new Skycons({
+                    "color": "#fff"
+                }),
+                list = [
+                    "clear-day", "clear-night", "partly-cloudy-day",
+                    "partly-cloudy-night", "cloudy", "rain", "sleet", "snow", "wind",
+                    "fog"
+                ],
+                i;
+
+            for (i = list.length; i--;)
+                icons.set(list[i], list[i]);
+
+            icons.play();
+
+             //World map by jvectormap
+             //Sparkline charts
+            var myvalues = [15, 19, -20, -22, -33, 27, 31, 27, 19, 30, 21];
+            $('#sparkline-1').sparkline(myvalues, {
+                type: 'bar',
+                barColor: '#0AA699',
+                negBarColor: "#0090D9",
+                height: '20px'
+            });
+            myvalues = [15, 19, 20, 22, 2, 10, -7, -27, -19, 30, 21];
+            $('#sparkline-2').sparkline(myvalues, {
+                type: 'bar',
+                barColor: '#0AA699',
+                negBarColor: "#0090D9",
+                height: '20px'
+            });
+            myvalues = [-15, -19, -20, 22, 33, 27, 31, 27, 19, 30, 21];
+            $('#sparkline-3').sparkline(myvalues, {
+                type: 'bar',
+                barColor: '#0AA699',
+                negBarColor: "#0090D9",
+                height: '20px'
+            });
+            myvalues = [15, 19, 20, -22, -33, -27, 31, 27, 19, 30, 21];
+            $('#sparkline-4').sparkline(myvalues, {
+                type: 'bar',
+                barColor: '#0AA699',
+                negBarColor: "#0090D9",
+                height: '20px'
+            });
+            myvalues = [15, 19, 20, 22, 33, 27, -31, -27, -19, 30, 21];
+            $('#sparkline-5').sparkline(myvalues, {
+                type: 'bar',
+                barColor: '#0AA699',
+                negBarColor: "#0090D9",
+                height: '20px'
+            });
+            myvalues = [15, 19, 20, 22, 13, 27, 31, 27, -19, -30, -21];
+            $('#sparkline-6').sparkline(myvalues, {
+                type: 'bar',
+                barColor: '#0AA699',
+                negBarColor: "#0090D9",
+                height: '20px'
+            });
+
+             //jvectormap data
+            var visitorsData = {
+                "US": 398, //USA
+                "SA": 400, //Saudi Arabia
+                "CA": 1000, //Canada
+                "DE": 500, //Germany
+                "FR": 760, //France
+                "CN": 300, //China
+                "AU": 700, //Australia
+                "BR": 600, //Brazil
+                "IN": 800, //India
+                "GB": 320, //Great Britain
+                "RU": 3000 //Russia
+            };
+             //World map by jvectormap
+            $('#world-map').vectorMap({
+                map: 'world_mill_en',
+                zoomMax: '8',
+                backgroundColor: "transparent",
+                regionStyle: {
+                    initial: {
+                        fill: '#000',
+                        "fill-opacity": 0.2,
+                        stroke: 'none',
+                        "stroke-width": 0,
+                        "stroke-opacity": 1
+                    }
+                },
+                series: {
+                    regions: [{
+                        values: visitorsData,
+                        scale: ["#3E5E6B", "#A6BAC2"], //['#3E5E6B', '#A6BAC2'],
+                        normalizeFunction: 'polynomial'
+                    }]
+                },
+                onRegionLabelShow: function(e, el, code) {
+                    if (typeof visitorsData[code] != "undefined")
+                        el.html(el.html() + ': ' + visitorsData[code] + ' new visitors');
+                }
+            });
+
+             //Date for the calendar events (dummy data)
+            var date = new Date();
+            var d = date.getDate(),
+                m = date.getMonth(),
+                y = date.getFullYear();
+
+             //Calendar
+            $('#calendar').fullCalendar({
+                editable: true, //Enable drag and drop
+                events: [{
+                    title: 'All Day Event',
+                    start: new Date(y, m, 1),
+                    backgroundColor: "#3c8dbc", //light-blue 
+                    borderColor: "#3c8dbc" //light-blue
+                }, {
+                    title: 'Long Event',
+                    start: new Date(y, m, d - 5),
+                    end: new Date(y, m, d - 2),
+                    backgroundColor: "#f39c12", //yellow
+                    borderColor: "#f39c12" //yellow
+                }, {
+                    title: 'Meeting',
+                    start: new Date(y, m, d, 10, 30),
+                    allDay: false,
+                    backgroundColor: "#0073b7", //Blue
+                    borderColor: "#0073b7" //Blue
+                }, {
+                    title: 'Lunch',
+                    start: new Date(y, m, d, 12, 0),
+                    end: new Date(y, m, d, 14, 0),
+                    allDay: false,
+                    backgroundColor: "#00c0ef", //Info (aqua)
+                    borderColor: "#00c0ef" //Info (aqua)
+                }, {
+                    title: 'Birthday Party',
+                    start: new Date(y, m, d + 1, 19, 0),
+                    end: new Date(y, m, d + 1, 22, 30),
+                    allDay: false,
+                    backgroundColor: "#0AA699", //Success (green)
+                    borderColor: "#0AA699" //Success (green)
+                }, {
+                    title: 'Meet Up',
+                    start: new Date(y, m, 28),
+                    end: new Date(y, m, 29),
+                    url: 'http://google.com/',
+                    backgroundColor: "#0090D9", //red
+                    borderColor: "#0090D9" //red
+                }],
+                buttonText: { //This is to add icons to the visible buttons
+                    prev: "<span class='fa fa-caret-left'></span>",
+                    next: "<span class='fa fa-caret-right'></span>",
+                    today: 'today',
+                    month: 'month',
+                    week: 'week',
+                    day: 'day'
+                },
+                header: {
+                    left: 'title',
+                    center: '',
+                    right: 'prev,next'
+                }
+            });
+
+             //animation icon
+            var interval = null;
+            $.each($('[data-start]'), function(idx, obj) {
+
+                var $obj = $(obj);
+                var start = $obj.attr('data-start');
+                var frames = $obj.attr('data-frames')
+                interval = $obj.attr('data-interval') || 500;
+
+                $obj.attr('data-icon', $('<div/>').html("&#x" + start + ";").text())
+                $obj.attr('data-index', 0);
+
+                setInterval(function() {
+                    var index = parseInt($obj.attr('data-index')) + 1;
+                    $obj.attr('data-index', index);
+
+                    if (index === parseInt(frames)) {
+                        $obj.attr('data-index', 0);
+                        index = 0
+                    } else {
+                        $obj.attr('data-index', index)
+                    }
+
+                    var val = (parseInt(start, 16) + index).toString(16);
+                    var enc = $('<div/>').html("&#x" + val + ";").text();
+                    $obj.attr('data-icon', enc);
+                }, parseInt(interval));
+            });
+            </script>

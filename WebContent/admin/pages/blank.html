@@ -1,0 +1,65 @@
+<ol class="breadcrumb newcrumb">
+    <li>
+        <a href="#">
+            <span><i class="fa fontello-home-outline"></i>
+            </span>Home</a>
+    </li>
+    <li><a href="#">Special Page</a>
+    </li>
+    <li>Blank Page</li>
+</ol>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="box">
+            <div class="box-header">
+                <!-- tools box -->
+                <div class="pull-right box-tools">
+
+                    <span class="box-btn" data-widget="collapse"><i class="fa fa-minus"></i>
+                    </span>
+                    <span class="box-btn" data-widget="remove"><i class="fa fa-times"></i>
+                    </span>
+                </div>
+                <h3 class="box-title fontello-doc">Blank Page</h3>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <h4>Content Goes Here</h4>
+                <p>content</p>
+            </div>
+            <!-- /.box-body -->
+        </div>
+        <!-- /.box -->
+    </div>
+</div>
+<script>
+/*
+ * INITIALIZE BUTTON TOGGLE
+ * ------------------------
+ * always use this code for toggle and close button effect
+ */
+
+$("[data-widget='remove']").click(function() {
+    //Find the box parent        
+    var box = $(this).parents(".box").first();
+    box.slideUp();
+});
+
+/*     
+ * Add collapse and remove events to boxes
+ */
+$("[data-widget='collapse']").click(function() {
+    //Find the box parent        
+    var box = $(this).parents(".box").first();
+    //Find the body and the footer
+    var bf = box.find(".box-body, .box-footer");
+    if (!box.hasClass("collapsed-box")) {
+        box.addClass("collapsed-box");
+        bf.slideUp();
+    } else {
+        box.removeClass("collapsed-box");
+        bf.slideDown();
+    }
+});
+</script>

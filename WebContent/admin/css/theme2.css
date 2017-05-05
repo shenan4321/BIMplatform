@@ -1,0 +1,32 @@
+/* DEFAULT STYLE */
+
+.main-theme .leftmenu {
+    background: #222A38;
+}
+.main-theme .sidebar > .sidebar-menu > li > a:hover, .main-theme .sidebar > .sidebar-menu > li.active > a {
+    color: #fff;
+    background: #0D131E;
+}
+.main-theme .sidebar > .sidebar-menu > li > .treeview-menu {
+    background: #0D131E;
+    color: #9fabbd;
+}
+.sidebar .sidebar-menu .treeview-menu > li > a {
+    color: #9fabbd;
+}
+.main-theme .sidebar a {
+    color: #9fabbd;
+}
+.profile-list li a span {
+    background: #0D131E;
+    color: #fff;
+}
+.content {
+    background: #E5E9EC;
+}
+ol.breadcrumb.newcrumb.ng-scope {
+    background: transparent;
+}
+.sidebar .sidebar-menu > li > a > .fa, .sidebar .sidebar-menu > li > a > .glyphicon, .sidebar .sidebar-menu > li > a > .ion {
+    color: #0e6166;
+}

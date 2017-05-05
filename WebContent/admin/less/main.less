@@ -1,0 +1,348 @@
+/* Colors */
+
+/*  Primary #3c8dbc */
+ @light-blue: #3c8dbc;
+
+/*  Danger #f56954 */
+ @red: #f56954;
+
+/* Success #37A8AF */
+ @green: #37A8AF;
+
+/* Info #0090D9 */
+ @aqua: #0090D9;
+
+/* Warning #f39c12 */
+ @yellow: #f39c12;
+
+/**
+  * ------
+ **/
+ @red-dark:#f4543c;
+ @aqua-dark:#0181c1;
+ @white: #ffffff;
+ @blue: #3E739D;
+ @blue-light: #3276b1;
+ @green-dark:#2c9399;
+ @navy: #001f3f;
+ @teal: #39CCCC;
+ @olive: #3D9970;
+ @lime: #01FF70;
+ @orange: #ff851b;
+ @red-orange: #e83922;
+ @fuchsia: #F012BE;
+ @purple: #932ab6;
+ @maroon: #85144B;
+ @black: #222A38;
+ @gray: #E5E9EC;
+ @green-dark: #218287;
+ @yellow-dark:#e08e0b;
+
+/* #E5E9EC */
+ @gray-two: #eaeaec;
+ @gray-three: #888888;
+ @white-opac: rgba(0, 0, 0, 0.1);
+
+/* #eaeaec */
+ html, body {
+    overflow-x: hidden!important;
+    font-family:'Open Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100%;
+    background: @gray;
+    font-size: 13px;
+    color: @gray-three!important;
+}
+a {
+    color: @green;
+}
+a:hover, a:active, a:focus {
+    outline: none;
+    text-decoration: none;
+    color: @green-dark;
+}
+/* Layouts */
+ .wrapper {
+    min-height: 100%;
+    background: @gray;
+    /* #222A38 */
+}
+/* background content */
+ .content, ol.breadcrumb.newcrumb.ng-scope {
+    background: @gray;
+}
+.bg-red, .bg-yellow, .bg-aqua, .bg-blue, .bg-light-blue, .bg-green, .bg-navy, .bg-teal, .bg-olive, .bg-lime, .bg-orange, .bg-fuchsia, .bg-purple, .bg-maroon, .bg-black {
+    color: #f9f9f9 !important;
+}
+.bg-white {
+    background-color: #fff !important;
+    color: @gray-three!important;
+}
+.bg-gray {
+    background-color: @gray-two !important;
+}
+.bg-black {
+    background-color: @black !important;
+}
+.bg-red {
+    background-color: @red !important;
+}
+.bg-yellow {
+    background-color: @yellow !important;
+}
+.bg-aqua {
+    background-color: @aqua !important;
+}
+.bg-blue {
+    background-color: @blue !important;
+}
+.bg-light-blue {
+    background-color: @light-blue !important;
+}
+.bg-green {
+    background-color: @green!important;
+}
+.bg-navy {
+    background-color: @navy !important;
+}
+.bg-teal {
+    background-color: @teal !important;
+}
+.bg-olive {
+    background-color: @olive !important;
+}
+.bg-lime {
+    background-color: @lime !important;
+}
+.bg-orange {
+    background-color: @orange !important;
+}
+.bg-red-orange {
+    background-color: @red-orange !important;
+}
+.bg-fuchsia {
+    background-color: @fuchsia !important;
+}
+.bg-purple {
+    background-color: @purple !important;
+}
+.bg-maroon {
+    background-color: @maroon !important;
+}
+/* Text colors */
+ .text-red {
+    color: @red !important;
+}
+.text-yellow {
+    color: @yellow !important;
+}
+.text-aqua {
+    color: @aqua !important;
+}
+.text-blue {
+    color: @blue !important;
+}
+.text-light-blue {
+    color: @light-blue !important;
+}
+.text-green {
+    color: @green !important;
+}
+.text-navy {
+    color: @navy !important;
+}
+.text-teal {
+    color: @teal !important;
+}
+.text-olive {
+    color: @olive !important;
+}
+.text-lime {
+    color: @lime !important;
+}
+.text-orange {
+    color: @orange !important;
+}
+.text-fuchsia {
+    color: @fuchsia !important;
+}
+.text-purple {
+    color: @purple !important;
+}
+.text-maroon {
+    color: @maroon !important;
+}
+.text-white {
+    color: @white!important;
+}
+/* LABEL */
+ .label-success {
+    background-color: @green!important;
+}
+.label-danger {
+    background-color: @red!important;
+}
+.label-info {
+    background-color: @aqua!important;
+}
+.label-warning {
+    background-color: @yellow!important;
+}
+/* BUTTON */
+ .btn.btn-default {
+    background-color: @white;
+    color: @gray-three;
+    border-color: @gray-two;
+}
+.btn.btn-primary {
+    background-color: @blue;
+    border-color: @blue;
+}
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .open .dropdown-toggle.btn-primary {
+    color: @white;
+    border-color: @blue-light!important;
+}
+.btn.btn-success {
+    background-color: @green;
+    border-color: @green;
+}
+.btn-success:hover, .btn-success:focus, .btn-success:active, .btn-success.active, .open .dropdown-toggle.btn-success {
+    color: @white;
+    background-color: @green-dark!important;
+    border-color: @green-dark!important;
+}
+.btn.btn-info {
+    background-color: @aqua;
+    border-color: @aqua;
+}
+.btn-info:hover, .btn-info:focus, .btn-info:active, .btn-info.active, .open .dropdown-toggle.btn-info {
+    color: @white;
+    background-color: @aqua-dark!important;
+    border-color: @aqua-dark!important;
+}
+.btn.btn-danger {
+    background-color:@red;
+    border-color: @red;
+}
+.btn-danger:hover, .btn-danger:focus, .btn-danger:active, .btn-danger.active, .open .dropdown-toggle.btn-danger {
+    color: @white;
+    background-color: @red-dark!important;
+    border-color: @red-dark!important;
+}
+.btn.btn-warning {
+    background-color: @yellow;
+    border-color: @yellow;
+}
+.btn-warning:hover, .btn-warning:focus, .btn-warning:active, .btn-warning.active, .open .dropdown-toggle.btn-warning {
+    color: @white;
+    background-color: @yellow-dark!important;
+    border-color: @yellow-dark!important;
+}
+/* PROGRESS BAR */
+ .progress-bar-green, .progress-bar-success {
+    background-color: @green;
+}
+.progress-bar-yellow, .progress-bar-warning {
+    background-color: @yellow;
+}
+.progress-bar-red, .progress-bar-danger {
+    background-color: @red;
+}
+.progress-bar-blue, .progress-bar-info {
+    background-color: @blue;
+}
+/* ALERT */
+ .alert-danger {
+    background-color: @red!important;
+    border: 2px solid @gray!important;
+    color: @white!important;
+}
+.alert-info {
+    background-color: @light-blue !important;
+    border: 2px solid @gray!important;
+    color: @white !important;
+}
+.alert-warning {
+    background-color: @yellow !important;
+    border: 2px solid @gray!important;
+    color: @white !important;
+}
+.alert-success {
+    color: @white !important;
+    background-color: @green !important;
+    border: 2px solid @gray!important;
+}
+/*  BOX CONTENT */
+ .box {
+    background: @white;
+    color: @gray-three;
+}
+.box .box-header > .fa, .box .box-header > .glyphicon, .box .box-header > .ion, .box .box-header .box-title {
+    color: @gray-three;
+}
+.box-tools span {
+    background: @white;
+    border: 2px solid @gray;
+    color: @gray;
+}
+/* HEADER */
+
+/* toggle button color */
+ body > .header .navbar .sidebar-toggle {
+    background-color: @green;
+}
+/* header main background:  */
+ .main-theme .navbar {
+    background-color: @white;
+    border-bottom: 1px solid @white-opac;
+}
+/* border right search  */
+ body > .header .search {
+    border-right: 1px solid @white-opac;
+}
+/* logo color and border logo color  */
+ .main-theme .logo {
+    color: @green;
+    border-left: 1px solid @white-opac;
+    border-right: 1px solid @white-opac;
+}
+/* logo background on hover  */
+ .main-theme .logo:hover {
+    background: @green;
+    color: @white;
+}
+/* Input search background color  */
+ .main-theme .sidebar-form input[type="text"], .main-theme .sidebar-form .btn {
+    background-color: @white;
+    border: 1px solid @white;
+}
+/* message border & text color */
+ .main-theme .navbar .nav .messages-menu a {
+    border: 2px solid @green;
+    color: @green;
+}
+/* message hover & focus color */
+ .main-theme .navbar .nav .messages-menu a:hover, .main-theme .navbar .nav .messages-menu a:focus {
+    background: @green!important;
+    color: @white;
+}
+/* notifications & text color */
+ .main-theme .navbar .nav .notifications-menu a {
+    border: 2px solid @aqua;
+    color: @aqua;
+}
+/* notifications hover & focus color */
+ .main-theme .navbar .nav .notifications-menu a:hover, .main-theme .navbar .nav .notifications-menu a:focus {
+    background: @aqua!important;
+    color: @white;
+}
+/* task hover & text color */
+ .main-theme .navbar .nav .tasks-menu a {
+    border: 2px solid @red;
+    color: @red;
+}
+/* LOADER */
+ .pace .pace-progress {
+     background: @green; 
+  
+ }

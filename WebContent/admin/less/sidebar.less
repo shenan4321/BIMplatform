@@ -1,0 +1,57 @@
+/* Colors for sidebar */
+ @color-white: #ffffff; /* #ffffff */
+ @color-gray_dark: #222a38; /* #222a38 */
+ @color-gray_more_dark: #0d131e; /* #0d131e */
+ @color-turquoise: #37A8AF; /* #37A8AF */
+ @color-gray_light: #9FABBD; /* #9FABBD */
+
+/* main sidebar background*/
+ .main-theme .leftmenu {
+    background: @color-gray_dark;
+}
+/* Color of icon sidebar */
+ .sidebar .sidebar-menu > li > a > .fa, .sidebar .sidebar-menu > li > a > .glyphicon, .sidebar .sidebar-menu > li > a > .ion {
+    color: @color-turquoise;
+}
+/* color of text sidebar */
+ .main-theme .sidebar a {
+    color: @color-gray_light;
+}
+/* hover color of text sidebar */
+ .main-theme .sidebar > .sidebar-menu > li > a:hover, .main-theme .sidebar > .sidebar-menu > li.active > a {
+    color: @color-white;
+    background: @color-gray_more_dark;
+}
+/* hover background color of sidebar */
+ .profile-list li a span {
+    background: @color-gray_more_dark;
+}
+.profile-list li a span:hover {
+    background: @color-turquoise;
+    color: @color-white;
+}
+/* focus background color of sidebar */
+ .main-theme .sidebar > .sidebar-menu > li > .treeview-menu {
+    background: @color-gray_more_dark;
+}
+/* profile image border */
+ .main-theme .user-panel > .image > img {
+    border: 4px solid @color-gray_light;
+}
+/* profile name color */
+ .user-panel > .info > p {
+    margin-bottom: 9px;
+    color: @color-gray_light;
+}
+.text-progess {
+    color: @color-gray_light;
+    position: relative;
+    top: -6px;
+}
+.sidebar .sidebar-menu .treeview-menu > li > a {
+    color: @color-gray_light;
+}
+/* dot online color on user profile */
+ .image-avatar span i {
+    color: @color-turquoise;
+}

@@ -1,0 +1,48 @@
+/* GREEN STYLE */
+.image-avatar span i {
+    color: #ffffff !important;
+}
+.main-theme .leftmenu {
+    background: #37A8AF;
+}
+.main-theme .sidebar > .sidebar-menu > li > a:hover, .main-theme .sidebar > .sidebar-menu > li.active > a {
+    color: #fff;
+    background: rgba(0, 0, 0, 0.2);
+}
+.main-theme .sidebar > .sidebar-menu > li > .treeview-menu {
+    background: rgba(0, 0, 0, 0.2);
+    color: #ffffff;
+}
+.sidebar .sidebar-menu .treeview-menu > li > a {
+    color: #ffffff;
+}
+.main-theme .sidebar a {
+    color: #ffffff;
+}
+.profile-list li a span {
+    background: rgba(0, 0, 0, 0.2);
+    color: #fff;
+}
+.content {
+    background: #E5E9EC;
+}
+ol.breadcrumb.newcrumb.ng-scope {
+    background: transparent;
+}
+.sidebar .sidebar-menu > li > a > .fa, .sidebar .sidebar-menu > li > a > .glyphicon, .sidebar .sidebar-menu > li > a > .ion {
+    color: #ffffff;
+}
+.text-progess {
+    color: #ffffff;
+}
+.user-panel > .info > p {
+    color: #ffffff;
+}
+.main-theme .user-panel > .image > img {
+    border: 4px solid #ffffff;
+}
+.profile-list li a span:hover {
+     cursor: pointer;
+     background: rgba(0,0,0,0.3)!important;
+     color: #ffffff;
+ }

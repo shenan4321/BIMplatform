@@ -3654,3 +3654,6 @@ Component: timeline
      margin-bottom: 25px!important;
      font-size: 11px!important;
  }
+.box-mgr{
+    margin: 10px 20px 0px 20px;
+}

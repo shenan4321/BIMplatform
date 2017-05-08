@@ -23,7 +23,7 @@ import com.mongodb.util.JSONSerializers;
 import cn.dlb.bim.action.LongGeometryQueryAction;
 import cn.dlb.bim.component.PlatformServer;
 import cn.dlb.bim.ifc.emf.Schema;
-import cn.dlb.bim.service.IBimService;
+import cn.dlb.bim.service.BimService;
 import cn.dlb.bim.vo.GeometryInfoVo;
 
 public class GeometrySocketHandler implements WebSocketHandler {

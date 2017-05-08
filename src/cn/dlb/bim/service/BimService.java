@@ -9,11 +9,10 @@ import cn.dlb.bim.ifc.engine.cells.Vector3d;
 import cn.dlb.bim.vo.GeometryInfoVo;
 import cn.dlb.bim.vo.GlbVo;
 
-public interface IBimService {
+public interface BimService {
 	public List<GeometryInfoVo> queryGeometryInfo(Integer rid);
-	public Integer newProject(Project project, File modelFile);
+	public Integer addRevision(Long pid, File modelFile);
 	public GlbVo queryGlbByRid(Integer rid);
 	public Vector3d queryGlbLonlatByRid(Integer rid);
-	public Project queryProjectByPid(Long pid);
-	public List<Project> queryAllProject();
+	public IfcModelInterface queryModelByRid(Integer rid);
 }

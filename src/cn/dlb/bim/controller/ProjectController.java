@@ -22,6 +22,7 @@ import cn.dlb.bim.dao.entity.Project;
 import cn.dlb.bim.service.ProjectService;
 import cn.dlb.bim.utils.IdentifyUtil;
 import cn.dlb.bim.utils.PicIdentifyUtil;
+import cn.dlb.bim.utils.PidUtil;
 
 @Controller
 @RequestMapping("/project/")
@@ -60,7 +61,7 @@ public class ProjectController {
 				e.printStackTrace();
 			}
 		} 
-		
+		project.setPid(PidUtil.nextId());
 		projectService.addProject(project);
 		result.put("success", true);
 		return result;

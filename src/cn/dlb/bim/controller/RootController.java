@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.alibaba.druid.sql.visitor.functions.Length;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import cn.dlb.bim.component.PlatformInitDatas;
@@ -35,6 +34,7 @@ import cn.dlb.bim.ifc.database.OldQuery;
 import cn.dlb.bim.ifc.database.queries.om.JsonQueryObjectModelConverter;
 import cn.dlb.bim.ifc.database.queries.om.Query;
 import cn.dlb.bim.ifc.database.queries.om.QueryException;
+import cn.dlb.bim.ifc.emf.IfcModelInterface;
 import cn.dlb.bim.ifc.emf.IfcModelInterfaceException;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
 import cn.dlb.bim.ifc.emf.ProjectInfo;
@@ -43,7 +43,8 @@ import cn.dlb.bim.ifc.engine.cells.Vector3d;
 import cn.dlb.bim.ifc.model.BasicIfcModel;
 import cn.dlb.bim.ifc.serializers.SerializerException;
 import cn.dlb.bim.ifc.tree.ProjectTree;
-import cn.dlb.bim.service.IBimService;
+import cn.dlb.bim.service.BimService;
+import cn.dlb.bim.service.ProjectService;
 import cn.dlb.bim.vo.GlbVo;
 
 @Controller
@@ -53,8 +54,12 @@ public class RootController {
 	private static final Logger LOGGER = LoggerFactory.getLogger(RootController.class);
 
 	@Autowired
-	@Qualifier("BimService")
-	private IBimService bimService;
+	@Qualifier("BimServiceImpl")
+	private BimService bimService;
+	
+	@Autowired
+	@Qualifier("ProjectServiceImpl")
+	private ProjectService projectService;
 	
 	@Autowired
 	@Qualifier("PlatformServer")
@@ -80,16 +85,19 @@ public class RootController {
 		return resMap;
 	}
 
-	@RequestMapping(value = "newProject", method = RequestMethod.POST)
+	@RequestMapping(value = "addRevision", method = RequestMethod.POST)
 	@ResponseBody
-	public Map<String, Object> newProject(@RequestParam(value = "file", required = false) MultipartFile file,
+	public Map<String, Object> addRevision(@RequestParam("pid") Long pid, @RequestParam(value = "file", required = true) MultipartFile file,
 			HttpServletRequest request// , ModelMap model
 	) {
-		Project project = new Project();
-		project.setAuthor("linfujun");
-		project.setTitle("test");
-		project.setStars(4);
 		Map<String, Object> resMap = new HashMap<String, Object>();
+		
+		Project project = projectService.queryProject(pid);
+		if (project == null) {
+			resMap.put("error", true);
+			resMap.put("msg", "project with pid = " + pid + " is null");
+			return resMap;
+		}
 		String path = request.getSession().getServletContext().getRealPath("upload/ifc/");
 		String fileName = file.getOriginalFilename();
 		String[] split = fileName.split("\\.");
@@ -98,7 +106,8 @@ public class RootController {
 			suffix = split[split.length - 1];
 		}
 		if (suffix == null || !suffix.equals("ifc")) {
-			resMap.put("success", "false");
+			resMap.put("error", true);
+			resMap.put("msg", "suffix : " + suffix + " is not be supported");
 			return resMap;
 		} 
 		String newFileName = fileName.substring(0, fileName.lastIndexOf("."));
@@ -113,8 +122,7 @@ public class RootController {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
-		int rid = bimService.newProject(project, targetFile);
+		int rid = bimService.addRevision(pid, targetFile);
 		resMap.put("success", "true");
 		resMap.put("rid", rid);
 		return resMap;
@@ -122,7 +130,7 @@ public class RootController {
 	
 	@RequestMapping(value = "jsonApi", method = RequestMethod.POST)
 	@ResponseBody
-	public Map<String, Object> jsonApi(@RequestBody ObjectNode jsonNode) {
+	public Map<String, Object> jsonApi(@RequestBody ObjectNode jsonNode) {//DEMO
 		PackageMetaData packageMetaData = server.getMetaDataManager()
 				.getPackageMetaData(Schema.IFC2X3TC1.getEPackageName());
 		JsonQueryObjectModelConverter converter = new JsonQueryObjectModelConverter(packageMetaData);
@@ -155,18 +163,7 @@ public class RootController {
 	
 	@RequestMapping(value = "kml", method = RequestMethod.GET)
 	public void kml(@RequestParam("rid")Integer rid) {
-		PackageMetaData packageMetaData = server.getMetaDataManager()
-				.getPackageMetaData(Schema.IFC2X3TC1.getEPackageName());
-		PlatformInitDatas platformInitDatas = server.getPlatformInitDatas();
-		IfcModelDbSession session = new IfcModelDbSession(server.getIfcModelDao(), server.getMetaDataManager(), platformInitDatas);
-		BasicIfcModel model = new BasicIfcModel(packageMetaData);
-		try {
-			session.get(rid, model, new OldQuery(packageMetaData, true));
-		} catch (IfcModelDbException e) {
-			e.printStackTrace();
-		} catch (IfcModelInterfaceException e) {
-			e.printStackTrace();
-		}
+		IfcModelInterface model = bimService.queryModelByRid(rid);
 		KmzSerializer serializer = new KmzSerializer();
 		ProjectInfo projectInfo = new ProjectInfo();
 		projectInfo.setName("bim");
@@ -180,34 +177,11 @@ public class RootController {
 	}
 	
 	@RequestMapping(value = "queryModelTree", method = RequestMethod.GET)
-	public ProjectTree queryModelTree(@RequestParam("pid")Long pid, @RequestParam("rid")Integer rid) {
-		Project project = bimService.queryProjectByPid(pid);
-//		String ifcSchema = project.getIfcSchema();
-		PackageMetaData packageMetaData = null;
-//		if (ifcSchema.equals(Schema.IFC4.getEPackageName())) {
-//			packageMetaData = server.getMetaDataManager().getPackageMetaData(Schema.IFC4.getEPackageName());
-//		} else {
-//			packageMetaData = server.getMetaDataManager().getPackageMetaData(Schema.IFC2X3TC1.getEPackageName());
-//		}
-		PlatformInitDatas platformInitDatas = server.getPlatformInitDatas();
-		IfcModelDbSession session = new IfcModelDbSession(server.getIfcModelDao(), server.getMetaDataManager(), platformInitDatas);
-		BasicIfcModel model = new BasicIfcModel(packageMetaData);
-		try {
-			session.get(rid, model, new OldQuery(packageMetaData, true));
-		} catch (IfcModelDbException e) {
-			e.printStackTrace();
-		} catch (IfcModelInterfaceException e) {
-			e.printStackTrace();
-		}
+	public ProjectTree queryModelTree(@RequestParam("rid")Integer rid) {
+		IfcModelInterface model = bimService.queryModelByRid(rid);
 		ProjectTree tree = new ProjectTree(model.getPackageMetaData());
 		tree.buildProjectTree(model);
 		return tree;
 	}
 	
-	@RequestMapping(value = "queryAllProject", method = RequestMethod.GET)
-	@ResponseBody
-	public List<Project> queryAllProject() {
-		return bimService.queryAllProject();
-	}
-
 }

@@ -53,13 +53,14 @@ public class IfcModelDbSession extends IfcModelBinary {
 		this.metaDataManager = metaDataManager;
 	}
 
-	public void saveIfcModel(IfcModelInterface model) throws IfcModelDbException {
+	public void saveIfcModel(IfcModelInterface model, Long pid) throws IfcModelDbException {
 		IfcModelEntity ifcModelEntity = new IfcModelEntity();
 		final Integer revisionId = ifcDataBase.newRevisionId();
 		model.getModelMetaData().setRevisionId(revisionId);
 		model.fixOids(ifcDataBase);
 		ifcModelEntity.setModelMetaData(model.getModelMetaData());
 		ifcModelEntity.setRid(revisionId);
+		ifcModelEntity.setPid(pid);
 
 		Map<Long, IdEObject> geometries = new HashMap<>();
 

@@ -7,7 +7,7 @@ import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 
-import cn.dlb.bim.service.IBimService;
+import cn.dlb.bim.service.BimService;
 import cn.dlb.bim.websocket.DlbHandshakeInterceptor;
 import cn.dlb.bim.websocket.DlbWebSocketHandler;
 import cn.dlb.bim.websocket.GeometryInterceptor;

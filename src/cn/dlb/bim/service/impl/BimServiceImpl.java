@@ -20,8 +20,9 @@ import com.mongodb.gridfs.GridFSDBFile;
 
 import cn.dlb.bim.component.PlatformInitDatas;
 import cn.dlb.bim.component.PlatformServer;
+import cn.dlb.bim.dao.IfcModelDao;
 import cn.dlb.bim.dao.ProjectDao;
-import cn.dlb.bim.dao.entity.Project;
+import cn.dlb.bim.dao.entity.IfcModelEntity;
 import cn.dlb.bim.ifc.GeometryGenerator;
 import cn.dlb.bim.ifc.collada.GlbSerializer;
 import cn.dlb.bim.ifc.database.IfcModelDbException;
@@ -43,38 +44,30 @@ import cn.dlb.bim.ifc.serializers.IfcStepSerializer;
 import cn.dlb.bim.ifc.serializers.SerializerException;
 import cn.dlb.bim.models.ifc2x3tc1.IfcProduct;
 import cn.dlb.bim.models.ifc2x3tc1.IfcSite;
-import cn.dlb.bim.service.IBimService;
+import cn.dlb.bim.service.BimService;
 import cn.dlb.bim.utils.BinUtils;
-import cn.dlb.bim.utils.IdentifyUtil;
+import cn.dlb.bim.utils.PidUtil;
 import cn.dlb.bim.vo.GeometryInfoVo;
 import cn.dlb.bim.vo.GlbVo;
 
-@Service("BimService")
-public class BimServiceImpl implements IBimService {
+@Service("BimServiceImpl")
+public class BimServiceImpl implements BimService {
+	
+	private static String IFC2X3_SCHEMA_SHORT = "IFC2x3";
+	private static String IFC4_SCHEMA_SHORT = "IFC4";
 
 	@Autowired
 	@Qualifier("PlatformServer")
 	private PlatformServer server;
 	
 	@Autowired
-	@Qualifier("ProjectDaoImpl")
-	private ProjectDao projectDao;
+	@Qualifier("IfcModelDaoImpl")
+	private IfcModelDao ifcModelDao;
 
 	@Override
 	public List<GeometryInfoVo> queryGeometryInfo(Integer rid) {
-		PackageMetaData packageMetaData = server.getMetaDataManager()
-				.getPackageMetaData(Schema.IFC2X3TC1.getEPackageName());
-		PlatformInitDatas platformInitDatas = server.getPlatformInitDatas();
-		IfcModelDbSession session = new IfcModelDbSession(server.getIfcModelDao(), server.getMetaDataManager(), platformInitDatas);
-		BasicIfcModel model = new BasicIfcModel(packageMetaData);
-		try {
-			session.get(rid, model, new OldQuery(packageMetaData, true));
-		} catch (IfcModelDbException e) {
-			e.printStackTrace();
-		} catch (IfcModelInterfaceException e) {
-			e.printStackTrace();
-		}
-
+		
+		IfcModelInterface model = queryModelByRid(rid);
 		List<GeometryInfoVo> geometryList = new ArrayList<>();
 
 		for (IfcProduct ifcProduct : model.getAllWithSubTypes(IfcProduct.class)) {
@@ -93,7 +86,7 @@ public class BimServiceImpl implements IBimService {
 	}
 
 	@Override
-	public Integer newProject(Project project, File modelFile) {
+	public Integer addRevision(Long pid, File modelFile) {
 
 		Schema schema = null;
 		try {
@@ -107,7 +100,6 @@ public class BimServiceImpl implements IBimService {
 		if (schema == null) {
 			return -1;
 		}
-		project.setPid(IdentifyUtil.nextId());
 		
 		IfcStepDeserializer deserializer = server.getSerializationManager().createIfcStepDeserializer(schema);
 		IfcStepSerializer serializer = server.getSerializationManager().createIfcStepSerializer(schema);
@@ -125,9 +117,8 @@ public class BimServiceImpl implements IBimService {
 			PlatformInitDatas platformInitDatas = server.getPlatformInitDatas();
 			model.fixOids(platformInitDatas);
 			IfcModelDbSession session = new IfcModelDbSession(server.getIfcModelDao(), server.getMetaDataManager(), platformInitDatas);
-			session.saveIfcModel(model);
+			session.saveIfcModel(model, PidUtil.nextId());
 			rid = model.getModelMetaData().getRevisionId();
-			projectDao.insertProject(project);
 		} catch (DeserializeException e) {
 			e.printStackTrace();
 		} catch (RenderEngineException e) {
@@ -212,19 +203,8 @@ public class BimServiceImpl implements IBimService {
 	}
 	
 	private void generateGlbAndCache(Integer rid) {
-		PackageMetaData packageMetaData = server.getMetaDataManager()
-				.getPackageMetaData(Schema.IFC2X3TC1.getEPackageName());
-		PlatformInitDatas platformInitDatas = server.getPlatformInitDatas();
-		IfcModelDbSession session = new IfcModelDbSession(server.getIfcModelDao(), server.getMetaDataManager(), platformInitDatas);
-		BasicIfcModel model = new BasicIfcModel(packageMetaData);
+		IfcModelInterface model = queryModelByRid(rid);
 		
-		try {
-			session.get(rid, model, new OldQuery(packageMetaData, true));
-		} catch (IfcModelDbException e) {
-			e.printStackTrace();
-		} catch (IfcModelInterfaceException e) {
-			e.printStackTrace();
-		}
 		GlbSerializer serializer = new GlbSerializer(server);
 		ProjectInfo projectInfo = new ProjectInfo();
 		projectInfo.setName("bim");
@@ -250,7 +230,6 @@ public class BimServiceImpl implements IBimService {
 		server.getColladaCacheManager().saveGlb(glbInput, rid.toString(), rid, longitude, latitude);
 	}
 	
-	@SuppressWarnings("unused")
 	private Schema preReadSchema(File file) throws IOException, DeserializeException {
 		BufferedReader br = new BufferedReader(new FileReader(file));
 		String line = null;
@@ -264,9 +243,9 @@ public class BimServiceImpl implements IBimService {
 				innerLine = innerLine.replace("\r\n", "");
 				StepParser stepParser = new StepParser(innerLine);
 				String schemaVersion = stepParser.readNextString();
-				if (schemaVersion.startsWith("IFC2X3")) {
+				if (schemaVersion.startsWith(IFC2X3_SCHEMA_SHORT)) {
 					result = Schema.IFC2X3TC1;
-				} else if (schemaVersion.startsWith("IFC4")) {
+				} else if (schemaVersion.startsWith(IFC4_SCHEMA_SHORT)) {
 					result = Schema.IFC4;
 				}
 			}
@@ -275,13 +254,30 @@ public class BimServiceImpl implements IBimService {
 	}
 
 	@Override
-	public Project queryProjectByPid(Long pid) {
-		return projectDao.queryProject(pid);
-	}
-
-	@Override
-	public List<Project> queryAllProject() {
-		return projectDao.queryAllProject();
+	public IfcModelInterface queryModelByRid(Integer rid) {
+		IfcModelEntity ifcModelEntity = ifcModelDao.queryIfcModelEntityByRid(rid);
+		String ifcSchemaVersion = ifcModelEntity.getModelMetaData().getIfcHeader().getIfcSchemaVersion();
+		PackageMetaData packageMetaData = null;
+		if (ifcSchemaVersion.startsWith(IFC2X3_SCHEMA_SHORT)) {
+			packageMetaData = server.getMetaDataManager()
+					.getPackageMetaData(Schema.IFC2X3TC1.getEPackageName());
+		} else {
+			packageMetaData = server.getMetaDataManager()
+					.getPackageMetaData(Schema.IFC4.getEPackageName());
+		}
+		PlatformInitDatas platformInitDatas = server.getPlatformInitDatas();
+		IfcModelDbSession session = new IfcModelDbSession(server.getIfcModelDao(), server.getMetaDataManager(), platformInitDatas);
+		BasicIfcModel model = new BasicIfcModel(packageMetaData);
+		
+		try {
+			session.get(rid, model, new OldQuery(packageMetaData, true));
+		} catch (IfcModelDbException e) {
+			e.printStackTrace();
+		} catch (IfcModelInterfaceException e) {
+			e.printStackTrace();
+		}
+		
+		return model;
 	}
 
 }

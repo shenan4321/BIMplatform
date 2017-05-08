@@ -94,7 +94,7 @@ public class ProjectController {
 		return result;
 	}
 	
-	@RequestMapping(value = "queryAllProject", method = RequestMethod.GET)
+	@RequestMapping(value = "queryAllProject", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> queryAllProject() {
 		Map<String, Object> result = new HashMap<String, Object>();

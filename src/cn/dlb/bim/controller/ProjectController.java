@@ -32,9 +32,9 @@ public class ProjectController {
 	@Qualifier("ProjectServiceImpl")
 	private ProjectService projectService;
 	
-	@RequestMapping(value = "newProject", method = RequestMethod.POST)
+	@RequestMapping(value = "addProject", method = RequestMethod.POST)
 	@ResponseBody
-	public Map<String, Object> newProject(Project project, @RequestParam(value = "file", required = false) MultipartFile pic,
+	public Map<String, Object> addProject(Project project, @RequestParam(value = "file", required = false) MultipartFile pic,
 			HttpServletRequest request) {
 		Map<String, Object> result = new HashMap<String, Object>();
 		

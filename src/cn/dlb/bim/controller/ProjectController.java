@@ -112,7 +112,7 @@ public class ProjectController {
 		   "tiff", "ico",  
 		 };
 		 for (String image : imageArray) {
-			 if (image.equals("picName")) {
+			 if (image.equals(picName)) {
 				 return true;
 			 }
 		 }

@@ -21,7 +21,7 @@ import com.mongodb.gridfs.GridFSDBFile;
 import cn.dlb.bim.component.PlatformInitDatas;
 import cn.dlb.bim.component.PlatformServer;
 import cn.dlb.bim.dao.ProjectDao;
-import cn.dlb.bim.dao.entity.BIMProject;
+import cn.dlb.bim.dao.entity.Project;
 import cn.dlb.bim.ifc.GeometryGenerator;
 import cn.dlb.bim.ifc.collada.GlbSerializer;
 import cn.dlb.bim.ifc.database.IfcModelDbException;
@@ -93,7 +93,7 @@ public class BimServiceImpl implements IBimService {
 	}
 
 	@Override
-	public Integer newProject(BIMProject project, File modelFile) {
+	public Integer newProject(Project project, File modelFile) {
 
 		Schema schema = null;
 		try {
@@ -127,8 +127,6 @@ public class BimServiceImpl implements IBimService {
 			IfcModelDbSession session = new IfcModelDbSession(server.getIfcModelDao(), server.getMetaDataManager(), platformInitDatas);
 			session.saveIfcModel(model);
 			rid = model.getModelMetaData().getRevisionId();
-			project.setRid(rid);
-			project.setIfcSchema(schema.getEPackageName());
 			projectDao.insertProject(project);
 		} catch (DeserializeException e) {
 			e.printStackTrace();
@@ -277,12 +275,12 @@ public class BimServiceImpl implements IBimService {
 	}
 
 	@Override
-	public BIMProject queryProjectByPid(Long pid) {
+	public Project queryProjectByPid(Long pid) {
 		return projectDao.queryProject(pid);
 	}
 
 	@Override
-	public List<BIMProject> queryAllProject() {
+	public List<Project> queryAllProject() {
 		return projectDao.queryAllProject();
 	}
 

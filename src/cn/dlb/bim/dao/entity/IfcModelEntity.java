@@ -1,9 +1,7 @@
 package cn.dlb.bim.dao.entity;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import cn.dlb.bim.ifc.emf.ModelMetaData;
@@ -17,6 +15,8 @@ public class IfcModelEntity {
 
 	@Id
 	private Integer rid;
+	@Indexed
+	private Long pid;
 	private ModelMetaData modelMetaData;
 	
 	public Integer getRid() {
@@ -24,6 +24,12 @@ public class IfcModelEntity {
 	}
 	public void setRid(Integer rid) {
 		this.rid = rid;
+	}
+	public Long getPid() {
+		return pid;
+	}
+	public void setPid(Long pid) {
+		this.pid = pid;
 	}
 	public ModelMetaData getModelMetaData() {
 		return modelMetaData;

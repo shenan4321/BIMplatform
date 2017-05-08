@@ -27,7 +27,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import cn.dlb.bim.component.PlatformInitDatas;
 import cn.dlb.bim.component.PlatformServer;
-import cn.dlb.bim.dao.entity.BIMProject;
+import cn.dlb.bim.dao.entity.Project;
 import cn.dlb.bim.ifc.collada.KmzSerializer;
 import cn.dlb.bim.ifc.database.IfcModelDbException;
 import cn.dlb.bim.ifc.database.IfcModelDbSession;
@@ -75,7 +75,7 @@ public class RootController {
 	@ResponseBody
 	public Map<String, Object> queryGeometryInfo(@RequestParam("rid") Integer rid) {
 		Map<String, Object> resMap = new HashMap<String, Object>();
-		resMap.put("success", "true");
+		resMap.put("success", true);
 		resMap.put("geometries", bimService.queryGeometryInfo(rid));
 		return resMap;
 	}
@@ -85,12 +85,12 @@ public class RootController {
 	public Map<String, Object> newProject(@RequestParam(value = "file", required = false) MultipartFile file,
 			HttpServletRequest request// , ModelMap model
 	) {
-		BIMProject project = new BIMProject();
+		Project project = new Project();
 		project.setAuthor("linfujun");
 		project.setTitle("test");
 		project.setStars(4);
 		Map<String, Object> resMap = new HashMap<String, Object>();
-		String path = request.getSession().getServletContext().getRealPath("upload");
+		String path = request.getSession().getServletContext().getRealPath("upload/ifc/");
 		String fileName = file.getOriginalFilename();
 		String[] split = fileName.split("\\.");
 		String suffix = null;
@@ -179,21 +179,21 @@ public class RootController {
 		}
 	}
 	
-	@RequestMapping(value = "queryProjectTree", method = RequestMethod.GET)
-	public ProjectTree queryProjectTree(@RequestParam("pid")Long pid) {
-		BIMProject project = bimService.queryProjectByPid(pid);
-		String ifcSchema = project.getIfcSchema();
+	@RequestMapping(value = "queryModelTree", method = RequestMethod.GET)
+	public ProjectTree queryModelTree(@RequestParam("pid")Long pid, @RequestParam("rid")Integer rid) {
+		Project project = bimService.queryProjectByPid(pid);
+//		String ifcSchema = project.getIfcSchema();
 		PackageMetaData packageMetaData = null;
-		if (ifcSchema.equals(Schema.IFC4.getEPackageName())) {
-			packageMetaData = server.getMetaDataManager().getPackageMetaData(Schema.IFC4.getEPackageName());
-		} else {
-			packageMetaData = server.getMetaDataManager().getPackageMetaData(Schema.IFC2X3TC1.getEPackageName());
-		}
+//		if (ifcSchema.equals(Schema.IFC4.getEPackageName())) {
+//			packageMetaData = server.getMetaDataManager().getPackageMetaData(Schema.IFC4.getEPackageName());
+//		} else {
+//			packageMetaData = server.getMetaDataManager().getPackageMetaData(Schema.IFC2X3TC1.getEPackageName());
+//		}
 		PlatformInitDatas platformInitDatas = server.getPlatformInitDatas();
 		IfcModelDbSession session = new IfcModelDbSession(server.getIfcModelDao(), server.getMetaDataManager(), platformInitDatas);
 		BasicIfcModel model = new BasicIfcModel(packageMetaData);
 		try {
-			session.get(project.getRid(), model, new OldQuery(packageMetaData, true));
+			session.get(rid, model, new OldQuery(packageMetaData, true));
 		} catch (IfcModelDbException e) {
 			e.printStackTrace();
 		} catch (IfcModelInterfaceException e) {
@@ -206,7 +206,7 @@ public class RootController {
 	
 	@RequestMapping(value = "queryAllProject", method = RequestMethod.GET)
 	@ResponseBody
-	public List<BIMProject> queryAllProject() {
+	public List<Project> queryAllProject() {
 		return bimService.queryAllProject();
 	}
 

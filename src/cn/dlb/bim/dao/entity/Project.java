@@ -3,16 +3,16 @@ package cn.dlb.bim.dao.entity;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "BIMProject")
-public class BIMProject {
+@Document(collection = "Project")
+public class Project {
 	
 	@Id
 	private Long pid;
 	private String author;
 	private String title;
+	private String description;
 	private Integer stars;
-	private String ifcSchema;
-	private Integer rid;
+	private String picUrl;
 	
 	public Long getPid() {
 		return pid;
@@ -32,22 +32,22 @@ public class BIMProject {
 	public void setTitle(String title) {
 		this.title = title;
 	}
+	public String getDescription() {
+		return description;
+	}
+	public void setDescription(String description) {
+		this.description = description;
+	}
 	public Integer getStars() {
 		return stars;
 	}
 	public void setStars(Integer stars) {
 		this.stars = stars;
 	}
-	public String getIfcSchema() {
-		return ifcSchema;
+	public String getPicUrl() {
+		return picUrl;
 	}
-	public void setIfcSchema(String ifcSchema) {
-		this.ifcSchema = ifcSchema;
-	}
-	public Integer getRid() {
-		return rid;
-	}
-	public void setRid(Integer rid) {
-		this.rid = rid;
+	public void setPicUrl(String picUrl) {
+		this.picUrl = picUrl;
 	}
 }

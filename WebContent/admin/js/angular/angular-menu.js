@@ -161,6 +161,19 @@ config(['$routeProvider',
 
         }).
 
+
+
+
+        when('/BimProject/projectList', {
+            templateUrl: 'pages/BimProject/projectList.html',
+            controller: BimProjerctCtrl,
+            activetab: 'BimProject'
+        }).
+        when('/BimProject/addProject', {
+            templateUrl: 'pages/BimProject/addProject.html',
+            controller: BimProjerctCtrl,
+            activetab: 'BimProject'
+        }).
         otherwise({
             redirectTo: '/'
         });

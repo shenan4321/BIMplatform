@@ -71,3 +71,5 @@ function ShopDetailCtrl($scope, $http, $timeout) {}
 function ShopListCtrl($scope, $http, $timeout) {}
 
 function PetaCtrl($scope, $http, $timeout) {}
+
+function BimProjerctCtrl($scope, $http, $timeout) {}

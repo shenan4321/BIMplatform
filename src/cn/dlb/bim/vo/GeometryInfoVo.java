@@ -9,13 +9,14 @@ import cn.dlb.bim.models.geometry.GeometryInfo;
 import cn.dlb.bim.models.ifc2x3tc1.IfcProduct;
 import cn.dlb.bim.models.ifc2x3tc1.IfcSpace;
 
-public class GeometryInfoVo implements ITransformer<GeometryInfo> {
+public class GeometryInfoVo {
 
 	private int[] indices;
 	private float[] vertices;
 	private float[] normals;
 	private Bound bound;
 	private String typeName;
+	private Boolean defaultVisiable;
 	
 	public GeometryInfoVo() {
 		init();
@@ -34,8 +35,7 @@ public class GeometryInfoVo implements ITransformer<GeometryInfo> {
 		bound = new Bound();
 	}
 	
-	@Override
-	public void transform(GeometryInfo geometryInfo) {
+	public void transform(GeometryInfo geometryInfo, String typeName, Boolean defaultVisiable) {
 		indices = byteArrayToIntArray(geometryInfo.getData().getIndices());
 		vertices = byteArrayToFloatArray(geometryInfo.getData().getVertices());
 		normals = byteArrayToFloatArray(geometryInfo.getData().getNormals());
@@ -47,30 +47,32 @@ public class GeometryInfoVo implements ITransformer<GeometryInfo> {
 		double minZ = geometryInfo.getMinBounds().getZ();
 		bound.max.set(maxX, maxY, maxZ);
 		bound.min.set(minX, minY, minZ);
+		this.typeName = typeName;
+		this.defaultVisiable = defaultVisiable;
 	}
 	
-	public boolean adapt(IfcProduct ifcProduct) {//IfcProduct
-		GeometryInfo geometryInfo = ifcProduct.getGeometry();
-		if (geometryInfo == null || ifcProduct instanceof IfcSpace) {
-			return false;
-		}
-		typeName = ifcProduct.getClass().getSimpleName();
-		if (typeName.endsWith("Impl")) {
-			typeName = typeName.substring(0, typeName.indexOf("Impl"));
-		}
-		indices = byteArrayToIntArray(geometryInfo.getData().getIndices());
-		vertices = byteArrayToFloatArray(geometryInfo.getData().getVertices());
-		normals = byteArrayToFloatArray(geometryInfo.getData().getNormals());
-		double maxX = geometryInfo.getMaxBounds().getX();
-		double maxY = geometryInfo.getMaxBounds().getY();
-		double maxZ = geometryInfo.getMaxBounds().getZ();
-		double minX = geometryInfo.getMinBounds().getX();
-		double minY = geometryInfo.getMinBounds().getY();
-		double minZ = geometryInfo.getMinBounds().getZ();
-		bound.max.set(maxX, maxY, maxZ);
-		bound.min.set(minX, minY, minZ);
-		return true;
-	}
+//	public boolean adapt(IfcProduct ifcProduct) {//IfcProduct
+//		GeometryInfo geometryInfo = ifcProduct.getGeometry();
+//		if (geometryInfo == null || ifcProduct instanceof IfcSpace) {
+//			return false;
+//		}
+//		typeName = ifcProduct.getClass().getSimpleName();
+//		if (typeName.endsWith("Impl")) {
+//			typeName = typeName.substring(0, typeName.indexOf("Impl"));
+//		}
+//		indices = byteArrayToIntArray(geometryInfo.getData().getIndices());
+//		vertices = byteArrayToFloatArray(geometryInfo.getData().getVertices());
+//		normals = byteArrayToFloatArray(geometryInfo.getData().getNormals());
+//		double maxX = geometryInfo.getMaxBounds().getX();
+//		double maxY = geometryInfo.getMaxBounds().getY();
+//		double maxZ = geometryInfo.getMaxBounds().getZ();
+//		double minX = geometryInfo.getMinBounds().getX();
+//		double minY = geometryInfo.getMinBounds().getY();
+//		double minZ = geometryInfo.getMinBounds().getZ();
+//		bound.max.set(maxX, maxY, maxZ);
+//		bound.min.set(minX, minY, minZ);
+//		return true;
+//	}
 	
 	private int[] byteArrayToIntArray(byte[] byteArray) {
 		 IntBuffer intBuf =
@@ -131,5 +133,12 @@ public class GeometryInfoVo implements ITransformer<GeometryInfo> {
 	public void setTypeName(String typeName) {
 		this.typeName = typeName;
 	}
-	
+
+	public Boolean getDefaultVisiable() {
+		return defaultVisiable;
+	}
+
+	public void setDefaultVisiable(Boolean defaultVisiable) {
+		this.defaultVisiable = defaultVisiable;
+	}
 }

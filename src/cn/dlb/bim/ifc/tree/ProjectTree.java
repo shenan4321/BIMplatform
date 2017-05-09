@@ -93,7 +93,7 @@ public class ProjectTree {
 	}
 	
 	private Boolean isInstanceOf(EClass originClass, String type) {
-		EClass eClass = (EClass) packageMetaData.getEClass(type);
+		EClass eClass = packageMetaData.getEClass(type);
 		return eClass.isSuperTypeOf(originClass);
 	}
 }

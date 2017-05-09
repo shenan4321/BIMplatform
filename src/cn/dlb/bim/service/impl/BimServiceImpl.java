@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.EClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,7 @@ import cn.dlb.bim.ifc.database.OldQuery;
 import cn.dlb.bim.ifc.deserializers.DeserializeException;
 import cn.dlb.bim.ifc.deserializers.IfcStepDeserializer;
 import cn.dlb.bim.ifc.deserializers.StepParser;
+import cn.dlb.bim.ifc.emf.IdEObject;
 import cn.dlb.bim.ifc.emf.IfcModelInterface;
 import cn.dlb.bim.ifc.emf.IfcModelInterfaceException;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
@@ -41,6 +43,7 @@ import cn.dlb.bim.ifc.engine.cells.Vector3d;
 import cn.dlb.bim.ifc.model.BasicIfcModel;
 import cn.dlb.bim.ifc.serializers.IfcStepSerializer;
 import cn.dlb.bim.ifc.serializers.SerializerException;
+import cn.dlb.bim.models.geometry.GeometryInfo;
 import cn.dlb.bim.models.ifc2x3tc1.IfcProduct;
 import cn.dlb.bim.models.ifc2x3tc1.IfcSite;
 import cn.dlb.bim.service.BimService;
@@ -65,22 +68,21 @@ public class BimServiceImpl implements BimService {
 
 	@Override
 	public List<GeometryInfoVo> queryGeometryInfo(Integer rid) {
-		
 		IfcModelInterface model = queryModelByRid(rid);
 		List<GeometryInfoVo> geometryList = new ArrayList<>();
+		PackageMetaData packageMetaData = model.getPackageMetaData();
+		EClass productClass = (EClass) model.getPackageMetaData().getEClassifierCaseInsensitive("IfcProject");
+		List<IdEObject> projectList = model.getAllWithSubTypes(productClass);
 
-		for (IfcProduct ifcProduct : model.getAllWithSubTypes(IfcProduct.class)) {
-			if (ifcProduct.getRepresentation() != null
-					&& ifcProduct.getRepresentation().getRepresentations().size() != 0) {
-
-				GeometryInfoVo adaptor = new GeometryInfoVo();
-				boolean flag = adaptor.adapt(ifcProduct);
-				if (flag) {
-					geometryList.add(adaptor);
-				}
+		for (IdEObject ifcProduct : projectList) {
+			GeometryInfoVo adaptor = new GeometryInfoVo();
+			GeometryInfo geometryInfo = (GeometryInfo) ifcProduct.eGet(ifcProduct.eClass().getEStructuralFeature("geometry"));
+			if (geometryInfo != null) {
+				Boolean defualtVisiable = !ifcProduct.eClass().isSuperTypeOf(packageMetaData.getEClass("IfcSpace"));
+				adaptor.transform(geometryInfo, ifcProduct.eClass().getName(), defualtVisiable);
+				geometryList.add(adaptor);
 			}
 		}
-
 		return geometryList;
 	}
 

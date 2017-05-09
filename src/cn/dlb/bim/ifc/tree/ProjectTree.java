@@ -13,6 +13,9 @@ import cn.dlb.bim.models.geometry.GeometryInfo;
 
 public class ProjectTree {
 	
+	public final static String KeyWord_IfcProject = "IfcProject";
+	public final static String KeyWord_IfcBuildingStorey = "IfcBuildingStorey";
+	
 	private PackageMetaData packageMetaData;
 	private List<TreeItem> treeRoots = new ArrayList<>();
 	
@@ -20,8 +23,8 @@ public class ProjectTree {
 		this.packageMetaData = packageMetaData;
 	}
 	
-	public void buildProjectTree(IfcModelInterface ifcModel) {
-		EClass productClass = (EClass) packageMetaData.getEClassifierCaseInsensitive("IfcProject");
+	public void buildProjectTree(IfcModelInterface ifcModel, String keyword) {
+		EClass productClass = (EClass) packageMetaData.getEClassifierCaseInsensitive(keyword);
 		List<IdEObject> projectList = ifcModel.getAllWithSubTypes(productClass);
 		
 		for (IdEObject ifcProject : projectList) {

@@ -94,12 +94,23 @@ public class ModelController {
 		return result.getResult();
 	}
 	
-	@RequestMapping(value = "queryModelTree", method = RequestMethod.GET)
+	@RequestMapping(value = "queryModelProjectTree", method = RequestMethod.GET)
 	public Map<String, Object> queryModelTree(@RequestParam("rid")Integer rid) {
 		ResultUtil result = new ResultUtil();
 		IfcModelInterface model = bimService.queryModelByRid(rid);
 		ProjectTree tree = new ProjectTree(model.getPackageMetaData());
-		tree.buildProjectTree(model);
+		tree.buildProjectTree(model, ProjectTree.KeyWord_IfcProject);
+		result.setSuccess(true);
+		result.setData(tree);
+		return result.getResult();
+	}
+	
+	@RequestMapping(value = "queryModelBuildingStoreyTree", method = RequestMethod.GET)
+	public Map<String, Object> queryModelBuildingStoreyTree(@RequestParam("rid")Integer rid) {
+		ResultUtil result = new ResultUtil();
+		IfcModelInterface model = bimService.queryModelByRid(rid);
+		ProjectTree tree = new ProjectTree(model.getPackageMetaData());
+		tree.buildProjectTree(model, ProjectTree.KeyWord_IfcBuildingStorey);
 		result.setSuccess(true);
 		result.setData(tree);
 		return result.getResult();

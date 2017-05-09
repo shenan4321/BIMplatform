@@ -20,9 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import cn.dlb.bim.dao.entity.Project;
 import cn.dlb.bim.service.ProjectService;
-import cn.dlb.bim.utils.IdentifyUtil;
-import cn.dlb.bim.utils.PicIdentifyUtil;
-import cn.dlb.bim.utils.PidUtil;
+import cn.dlb.bim.utils.IdentifyManager;
 
 @Controller
 @RequestMapping("/project/")
@@ -48,7 +46,7 @@ public class ProjectController {
 		}
 		if (suffix != null && isPicture(suffix)) {
 			String newPicName = picName.substring(0, picName.lastIndexOf("."));
-			newPicName += "-" + PicIdentifyUtil.nextId();
+			newPicName += "-" + IdentifyManager.getIdentifyManager().nextId(IdentifyManager.PICTURE_KEY);
 			newPicName += "." + suffix;
 			File targetFile = new File(path, newPicName);
 			if (!targetFile.exists()) {
@@ -61,7 +59,7 @@ public class ProjectController {
 				e.printStackTrace();
 			}
 		} 
-		project.setPid(PidUtil.nextId());
+		project.setPid(IdentifyManager.getIdentifyManager().nextId(IdentifyManager.PID_KEY));
 		projectService.addProject(project);
 		result.put("success", true);
 		return result;

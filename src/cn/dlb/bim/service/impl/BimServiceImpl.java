@@ -21,7 +21,6 @@ import com.mongodb.gridfs.GridFSDBFile;
 import cn.dlb.bim.component.PlatformInitDatas;
 import cn.dlb.bim.component.PlatformServer;
 import cn.dlb.bim.dao.IfcModelDao;
-import cn.dlb.bim.dao.ProjectDao;
 import cn.dlb.bim.dao.entity.IfcModelEntity;
 import cn.dlb.bim.ifc.GeometryGenerator;
 import cn.dlb.bim.ifc.collada.GlbSerializer;
@@ -46,7 +45,7 @@ import cn.dlb.bim.models.ifc2x3tc1.IfcProduct;
 import cn.dlb.bim.models.ifc2x3tc1.IfcSite;
 import cn.dlb.bim.service.BimService;
 import cn.dlb.bim.utils.BinUtils;
-import cn.dlb.bim.utils.PidUtil;
+import cn.dlb.bim.utils.IdentifyManager;
 import cn.dlb.bim.vo.GeometryInfoVo;
 import cn.dlb.bim.vo.GlbVo;
 
@@ -55,7 +54,7 @@ public class BimServiceImpl implements BimService {
 	
 	private static String IFC2X3_SCHEMA_SHORT = "IFC2x3";
 	private static String IFC4_SCHEMA_SHORT = "IFC4";
-
+	
 	@Autowired
 	@Qualifier("PlatformServer")
 	private PlatformServer server;
@@ -117,7 +116,7 @@ public class BimServiceImpl implements BimService {
 			PlatformInitDatas platformInitDatas = server.getPlatformInitDatas();
 			model.fixOids(platformInitDatas);
 			IfcModelDbSession session = new IfcModelDbSession(server.getIfcModelDao(), server.getMetaDataManager(), platformInitDatas);
-			session.saveIfcModel(model, PidUtil.nextId());
+			session.saveIfcModel(model, pid);
 			rid = model.getModelMetaData().getRevisionId();
 		} catch (DeserializeException e) {
 			e.printStackTrace();

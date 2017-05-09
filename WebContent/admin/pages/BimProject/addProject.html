@@ -3,74 +3,66 @@
     <li><a href="#!/BimProject/projectList">项目管理</a></li>
     <li class="active">添加项目</li>
 </ol>
-
-<script>
-function validateCallback(form, callback, confirmMsg) {
-	console.log(1);
-	var $form = $(form);
-	
-	var formData = new FormData(form);
-	
-	var _submitFn = function(){
-		$.ajax({
-			type: form.method || 'POST',
-			url:$form.attr("action"),
-		    cache: false,
-		    data: formData,
-		    processData: false,
-		    contentType: false
-		}).done(function(res) {
-			console.log(res);
-		}).fail(function(res) {
-			console.log(res);
-		});
-	}
-	
-	
-	//if (confirmMsg) {
-		//alertMsg.confirm(confirmMsg, {okCall: _submitFn});
-	//} else {
-		$form.html5Validate(function() {
-			console.log(111);
-			_submitFn();    
-		});
-	//}
-	
-	return false;
-}
-
-</script>
-
+<!-- 添加项目html -->
 <div class="row">
     <div class="col-md-12">
         <div class="box ">
             <div class="box-header">
                 <h3 class="box-title">添加项目</h3>
             </div>
-            <form role="form" action="../project/addProject.do" enctype="multipart/form-data" method="post" onsubmit="return validateCallback(this,function(res){console.log(res)})" id="addProjectform" novalidate>
+            <form role="form" id="addProjectform">
                 <div class="box-body">
                     <div class="form-group">
-                        <label for="exampleInputEmail1">项目名称</label>
-                        <input type="text" class="form-control" id="exampleInputEmail1" placeholder="请输入项目名称 " name="title" required>
+                        <label for="projectName">项目名称</label>
+                        <input type="text" class="form-control" id="projectName" placeholder="请输入项目名称 " name="title" required>
                     </div>
-                    <div class="form-group" action="form_action.asp" method="get">
-                        <label for="exampleInputPassword1">项目简介</label>
-                        <input type="text" class="form-control" id="exampleInputPassword1" placeholder="请输入项目简介" name="description">
+                    <div class="form-group">
+                        <label for="projectProfile">项目简介</label>
+                        <input type="text" class="form-control" id="projectProfile" placeholder="请输入项目简介" name="description" required>
                     </div>
-                    <div class="form-group" action="form_action.asp" method="get">
-                        <label for="exampleInputPassword1">项目评分</label>
-                        <input type="range" class="form-control" name="stars" id="exampleInputPassword" min="0" max="5" value="5" placeholder="请输入项目评分" style="width:200px;" onmousemove="document.getElementById('rangeValue').innerHTML=this.value">
+                    <div class="form-group">
+                        <label for="projectName">项目作者</label>
+                        <input type="text" class="form-control" id="projectName" placeholder="请输入项目作者 " name="author" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="projectScore">项目评分</label>
+                        <input type="range" class="form-control" name="stars" id="projectScore" min="0" max="5" value="5" placeholder="请输入项目评分" style="width:200px;" onmousemove="document.getElementById('rangeValue').innerHTML=this.value" required>
                         <span id="rangeValue">现在是5分</span>　　满分5分
                     </div>
-                    <div class="form-group" action="form_action.asp" method="get">
-                        <label for="exampleInputFile">上传主图</label>
-                        <input type="file" id="exampleInputFile" name="file">
+                    <div class="form-group">
+                        <label for="projectImg">上传主图</label>
+                        <input type="file" id="projectImg" name="file">
                     </div>
                 </div>
                 <div class="box-footer">
-                    <button type="submit" class="btn btn-primary">提交</button>
+                    <button type="btn" class="btn btn-primary" id="addProjectSubmit">提交</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+<script type="text/javascript">
+$(function(){
+	var $form = $('#addProjectform');
+	$('#addProjectSubmit').click(function(){
+		debugger
+		$form.html5Validate(function() {
+			$.ajax({
+				type: 'POST',
+				url:'../project/addProject.do',
+			    cache: false,
+			    data: new FormData($form[0]),
+			    processData: false,
+			    contentType: false
+			}).done(function(res) {
+				debugger
+				window.location.href="#!/BimProject/projectList";
+			}).fail(function(res) {
+				console.log(res);
+			});
+		});
+		
+	})
+})
+
+</script>

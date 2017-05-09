@@ -161,9 +161,6 @@ config(['$routeProvider',
 
         }).
 
-
-
-
         when('/BimProject/projectList', {
             templateUrl: 'pages/BimProject/projectList.html',
             controller: BimProjerctCtrl,

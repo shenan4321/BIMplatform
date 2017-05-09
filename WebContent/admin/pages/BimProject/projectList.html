@@ -18,37 +18,75 @@
                         <th>编号</th>
                         <th>项目名称</th>
                         <th>项目简介</th>
-                        <th>缩略图</th>
                         <th>项目评分</th>
                         <th>项目作者</th>
-                        <th>操作</th>
                     </tr>
                     </thead>
                     <tbody>
                     </tbody>
-                    <tfoot>
-                    <tr>
-                        <th>编号</th>
-                        <th>项目名称</th>
-                        <th>项目简介</th>
-                        <th>缩略图</th>
-                        <th>项目评分</th>
-                        <th>项目作者</th>
-                        <th>操作</th>
-                    </tr>
-                    </tfoot>
                 </table>
             </div>
         </div>
     </div>
 </div>
 <script>
-    $('#projectList').dataTable({
-        "bPaginate": true,
-        "bLengthChange": false,
-        "bFilter": false,
-        "bSort": true,
-        "bInfo": true,
-        "bAutoWidth": false
-    });
+    $(function(){
+    	$('#projectList').dataTable({
+            "bPaginate": true,
+            "bLengthChange": false,
+            "bFilter": false,
+            "bSort": true,
+            "bInfo": true,
+            "bAutoWidth": false,
+            "aLengthMenu" : [20, 40, 60], //更改显示记录数选项  
+            "iDisplayLength" : 40, //默认显示的记录数  
+            "bAutoWidth" : false, //是否自适应宽度  
+            //"sAjaxSource" : "../project/queryAllProject.do",
+            "aoColumns" : [{  
+                    "mDataProp" : "pid",  
+                    "sDefaultContent" : "", //此列默认值为""，以防数据中没有此值，DataTables加载数据的时候报错  
+                    "bVisible" : false //此列不显示  
+                }, {  
+                    "mDataProp" : "title",  
+                    "sTitle" : "项目名称",  
+                    "sDefaultContent" : "",  
+                    "sClass" : "center"  
+                }, {  
+                    "mDataProp" : "description",  
+                    "sTitle" : "项目描述",  
+                    "sDefaultContent" : "",  
+                    "sClass" : "center"  
+                }, {  
+                    "mDataProp" : "stars",  
+                    "sTitle" : "项目评分",  
+                    "sDefaultContent" : "",  
+                    "sClass" : "center" 
+                },{  
+                    "mDataProp" : "author",  
+                    "sTitle" : "作者",  
+                    "sDefaultContent" : "",  
+                    "sClass" : "center"  
+                }],
+              "sAjaxSource" : "../project/queryAllProject.do?now=" + new Date().getTime(),  
+              "sAjaxDataProp": "",
+                //服务器端，数据回调处理  
+              "fnServerData" : function(sSource, aoData, fnCallback) {
+                     debugger
+                     $.ajax( {
+                         type: "POST", 
+                         url: sSource, 
+                         dataType: "json",
+                         data: { aoData: JSON.stringify(aoData) }, 
+                         success: function(resp) {
+                        	 debugger
+                        	 fnCallback(resp.projects);
+                         },
+                         error:function(){
+                         	alert('error');
+                         }
+                    });
+               },
+               
+        });
+    })
 </script>

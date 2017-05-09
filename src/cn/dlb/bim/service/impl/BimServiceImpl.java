@@ -71,7 +71,7 @@ public class BimServiceImpl implements BimService {
 		IfcModelInterface model = queryModelByRid(rid);
 		List<GeometryInfoVo> geometryList = new ArrayList<>();
 		PackageMetaData packageMetaData = model.getPackageMetaData();
-		EClass productClass = (EClass) model.getPackageMetaData().getEClassifierCaseInsensitive("IfcProject");
+		EClass productClass = (EClass) model.getPackageMetaData().getEClassifierCaseInsensitive("IfcProduct");
 		List<IdEObject> projectList = model.getAllWithSubTypes(productClass);
 
 		for (IdEObject ifcProduct : projectList) {

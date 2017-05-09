@@ -89,7 +89,7 @@ public class LongGeometryQueryAction extends LongAction {
 		session.get(rid, model, new OldQuery(packageMetaData, true));
 		
 		List<GeometryInfoVo> geometryList = new ArrayList<>();
-		EClass productClass = (EClass) model.getPackageMetaData().getEClassifierCaseInsensitive("IfcProject");
+		EClass productClass = (EClass) model.getPackageMetaData().getEClassifierCaseInsensitive("IfcProduct");
 		List<IdEObject> projectList = model.getAllWithSubTypes(productClass);
 
 		for (IdEObject ifcProduct : projectList) {

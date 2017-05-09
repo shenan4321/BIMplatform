@@ -19,8 +19,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import cn.dlb.bim.dao.entity.Project;
+import cn.dlb.bim.service.BimService;
 import cn.dlb.bim.service.ProjectService;
 import cn.dlb.bim.utils.IdentifyManager;
+import cn.dlb.bim.web.ResultUtil;
 
 @Controller
 @RequestMapping("/project/")
@@ -31,11 +33,15 @@ public class ProjectController {
 	@Qualifier("ProjectServiceImpl")
 	private ProjectService projectService;
 	
+	@Autowired
+	@Qualifier("BimServiceImpl")
+	private BimService bimService;
+	
 	@RequestMapping(value = "addProject", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> addProject(Project project, @RequestParam(value = "file", required = false) MultipartFile pic,
 			HttpServletRequest request) {
-		Map<String, Object> result = new HashMap<String, Object>();
+		ResultUtil result = new ResultUtil();
 		
 		String path = request.getSession().getServletContext().getRealPath("upload/pic/");
 		String picName = pic.getOriginalFilename();
@@ -61,45 +67,56 @@ public class ProjectController {
 		} 
 		project.setPid(IdentifyManager.getIdentifyManager().nextId(IdentifyManager.PID_KEY));
 		projectService.addProject(project);
-		result.put("success", true);
-		return result;
+		result.setSuccess(true);
+		return result.getResult();
 	}
 	
 	@RequestMapping(value = "deleteProject", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> deleteProject(@RequestParam("pid") Long pid) {
-		Map<String, Object> result = new HashMap<String, Object>();
+		ResultUtil result = new ResultUtil();
 		projectService.deleteProject(pid);
-		result.put("success", true);
-		return result;
+		result.setSuccess(true);
+		return result.getResult();
 	}
 	
 	@RequestMapping(value = "updateProject", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> updateProject(Project project) {
-		Map<String, Object> result = new HashMap<String, Object>();
+		ResultUtil result = new ResultUtil();
 		projectService.updateProject(project);
-		result.put("success", true);
-		return result;
+		result.setSuccess(true);
+		return result.getResult();
 	}
 	
 	@RequestMapping(value = "queryProject", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> queryProject(@RequestParam("pid") Long pid) {
-		Map<String, Object> result = new HashMap<String, Object>();
-		projectService.queryProject(pid);
-		result.put("success", true);
-		return result;
+		ResultUtil result = new ResultUtil();
+		Project project = projectService.queryProject(pid);
+		result.setSuccess(true);
+		result.setData(project);
+		return result.getResult();
 	}
 	
 	@RequestMapping(value = "queryAllProject", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> queryAllProject() {
-		Map<String, Object> result = new HashMap<String, Object>();
+		ResultUtil result = new ResultUtil();
 		List<Project> projectList = projectService.queryAllProject();
-		result.put("success", true);
-		result.put("projects", projectList);
-		return result;
+		result.setSuccess(true);
+		result.setData(projectList);
+		return result.getResult();
+	}
+	
+	@RequestMapping(value = "queryModelIdByPid", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> queryModelIdByPid(@RequestParam("pid") Long pid) {
+		ResultUtil result = new ResultUtil();
+		List<Integer> modelIdList = bimService.queryModelInProject(pid);
+		result.setSuccess(true);
+		result.setData(modelIdList);
+		return result.getResult();
 	}
 	
 	private boolean isPicture(String picName) {

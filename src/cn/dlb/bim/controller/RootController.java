@@ -23,6 +23,7 @@ import cn.dlb.bim.ifc.emf.PackageMetaData;
 import cn.dlb.bim.ifc.emf.Schema;
 import cn.dlb.bim.service.BimService;
 import cn.dlb.bim.service.ProjectService;
+import cn.dlb.bim.web.ResultUtil;
 
 @Controller
 @RequestMapping("/")
@@ -56,6 +57,8 @@ public class RootController {
 	@RequestMapping(value = "jsonApi", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> jsonApi(@RequestBody ObjectNode jsonNode) {//DEMO
+		
+		ResultUtil result = new ResultUtil();
 		PackageMetaData packageMetaData = server.getMetaDataManager()
 				.getPackageMetaData(Schema.IFC2X3TC1.getEPackageName());
 		JsonQueryObjectModelConverter converter = new JsonQueryObjectModelConverter(packageMetaData);
@@ -65,8 +68,8 @@ public class RootController {
 		} catch (QueryException e) {
 			e.printStackTrace();
 		}
-		Map<String, Object> resMap = new HashMap<String, Object>();
-		return resMap;
+		result.setSuccess(true);
+		return result.getResult();
 	}
 	
 }

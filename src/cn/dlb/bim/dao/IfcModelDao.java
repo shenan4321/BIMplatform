@@ -13,4 +13,5 @@ public interface IfcModelDao {
 	public List<IdEObjectEntity> queryAllIdEObjectEntityByOids(List<Long> oids);
 	public void insertIfcModelEntity(IfcModelEntity ifcModelEntity);
 	public IfcModelEntity queryIfcModelEntityByRid(Integer rid);
+	public List<IfcModelEntity> queryIfcModelEntityByPid(Long pid);
 }

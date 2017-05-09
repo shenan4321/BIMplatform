@@ -279,4 +279,14 @@ public class BimServiceImpl implements BimService {
 		return model;
 	}
 
+	@Override
+	public List<Integer> queryModelInProject(Long pid) {
+		List<IfcModelEntity> ifcModelEntityList = ifcModelDao.queryIfcModelEntityByPid(pid);
+		List<Integer> result = new ArrayList<>();
+		for (IfcModelEntity ifcModelEntity :ifcModelEntityList) {
+			result.add(ifcModelEntity.getRid());
+		}
+		return result;
+	}
+
 }

@@ -61,4 +61,11 @@ public class IfcModelDaoImpl implements IfcModelDao {
 		return mongoTemplate.find(query, IdEObjectEntity.class);
 	}
 
+	@Override
+	public List<IfcModelEntity> queryIfcModelEntityByPid(Long pid) {
+		Query query = new Query();
+		query.addCriteria(Criteria.where("pid").is(pid));
+		return mongoTemplate.find(query, IfcModelEntity.class);
+	}
+
 }

@@ -17,4 +17,7 @@ public class ResultUtil {
 	public void setData(Object data) {
 		result.put("data", data);
 	}
+	public void setKeyValue(String key, Object value) {
+		result.put(key, value);
+	}
 }

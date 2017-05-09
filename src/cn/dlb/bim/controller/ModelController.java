@@ -28,6 +28,7 @@ import cn.dlb.bim.ifc.tree.ProjectTree;
 import cn.dlb.bim.service.BimService;
 import cn.dlb.bim.service.ProjectService;
 import cn.dlb.bim.vo.GlbVo;
+import cn.dlb.bim.web.ResultUtil;
 
 @Controller
 @RequestMapping("/model/")
@@ -46,13 +47,13 @@ public class ModelController {
 	public Map<String, Object> addRevision(@RequestParam("pid") Long pid, @RequestParam(value = "file", required = true) MultipartFile file,
 			HttpServletRequest request// , ModelMap model
 	) {
-		Map<String, Object> resMap = new HashMap<String, Object>();
+		ResultUtil result = new ResultUtil();
 		
 		Project project = projectService.queryProject(pid);
 		if (project == null) {
-			resMap.put("error", true);
-			resMap.put("msg", "project with pid = " + pid + " is null");
-			return resMap;
+			result.setSuccess(false);
+			result.setMsg("project with pid = " + pid + " is null");
+			return result.getResult();
 		}
 		String path = request.getSession().getServletContext().getRealPath("upload/ifc/");
 		String fileName = file.getOriginalFilename();
@@ -62,9 +63,9 @@ public class ModelController {
 			suffix = split[split.length - 1];
 		}
 		if (suffix == null || !suffix.equals("ifc")) {
-			resMap.put("error", true);
-			resMap.put("msg", "suffix : " + suffix + " is not be supported");
-			return resMap;
+			result.setSuccess(false);
+			result.setMsg("suffix : " + suffix + " is not be supported");
+			return result.getResult();
 		} 
 		String newFileName = fileName.substring(0, fileName.lastIndexOf("."));
 		newFileName += "-" + System.currentTimeMillis();
@@ -79,26 +80,29 @@ public class ModelController {
 			e.printStackTrace();
 		}
 		int rid = bimService.addRevision(pid, targetFile);
-		resMap.put("success", "true");
-		resMap.put("rid", rid);
-		return resMap;
+		result.setSuccess(true);
+		result.setKeyValue("rid", rid);
+		return result.getResult();
 	}
 	
 	@RequestMapping(value = "queryGeometryInfo", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> queryGeometryInfo(@RequestParam("rid") Integer rid) {
-		Map<String, Object> resMap = new HashMap<String, Object>();
-		resMap.put("success", true);
-		resMap.put("geometries", bimService.queryGeometryInfo(rid));
-		return resMap;
+		ResultUtil result = new ResultUtil();
+		result.setSuccess(true);
+		result.setKeyValue("geometries", bimService.queryGeometryInfo(rid));
+		return result.getResult();
 	}
 	
 	@RequestMapping(value = "queryModelTree", method = RequestMethod.GET)
-	public ProjectTree queryModelTree(@RequestParam("rid")Integer rid) {
+	public Map<String, Object> queryModelTree(@RequestParam("rid")Integer rid) {
+		ResultUtil result = new ResultUtil();
 		IfcModelInterface model = bimService.queryModelByRid(rid);
 		ProjectTree tree = new ProjectTree(model.getPackageMetaData());
 		tree.buildProjectTree(model);
-		return tree;
+		result.setSuccess(true);
+		result.setData(tree);
+		return result.getResult();
 	}
 	
 	@RequestMapping(value = "queryGlbByRid", method = RequestMethod.POST)
@@ -107,6 +111,7 @@ public class ModelController {
 		try {
 			OutputStream os = response.getOutputStream();
 			os.write(glbVo.getData());
+			os.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -114,8 +119,20 @@ public class ModelController {
 	
 	@RequestMapping(value = "queryGlbLonlatByRid", method = RequestMethod.POST)
 	@ResponseBody
-	public Vector3d queryGlbLonlatByRid(@RequestParam("rid")Integer rid) {
-		return bimService.queryGlbLonlatByRid(rid);
+	public Map<String, Object> queryGlbLonlatByRid(@RequestParam("rid")Integer rid) {
+		ResultUtil result = new ResultUtil();
+		
+		Vector3d lonlat = bimService.queryGlbLonlatByRid(rid);
+		
+		if (lonlat == null) {
+			result.setSuccess(false);
+			result.setMsg("no glb finded by rid");
+		} else {
+			result.setSuccess(true);
+			result.setData(lonlat);
+		}
+		
+		return result.getResult();
 	}
 	
 	@RequestMapping(value = "kml", method = RequestMethod.GET)

@@ -296,15 +296,15 @@ public class BimServiceImpl implements BimService {
 		PlatformInitDatas platformInitDatas = server.getPlatformInitDatas();
 		IfcModelDbSession session = new IfcModelDbSession(server.getIfcModelDao(), server.getMetaDataManager(), platformInitDatas);
 		
-		try {
-			session.get(rid, model, new OldQuery(packageMetaData, true));
-		} catch (IfcModelDbException e) {
-			e.printStackTrace();
-		} catch (IfcModelInterfaceException e) {
-			e.printStackTrace();
-		}
+//		try {
+////			session.get(rid, model, new OldQuery(packageMetaData, true));
+//		} catch (IfcModelDbException e) {
+//			e.printStackTrace();
+//		} catch (IfcModelInterfaceException e) {
+//			e.printStackTrace();
+//		}
 		
-		idEObjectEntity.
+//		idEObjectEntity.
 		return null;
 	}
 

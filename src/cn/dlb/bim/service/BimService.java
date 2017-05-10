@@ -3,6 +3,7 @@ package cn.dlb.bim.service;
 import java.io.File;
 import java.util.List;
 
+import cn.dlb.bim.ifc.emf.IdEObject;
 import cn.dlb.bim.ifc.emf.IfcModelInterface;
 import cn.dlb.bim.ifc.engine.cells.Vector3d;
 import cn.dlb.bim.vo.GeometryInfoVo;
@@ -15,4 +16,5 @@ public interface BimService {
 	public Vector3d queryGlbLonlatByRid(Integer rid);
 	public IfcModelInterface queryModelByRid(Integer rid);
 	public List<Integer> queryModelInProject(Long pid);
+	public IdEObject queryIdEObjectByOid(Long oid);
 }

@@ -4,11 +4,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.emf.ecore.EClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -20,11 +22,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import cn.dlb.bim.dao.entity.Project;
 import cn.dlb.bim.ifc.collada.KmzSerializer;
+import cn.dlb.bim.ifc.emf.IdEObject;
 import cn.dlb.bim.ifc.emf.IfcModelInterface;
 import cn.dlb.bim.ifc.emf.ProjectInfo;
 import cn.dlb.bim.ifc.engine.cells.Vector3d;
 import cn.dlb.bim.ifc.serializers.SerializerException;
 import cn.dlb.bim.ifc.tree.ProjectTree;
+import cn.dlb.bim.ifc.tree.Property;
+import cn.dlb.bim.ifc.tree.TreeItem;
 import cn.dlb.bim.service.BimService;
 import cn.dlb.bim.service.ProjectService;
 import cn.dlb.bim.vo.GlbVo;
@@ -49,12 +54,12 @@ public class ModelController {
 	) {
 		ResultUtil result = new ResultUtil();
 		
-		Project project = projectService.queryProject(pid);
-		if (project == null) {
-			result.setSuccess(false);
-			result.setMsg("project with pid = " + pid + " is null");
-			return result.getResult();
-		}
+//		Project project = projectService.queryProject(pid);
+//		if (project == null) {
+//			result.setSuccess(false);
+//			result.setMsg("project with pid = " + pid + " is null");
+//			return result.getResult();
+//		}
 		String path = request.getSession().getServletContext().getRealPath("upload/ifc/");
 		String fileName = file.getOriginalFilename();
 		String[] split = fileName.split("\\.");
@@ -113,6 +118,23 @@ public class ModelController {
 		tree.buildProjectTree(model, ProjectTree.KeyWord_IfcBuildingStorey);
 		result.setSuccess(true);
 		result.setData(tree);
+		return result.getResult();
+	}
+	
+	@RequestMapping(value = "queryProperty", method = RequestMethod.GET)
+	public Map<String, Object> queryProperty(@RequestParam("rid")Integer rid, @RequestParam("oid")Long oid) {
+		ResultUtil result = new ResultUtil();
+		IfcModelInterface model = bimService.queryModelByRid(rid);
+		bimService.quer
+		
+		EClass productClass = (EClass) model.getPackageMetaData().getEClassifierCaseInsensitive("IfcProduct");
+		List<IdEObject> projectList = model.getAllWithSubTypes(productClass);
+		
+		for (IdEObject ifcProject : projectList) {
+			Property p = new Property();
+			p.getProperty(model.getPackageMetaData(), ifcProject);
+		}
+		result.setSuccess(true);
 		return result.getResult();
 	}
 	

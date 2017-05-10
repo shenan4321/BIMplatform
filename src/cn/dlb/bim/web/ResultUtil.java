@@ -1,9 +1,10 @@
 package cn.dlb.bim.web;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class ResultUtil {
-	private Map<String, Object> result;
+	private Map<String, Object> result = new HashMap<String, Object>();
 
 	public void setSuccess(Boolean success) {
 		result.put("success", success);

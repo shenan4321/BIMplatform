@@ -22,6 +22,7 @@ import com.mongodb.gridfs.GridFSDBFile;
 import cn.dlb.bim.component.PlatformInitDatas;
 import cn.dlb.bim.component.PlatformServer;
 import cn.dlb.bim.dao.IfcModelDao;
+import cn.dlb.bim.dao.entity.IdEObjectEntity;
 import cn.dlb.bim.dao.entity.IfcModelEntity;
 import cn.dlb.bim.ifc.GeometryGenerator;
 import cn.dlb.bim.ifc.collada.GlbSerializer;
@@ -44,18 +45,16 @@ import cn.dlb.bim.ifc.model.BasicIfcModel;
 import cn.dlb.bim.ifc.serializers.IfcStepSerializer;
 import cn.dlb.bim.ifc.serializers.SerializerException;
 import cn.dlb.bim.models.geometry.GeometryInfo;
-import cn.dlb.bim.models.ifc2x3tc1.IfcProduct;
 import cn.dlb.bim.models.ifc2x3tc1.IfcSite;
 import cn.dlb.bim.service.BimService;
 import cn.dlb.bim.utils.BinUtils;
-import cn.dlb.bim.utils.IdentifyManager;
 import cn.dlb.bim.vo.GeometryInfoVo;
 import cn.dlb.bim.vo.GlbVo;
 
 @Service("BimServiceImpl")
 public class BimServiceImpl implements BimService {
 	
-	private static String IFC2X3_SCHEMA_SHORT = "IFC2x3";
+	private static String IFC2X3_SCHEMA_SHORT = "IFC2X3";
 	private static String IFC4_SCHEMA_SHORT = "IFC4";
 	
 	@Autowired
@@ -289,6 +288,24 @@ public class BimServiceImpl implements BimService {
 			result.add(ifcModelEntity.getRid());
 		}
 		return result;
+	}
+
+	@Override
+	public IdEObject queryIdEObjectByOid(Long oid) {
+		IdEObjectEntity idEObjectEntity = ifcModelDao.queryIdEObjectEntityByOid(oid);
+		PlatformInitDatas platformInitDatas = server.getPlatformInitDatas();
+		IfcModelDbSession session = new IfcModelDbSession(server.getIfcModelDao(), server.getMetaDataManager(), platformInitDatas);
+		
+		try {
+			session.get(rid, model, new OldQuery(packageMetaData, true));
+		} catch (IfcModelDbException e) {
+			e.printStackTrace();
+		} catch (IfcModelInterfaceException e) {
+			e.printStackTrace();
+		}
+		
+		idEObjectEntity.
+		return null;
 	}
 
 }

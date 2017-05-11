@@ -29,6 +29,7 @@ import cn.dlb.bim.web.ResultUtil;
 @RequestMapping("/project/")
 public class ProjectController {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ProjectController.class);
+	private static final String PIC_UPLOAD_PATH = "upload/pic/";
 	
 	@Autowired
 	@Qualifier("ProjectServiceImpl")
@@ -44,7 +45,7 @@ public class ProjectController {
 			HttpServletRequest request) {
 		ResultUtil result = new ResultUtil();
 		
-		String path = request.getSession().getServletContext().getRealPath("upload/pic/");
+		String path = request.getSession().getServletContext().getRealPath(PIC_UPLOAD_PATH);
 		String picName = pic.getOriginalFilename();
 		String[] split = picName.split("\\.");
 		String suffix = null;
@@ -61,7 +62,7 @@ public class ProjectController {
 			}
 			try {
 				pic.transferTo(targetFile);
-				project.setPicUrl(targetFile.getAbsolutePath());
+				project.setPicUrl(PIC_UPLOAD_PATH + targetFile.getName());
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

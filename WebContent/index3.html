@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>模型</title>
+	<base href="./">	
     <script src="public/js/scenejs/plugins/lib/jquery-1.8.3.min.js"></script>
 	<script src="public/js/scenejs/scenejs.js"></script>
 	<script src="public/js/scenejs/plugins/node/geometry/base64util.js"></script>
@@ -20,28 +21,33 @@
     queryData();
     
 	function queryData() {
-	    var params = {rid:1};
+	    var params = {rid:4};
 	    
 	    $.ajax ({
 	        async:false,
 	        type: "GET",
-	        url: "queryGeometryInfo.do",
-// 	        data: params,
+	        url: "queryDbGeometryInfo.do",
+	        data: params,
 	       	dataType:"json",
 	        success:function(data) {
+	        	console.log(data);
 	//        	var str = JSON.stringify(data);
-	        	showView(data);
+	        	sceneJsShow(data);
 	        },
 	        error:function(data){
 	            alert("error");
 	        }
+	        
+	        
 	    });
 	}
 	
     function showView(data) {
-    	var geometries = data.geometries;
     	
-    	var boundMinX = 0, boundMinY = 0, boundMinZ = 0, boundMaxX = 0, boundMaxY = 0, boundMaxZ = 0;
+    	var geometries = data.geometries;
+
+    	var boundMinX = 0, boundMinY = 0, boundMinZ = 0,
+    	    boundMaxX = 0, boundMaxY = 0, boundMaxZ = 0;
     	
     	var nodes = new Array(geometries.length);
    	    for(var i = 0; i < geometries.length; i++){
@@ -53,7 +59,15 @@
             boundMaxX = Math.max(boundMaxX, geom.bound.max.x);
             boundMaxY = Math.max(boundMaxY, geom.bound.max.y);
             boundMaxZ = Math.max(boundMaxZ, geom.bound.max.z);
-
+            
+            if(i==geometries.length-1){
+            	console.log(boundMinX,boundMinY,boundMinZ,boundMaxX,boundMaxY,boundMaxZ);
+            	console.log((boundMinX-boundMaxX)/2);
+            	
+            	var len = Math.abs(boundMaxX-boundMinX);
+            	console.log(len);
+            }
+            
    	    	var node = {
    	    			nodes:[
    	                    {
@@ -72,20 +86,23 @@
    	    	nodes[i] = node;
 
    	    }
-
-        sceneJsShow(nodes);
+   	    
+   	    return {node:nodes,len:len};
+  	 	
     }
     
     function sceneJsShow(sceneNodes) {
     	
+    	var sceneNodes = showView(sceneNodes);
+
+    	
     	var sceneViewObj = {
-				backfaces: false,
 				type: "scene",
 				nodes: [{
 					type: 'lookAt',
 					id: 'main-lookAt',
 					eye: { x: 1, y: 1, z: 1 },
-					look:{ x: 0.0, y: 0.0, z: 0.0 },
+					look:{ x: 0.0, y: 0.0, z: 0.0 }, 
 					up:{ x: 0.0, y: 0.0, z: 1.0 },
 					nodes: [{
 						nodes: [{
@@ -93,16 +110,20 @@
 							id: 'main-camera',
 							optics: {
 								type: 'perspective',
-								far: 100,
-								near: 0.001,
+								far: 132440.78865666725,
+								near: 132.44078865666725,
 								aspect: $(window).width() / $(window).height(),
 								fovy: 37.8493
 							},
-							
 							nodes: [{
-								type: "cameras/orbit",
-		                        zoomSensitivity: 1000,
-		                        
+                                type:"cameras/orbit",
+                                id:'cameras',
+                                yaw:0,
+                                pitch:115.89999999999996,
+                                zoom:-sceneNodes.len,
+                                zoomSensitivity:2000,
+                                eye:{ x:0, y:0, z:10 },
+                                look:{ x:0, y:0, z:0 },
 								nodes: [{
 									type: 'renderer',
 									id: 'main-renderer',
@@ -114,14 +135,34 @@
 									nodes: [{
 										type: 'lights',
 										id: 'my-lights',
-										lights: []
-									},
-									{
-						            	type:"material",
-						            	color:{ r:0.3, g:0.3, b:1.0 },
-					                	nodes: sceneNodes
-						            }
-									]
+										lights: [
+											{
+												mode:"ambient",
+												color:{ r:0.9, g:0.9, b:0.9},
+												diffuse:false,
+												specular:false
+											},
+											{
+												mode:"dir",
+												color:{ r:1.0, g:1.0, b:1.0 },
+												diffuse:true,
+												specular:true,
+												dir:{ x:-0.5, y:-0.5, z:-1.0 },
+												space:"view"
+											},
+											{
+											type:		'light',
+											id:			'sun-light',
+											mode:		'dir',
+											color:		{r: 0.6, g: 0.6, b: 0.6},
+											dir:   		{x: -0.5, y: 0.5, z: -1.0},
+											diffuse:	true,
+											specular:	true
+											}
+										]
+									}
+									
+						            ]
 								}]
 							
 							}]
@@ -131,6 +172,10 @@
 			};
     	
     	SceneJS.createScene(sceneViewObj);
+    	
+    	SceneJS.getScene().getNode("my-lights",function(xxx){
+	   		xxx.addNode({type:"material",nodes: sceneNodes.node})
+	   	});
     }
 
 

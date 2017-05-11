@@ -39,6 +39,8 @@ function showView(data) {
 }
 
 function sceneJsShow(sceneNodes) {
+	console.log(sceneNodes);
+	
     var sceneViewObj = {
         canvasId:"mySceneCanvas",
         type: "scene",

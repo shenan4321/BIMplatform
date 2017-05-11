@@ -10,7 +10,7 @@
             <div class="box-header">
                 <h3 class="box-title">添加项目</h3>
             </div>
-            <form role="form" id="addProjectform">
+            <form role="form" action="../project/addProject.do" enctype="multipart/form-data" method="post" onsubmit="return validateCallback(this,function(res){console.log(res)})" id="addProjectform" novalidate>
                 <div class="box-body">
                     <div class="form-group">
                         <label for="projectName">项目名称</label>
@@ -35,34 +35,10 @@
                     </div>
                 </div>
                 <div class="box-footer">
-                    <button type="btn" class="btn btn-primary" id="addProjectSubmit">提交</button>
+                    <button type="btn" class="btn btn-primary" id="addProjectSubmit">提交</button>　
+                    <a type="btn" class="btn btn-danger" id="addProjectSubmit" href="#!/BimProject/projectList">返回列表</a>
                 </div>
             </form>
         </div>
     </div>
 </div>
-<script type="text/javascript">
-$(function(){
-	var $form = $('#addProjectform');
-	$('#addProjectSubmit').click(function(){
-		debugger
-		$form.html5Validate(function() {
-			$.ajax({
-				type: 'POST',
-				url:'../project/addProject.do',
-			    cache: false,
-			    data: new FormData($form[0]),
-			    processData: false,
-			    contentType: false
-			}).done(function(res) {
-				debugger
-				window.location.href="#!/BimProject/projectList";
-			}).fail(function(res) {
-				console.log(res);
-			});
-		});
-		
-	})
-})
-
-</script>

@@ -1,0 +1,115 @@
+<ol class="breadcrumb newcrumb">
+    <li><a href="#"><span><i class="fa fontello-home-outline"></i></span>主页</a></li>
+    <li class="active"><a href="">模型管理</a></li>
+</ol>
+<div class="row">
+    <div class="col-xs-12">
+        <div class="box">
+            <div class="box-header">
+                <h3 class="box-title">模型列表</h3>
+            </div>
+            <div class="box-mgr">
+                <a class="btn btn-info" id="addModelBtn">添加模型</a>
+            </div>
+            <div class="box-body table-responsive">
+                <table id="modelListTable" class="table table-bordered table-striped" data-unique-id="rid">
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+	window.actionModelListEvents = {
+        'click .editModel' : function (e, value, row, index) {
+            $("#dialogBoxModelListEdit").css('zIndex',++Global.data.zIndex).load(Global.baseDir + "dialogModelListEdit.html", function(){
+                $("#dialogBoxModelListEdit").show();
+                new DialogModelListEdit(row);
+            });
+        },
+        'click .delModel' : function (e, value, row, index) {
+        	if(confirm('是否确认删除')){
+        		$.ajax({
+    				type: 'POST',
+    				url:'../model/deleteModel.do',			    
+    			    data: {rid:row.rid}
+    			}).done(function(res) {
+    				$('table').bootstrapTable('removeByUniqueId', row.rid);
+    			}).fail(function(res) {
+    				
+    			});	
+        	}
+        }
+    };
+	
+	function fmtIdx1(value, row, index) {
+        return index+1;
+    }
+	
+	function applyTypeConvert(value){
+		var a ;
+		switch(value){
+			case 1: a = '结构'; break;
+			case 2: a = '建筑'; break;
+			case 3: a = '强电'; break;
+			case 4: a = '给排水'; break;
+			case 5: a = '消防'; break;
+			case 6: a = '停车场'; break;
+			case 7: a = '暖通'; break;
+			case 8: a = '弱电'; break;
+		}
+		return a;
+	}
+	
+	function ModelListStausFormatter(value) {
+		return '<button class="btn btn-info btn-sm delModel">删除</button>'
+		/* return '<button class="btn btn-info btn-sm editModel">修改</button>　<button class="btn btn-info btn-sm uploadModel">上传BIM模型</button>　<button class="btn btn-info btn-sm delModel">删除</button>' */
+    }
+	
+
+	$(function(){
+		var routeParam = location.hash.split('/');
+		var pid = routeParam[routeParam.length-1];
+		$('#addModelBtn').attr('href',"#!/BimModel/addModel/"+pid)
+		$('#modelListTable').bootstrapTable({
+			showHeader:true,
+			columns: [
+				{
+					field: 'index',
+					formatter:fmtIdx1,
+					title:'编号'
+				},{
+					field: 'name',
+					title: '模型名称'
+				}, {
+					field: 'applyType',
+					title: '模型应用',
+					formatter: applyTypeConvert
+				}, {
+					title: '操作',
+					width:250,
+					formatter: ModelListStausFormatter,
+					events: actionModelListEvents
+				}],
+			method: 'POST',
+			url: "../model/queryModelInfoByPid.do?pid="+pid,
+			sidePagination: "client", //服务端请求
+			showColumns:true,
+			pagination:true,
+			cache: false,
+			striped: true,
+			sidePagination: 'client', // client or server
+			pageNumber: 1,
+			pageSize: 10,
+			pageList: [5,10,15],
+			paginationHAlign: 'right', //right, left
+			paginationVAlign: 'bottom', //bottom, top, both
+			sortable:false,
+			search: true,
+			showPaginationSwitch: false,
+			showRefresh: true,
+			clickToSelect: true
+		});	
+	});
+
+</script>

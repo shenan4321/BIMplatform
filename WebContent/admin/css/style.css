@@ -3657,3 +3657,4 @@ Component: timeline
 .box-mgr{
     margin: 10px 20px 0px 20px;
 }
+#projectListTable.table td{line-height:60px;text-align:center;}

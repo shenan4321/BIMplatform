@@ -1,92 +1,111 @@
 <ol class="breadcrumb newcrumb">
     <li><a href="#"><span><i class="fa fontello-home-outline"></i></span>主页</a></li>
-    <li class="active"><a href="">项目管理</a></li>
+    <li class="active"><a href="">模型管理</a></li>
 </ol>
 <div class="row">
     <div class="col-xs-12">
         <div class="box">
             <div class="box-header">
-                <h3 class="box-title">项目列表</h3>
+                <h3 class="box-title">模型列表</h3>
             </div>
             <div class="box-mgr">
-                <a class="btn btn-info" href="#!/BimProject/addProject">添加项目</a>
+                <a class="btn btn-info" href="#!/BimProject/addProject">添加模型</a>
             </div>
             <div class="box-body table-responsive">
-                <table id="projectList" class="table table-bordered table-striped">
-                    <thead>
-                    <tr>
-                        <th>编号</th>
-                        <th>项目名称</th>
-                        <th>项目简介</th>
-                        <th>项目评分</th>
-                        <th>项目作者</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
+                <table id="projectListTable" class="table table-bordered table-striped" data-unique-id="pid">
                 </table>
             </div>
         </div>
     </div>
 </div>
 <script>
-    $(function(){
-    	$('#projectList').dataTable({
-            "bPaginate": true,
-            "bLengthChange": false,
-            "bFilter": false,
-            "bSort": true,
-            "bInfo": true,
-            "bAutoWidth": false,
-            "aLengthMenu" : [20, 40, 60], //更改显示记录数选项  
-            "iDisplayLength" : 40, //默认显示的记录数  
-            "bAutoWidth" : false, //是否自适应宽度  
-            //"sAjaxSource" : "../project/queryAllProject.do",
-            "aoColumns" : [{  
-                    "mDataProp" : "pid",  
-                    "sDefaultContent" : "", //此列默认值为""，以防数据中没有此值，DataTables加载数据的时候报错  
-                    "bVisible" : false //此列不显示  
-                }, {  
-                    "mDataProp" : "title",  
-                    "sTitle" : "项目名称",  
-                    "sDefaultContent" : "",  
-                    "sClass" : "center"  
-                }, {  
-                    "mDataProp" : "description",  
-                    "sTitle" : "项目描述",  
-                    "sDefaultContent" : "",  
-                    "sClass" : "center"  
-                }, {  
-                    "mDataProp" : "stars",  
-                    "sTitle" : "项目评分",  
-                    "sDefaultContent" : "",  
-                    "sClass" : "center" 
-                },{  
-                    "mDataProp" : "author",  
-                    "sTitle" : "作者",  
-                    "sDefaultContent" : "",  
-                    "sClass" : "center"  
-                }],
-              "sAjaxSource" : "../project/queryAllProject.do?now=" + new Date().getTime(),  
-              "sAjaxDataProp": "",
-                //服务器端，数据回调处理  
-              "fnServerData" : function(sSource, aoData, fnCallback) {
-                     debugger
-                     $.ajax( {
-                         type: "POST", 
-                         url: sSource, 
-                         dataType: "json",
-                         data: { aoData: JSON.stringify(aoData) }, 
-                         success: function(resp) {
-                        	 debugger
-                        	 fnCallback(resp.projects);
-                         },
-                         error:function(){
-                         	alert('error');
-                         }
-                    });
-               },
-               
-        });
-    })
+	window.actionProjectListEvents = {
+        'click .editProject' : function (e, value, row, index) {
+            $("#dialogBoxProjectListEdit").css('zIndex',++Global.data.zIndex).load(Global.baseDir + "dialogProjectListEdit.html", function(){
+                $("#dialogBoxProjectListEdit").show();
+                new DialogProjectListEdit(row);
+            });
+        },
+        'click .delProject' : function (e, value, row, index) {
+        	if(confirm('是否确认删除')){
+        		$.ajax({
+    				type: 'POST',
+    				url:'../project/deleteProject.do',			    
+    			    data: {pid:row.pid}
+    			}).done(function(res) {
+    				$('table').bootstrapTable('removeByUniqueId', row.pid);
+    			}).fail(function(res) {
+    				
+    			});	
+        	}
+        }
+    };
+	
+	function fmtIdx1(value, row, index) {
+        return index+1;
+    }
+	
+	function ProjectListStausFormatter(value,row) {
+		return '<a class="btn btn-info btn-sm uploadProject" href="#!/BimModel/modelList/'+row.pid+'">查看BIM模型</a>　<button class="btn btn-info btn-sm delProject">删除</button>'
+		/* return '<button class="btn btn-info btn-sm editProject">修改</button>　<button class="btn btn-info btn-sm uploadProject">上传BIM模型</button>　<button class="btn btn-info btn-sm delProject">删除</button>' */
+    }
+	
+
+	function ProjectListPicsFormatter(value, row, index){
+		return "<img src="+ value + " height=36 />";
+	}
+	
+	$(function(){
+
+		$('#projectListTable').bootstrapTable({
+			showHeader:true,
+			columns: [
+				{
+					field: 'index',
+					formatter:fmtIdx1,
+					title:'编号'
+				},{
+					field: 'title',
+					title: '模型名称'
+				}, {
+					field: 'picUrl',
+					title: '模型结构',
+					formatter: ProjectListPicsFormatter
+				}, {
+					field: 'description',
+					title: '模型简介'
+				},{
+					field:'stars',
+					title:'评分',
+					width:80,
+				},{
+					field: 'author',
+					title: '模型作者'
+				},{
+					title: '操作',
+					width:250,
+					formatter: ProjectListStausFormatter,
+					events: actionProjectListEvents
+				}],
+			method: 'POST',
+			url: "../project/queryAllProject.do",
+			sidePagination: "client", //服务端请求
+			showColumns:true,
+			pagination:true,
+			cache: false,
+			striped: true,
+			sidePagination: 'client', // client or server
+			pageNumber: 1,
+			pageSize: 10,
+			pageList: [5,10,15],
+			paginationHAlign: 'right', //right, left
+			paginationVAlign: 'bottom', //bottom, top, both
+			sortable:false,
+			search: true,
+			showPaginationSwitch: false,
+			showRefresh: true,
+			clickToSelect: true
+		});	
+	});
+
 </script>

@@ -1,0 +1,283 @@
+<script>var countTime = +new Date();</script>
+<!DOCTYPE html>
+<html lang="en" manifest="demo.appcache"> 
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">  <!-- Use Chrome Frame in IE -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+    <meta name="cesium-sandcastle-labels" content="Beginner, Showcases">
+    <title>东链博智慧城市BIM+3DGIS公共服务平台</title>
+    <script type="text/javascript" src="Sandcastle-header.js"></script>
+    
+    <link rel="stylesheet" href="./legend.css">
+</head>
+<body class="sandcastle-loading" data-sandcastle-bucket="bucket-requirejs.html" id="sandcastleBox">
+<style>
+    @import url(./templates/bucket.css);
+    @import url(./dist/Widgets/widgets.css);
+	@import url(./dist/Widgets/lighter.css);
+    #toolbar button { display: block; }
+    .cesium-performanceDisplay{margin-bottom:10px;cursor:pointer}
+	.cesium-performanceDisplay:hover{background: #48b;border-color #aef;box-shadow:0 0 8px #fff;outline:none}
+	.cesium-performanceDisplay:focus{border:1px solid #d5c514}
+    .cesium-viewer-bimserverContainer{position: relative;display: inline-block;margin: 0 3px;}
+    .manubox{margin-bottom:3px;text-align:center}
+    .wt{color:#fff}
+    .manubox-icon{width:16px;height:16px;float:none;}
+    .loadEffect{position:absolute;top:50%;left:50%;margin:0 auto;margin-top:-50px;margin-left:-50px;width:100px;height:100px}
+	.loadEffect span{position:absolute;display:inline-block;width:16px;height:16px;border-radius:50%;background:#87cefa;-webkit-animation:load 1.04s ease infinite}
+	@-webkit-keyframes load{0%{opacity:1}100%{opacity:.2}}.loadEffect span:nth-child(1){top:50%;left:0;margin-top:-8px;-webkit-animation-delay:.13s}.loadEffect span:nth-child(2){top:14px;left:14px;-webkit-animation-delay:.26s}.loadEffect span:nth-child(3){top:0;left:50%;margin-left:-8px;-webkit-animation-delay:.39s}.loadEffect span:nth-child(4){top:14px;right:14px;-webkit-animation-delay:.52s}.loadEffect span:nth-child(5){top:50%;right:0;margin-top:-8px;-webkit-animation-delay:.65s}.loadEffect span:nth-child(6){right:14px;bottom:14px;-webkit-animation-delay:.78s}.loadEffect span:nth-child(7){bottom:0;left:50%;margin-left:-8px;-webkit-animation-delay:.91s}.loadEffect span:nth-child(8){bottom:14px;left:14px;-webkit-animation-delay:1.04s}
+	.modal h4,.modal-body{color:#555;}
+	.fixed-table-body {height:auto;max-height:500px;}
+</style>
+
+<div id="cesiumContainer" class="fullSize"></div>
+<div id="loadingOverlay">
+    <div class="loadEffect">
+	    <span></span>
+	    <span></span>
+	    <span></span>
+	    <span></span>
+	    <span></span>
+	    <span></span>
+	    <span></span>
+	    <span></span>
+	</div>	
+</div>
+<div id="toolbar"></div>
+
+<div id="timeLineFrameBox" style="display:none">
+<iframe id="timeLineFrame"  width="100%" height="100%" frameborder=0  name="timeLineFrame" src="./bigData/demo2.html" 
+ style="position:absolute;top:0;bottom:0;left:0;right:0;z-index:1999"></iframe>
+</div>	
+<script id="cesium_sandcastle_script">
+	var viewer;
+	var toolbtn = {
+        //政府按钮（查看水电煤）
+        gov: {
+            ecButton: undefined,
+            dyButton: undefined,//党员按钮
+            wcButton: undefined,
+            pmButton: undefined,
+            lookpPartyBuilding:undefined,//查看党楼
+            drawArea:undefined,//绘制片区,
+            taxButton:undefined,//查看税收,
+            partyInfoButton:undefined,//党员信息
+            clearButton:undefined,
+            pertaxButton:undefined,//查看个税
+            addActionButton:undefined,//添加活动
+            Button:undefined,//添加活动
+            findActButton:undefined//查所有活动
+        },
+        //企业按钮（查看企业分布）
+        cpy: {
+            ttButton: undefined
+        },
+        //建筑按钮（查看楼层高度，查看楼龄）
+        bld: {
+            heightButton: undefined,
+            ageButton: undefined
+        },
+        mea:{
+        	mianjiButton:undefined,
+        	zhouchangButton:undefined,
+        	jingjiButton:undefined
+        },
+    };
+	
+    var  showID = []; //显示效果存放的entity
+    var  buildData =[];
+    var  buildDataID =[];
+    
+function startup(Cesium,Dlb){
+	'use strict';
+	//Sandcastle_Begin
+	viewer = new Cesium.Viewer('cesiumContainer', {
+		animation:false,
+	    timeline : true,
+	    creditContainer:document.createElement('div'),
+	    shadows : false,
+	    mapMeatureTool:false,
+	    vrButton:true
+	});
+	
+	
+    var scene = viewer.scene;
+    var handler;
+    
+    
+	
+	function createBuild(dataJson){
+		var len = dataJson.length;
+		buildData.push.apply(buildData,dataJson);
+        for(var i=0;i<len;i++){
+        	buildDataID.push(dataJson[i].id);
+        	var POLYGON1 = dataJson[i].polygon;
+            var des = '<table class="cesium-infoBox-defaultTable"><tbody><tr><th>地址</th><td>'+dataJson[i].address+'</td></tr></tbody></table>';
+            viewer.entities.add({
+                name : dataJson[i].id,
+                id:dataJson[i].id,
+                polygon : {
+                    hierarchy : Cesium.Cartesian3.fromDegreesArrayHeights(POLYGON1),
+                    extrudedHeight: 0,
+                    perPositionHeight : true,
+                    material : Cesium.Color.WHITE.withAlpha(1),
+                    outline : false
+                },
+            	description:des,
+            	polygonArray:POLYGON1,
+            	address:dataJson[i].address,
+            	des:des,
+            	lng:dataJson[i].lng,
+            	lat:dataJson[i].lat
+            });
+        }
+	}
+
+    viewer.camera.flyTo({
+        destination : Cesium.Cartesian3.fromDegrees(121.49513912616937, 31.214, 3000.0),
+        orientation : {
+            heading : 0.0,
+            pitch :Cesium.Math.toRadians(-50.0),
+            roll : 0.0
+        },
+        complete:function(){
+        	//请求四点坐标
+            var viewRect = viewer.camera.computeViewRectangle();
+            var paramViewRect = {}
+            if (Cesium.defined(viewRect)) {
+                for(var key in viewRect){
+                	if(!isNaN(viewRect[key])){
+                		paramViewRect[key] = Cesium.Math.toDegrees(viewRect[key])
+                	}
+                }
+            };
+            
+            
+            var work = new Array(4);
+    		for(var i=2;i<4;i++){
+    			(function(i){
+    				 //创建线程 work对象
+    		        work[i] = new Worker("work"+i+".js");
+    		        //发送消息
+    		        work[i].postMessage(5000);
+    		        // 监听消息
+    		        work[i].onmessage = function(dataJson) {
+    		        	createBuild(dataJson.data)
+    		        };	
+    			})(i)
+    		};
+    		
+    		Dlb.call("SMSInterface", "getPageOfBuildings", {pageIndex:2,pageSize:5000} , function(dataJson){
+            	createBuild(dataJson);
+    		});
+            
+    		
+    		//社区下拉框
+		    var communityToolbarMenu=[{
+		        text : '查看社区',
+		        value : '0',
+		        onselect : function() {
+		        	 viewer.entities.removeById('lujiazuiCommunity');
+		        	 viewer.entities.removeById('huamuCommunity');
+		        }
+		    },{
+		        text : '陆家嘴社区',
+		        value :'1',
+		        onselect : function() {
+		        	if((showID.length!=0) &&!(showID[0]&&showID[0].indexOf('Community')==0)) {
+                        Dlb.resetBuilding('no');
+                    }
+		        	viewer.entities.removeById('huamuCommunity');
+		            var lujiazuiCommunity=[121.52955083164368,31.235219481898604,121.52068427981844, 31.232160837970955,121.52207149866089, 31.227973042871973, 121.513366730052, 31.225237192953514, 121.51197859124709, 31.229317749351125, 121.50381517898815, 31.22624319912703, 121.48924745642972, 31.240515781198315, 121.4922892937386, 31.243511428567817, 121.50535704481565, 31.247741938478576, 121.52323542994729, 31.246911011044222, 121.52955083164368, 31.235219481898604];
+		            viewer.entities.add({
+		            	id:"Communitylujiazui",
+		            	name:"陆家嘴社区",
+		                polygon:{
+		                    hierarchy : Cesium.Cartesian3.fromDegreesArray(lujiazuiCommunity),
+		                    extrudedHeight: 0.0,
+		                    material : new Cesium.Color(0,0.75,1,0.5),
+		                    closeTop : false,
+		                    closeBottom : false
+		                }
+		            });
+		            viewer.camera.flyTo({
+		                  destination : Cesium.Cartesian3.fromDegrees(121.509043,31.237698,4000),
+		                  duration : 0,
+		            });
+		        }
+		    },{
+		        text : '花木社区',
+		        value :'2', 
+		        onselect : function() {
+		           if((showID.length!=0) &&!(showID[0]&&showID[0].indexOf('Community')==0)) {
+                        Dlb.resetBuilding('no');
+                   }
+		           viewer.entities.removeById('Communitylujiazui');
+		           var huamuCommunity=[121.537477,31.21418340,121.5413122,31.2131444,121.5411833,31.21210433,121.541387,31.210988,121.541689,31.21041569,121.5400928,31.210365,121.536357,31.2113263];
+		            viewer.entities.add({
+		            	id:"Communityhuamu",
+		            	name:"花木社区",
+		                polygon:{
+		                    hierarchy : Cesium.Cartesian3.fromDegreesArray(huamuCommunity),
+		                    extrudedHeight: 0.0,
+		                    material : new Cesium.Color(0,0.75,1,0.5),
+		                    closeTop : false,
+		                    closeBottom : false
+		                }
+		            });
+		            viewer.camera.flyTo({
+		                  destination : Cesium.Cartesian3.fromDegrees(121.539029, 31.212464, 1000),
+		                  duration : 0,
+		            });
+		        }
+		    }];
+		    Sandcastle.addToolbarMenu(communityToolbarMenu);
+		    
+    		
+    		
+    		var  manuArray = [{
+    	        en:'measure',
+    	        ch:'比对',
+    	        click:function(){
+    	        	socket.emit('showMenu', true );
+    	        }
+    	    }];
+    		
+    		Dlb.PerformanceDisplay.create(manuArray);
+            
+        }
+    });
+    
+	//Sandcastle_End
+    Sandcastle.finishedLoading();  
+	
+    var socket = io("ws://192.168.1.193:3000/");
+    
+    socket.on('showMenu', function(res){
+        if(res){
+        	if(!toolbtn.mea.jingjiButton){
+        		toolbtn.mea.jingjiButton = Sandcastle.addToolbarButton('查看经济状况', function(){
+        			socket.emit('showPrice', true );        			
+        		}); 
+        	}
+        }
+    });
+    
+    socket.on('showPrice', function(res){
+        if(res){
+        	Dlb.RenderBim();
+        }
+    });
+    
+  	
+}
+</script>
+<script type="text/javascript" src="ThirdParty/requirejs-2.1.20/require.min.js"  data-main="Source/main"></script>
+<script>
+        
+        
+        
+</script>
+</body>
+</html>

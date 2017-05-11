@@ -101,6 +101,8 @@ public class ModelController {
 		return result.getResult();
 	}
 	
+	@RequestMapping(value = "deleteModel", method = RequestMethod.POST)
+	@ResponseBody
 	public Map<String, Object> deleteModel(@RequestParam("rid") Integer rid) {
 		ResultUtil result = new ResultUtil();
 		bimService.deleteModel(rid);

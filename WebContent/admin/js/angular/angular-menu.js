@@ -160,7 +160,17 @@ config(['$routeProvider',
             activetab: 'ShopList'
 
         }).
-
+        
+        when('/BimModel/modelList/:id', {
+            templateUrl: 'pages/BimModel/modelList.html',
+            controller: BimProjerctCtrl,
+            activetab: 'BimProject'
+        }).
+        when('/BimModel/addModel/:id', {
+            templateUrl: 'pages/BimModel/addModel.html',
+            controller: BimProjerctCtrl,
+            activetab: 'BimProject'
+        }).
         when('/BimProject/projectList', {
             templateUrl: 'pages/BimProject/projectList.html',
             controller: BimProjerctCtrl,

@@ -267,10 +267,10 @@ public class BimServiceImpl implements BimService {
 		}
 		PlatformInitDatas platformInitDatas = server.getPlatformInitDatas();
 		IfcModelDbSession session = new IfcModelDbSession(server.getIfcModelDao(), server.getMetaDataManager(), platformInitDatas);
-		BasicIfcModel model = new BasicIfcModel(packageMetaData);
+		IfcModelInterface model = null;
 		
 		try {
-			session.get(rid, model, new OldQuery(packageMetaData, true));
+			model = session.get(packageMetaData, rid, new OldQuery(packageMetaData, true));
 		} catch (IfcModelDbException e) {
 			e.printStackTrace();
 		} catch (IfcModelInterfaceException e) {
@@ -288,24 +288,6 @@ public class BimServiceImpl implements BimService {
 			result.add(ifcModelEntity.getRid());
 		}
 		return result;
-	}
-
-	@Override
-	public IdEObject queryIdEObjectByOid(Long oid) {
-		IdEObjectEntity idEObjectEntity = ifcModelDao.queryIdEObjectEntityByOid(oid);
-		PlatformInitDatas platformInitDatas = server.getPlatformInitDatas();
-		IfcModelDbSession session = new IfcModelDbSession(server.getIfcModelDao(), server.getMetaDataManager(), platformInitDatas);
-		
-//		try {
-////			session.get(rid, model, new OldQuery(packageMetaData, true));
-//		} catch (IfcModelDbException e) {
-//			e.printStackTrace();
-//		} catch (IfcModelInterfaceException e) {
-//			e.printStackTrace();
-//		}
-		
-//		idEObjectEntity.
-		return null;
 	}
 
 }

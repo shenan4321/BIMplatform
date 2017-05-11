@@ -22,6 +22,7 @@ import cn.dlb.bim.ifc.database.IfcModelDbException;
 import cn.dlb.bim.ifc.database.IfcModelDbSession;
 import cn.dlb.bim.ifc.database.OldQuery;
 import cn.dlb.bim.ifc.emf.IdEObject;
+import cn.dlb.bim.ifc.emf.IfcModelInterface;
 import cn.dlb.bim.ifc.emf.IfcModelInterfaceException;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
 import cn.dlb.bim.ifc.model.BasicIfcModel;
@@ -30,6 +31,7 @@ import cn.dlb.bim.models.geometry.GeometryInfo;
 import cn.dlb.bim.models.ifc2x3tc1.IfcProduct;
 import cn.dlb.bim.vo.GeometryInfoVo;
 import cn.dlb.bim.vo.ProgressVo;
+import cn.dlb.bim.web.ResultUtil;
 
 public class LongGeometryQueryAction extends LongAction {
 
@@ -83,10 +85,12 @@ public class LongGeometryQueryAction extends LongAction {
 		};
 
 		IfcModelDbSession session = new IfcModelDbSession(server.getIfcModelDao(), server.getMetaDataManager(),
-				server.getPlatformInitDatas(), progressReporter);
-		BasicIfcModel model = new BasicIfcModel(packageMetaData);
-
-		session.get(rid, model, new OldQuery(packageMetaData, true));
+				server.getPlatformInitDatas(), progressReporter, server.getModelCacheManager());
+		IfcModelInterface model = session.get(packageMetaData, rid, new OldQuery(packageMetaData, true));
+		
+		if (model == null) {
+			sendErrorWebSocketClose(rid);
+		}
 		
 		List<GeometryInfoVo> geometryList = new ArrayList<>();
 		EClass productClass = (EClass) model.getPackageMetaData().getEClassifierCaseInsensitive("IfcProduct");
@@ -149,5 +153,22 @@ public class LongGeometryQueryAction extends LongAction {
 			}
 		}
 	}
-
+	
+	public void sendErrorWebSocketClose(Integer rid) {
+		if (webSocketSession == null || !webSocketSession.isOpen()) {
+			return;
+		}
+		ResultUtil result = new ResultUtil();
+		result.setSuccess(false);
+		result.setMsg("no model with rid : " + rid);
+		Gson gson = new Gson();
+		String jsonStr = gson.toJson(result.getResult());
+		TextMessage message = new TextMessage(jsonStr);
+		try {
+			webSocketSession.sendMessage(message);
+			webSocketSession.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 }

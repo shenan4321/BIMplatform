@@ -16,5 +16,4 @@ public interface BimService {
 	public Vector3d queryGlbLonlatByRid(Integer rid);
 	public IfcModelInterface queryModelByRid(Integer rid);
 	public List<Integer> queryModelInProject(Long pid);
-	public IdEObject queryIdEObjectByOid(Long oid);
 }

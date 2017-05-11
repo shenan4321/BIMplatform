@@ -125,8 +125,6 @@ public class ModelController {
 	public Map<String, Object> queryProperty(@RequestParam("rid")Integer rid, @RequestParam("oid")Long oid) {
 		ResultUtil result = new ResultUtil();
 		IfcModelInterface model = bimService.queryModelByRid(rid);
-		bimService.quer
-		
 		EClass productClass = (EClass) model.getPackageMetaData().getEClassifierCaseInsensitive("IfcProduct");
 		List<IdEObject> projectList = model.getAllWithSubTypes(productClass);
 		

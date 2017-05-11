@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Iterators;
 
+import cn.dlb.bim.cache.ModelCacheManager;
 import cn.dlb.bim.dao.IfcModelDao;
 import cn.dlb.bim.dao.entity.IdEObjectEntity;
 import cn.dlb.bim.dao.entity.IfcModelEntity;
@@ -22,9 +23,11 @@ import cn.dlb.bim.ifc.database.binary.TodoList;
 import cn.dlb.bim.ifc.emf.IdEObject;
 import cn.dlb.bim.ifc.emf.IdEObjectImpl;
 import cn.dlb.bim.ifc.emf.IdEObjectImpl.State;
+import cn.dlb.bim.ifc.model.BasicIfcModel;
 import cn.dlb.bim.ifc.emf.IfcModelInterface;
 import cn.dlb.bim.ifc.emf.IfcModelInterfaceException;
 import cn.dlb.bim.ifc.emf.MetaDataManager;
+import cn.dlb.bim.ifc.emf.PackageMetaData;
 import cn.dlb.bim.ifc.emf.QueryInterface;
 import cn.dlb.bim.ifc.shared.ProgressReporter;
 import cn.dlb.bim.models.geometry.GeometryData;
@@ -38,9 +41,10 @@ public class IfcModelDbSession extends IfcModelBinary {
 	private final IfcModelDao ifcModelDao;
 	private final MetaDataManager metaDataManager;
 	private ProgressReporter progressReporter;
+	private ModelCacheManager modelCacheManager;
 
 	public IfcModelDbSession(IfcModelDao ifcModelDao, MetaDataManager metaDataManager, IfcDataBase ifcDataBase,
-			ProgressReporter progressReporter) {
+			ProgressReporter progressReporter, ModelCacheManager modelCacheManager) {
 		super(ifcDataBase);
 		this.ifcModelDao = ifcModelDao;
 		this.metaDataManager = metaDataManager;
@@ -96,11 +100,15 @@ public class IfcModelDbSession extends IfcModelBinary {
 		ifcModelDao.insertAllIdEObjectEntity(idEObjectEntityList);
 
 		ifcDataBase.updateDataBase();
-
+		modelCacheManager.cacheModel(revisionId, model);
 	}
 
-	public boolean get(int rid, IfcModelInterface model, QueryInterface query)
+	public IfcModelInterface get(PackageMetaData packageMetaData, int rid, QueryInterface query)
 			throws IfcModelDbException, IfcModelInterfaceException {
+		if (modelCacheManager.contains(rid)) {
+			return modelCacheManager.getIfcModel(rid);
+		}
+		IfcModelInterface model = new BasicIfcModel(packageMetaData);
 		TodoList todoList = new TodoList();
 
 		progressReporterTitle("Querying ifcmodel ...");
@@ -108,7 +116,7 @@ public class IfcModelDbSession extends IfcModelBinary {
 		IfcModelEntity modelEntity = ifcModelDao.queryIfcModelEntityByRid(rid);
 
 		if (modelEntity == null) {
-			return false;
+			return null;
 		}
 
 		List<IdEObjectEntity> idEObjectEntitys = ifcModelDao.queryIdEObjectEntityByRid(rid);
@@ -122,7 +130,9 @@ public class IfcModelDbSession extends IfcModelBinary {
 			progressReporterUpdate(++doneObjectCount, total);
 		}
 		model.setModelMetaDataValue(modelEntity.getModelMetaData());
-		return true;
+		
+		modelCacheManager.cacheModel(rid, model);
+		return model;
 	}
 
 	@SuppressWarnings("unchecked")

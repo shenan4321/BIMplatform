@@ -4,11 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import cn.dlb.bim.PlatformContext;
+import cn.dlb.bim.cache.ModelCacheManager;
 import cn.dlb.bim.dao.IfcModelDao;
 import cn.dlb.bim.ifc.SerializationManager;
-import cn.dlb.bim.ifc.collada.ColladaProcess;
-import cn.dlb.bim.ifc.collada.ColladaProcessFactory;
 import cn.dlb.bim.ifc.collada.ColladaCacheManager;
+import cn.dlb.bim.ifc.collada.ColladaProcessFactory;
 import cn.dlb.bim.ifc.emf.MetaDataManager;
 import cn.dlb.bim.ifc.engine.IRenderEngineFactory;
 import cn.dlb.bim.ifc.engine.jvm.JvmRenderEngineFactory;
@@ -25,6 +25,7 @@ public class PlatformServer {
 	private final IRenderEngineFactory renderEngineFactory;
 	private final ColladaCacheManager colladaCacheManager;
 	private final ColladaProcessFactory colladaProcessFactory;
+	private final ModelCacheManager modelCacheManager;
 	
 	@Autowired
 	private MongoGridFs mongoGridFs;
@@ -41,6 +42,7 @@ public class PlatformServer {
 		renderEngineFactory = new JvmRenderEngineFactory(this);
 		colladaCacheManager = new ColladaCacheManager(this);
 		colladaProcessFactory = new ColladaProcessFactory();
+		modelCacheManager = new ModelCacheManager();
 		
 		initialize();
 	}
@@ -86,5 +88,8 @@ public class PlatformServer {
 	public ColladaProcessFactory getColladaProcessFactory() {
 		return colladaProcessFactory;
 	}
-	
+
+	public ModelCacheManager getModelCacheManager() {
+		return modelCacheManager;
+	}
 }

@@ -22,6 +22,7 @@ import cn.dlb.bim.dao.entity.Project;
 import cn.dlb.bim.service.BimService;
 import cn.dlb.bim.service.ProjectService;
 import cn.dlb.bim.utils.IdentifyManager;
+import cn.dlb.bim.vo.ModelInfoVo;
 import cn.dlb.bim.web.ResultUtil;
 
 @Controller
@@ -106,16 +107,6 @@ public class ProjectController {
 		List<Project> projectList = projectService.queryAllProject();
 		result.setSuccess(true);
 		result.setData(projectList);
-		return result.getResult();
-	}
-	
-	@RequestMapping(value = "queryModelIdByPid", method = RequestMethod.POST)
-	@ResponseBody
-	public Map<String, Object> queryModelIdByPid(@RequestParam("pid") Long pid) {
-		ResultUtil result = new ResultUtil();
-		List<Integer> modelIdList = bimService.queryModelInProject(pid);
-		result.setSuccess(true);
-		result.setData(modelIdList);
 		return result.getResult();
 	}
 	

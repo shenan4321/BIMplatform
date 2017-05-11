@@ -18,6 +18,8 @@ public class IfcModelEntity {
 	@Indexed
 	private Long pid;
 	private ModelMetaData modelMetaData;
+	private String name;
+	private Integer applyType;
 	
 	public Integer getRid() {
 		return rid;
@@ -37,5 +39,16 @@ public class IfcModelEntity {
 	public void setModelMetaData(ModelMetaData modelMetaData) {
 		this.modelMetaData = modelMetaData;
 	}
-	
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public Integer getApplyType() {
+		return applyType;
+	}
+	public void setApplyType(Integer applyType) {
+		this.applyType = applyType;
+	}
 }

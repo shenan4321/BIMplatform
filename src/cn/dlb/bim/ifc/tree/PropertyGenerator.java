@@ -9,13 +9,14 @@ import org.eclipse.emf.ecore.EStructuralFeature;
 import cn.dlb.bim.ifc.emf.IdEObject;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
 
-public class Property {
+public class PropertyGenerator {
 	@SuppressWarnings("rawtypes")
 	public void getProperty(PackageMetaData packageMetaData, IdEObject product) {
 		EClass productClass = packageMetaData.getEClass("IfcProduct");
 		if (!productClass.isSuperTypeOf(product.eClass())) {
 			return ;
 		}
+		PropertySetCollection collection = new PropertySetCollection();
 		EReference isDefinedByReference = packageMetaData.getEReference(product.eClass().getName(), "IsDefinedBy");
 		if (isDefinedByReference != null) {
 			List isDefinedByList = (List) product.eGet(isDefinedByReference);
@@ -27,7 +28,7 @@ public class Property {
 						Object relatingPropertyDefinition = ifcRelDefinesByProperties.eGet(relatingPropertyDefinitionEReference);
 						if (relatingPropertyDefinition instanceof IdEObject) {
 							IdEObject ifcPropertySet = (IdEObject) relatingPropertyDefinition;
-							showPropertySet(packageMetaData, ifcPropertySet);
+							showPropertySet(packageMetaData, ifcPropertySet, collection);
 						}
 					}
 				}
@@ -36,31 +37,32 @@ public class Property {
 		}
 	}
 	
-	public void showPropertySet(PackageMetaData packageMetaData, IdEObject ifcPropertySet) {
+	@SuppressWarnings({ "rawtypes" })
+	public void showPropertySet(PackageMetaData packageMetaData, IdEObject ifcPropertySet, PropertySetCollection collection) {
 		
 		EClass ifcPropertySetClass = packageMetaData.getEClass("IfcPropertySet");
 		if (!ifcPropertySetClass.isSuperTypeOf(ifcPropertySet.eClass())) {
 			return;
 		}
 		
+		Long setOid = ifcPropertySet.getOid();
+		String setName = (String) ifcPropertySet.eGet(ifcPropertySetClass.getEStructuralFeature("Name"));
 		
-		//head
-		Long oid = ifcPropertySet.getOid();
-		String uri = (String) ifcPropertySet.eGet(ifcPropertySetClass.getEStructuralFeature("Name"));
-		
-		System.out.println("Property Set : " + oid + ", name :" + uri);
+		PropertySet propertySet = new PropertySet();
+		propertySet.setOid(setOid);
+		propertySet.setName(setName);
 		
 		List hasProperties = (List) ifcPropertySet.eGet(ifcPropertySetClass.getEStructuralFeature("HasProperties"));
 		for (Object hasProperty : hasProperties) {
 			if (hasProperty instanceof IdEObject) {
 				IdEObject ifcPropertySingleValue = (IdEObject) hasProperty;
-				showProperty(packageMetaData, ifcPropertySingleValue);
+				showProperty(packageMetaData, ifcPropertySingleValue, propertySet);
 			}
 		}
 		
 	}
 	
-	public void showProperty(PackageMetaData packageMetaData, IdEObject ifcPropertySingleValue) {
+	public void showProperty(PackageMetaData packageMetaData, IdEObject ifcPropertySingleValue, PropertySet propertySet) {
 		EClass ifcPropertySingleValueClass = packageMetaData.getEClass("IfcPropertySingleValue");
 		if (!ifcPropertySingleValueClass.isSuperTypeOf(ifcPropertySingleValue.eClass())) {
 			return;

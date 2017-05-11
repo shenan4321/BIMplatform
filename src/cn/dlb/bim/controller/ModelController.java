@@ -28,11 +28,12 @@ import cn.dlb.bim.ifc.emf.ProjectInfo;
 import cn.dlb.bim.ifc.engine.cells.Vector3d;
 import cn.dlb.bim.ifc.serializers.SerializerException;
 import cn.dlb.bim.ifc.tree.ProjectTree;
-import cn.dlb.bim.ifc.tree.Property;
+import cn.dlb.bim.ifc.tree.PropertyGenerator;
 import cn.dlb.bim.ifc.tree.TreeItem;
 import cn.dlb.bim.service.BimService;
 import cn.dlb.bim.service.ProjectService;
 import cn.dlb.bim.vo.GlbVo;
+import cn.dlb.bim.vo.ModelInfoVo;
 import cn.dlb.bim.web.ResultUtil;
 
 @Controller
@@ -49,17 +50,17 @@ public class ModelController {
 	
 	@RequestMapping(value = "addRevision", method = RequestMethod.POST)
 	@ResponseBody
-	public Map<String, Object> addRevision(@RequestParam("pid") Long pid, @RequestParam(value = "file", required = true) MultipartFile file,
+	public Map<String, Object> addRevision(ModelInfoVo modelInfo, @RequestParam(value = "file", required = true) MultipartFile file,
 			HttpServletRequest request// , ModelMap model
 	) {
 		ResultUtil result = new ResultUtil();
-		
-//		Project project = projectService.queryProject(pid);
-//		if (project == null) {
-//			result.setSuccess(false);
-//			result.setMsg("project with pid = " + pid + " is null");
-//			return result.getResult();
-//		}
+		Long pid = modelInfo.getPid();
+		Project project = projectService.queryProject(pid);
+		if (project == null) {
+			result.setSuccess(false);
+			result.setMsg("project with pid = " + pid + " is null");
+			return result.getResult();
+		}
 		String path = request.getSession().getServletContext().getRealPath("upload/ifc/");
 		String fileName = file.getOriginalFilename();
 		String[] split = fileName.split("\\.");
@@ -84,9 +85,19 @@ public class ModelController {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		int rid = bimService.addRevision(pid, targetFile);
+		int rid = bimService.addRevision(modelInfo, targetFile);
 		result.setSuccess(true);
 		result.setKeyValue("rid", rid);
+		return result.getResult();
+	}
+	
+	@RequestMapping(value = "queryModelInfoByPid", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> queryModelInfoByPid(@RequestParam("pid") Long pid) {
+		ResultUtil result = new ResultUtil();
+		List<ModelInfoVo> modelInfoList = bimService.queryModelInfoByPid(pid);
+		result.setSuccess(true);
+		result.setData(modelInfoList);
 		return result.getResult();
 	}
 	
@@ -130,7 +141,7 @@ public class ModelController {
 		List<IdEObject> projectList = model.getAllWithSubTypes(productClass);
 		
 		for (IdEObject ifcProject : projectList) {
-			Property p = new Property();
+			PropertyGenerator p = new PropertyGenerator();
 			p.getProperty(model.getPackageMetaData(), ifcProject);
 		}
 		result.setSuccess(true);

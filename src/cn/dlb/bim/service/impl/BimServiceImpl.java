@@ -50,6 +50,7 @@ import cn.dlb.bim.service.BimService;
 import cn.dlb.bim.utils.BinUtils;
 import cn.dlb.bim.vo.GeometryInfoVo;
 import cn.dlb.bim.vo.GlbVo;
+import cn.dlb.bim.vo.ModelInfoVo;
 
 @Service("BimServiceImpl")
 public class BimServiceImpl implements BimService {
@@ -86,7 +87,7 @@ public class BimServiceImpl implements BimService {
 	}
 
 	@Override
-	public Integer addRevision(Long pid, File modelFile) {
+	public Integer addRevision(ModelInfoVo modelInfo, File modelFile) {
 
 		Schema schema = null;
 		try {
@@ -117,7 +118,7 @@ public class BimServiceImpl implements BimService {
 			PlatformInitDatas platformInitDatas = server.getPlatformInitDatas();
 			model.fixOids(platformInitDatas);
 			IfcModelDbSession session = new IfcModelDbSession(server.getIfcModelDao(), server.getMetaDataManager(), platformInitDatas, null, server.getModelCacheManager());
-			session.saveIfcModel(model, pid);
+			session.saveIfcModel(model, modelInfo);
 			rid = model.getModelMetaData().getRevisionId();
 		} catch (DeserializeException e) {
 			e.printStackTrace();
@@ -290,4 +291,18 @@ public class BimServiceImpl implements BimService {
 		return result;
 	}
 
+	@Override
+	public List<ModelInfoVo> queryModelInfoByPid(Long pid) {
+		List<IfcModelEntity> ifcModelEntityList = ifcModelDao.queryIfcModelEntityByPid(pid);
+		List<ModelInfoVo> result = new ArrayList<>();
+		for (IfcModelEntity ifcModelEntity :ifcModelEntityList) {
+			ModelInfoVo modelInfo = new ModelInfoVo();
+			modelInfo.setName(ifcModelEntity.getName());
+			modelInfo.setPid(ifcModelEntity.getPid());
+			modelInfo.setApplyType(ifcModelEntity.getApplyType());
+			modelInfo.setRid(ifcModelEntity.getRid());
+			result.add(modelInfo);
+		}
+		return result;
+	}
 }

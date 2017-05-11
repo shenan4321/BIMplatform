@@ -33,6 +33,7 @@ import cn.dlb.bim.ifc.shared.ProgressReporter;
 import cn.dlb.bim.models.geometry.GeometryData;
 import cn.dlb.bim.models.geometry.GeometryInfo;
 import cn.dlb.bim.models.ifc2x3tc1.IfcProduct;
+import cn.dlb.bim.vo.ModelInfoVo;
 
 public class IfcModelDbSession extends IfcModelBinary {
 
@@ -52,14 +53,16 @@ public class IfcModelDbSession extends IfcModelBinary {
 		this.modelCacheManager = modelCacheManager;
 	}
 
-	public void saveIfcModel(IfcModelInterface model, Long pid) throws IfcModelDbException {
+	public void saveIfcModel(IfcModelInterface model, ModelInfoVo modelInfo) throws IfcModelDbException {
 		IfcModelEntity ifcModelEntity = new IfcModelEntity();
 		final Integer revisionId = ifcDataBase.newRevisionId();
 		model.getModelMetaData().setRevisionId(revisionId);
 		model.fixOids(ifcDataBase);
 		ifcModelEntity.setModelMetaData(model.getModelMetaData());
 		ifcModelEntity.setRid(revisionId);
-		ifcModelEntity.setPid(pid);
+		ifcModelEntity.setPid(modelInfo.getPid());
+		ifcModelEntity.setApplyType(modelInfo.getApplyType());
+		ifcModelEntity.setName(modelInfo.getName());
 
 		Map<Long, IdEObject> geometries = new HashMap<>();
 

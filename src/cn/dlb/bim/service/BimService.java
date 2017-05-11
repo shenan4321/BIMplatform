@@ -8,12 +8,14 @@ import cn.dlb.bim.ifc.emf.IfcModelInterface;
 import cn.dlb.bim.ifc.engine.cells.Vector3d;
 import cn.dlb.bim.vo.GeometryInfoVo;
 import cn.dlb.bim.vo.GlbVo;
+import cn.dlb.bim.vo.ModelInfoVo;
 
 public interface BimService {
 	public List<GeometryInfoVo> queryGeometryInfo(Integer rid);
-	public Integer addRevision(Long pid, File modelFile);
+	public Integer addRevision(ModelInfoVo modelInfo, File modelFile);
 	public GlbVo queryGlbByRid(Integer rid);
 	public Vector3d queryGlbLonlatByRid(Integer rid);
 	public IfcModelInterface queryModelByRid(Integer rid);
 	public List<Integer> queryModelInProject(Long pid);
+	public List<ModelInfoVo> queryModelInfoByPid(Long pid);
 }

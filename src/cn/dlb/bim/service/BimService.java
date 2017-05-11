@@ -16,6 +16,6 @@ public interface BimService {
 	public GlbVo queryGlbByRid(Integer rid);
 	public Vector3d queryGlbLonlatByRid(Integer rid);
 	public IfcModelInterface queryModelByRid(Integer rid);
-	public List<Integer> queryModelInProject(Long pid);
 	public List<ModelInfoVo> queryModelInfoByPid(Long pid);
+	public void deleteModel(Integer rid);
 }

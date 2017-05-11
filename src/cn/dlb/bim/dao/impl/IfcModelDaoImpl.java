@@ -68,4 +68,18 @@ public class IfcModelDaoImpl implements IfcModelDao {
 		return mongoTemplate.find(query, IfcModelEntity.class);
 	}
 
+	@Override
+	public void deleteIdEObjectEntity(Integer rid) {
+		Query query = new Query();
+		query.addCriteria(Criteria.where("rid").is(rid));
+		mongoTemplate.findAllAndRemove(query, IdEObjectEntity.class);
+	}
+
+	@Override
+	public void deleteIfcModelEntity(Integer rid) {
+		Query query = new Query();
+		query.addCriteria(Criteria.where("rid").is(rid));
+		mongoTemplate.findAllAndRemove(query, IfcModelEntity.class);
+	}
+
 }

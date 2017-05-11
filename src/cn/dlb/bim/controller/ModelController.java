@@ -48,9 +48,9 @@ public class ModelController {
 	@Qualifier("ProjectServiceImpl")
 	private ProjectService projectService;
 	
-	@RequestMapping(value = "addRevision", method = RequestMethod.POST)
+	@RequestMapping(value = "addModel", method = RequestMethod.POST)
 	@ResponseBody
-	public Map<String, Object> addRevision(ModelInfoVo modelInfo, @RequestParam(value = "file", required = true) MultipartFile file,
+	public Map<String, Object> addModel(ModelInfoVo modelInfo, @RequestParam(value = "file", required = true) MultipartFile file,
 			HttpServletRequest request// , ModelMap model
 	) {
 		ResultUtil result = new ResultUtil();
@@ -98,6 +98,12 @@ public class ModelController {
 		List<ModelInfoVo> modelInfoList = bimService.queryModelInfoByPid(pid);
 		result.setSuccess(true);
 		result.setData(modelInfoList);
+		return result.getResult();
+	}
+	
+	public Map<String, Object> deleteModel(@RequestParam("rid") Integer rid) {
+		ResultUtil result = new ResultUtil();
+		bimService.deleteModel(rid);
 		return result.getResult();
 	}
 	

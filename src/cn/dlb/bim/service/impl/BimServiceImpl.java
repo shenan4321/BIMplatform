@@ -22,7 +22,6 @@ import com.mongodb.gridfs.GridFSDBFile;
 import cn.dlb.bim.component.PlatformInitDatas;
 import cn.dlb.bim.component.PlatformServer;
 import cn.dlb.bim.dao.IfcModelDao;
-import cn.dlb.bim.dao.entity.IdEObjectEntity;
 import cn.dlb.bim.dao.entity.IfcModelEntity;
 import cn.dlb.bim.ifc.GeometryGenerator;
 import cn.dlb.bim.ifc.collada.GlbSerializer;
@@ -41,7 +40,6 @@ import cn.dlb.bim.ifc.emf.Schema;
 import cn.dlb.bim.ifc.engine.IRenderEngine;
 import cn.dlb.bim.ifc.engine.RenderEngineException;
 import cn.dlb.bim.ifc.engine.cells.Vector3d;
-import cn.dlb.bim.ifc.model.BasicIfcModel;
 import cn.dlb.bim.ifc.serializers.IfcStepSerializer;
 import cn.dlb.bim.ifc.serializers.SerializerException;
 import cn.dlb.bim.models.geometry.GeometryInfo;
@@ -282,16 +280,6 @@ public class BimServiceImpl implements BimService {
 	}
 
 	@Override
-	public List<Integer> queryModelInProject(Long pid) {
-		List<IfcModelEntity> ifcModelEntityList = ifcModelDao.queryIfcModelEntityByPid(pid);
-		List<Integer> result = new ArrayList<>();
-		for (IfcModelEntity ifcModelEntity :ifcModelEntityList) {
-			result.add(ifcModelEntity.getRid());
-		}
-		return result;
-	}
-
-	@Override
 	public List<ModelInfoVo> queryModelInfoByPid(Long pid) {
 		List<IfcModelEntity> ifcModelEntityList = ifcModelDao.queryIfcModelEntityByPid(pid);
 		List<ModelInfoVo> result = new ArrayList<>();
@@ -304,5 +292,11 @@ public class BimServiceImpl implements BimService {
 			result.add(modelInfo);
 		}
 		return result;
+	}
+
+	@Override
+	public void deleteModel(Integer rid) {
+		ifcModelDao.deleteIdEObjectEntity(rid);
+		ifcModelDao.deleteIfcModelEntity(rid);
 	}
 }

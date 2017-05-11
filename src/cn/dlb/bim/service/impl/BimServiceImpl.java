@@ -116,7 +116,7 @@ public class BimServiceImpl implements BimService {
 
 			PlatformInitDatas platformInitDatas = server.getPlatformInitDatas();
 			model.fixOids(platformInitDatas);
-			IfcModelDbSession session = new IfcModelDbSession(server.getIfcModelDao(), server.getMetaDataManager(), platformInitDatas);
+			IfcModelDbSession session = new IfcModelDbSession(server.getIfcModelDao(), server.getMetaDataManager(), platformInitDatas, null, server.getModelCacheManager());
 			session.saveIfcModel(model, pid);
 			rid = model.getModelMetaData().getRevisionId();
 		} catch (DeserializeException e) {
@@ -266,7 +266,7 @@ public class BimServiceImpl implements BimService {
 					.getPackageMetaData(Schema.IFC4.getEPackageName());
 		}
 		PlatformInitDatas platformInitDatas = server.getPlatformInitDatas();
-		IfcModelDbSession session = new IfcModelDbSession(server.getIfcModelDao(), server.getMetaDataManager(), platformInitDatas);
+		IfcModelDbSession session = new IfcModelDbSession(server.getIfcModelDao(), server.getMetaDataManager(), platformInitDatas, null, server.getModelCacheManager());
 		IfcModelInterface model = null;
 		
 		try {

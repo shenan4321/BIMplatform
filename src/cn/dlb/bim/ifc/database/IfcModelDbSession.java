@@ -51,12 +51,6 @@ public class IfcModelDbSession extends IfcModelBinary {
 		this.progressReporter = progressReporter;
 	}
 
-	public IfcModelDbSession(IfcModelDao ifcModelDao, MetaDataManager metaDataManager, IfcDataBase ifcDataBase) {
-		super(ifcDataBase);
-		this.ifcModelDao = ifcModelDao;
-		this.metaDataManager = metaDataManager;
-	}
-
 	public void saveIfcModel(IfcModelInterface model, Long pid) throws IfcModelDbException {
 		IfcModelEntity ifcModelEntity = new IfcModelEntity();
 		final Integer revisionId = ifcDataBase.newRevisionId();

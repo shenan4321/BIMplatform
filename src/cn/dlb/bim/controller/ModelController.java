@@ -122,7 +122,8 @@ public class ModelController {
 	}
 	
 	@RequestMapping(value = "queryProperty", method = RequestMethod.GET)
-	public Map<String, Object> queryProperty(@RequestParam("rid")Integer rid, @RequestParam("oid")Long oid) {
+	public Map<String, Object> queryProperty(@RequestParam("rid")Integer rid//, @RequestParam("oid")Long oid
+			) {
 		ResultUtil result = new ResultUtil();
 		IfcModelInterface model = bimService.queryModelByRid(rid);
 		EClass productClass = (EClass) model.getPackageMetaData().getEClassifierCaseInsensitive("IfcProduct");

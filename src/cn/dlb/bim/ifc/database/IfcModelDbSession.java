@@ -49,6 +49,7 @@ public class IfcModelDbSession extends IfcModelBinary {
 		this.ifcModelDao = ifcModelDao;
 		this.metaDataManager = metaDataManager;
 		this.progressReporter = progressReporter;
+		this.modelCacheManager = modelCacheManager;
 	}
 
 	public void saveIfcModel(IfcModelInterface model, Long pid) throws IfcModelDbException {

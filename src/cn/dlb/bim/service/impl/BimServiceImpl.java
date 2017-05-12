@@ -38,7 +38,9 @@ import cn.dlb.bim.ifc.emf.PackageMetaData;
 import cn.dlb.bim.ifc.emf.ProjectInfo;
 import cn.dlb.bim.ifc.emf.Schema;
 import cn.dlb.bim.ifc.engine.IRenderEngine;
+import cn.dlb.bim.ifc.engine.MaterialGetter;
 import cn.dlb.bim.ifc.engine.RenderEngineException;
+import cn.dlb.bim.ifc.engine.cells.Material;
 import cn.dlb.bim.ifc.engine.cells.Vector3d;
 import cn.dlb.bim.ifc.serializers.IfcStepSerializer;
 import cn.dlb.bim.ifc.serializers.SerializerException;
@@ -77,7 +79,9 @@ public class BimServiceImpl implements BimService {
 			GeometryInfo geometryInfo = (GeometryInfo) ifcProduct.eGet(ifcProduct.eClass().getEStructuralFeature("geometry"));
 			if (geometryInfo != null) {
 				Boolean defualtVisiable = !ifcProduct.eClass().isSuperTypeOf(packageMetaData.getEClass("IfcSpace"));
-				adaptor.transform(geometryInfo, ifcProduct.getOid(), ifcProduct.eClass().getName(), defualtVisiable);
+				MaterialGetter materialGetter = new MaterialGetter(model);
+				Material material = materialGetter.getMaterial(ifcProduct);
+				adaptor.transform(geometryInfo, ifcProduct.getOid(), ifcProduct.eClass().getName(), defualtVisiable, material.getAmbient());
 				geometryList.add(adaptor);
 			}
 		}

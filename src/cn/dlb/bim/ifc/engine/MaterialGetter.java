@@ -1,7 +1,16 @@
 package cn.dlb.bim.ifc.engine;
 
-import org.eclipse.emf.common.util.EList;
+import java.util.List;
 
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EStructuralFeature;
+
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+
+import cn.dlb.bim.ifc.emf.IdEObject;
+import cn.dlb.bim.ifc.emf.IfcModelInterface;
 import cn.dlb.bim.ifc.engine.cells.Colord;
 import cn.dlb.bim.ifc.engine.cells.Material;
 import cn.dlb.bim.models.ifc2x3tc1.IfcColourOrFactor;
@@ -28,9 +37,35 @@ import cn.dlb.bim.models.ifc2x3tc1.IfcSurfaceStyleElementSelect;
 import cn.dlb.bim.models.ifc2x3tc1.IfcSurfaceStyleRendering;
 
 public class MaterialGetter {
-	public Material getMaterial(IfcProduct ifcProduct) {
+	private IfcModelInterface model;
+	private BiMap<IdEObject, IdEObject> materialMap = HashBiMap.create();
+	
+	public MaterialGetter(IfcModelInterface model) {
+		this.model = model;
+		generateMaterialMap();
+	}
+	
+	@SuppressWarnings("rawtypes")
+	private void generateMaterialMap() {
+		EClass ifcRelAssociatesMaterialClass = (EClass) model.getPackageMetaData().getEClassifierCaseInsensitive("IfcRelAssociatesMaterial");
+		List<IdEObject> materiallist = model.getAllWithSubTypes(ifcRelAssociatesMaterialClass);
+		for (IdEObject material : materiallist) {
+			EStructuralFeature relatedObjectsEStructuralFeature = ifcRelAssociatesMaterialClass.getEStructuralFeature("RelatedObjects");
+			EStructuralFeature relatingMaterialEStructuralFeature = ifcRelAssociatesMaterialClass.getEStructuralFeature("RelatingMaterial");
+			List relatedObjects = (List) material.eGet(relatedObjectsEStructuralFeature);
+			IdEObject relatingMaterial = (IdEObject) material.eGet(relatingMaterialEStructuralFeature);
+			for (Object relatedObject : relatedObjects) {
+				if (relatedObject instanceof IdEObject) {
+					materialMap.put(relatingMaterial, (IdEObject) relatedObject);
+				}
+			}
+		}
+		
+	}
+	
+	public Material getMaterial(IdEObject ifcProduct) {
 		Material material = null;
-		IfcProductRepresentation ifcProductRepresentation = ifcProduct.getRepresentation();
+		IfcProductRepresentation ifcProductRepresentation = ((IfcProduct)ifcProduct).getRepresentation();
 		
 		if (ifcProductRepresentation != null) {//TODO 如果找到就返回
 			material = getRgbProductDefinitionShape(ifcProductRepresentation);
@@ -39,24 +74,40 @@ public class MaterialGetter {
 			}
 		}
 		
-		EList<IfcRelAssociates> ifcRelAssociateses = ifcProduct.getHasAssociations();
-		for (IfcRelAssociates ifcRelAssociates : ifcRelAssociateses) {
-			if (ifcRelAssociates instanceof IfcRelAssociatesMaterial) {
-				IfcRelAssociatesMaterial ifcRelAssociatesMaterial = (IfcRelAssociatesMaterial) ifcRelAssociates;
-				IfcMaterialSelect ifcMaterialSelect = ifcRelAssociatesMaterial.getRelatingMaterial();
-				if (ifcMaterialSelect instanceof IfcMaterial) {
-					getRGBifcMaterial((IfcMaterial) ifcMaterialSelect);
-				} else if (ifcMaterialSelect instanceof IfcMaterialList) {
-					getRGBifcMaterialList((IfcMaterialList) ifcMaterialSelect);
-				} else if (ifcMaterialSelect instanceof IfcMaterialLayerSetUsage) {
-					getRGBifcMaterialLayerSetUsage( (IfcMaterialLayerSetUsage) ifcMaterialSelect);
-				} else if (ifcMaterialSelect instanceof IfcMaterialLayerSet) {
-					getRGBifcMaterialLayerSet((IfcMaterialLayerSet) ifcMaterialSelect);
-				} else if (ifcMaterialSelect instanceof IfcMaterialLayer) {
-					getRGBifcMaterialLayer((IfcMaterialLayer) ifcMaterialSelect);
-				}
-			}
+		IdEObject materialInMap = materialMap.inverse().get(ifcProduct);
+		if (materialInMap == null) {
+			return null;
 		}
+		if (materialInMap instanceof IfcMaterial) {
+			material = getRGBifcMaterial((IfcMaterial) materialInMap);
+		} else if (materialInMap instanceof IfcMaterialList) {
+			material = getRGBifcMaterialList((IfcMaterialList) materialInMap);
+		} else if (materialInMap instanceof IfcMaterialLayerSetUsage) {
+			material = getRGBifcMaterialLayerSetUsage( (IfcMaterialLayerSetUsage) materialInMap);
+		} else if (materialInMap instanceof IfcMaterialLayerSet) {
+			material = getRGBifcMaterialLayerSet((IfcMaterialLayerSet) materialInMap);
+		} else if (materialInMap instanceof IfcMaterialLayer) {
+			material = getRGBifcMaterialLayer((IfcMaterialLayer) materialInMap);
+		}
+		
+//		EList<IfcRelAssociates> ifcRelAssociateses = ifcProduct.getHasAssociations();
+//		for (IfcRelAssociates ifcRelAssociates : ifcRelAssociateses) {
+//			if (ifcRelAssociates instanceof IfcRelAssociatesMaterial) {
+//				IfcRelAssociatesMaterial ifcRelAssociatesMaterial = (IfcRelAssociatesMaterial) ifcRelAssociates;
+//				IfcMaterialSelect ifcMaterialSelect = ifcRelAssociatesMaterial.getRelatingMaterial();
+//				if (ifcMaterialSelect instanceof IfcMaterial) {
+//					getRGBifcMaterial((IfcMaterial) ifcMaterialSelect);
+//				} else if (ifcMaterialSelect instanceof IfcMaterialList) {
+//					getRGBifcMaterialList((IfcMaterialList) ifcMaterialSelect);
+//				} else if (ifcMaterialSelect instanceof IfcMaterialLayerSetUsage) {
+//					getRGBifcMaterialLayerSetUsage( (IfcMaterialLayerSetUsage) ifcMaterialSelect);
+//				} else if (ifcMaterialSelect instanceof IfcMaterialLayerSet) {
+//					getRGBifcMaterialLayerSet((IfcMaterialLayerSet) ifcMaterialSelect);
+//				} else if (ifcMaterialSelect instanceof IfcMaterialLayer) {
+//					getRGBifcMaterialLayer((IfcMaterialLayer) ifcMaterialSelect);
+//				}
+//			}
+//		}
 		return material;
 	}
 	

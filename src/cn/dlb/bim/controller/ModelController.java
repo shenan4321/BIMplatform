@@ -165,8 +165,8 @@ public class ModelController {
 		EClass productClass = (EClass) model.getPackageMetaData().getEClassifierCaseInsensitive("IfcProduct");
 		List<IdEObject> projectList = model.getAllWithSubTypes(productClass);
 		
+		MaterialGetter materialGetter = new MaterialGetter(model);
 		for (IdEObject ifcProject : projectList) {
-			MaterialGetter materialGetter = new MaterialGetter();
 			Material material = materialGetter.getMaterial(((IfcProduct) ifcProject));
 			if (material != null) {
 				System.out.println("type : " + ifcProject.eClass().getName() 
@@ -174,6 +174,8 @@ public class ModelController {
 						+ " g " + material.getAmbient().g
 						+ " b " + material.getAmbient().b
 						+ " a " + material.getTransparency());
+			} else {
+				System.out.println("type : " + ifcProject.eClass().getName() + "no material.");
 			}
 			
 		}

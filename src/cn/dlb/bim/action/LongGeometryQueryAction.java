@@ -1,21 +1,13 @@
 package cn.dlb.bim.action;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.emf.ecore.EClass;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import com.google.gson.Gson;
-import com.google.gson.stream.JsonWriter;
 
 import cn.dlb.bim.component.PlatformServer;
 import cn.dlb.bim.ifc.database.IfcModelDbException;
@@ -25,10 +17,10 @@ import cn.dlb.bim.ifc.emf.IdEObject;
 import cn.dlb.bim.ifc.emf.IfcModelInterface;
 import cn.dlb.bim.ifc.emf.IfcModelInterfaceException;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
-import cn.dlb.bim.ifc.model.BasicIfcModel;
+import cn.dlb.bim.ifc.engine.MaterialGetter;
+import cn.dlb.bim.ifc.engine.cells.Material;
 import cn.dlb.bim.ifc.shared.ProgressReporter;
 import cn.dlb.bim.models.geometry.GeometryInfo;
-import cn.dlb.bim.models.ifc2x3tc1.IfcProduct;
 import cn.dlb.bim.vo.GeometryInfoVo;
 import cn.dlb.bim.vo.ProgressVo;
 import cn.dlb.bim.web.ResultUtil;
@@ -101,7 +93,9 @@ public class LongGeometryQueryAction extends LongAction {
 			GeometryInfo geometryInfo = (GeometryInfo) ifcProduct.eGet(ifcProduct.eClass().getEStructuralFeature("geometry"));
 			if (geometryInfo != null) {
 				Boolean defualtVisiable = !ifcProduct.eClass().isSuperTypeOf(packageMetaData.getEClass("IfcSpace"));
-				adaptor.transform(geometryInfo, ifcProduct.getOid(), ifcProduct.eClass().getName(), defualtVisiable);
+				MaterialGetter materialGetter = new MaterialGetter(model);
+				Material material = materialGetter.getMaterial(ifcProduct);
+				adaptor.transform(geometryInfo, ifcProduct.getOid(), ifcProduct.eClass().getName(), defualtVisiable, material.getAmbient());
 				geometryList.add(adaptor);
 			}
 		}

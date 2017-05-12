@@ -5,6 +5,7 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
+import cn.dlb.bim.ifc.engine.cells.Colord;
 import cn.dlb.bim.models.geometry.GeometryInfo;
 import cn.dlb.bim.models.ifc2x3tc1.IfcProduct;
 import cn.dlb.bim.models.ifc2x3tc1.IfcSpace;
@@ -18,6 +19,7 @@ public class GeometryInfoVo {
 	private Bound bound;
 	private String typeName;
 	private Boolean defaultVisiable;
+	private Colord color;
 	
 	public GeometryInfoVo() {
 		init();
@@ -36,8 +38,9 @@ public class GeometryInfoVo {
 		bound = new Bound();
 	}
 	
-	public void transform(GeometryInfo geometryInfo, Long oid, String typeName, Boolean defaultVisiable) {
+	public void transform(GeometryInfo geometryInfo, Long oid, String typeName, Boolean defaultVisiable, Colord color) {
 		this.oid = oid;
+		this.color = color;
 		indices = byteArrayToIntArray(geometryInfo.getData().getIndices());
 		vertices = byteArrayToFloatArray(geometryInfo.getData().getVertices());
 		normals = byteArrayToFloatArray(geometryInfo.getData().getNormals());
@@ -152,4 +155,13 @@ public class GeometryInfoVo {
 	public void setDefaultVisiable(Boolean defaultVisiable) {
 		this.defaultVisiable = defaultVisiable;
 	}
+
+	public Colord getColor() {
+		return color;
+	}
+
+	public void setColor(Colord color) {
+		this.color = color;
+	}
+	
 }

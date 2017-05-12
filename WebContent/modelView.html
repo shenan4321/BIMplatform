@@ -218,9 +218,15 @@
 		});
 	</script> 
   <script>
+function GetQueryString(name){
+   var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)","i");
+   var r = window.location.search.substr(1).match(reg);
+   if (r!=null) return unescape(r[2]); return null;
+}
+var string = GetQueryString("rid")||1;
 var websocket = new WebsocketBim();
 websocket.init({
-	urlPath:"ws/geometry?rid=1",
+	urlPath:"ws/geometry?rid="+string,
 	onopen:function(msg){
 		window.progress = $.progress();
 	},
@@ -235,7 +241,7 @@ websocket.init({
 			sceneJsShow(data);
 		}
 	}
-})
+});
 
 $(function(){
 	var thisTime;

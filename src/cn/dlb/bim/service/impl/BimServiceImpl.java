@@ -81,7 +81,7 @@ public class BimServiceImpl implements BimService {
 				Boolean defualtVisiable = !ifcProduct.eClass().isSuperTypeOf(packageMetaData.getEClass("IfcSpace"));
 				MaterialGetter materialGetter = new MaterialGetter(model);
 				Material material = materialGetter.getMaterial(ifcProduct);
-				adaptor.transform(geometryInfo, ifcProduct.getOid(), ifcProduct.eClass().getName(), defualtVisiable, material.getAmbient());
+				adaptor.transform(geometryInfo, ifcProduct.getOid(), ifcProduct.eClass().getName(), defualtVisiable, material == null ? null : material.getAmbient());
 				geometryList.add(adaptor);
 			}
 		}

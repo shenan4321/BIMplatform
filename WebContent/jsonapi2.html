@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>jsonapi</title>
+
+    <script src="public/js/scenejs/plugins/lib/jquery-1.8.3.min.js"></script>
+	<script src="public/js/scenejs/scenejs.js"></script>
+	<script src="public/js/scenejs/plugins/node/geometry/base64util.js"></script>
+	<script src="public/js/ifc/Constants.js"></script>
+</head>
+<body>
+    <script>
+	    var params = {rid:11};
+	    $.ajax ({
+	        async:false,
+	        type: "GET",
+	        url: "queryGlbByRid.do",
+	        contentType: "application/json",  
+ 	        data: params,
+	       	dataType:"json",
+	        success:function(data) {
+	        	alert("success");
+	        },
+	        error:function(data){
+	            alert("error");
+	        }
+	    });
+	
+    </script>
+</body>
+</html>

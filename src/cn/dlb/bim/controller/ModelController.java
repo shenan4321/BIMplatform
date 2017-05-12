@@ -3,7 +3,6 @@ package cn.dlb.bim.controller;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,11 +24,13 @@ import cn.dlb.bim.ifc.collada.KmzSerializer;
 import cn.dlb.bim.ifc.emf.IdEObject;
 import cn.dlb.bim.ifc.emf.IfcModelInterface;
 import cn.dlb.bim.ifc.emf.ProjectInfo;
+import cn.dlb.bim.ifc.engine.MaterialGetter;
+import cn.dlb.bim.ifc.engine.cells.Material;
 import cn.dlb.bim.ifc.engine.cells.Vector3d;
 import cn.dlb.bim.ifc.serializers.SerializerException;
 import cn.dlb.bim.ifc.tree.ProjectTree;
 import cn.dlb.bim.ifc.tree.PropertyGenerator;
-import cn.dlb.bim.ifc.tree.TreeItem;
+import cn.dlb.bim.models.ifc2x3tc1.IfcProduct;
 import cn.dlb.bim.service.BimService;
 import cn.dlb.bim.service.ProjectService;
 import cn.dlb.bim.vo.GlbVo;
@@ -151,6 +152,30 @@ public class ModelController {
 		for (IdEObject ifcProject : projectList) {
 			PropertyGenerator p = new PropertyGenerator();
 			p.getProperty(model.getPackageMetaData(), ifcProject);
+		}
+		result.setSuccess(true);
+		return result.getResult();
+	}
+	
+	@RequestMapping(value = "queryMaterial", method = RequestMethod.GET)
+	public Map<String, Object> queryMaterial(@RequestParam("rid")Integer rid//, @RequestParam("oid")Long oid
+			) {
+		ResultUtil result = new ResultUtil();
+		IfcModelInterface model = bimService.queryModelByRid(rid);
+		EClass productClass = (EClass) model.getPackageMetaData().getEClassifierCaseInsensitive("IfcProduct");
+		List<IdEObject> projectList = model.getAllWithSubTypes(productClass);
+		
+		for (IdEObject ifcProject : projectList) {
+			MaterialGetter materialGetter = new MaterialGetter();
+			Material material = materialGetter.getMaterial(((IfcProduct) ifcProject));
+			if (material != null) {
+				System.out.println("type : " + ifcProject.eClass().getName() 
+						+ " color : r " + material.getAmbient().r
+						+ " g " + material.getAmbient().g
+						+ " b " + material.getAmbient().b
+						+ " a " + material.getTransparency());
+			}
+			
 		}
 		result.setSuccess(true);
 		return result.getResult();

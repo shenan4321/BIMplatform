@@ -11,6 +11,7 @@ import cn.dlb.bim.models.ifc2x3tc1.IfcSpace;
 
 public class GeometryInfoVo {
 
+	private Long oid;
 	private int[] indices;
 	private float[] vertices;
 	private float[] normals;
@@ -35,7 +36,8 @@ public class GeometryInfoVo {
 		bound = new Bound();
 	}
 	
-	public void transform(GeometryInfo geometryInfo, String typeName, Boolean defaultVisiable) {
+	public void transform(GeometryInfo geometryInfo, Long oid, String typeName, Boolean defaultVisiable) {
+		this.oid = oid;
 		indices = byteArrayToIntArray(geometryInfo.getData().getIndices());
 		vertices = byteArrayToFloatArray(geometryInfo.getData().getVertices());
 		normals = byteArrayToFloatArray(geometryInfo.getData().getNormals());
@@ -92,6 +94,15 @@ public class GeometryInfoVo {
 				 float[] array = new float[floatBuf.remaining()];
 				 floatBuf.get(array);
 		return array;
+	}
+
+	
+	public Long getOid() {
+		return oid;
+	}
+
+	public void setOid(Long oid) {
+		this.oid = oid;
 	}
 
 	public int[] getIndices() {

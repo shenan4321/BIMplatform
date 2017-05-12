@@ -77,7 +77,7 @@ public class BimServiceImpl implements BimService {
 			GeometryInfo geometryInfo = (GeometryInfo) ifcProduct.eGet(ifcProduct.eClass().getEStructuralFeature("geometry"));
 			if (geometryInfo != null) {
 				Boolean defualtVisiable = !ifcProduct.eClass().isSuperTypeOf(packageMetaData.getEClass("IfcSpace"));
-				adaptor.transform(geometryInfo, ifcProduct.eClass().getName(), defualtVisiable);
+				adaptor.transform(geometryInfo, ifcProduct.getOid(), ifcProduct.eClass().getName(), defualtVisiable);
 				geometryList.add(adaptor);
 			}
 		}

@@ -2,6 +2,7 @@ package cn.dlb.bim.ifc.engine;
 
 import org.eclipse.emf.common.util.EList;
 
+import cn.dlb.bim.ifc.engine.cells.Colord;
 import cn.dlb.bim.ifc.engine.cells.Material;
 import cn.dlb.bim.models.ifc2x3tc1.IfcColourOrFactor;
 import cn.dlb.bim.models.ifc2x3tc1.IfcColourRgb;
@@ -27,10 +28,16 @@ import cn.dlb.bim.models.ifc2x3tc1.IfcSurfaceStyleElementSelect;
 import cn.dlb.bim.models.ifc2x3tc1.IfcSurfaceStyleRendering;
 
 public class MaterialGetter {
-	public void getMaterial(IfcProduct ifcProduct, Material material) {
-		
+	public Material getMaterial(IfcProduct ifcProduct) {
+		Material material = null;
 		IfcProductRepresentation ifcProductRepresentation = ifcProduct.getRepresentation();
 		
+		if (ifcProductRepresentation != null) {//TODO 如果找到就返回
+			material = getRgbProductDefinitionShape(ifcProductRepresentation);
+			if (material != null) {
+				return material;
+			}
+		}
 		
 		EList<IfcRelAssociates> ifcRelAssociateses = ifcProduct.getHasAssociations();
 		for (IfcRelAssociates ifcRelAssociates : ifcRelAssociateses) {
@@ -38,33 +45,91 @@ public class MaterialGetter {
 				IfcRelAssociatesMaterial ifcRelAssociatesMaterial = (IfcRelAssociatesMaterial) ifcRelAssociates;
 				IfcMaterialSelect ifcMaterialSelect = ifcRelAssociatesMaterial.getRelatingMaterial();
 				if (ifcMaterialSelect instanceof IfcMaterial) {
-					
+					getRGBifcMaterial((IfcMaterial) ifcMaterialSelect);
 				} else if (ifcMaterialSelect instanceof IfcMaterialList) {
-					
+					getRGBifcMaterialList((IfcMaterialList) ifcMaterialSelect);
 				} else if (ifcMaterialSelect instanceof IfcMaterialLayerSetUsage) {
-					IfcMaterialLayerSetUsage ifcMaterialLayerSetUsage = (IfcMaterialLayerSetUsage) ifcMaterialSelect;
-					IfcMaterialLayerSet ifcMaterialLayerSet = ifcMaterialLayerSetUsage.getForLayerSet();
-					EList<IfcMaterialLayer> ifcMaterialLayerAggr = ifcMaterialLayerSet.getMaterialLayers();
-					int count = ifcMaterialLayerAggr.size();
-					if (count != 0) {
-						IfcMaterialLayer ifcMaterialLayer = ifcMaterialLayerAggr.get(0);
-						IfcMaterial ifcMaterial = ifcMaterialLayer.getMaterial();
-						EList<IfcMaterialDefinitionRepresentation> ifcMaterialDefinitionRepresentationAggr = ifcMaterial.getHasRepresentation();
-						for (IfcMaterialDefinitionRepresentation ifcMaterialDefinitionRepresentation : ifcMaterialDefinitionRepresentationAggr) {
-							getRgbIfcMaterialDefinitionRepresentation(ifcMaterialDefinitionRepresentation, material);
-						}
-						
-					}
+					getRGBifcMaterialLayerSetUsage( (IfcMaterialLayerSetUsage) ifcMaterialSelect);
 				} else if (ifcMaterialSelect instanceof IfcMaterialLayerSet) {
-					
+					getRGBifcMaterialLayerSet((IfcMaterialLayerSet) ifcMaterialSelect);
 				} else if (ifcMaterialSelect instanceof IfcMaterialLayer) {
-					
+					getRGBifcMaterialLayer((IfcMaterialLayer) ifcMaterialSelect);
 				}
 			}
 		}
+		return material;
 	}
 	
-	private void getRgbProductDefinitionShape(IfcProductRepresentation ifcProductRepresentation, Material material) {
+	private Material getRGBifcMaterialList(IfcMaterialList ifcMaterialList) {
+		Material material = null;
+		EList<IfcMaterial> ifcMaterials = ifcMaterialList.getMaterials();
+		if (ifcMaterials.size() > 0) {
+			IfcMaterial ifcMaterial = ifcMaterials.get(0);
+			material = getRGBifcMaterial(ifcMaterial);
+		}
+		return material;
+	}
+	
+	private Material getRGBifcMaterialLayerSet(IfcMaterialLayerSet ifcMaterialLayerSet) {
+		Material material = null;
+		EList<IfcMaterialLayer> ifcMaterialLayerList = ifcMaterialLayerSet.getMaterialLayers();
+		if (ifcMaterialLayerList.size() > 0) {
+			IfcMaterialLayer ifcMaterialLayer = ifcMaterialLayerList.get(0);
+			material = getRGBifcMaterialLayer(ifcMaterialLayer);
+		}
+		return material;
+	}
+	
+	private Material getRGBifcMaterialLayer(IfcMaterialLayer ifcMaterialLayer) {
+		IfcMaterial ifcMaterial =ifcMaterialLayer.getMaterial();
+		Material material = getRGBifcMaterial(ifcMaterial);
+		return material;
+	}
+	
+	private Material getRGBifcMaterial(IfcMaterial ifcMaterial) {
+		Material material = null;
+		EList<IfcMaterialDefinitionRepresentation> ifcMaterialDefinitionRepresentationList = ifcMaterial.getHasRepresentation();
+		for (IfcMaterialDefinitionRepresentation ifcMaterialDefinitionRepresentation : ifcMaterialDefinitionRepresentationList) {
+			EList<IfcRepresentation> ifcRepresentationList = ifcMaterialDefinitionRepresentation.getRepresentations();
+			for (IfcRepresentation ifcRepresentation : ifcRepresentationList) {
+				if (ifcRepresentation instanceof IfcStyledRepresentation) {
+					material = getRGBifcStyledRepresentation((IfcStyledRepresentation) ifcRepresentation);
+				}
+			}
+		}
+		return material;
+	}
+	
+	private Material getRGBifcStyledRepresentation(IfcStyledRepresentation ifcStyledRepresentation) {
+		Material material = null;
+		EList<IfcRepresentationItem> ifcRepresentationItemAggr = ifcStyledRepresentation.getItems();
+		for (IfcRepresentationItem ifcRepresentationItem : ifcRepresentationItemAggr) {
+			if (ifcRepresentationItem instanceof IfcStyledItem) {
+				IfcStyledItem ifcStyledItem = (IfcStyledItem) ifcRepresentationItem;
+				material = getRgbStyledItem(ifcStyledItem);
+			}
+		}
+		return material;
+	}
+	
+	private Material getRGBifcMaterialLayerSetUsage(IfcMaterialLayerSetUsage ifcMaterialLayerSetUsage) {
+		Material material = null;
+		IfcMaterialLayerSet ifcMaterialLayerSet = ifcMaterialLayerSetUsage.getForLayerSet();
+		EList<IfcMaterialLayer> ifcMaterialLayerAggr = ifcMaterialLayerSet.getMaterialLayers();
+		int count = ifcMaterialLayerAggr.size();
+		if (count != 0) {
+			IfcMaterialLayer ifcMaterialLayer = ifcMaterialLayerAggr.get(0);
+			IfcMaterial ifcMaterial = ifcMaterialLayer.getMaterial();
+			EList<IfcMaterialDefinitionRepresentation> ifcMaterialDefinitionRepresentationAggr = ifcMaterial.getHasRepresentation();
+			for (IfcMaterialDefinitionRepresentation ifcMaterialDefinitionRepresentation : ifcMaterialDefinitionRepresentationAggr) {
+				material = getRgbIfcMaterialDefinitionRepresentation(ifcMaterialDefinitionRepresentation);
+			}
+		}
+		return material;
+	}
+	
+	private Material getRgbProductDefinitionShape(IfcProductRepresentation ifcProductRepresentation) {
+		Material material = null;
 		EList<IfcRepresentation> representationsSet = ifcProductRepresentation.getRepresentations();
 		for (IfcRepresentation ifcRepresentation : representationsSet) {
 			String representationIdentifier = ifcRepresentation.getRepresentationIdentifier();
@@ -76,14 +141,16 @@ public class MaterialGetter {
 				for (IfcRepresentationItem geometry : geometrySet) {
 					EList<IfcStyledItem> styledItemAggr = geometry.getStyledByItem();
 					for (IfcStyledItem ifcStyledItem : styledItemAggr) {
-						getRgbStyledItem(ifcStyledItem, material);
+						material = getRgbStyledItem(ifcStyledItem);
 					}
 				}
 			}
 		}
+		return material;
 	}
 	
-	private void getRgbStyledItem(IfcStyledItem ifcStyledItem, Material material) {
+	private Material getRgbStyledItem(IfcStyledItem ifcStyledItem) {
+		Material material = null;
 		EList<IfcPresentationStyleAssignment> ifcPresentationStyleAssignmentAggr = ifcStyledItem.getStyles();
 		for (IfcPresentationStyleAssignment ifcPresentationStyleAssignment : ifcPresentationStyleAssignmentAggr) {
 			EList<IfcPresentationStyleSelect> ifcPresentationStyleSelectAggr = ifcPresentationStyleAssignment.getStyles();
@@ -94,31 +161,28 @@ public class MaterialGetter {
 					for (IfcSurfaceStyleElementSelect ifcSurfaceStyleElementSelect : ifcSurfaceStyleElementSelectAggr) {
 						if (ifcSurfaceStyleElementSelect instanceof IfcSurfaceStyleRendering) {
 							IfcSurfaceStyleRendering ifcSurfaceStyleRendering = (IfcSurfaceStyleRendering) ifcSurfaceStyleElementSelect;
-							getRgbSurfaceStyle(ifcSurfaceStyleRendering, material);
+							material = getRgbSurfaceStyle(ifcSurfaceStyleRendering);
 						}
 					}
 				}
 			}
 		}
+		return material;
 	}
 	
-	private void getRgbIfcMaterialDefinitionRepresentation(IfcMaterialDefinitionRepresentation ifcMaterialDefinitionRepresentation, Material material) {
+	private Material getRgbIfcMaterialDefinitionRepresentation(IfcMaterialDefinitionRepresentation ifcMaterialDefinitionRepresentation) {
+		Material material = null;
 		EList<IfcRepresentation> ifcRepresentationAggr = ifcMaterialDefinitionRepresentation.getRepresentations();
 		for (IfcRepresentation ifcRepresentation : ifcRepresentationAggr) {
 			if (ifcRepresentation instanceof IfcStyledRepresentation) {
-				IfcStyledRepresentation ifcStyledRepresentation = (IfcStyledRepresentation) ifcRepresentation;
-				EList<IfcRepresentationItem> ifcRepresentationItemAggr = ifcStyledRepresentation.getItems();
-				for (IfcRepresentationItem ifcRepresentationItem : ifcRepresentationItemAggr) {
-					if (ifcRepresentationItem instanceof IfcStyledItem) {
-						IfcStyledItem ifcStyledItem = (IfcStyledItem) ifcRepresentationItem;
-						getRgbStyledItem(ifcStyledItem, material);
-					}
-				}
+				material = getRGBifcStyledRepresentation((IfcStyledRepresentation) ifcRepresentation);
 			}
 		}
+		return material;
 	}
 	
-	private void getRgbSurfaceStyle(IfcSurfaceStyleRendering ifcSurfaceStyleRendering, Material material) {
+	private Material getRgbSurfaceStyle(IfcSurfaceStyleRendering ifcSurfaceStyleRendering) {
+		Material material = new Material();
 		double transparency = ifcSurfaceStyleRendering.getTransparency();
 		IfcColourRgb surfaceColour = ifcSurfaceStyleRendering.getSurfaceColour();
 		double red = surfaceColour.getRed();
@@ -126,5 +190,8 @@ public class MaterialGetter {
 		double blue = surfaceColour.getBlue();
 		IfcColourOrFactor diffuseColour = ifcSurfaceStyleRendering.getDiffuseColour();
 		IfcColourOrFactor specularColour = ifcSurfaceStyleRendering.getSpecularColour();
+		Colord color = new Colord(red, green, blue, transparency);
+		material.setAmbient(color);
+		return material;
 	}
 }

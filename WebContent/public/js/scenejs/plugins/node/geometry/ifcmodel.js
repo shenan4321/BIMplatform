@@ -77,13 +77,13 @@
 					enabled: true,
 					nodes : [{
 						type : "name",
-						name : coreId,
+						name : geometryInfo.oid,
 						alpha: 1,//透明度
 						nodes : [{
 							type : "material",
 							baseColor: geometryInfo.color ? { r: geometryInfo.color.r , g:geometryInfo.color.g , b:geometryInfo.color.b } : material,
 							//color:geometryInfo.color ? { r: geometryInfo.color.r , g:geometryInfo.color.g , b:geometryInfo.color.b } : material,
-		        			id:coreId+"geometry",
+		        			id:geometryInfo.oid+"geometry",
 							nodes: [{
 			        			type : "geometry",
 			        			primitive : params.wire ? "lines" : "triangles",

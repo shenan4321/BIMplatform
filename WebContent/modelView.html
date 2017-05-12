@@ -33,14 +33,14 @@
   </header> 
   <div class="aside-menu-box"> 
    <ul class="aside-box"> 
-    <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p class=""> 文件 </p> </a> </li> 
-    <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p class=""> 场景树 </p> </a> </li> 
-    <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p class=""> 类型 </p> </a> </li> 
-    <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p class=""> 属性 </p> </a> </li> 
-    <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p class=""> 搜索 </p> </a> </li> 
-    <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p class=""> 标注 </p> </a> </li> 
-    <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p class=""> 楼层 </p> </a> </li> 
-    <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p class=""> 漫游控制 </p> </a> </li> 
+    <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 文件 </p> </a> </li> 
+    <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 场景树 </p> </a> </li> 
+    <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 类型 </p> </a> </li> 
+    <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 属性 </p> </a> </li> 
+    <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 搜索 </p> </a> </li> 
+    <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 标注 </p> </a> </li> 
+    <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 楼层 </p> </a> </li> 
+    <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 漫游控制 </p> </a> </li> 
    </ul> 
   </div> 
   <div class="nav-slide"> 
@@ -255,7 +255,16 @@ $(function(){
 		else{
 			$('.nav-slide').removeClass('hover');
 		}
-		
+	})
+	
+	$('.aside-box li').click(function(){
+		clearTimeout(thisTime);
+		var thisUB	=	$('.aside-box li').index($(this));
+		if($.trim($('.nav-slide-o').eq(thisUB).html()) != ""){
+			$('.nav-slide').addClass('hover');
+			$('.nav-slide-o').hide();
+			$('.nav-slide-o').eq(thisUB).show();
+		}
 	})
 	
 	function thisMouseOut(){

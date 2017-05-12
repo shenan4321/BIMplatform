@@ -3,6 +3,14 @@
     <li><a href="#!/Bimmodel/modelList">模型管理</a></li>
     <li class="active">添加模型</li>
 </ol>
+<script>
+	$(function(){
+		var routeParam = location.hash.split('/');
+		var pid = routeParam[routeParam.length-1];
+		$('#pId').val(pid);
+		$('#backBtn').attr('href',"#!/BimModel/modelList/"+pid);
+	})
+</script>
 <!-- 添加模型html -->
 <div class="row">
     <div class="col-md-12">
@@ -43,14 +51,7 @@
         </div>
     </div>
 </div>
-<script>
-	$(function(){
-		var routeParam = location.hash.split('/');
-		var pid = routeParam[routeParam.length-1];
-		$('#pId').val(pid);
-		$('#backBtn').attr('href',"#!/BimModel/modelList/"+pid);
-	})
-</script>
+
 
 
 		

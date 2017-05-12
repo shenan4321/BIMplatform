@@ -2,10 +2,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="x5-orientation" content="portrait">
+    <meta name="full-screen" content="yes">
+    <meta name="x5-fullscreen" content="true">
+    <meta name="browsermode" content="application">
+    <meta name="x5-page-mode" content="app">
     <link rel="stylesheet" href="public/js/zTree_v3/css/demo.css" type="text/css">
 	<link rel="stylesheet" href="public/js/zTree_v3/css/zTreeStyle/zTreeStyle.css" type="text/css">
 	<link rel="stylesheet" href="public/css/format.css" type="text/css">
 	<link rel="stylesheet" href="public/css/bim.css" type="text/css">
+	    
 	<script type="text/javascript" src="public/js/jquery/2.1.4/jquery-2.1.4.min.js"></script>
 	<script type="text/javascript" src="public/js/zTree_v3/js/jquery.ztree.core.js"></script>
 	<script type="text/javascript" src="public/js/zTree_v3/js/jquery.ztree.excheck.js"></script>
@@ -15,7 +23,7 @@
 	<script src="public/js/scenejs/plugins/node/geometry/base64util.js"></script>
 	<script src="public/js/ifc/Constants.js"></script>
 	<title>进度条demo</title>
-       	<script type="text/javascript">
+    <script type="text/javascript">
 		var setting = {
 			check: {
 				enable: true
@@ -84,7 +92,7 @@
 <script>
 var websocket = new WebsocketBim();
 websocket.init({
-	urlPath:"ws/geometry?rid=1",
+	urlPath:"ws/geometry?rid=4",
 	onopen:function(msg){
 		window.progress = $.progress();
 	},
@@ -95,6 +103,7 @@ websocket.init({
 				progress.hide();
 			}
 		}else{
+			progress.hide();
 			sceneJsShow(data);
 		}
 	}

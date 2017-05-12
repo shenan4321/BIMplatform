@@ -17,8 +17,8 @@
 .navbar-brand{display: inline-block;padding-top: .25rem;padding-bottom: .25rem;margin-right: 1rem;font-size: 1.25rem;line-height: inherit;white-space: nowrap;/*color: #20a8d8;*/text-decoration: none;display: inline-block;width: 60px;height: 60px;background-color: rgb(45, 53, 61);background-image: url(images/20.png);background-repeat: no-repeat;background-origin:content-box;background-position: center center;background-size: 25px auto;border-bottom: 1px solid rgb(45, 53, 61);}
 .navbar-brand{display: inline-block;width: 60px;height: 60px;/*float: inherit;*/
 ;background-position:center;background-color:rgb(45, 53, 61);background-image: url(../images/DLB-logo.png);background-repeat: no-repeat;}
-header.navbar{position: absolute;left: 0;right: 0;height: 60px;top: 0;padding: 0;background-color: #fff;border-bottom: 1px;background-position:center;}
-.aside-menu-box{width: 60px;top: 60px;;height: 93.8%;position: absolute;left: 0px;z-index:10;background-color: rgb(45, 53, 61);}
+header.navbar{position: absolute;left: 0;right: 0;height: 60px;top: 0;padding: 0;background-color: #fff;border-bottom: 1px;background-position:center;border-bottom-width: 1px;border-bottom-style: none;border-bottom-color: rgba(0, 0, 0, 0.156863);padding-left:;padding-right: 30px;min-width: 1280px;box-shadow: rgba(0, 0, 0, 0.14902) 0px 1px 3px 0px;width: 100%;background-color: rgb(249, 249, 249);}
+.aside-menu-box{width: 60px;top: 60px;bottom: 0;position: absolute;left: 0px;z-index:10;background-color: rgb(45, 53, 61);}
 .aside-box{height:auto;padding-left: 0px;list-style-type: none;}
 li.li:hover{background-color: #103956 !important;}
 li.li:hover .iconfont1{display:block;}

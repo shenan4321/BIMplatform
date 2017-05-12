@@ -136,6 +136,7 @@ function sceneJsShow(sceneNodes) {
     	                      }
     	                      hisPick = {name:hit.name,color:material.getColor()}
     	                      material.setColor({r: 0, g: 1, b: 0});
+    	                      //material.setColor({r: 0.501960784313725, g:0.501960784313725, b: 0.501960784313725});
     	                  });
     	          info.innerHTML = "Pick hit: " + JSON.stringify(hit);
 

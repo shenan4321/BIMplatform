@@ -62,7 +62,6 @@ public class ProjectTreeGenerator {
 						for (IdEObject subIfcProduct : subIfcProductList) {
 							TreeItem subTree = buildTree(subIfcProduct);
 							curTree.getContains().add(subTree);
-							subTree.setParent(curTree);
 						}
 					}
 				}
@@ -84,7 +83,6 @@ public class ProjectTreeGenerator {
 									IdEObject relatedIdEObject = (IdEObject) relatedObject;
 									TreeItem subTree = buildTree(relatedIdEObject);
 									curTree.getDecomposition().add(subTree);
-									subTree.setParent(curTree);
 								}
 							}
 						}

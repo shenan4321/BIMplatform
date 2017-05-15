@@ -11,7 +11,7 @@ public class TreeItem {
 	private List<TreeItem> decomposition;
 	private List<TreeItem> contains;
 	private Boolean selected = false;
-	private TreeItem parent;
+//	private TreeItem parent;
 	private String ifcClassType;
 	
 	public TreeItem() {
@@ -54,12 +54,6 @@ public class TreeItem {
 	}
 	public void setSelected(Boolean selected) {
 		this.selected = selected;
-	}
-	public TreeItem getParent() {
-		return parent;
-	}
-	public void setParent(TreeItem parent) {
-		this.parent = parent;
 	}
 	public String getIfcClassType() {
 		return ifcClassType;

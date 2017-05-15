@@ -54,11 +54,11 @@ public class ProjectTreeGenerator {
 			EReference containElementsReference = packageMetaData.getEReference(object.eClass().getName(), "ContainsElements");
 			
 			if (containElementsReference != null) {
-				List<IdEObject> ifcRelContainedInSpatialStructureList = (List<IdEObject>) object.eGet(containElementsReference.getEOpposite());
+				List<IdEObject> ifcRelContainedInSpatialStructureList = (List<IdEObject>) object.eGet(containElementsReference);
 				for (IdEObject ifcRelContainedInSpatialStructure : ifcRelContainedInSpatialStructureList) {
 					EReference relatedElementsReference = packageMetaData.getEReference(ifcRelContainedInSpatialStructure.eClass().getName(), "RelatedElements");
 					if (relatedElementsReference != null) {
-						List<IdEObject> subIfcProductList = (List<IdEObject>) ifcRelContainedInSpatialStructure.eGet(relatedElementsReference.getEOpposite());
+						List<IdEObject> subIfcProductList = (List<IdEObject>) ifcRelContainedInSpatialStructure.eGet(relatedElementsReference);
 						for (IdEObject subIfcProduct : subIfcProductList) {
 							TreeItem subTree = buildTree(subIfcProduct);
 							curTree.getContains().add(subTree);

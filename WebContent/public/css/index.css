@@ -1,18 +1,7 @@
 .wrap{width:100%;height:1000px;}
 .wrap p{font-size: 48px;text-align: center;color: #fff;padding-top: 280px;line-height: 60px;}
-.nav-ul li a{display: block;width: 100px;height: 100px;overflow: hidden;text-align: center;position: relative;transition: all .5s;-moz-transition: all .5s;-webkit-transition: all .5s;-o-transition: all .5s;}
-.nav-ul li a:before{content: '';position: absolute;left: -240px;top: 0px;width: 200px;height: 100%;background: #fff;z-index: 1;transform: skew(30deg, 0);-webkit-transform: skew(30deg, 0);-ms-transform: skew(30deg, 0);-moz-transform: skew(30deg, 0);-o-transform: skew(30deg, 0);transition: all .5s;-moz-transition: all .5s;-webkit-transition: all .5s;-o-transition: all .5s;}
-.nav-ul li a:hover{background: #fff;}
-.nav-ul li a:hover:before{left: -30px;}
-.nav-ul li a:after{content: '';position: absolute;width: 100%;height: 30px;left: 0;top: 20px;z-index: 1;}
-.nav-ul li a span{display: block;margin-top: 60px;position: relative;z-index: 1;}
 .nav-slide{position: fixed;left: 60px;top: 60px;width: 300px;height: 93.8%;background: #eeeeee;transform: rotateY(120deg);-webkit-transform: rotateY(120deg);-moz-transform: rotateY(120deg);-o-transform: rotateY(120deg);-ms-transform: rotateY(120deg);z-index: 99;visibility: hidden;transform-origin: 0 0;-webkit-transform-origin: 0 0;-moz-transform-origin: 0 0;-o-transform-origin: 0 0;-ms-transform-origin: 0 0;backface-visibility: hidden;-webkit-backface-visibility: hidden;transition: all .5s;-webkit-transition: all .5s;-moz-transition: all .5s;-o-transition: all .5s;transition-timing-function: cubic-bezier(.08, .72, .71, .96);-webkit-transition-timing-function: cubic-bezier(.08, .72, .71, .96);}
 .nav-slide.hover{transform: rotateY(0deg);-webkit-transform: rotateY(0deg);-moz-transform: rotateY(0deg);-o-transform: rotateY(0deg);-ms-transform: rotateY(0deg);z-index: 15;visibility: visible;}
-.nav-slide-o li a{line-height: 50px;display: block;padding: 0 20px;font-size: 14px;overflow: hidden;text-align: left;position: relative;transition: all .5s;-webkit-transition: all .5s;-moz-transition: all .5s;-o-transition: all .5s;}
-.nav-slide-o li a:before{content: '';position: absolute;left: -230%;top: 0px;width: 200%;height: 100%;background: #000;z-index: 1;transform: skew(30deg, 0);-webkit-transform: skew(30deg, 0);-moz-transform: skew(30deg, 0);-o-transform: skew(30deg, 0);-ms-transform: skew(30deg, 0);transition: all .5s;-webkit-transition: all .5s;-moz-transition: all .5s;-o-transition: all .5s;}
-.nav-slide-o li a:hover{background: #fff;}
-.nav-slide-o li a:hover:before{left: -60px;}
-.nav-slide-o li a span{position: relative;z-index: 1;}
 .nav-slide-o{display: none;}
 .navbar-brand{display: inline-block;padding-top: .25rem;padding-bottom: .25rem;margin-right: 1rem;font-size: 1.25rem;line-height: inherit;white-space: nowrap;/*color: #20a8d8;*/text-decoration: none;display: inline-block;width: 60px;height: 60px;background-color: rgb(45, 53, 61);background-image: url(images/20.png);background-repeat: no-repeat;background-origin:content-box;background-position: center center;background-size: 25px auto;border-bottom: 1px solid rgb(45, 53, 61);}
 .navbar-brand{display: inline-block;width: 60px;height: 60px;/*float: inherit;*/
@@ -21,7 +10,8 @@ header.navbar{position: absolute;left: 0;right: 0;height: 60px;top: 0;padding: 0
 .aside-menu-box{width: 60px;top: 60px;bottom: 0;position: absolute;left: 0px;z-index:10;background-color: rgb(45, 53, 61);}
 .aside-box{height:auto;padding-left: 0px;list-style-type: none;}
 li.li:hover{background-color: #103956 !important;}
-li.li:hover .iconfont1{display:block;}
+li.li.hover{background-color: #103956 !important;}
+li.li.hover .iconfont1{display:block;}
 .li{padding-top: 15px;position: relative;height: 70px;}
 .font{font-size: 10px;color: #ffffff;text-decoration: none;display: inline-block;text-align: center;display: block;}
 @font-face{font-family: 'iconfont';src: url('../font/iconfont.eot');src: url('../font/iconfont.eot?#iefix') format('embedded-opentype'),url('../font/iconfont.woff') format('woff'),url('../font/iconfont.ttf') format('truetype'),url('../font/iconfont.svg#iconfont') format('svg');}

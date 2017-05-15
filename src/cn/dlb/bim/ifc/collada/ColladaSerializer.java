@@ -60,7 +60,6 @@ import cn.dlb.bim.models.ifc2x3tc1.IfcRoof;
 import cn.dlb.bim.models.ifc2x3tc1.IfcSIUnit;
 import cn.dlb.bim.models.ifc2x3tc1.IfcSite;
 import cn.dlb.bim.models.ifc2x3tc1.IfcSlab;
-import cn.dlb.bim.models.ifc2x3tc1.IfcSlabTypeEnum;
 import cn.dlb.bim.models.ifc2x3tc1.IfcSpace;
 import cn.dlb.bim.models.ifc2x3tc1.IfcStair;
 import cn.dlb.bim.models.ifc2x3tc1.IfcStairFlight;

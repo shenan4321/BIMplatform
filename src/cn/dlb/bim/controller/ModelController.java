@@ -28,7 +28,7 @@ import cn.dlb.bim.ifc.engine.cells.Vector3d;
 import cn.dlb.bim.ifc.serializers.SerializerException;
 import cn.dlb.bim.ifc.tree.Material;
 import cn.dlb.bim.ifc.tree.MaterialGenerator;
-import cn.dlb.bim.ifc.tree.ProjectTree;
+import cn.dlb.bim.ifc.tree.ProjectTreeGenerator;
 import cn.dlb.bim.ifc.tree.PropertyGenerator;
 import cn.dlb.bim.models.ifc2x3tc1.IfcProduct;
 import cn.dlb.bim.service.BimService;
@@ -123,10 +123,10 @@ public class ModelController {
 	public Map<String, Object> queryModelTree(@RequestParam("rid")Integer rid) {
 		ResultUtil result = new ResultUtil();
 		IfcModelInterface model = bimService.queryModelByRid(rid);
-		ProjectTree tree = new ProjectTree(model.getPackageMetaData());
-		tree.buildProjectTree(model, ProjectTree.KeyWord_IfcProject);
+		ProjectTreeGenerator treeGenerator = new ProjectTreeGenerator(model.getPackageMetaData());
+		treeGenerator.buildProjectTree(model, ProjectTreeGenerator.KeyWord_IfcProject);
 		result.setSuccess(true);
-		result.setData(tree);
+		result.setData(treeGenerator.getTree());
 		return result.getResult();
 	}
 	
@@ -134,8 +134,8 @@ public class ModelController {
 	public Map<String, Object> queryModelBuildingStoreyTree(@RequestParam("rid")Integer rid) {
 		ResultUtil result = new ResultUtil();
 		IfcModelInterface model = bimService.queryModelByRid(rid);
-		ProjectTree tree = new ProjectTree(model.getPackageMetaData());
-		tree.buildProjectTree(model, ProjectTree.KeyWord_IfcBuildingStorey);
+		ProjectTreeGenerator tree = new ProjectTreeGenerator(model.getPackageMetaData());
+		tree.buildProjectTree(model, ProjectTreeGenerator.KeyWord_IfcBuildingStorey);
 		result.setSuccess(true);
 		result.setData(tree);
 		return result.getResult();

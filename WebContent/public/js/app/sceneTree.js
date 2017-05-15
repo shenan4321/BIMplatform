@@ -31,10 +31,22 @@ function showCode(str) {
 }
 
 $(document).ready(function(){
-	$.fn.zTree.init($("#treeDemo"), setting, zNodes);
-	setCheck();
-	$("#py").bind("change", setCheck);
-	$("#sy").bind("change", setCheck);
-	$("#pn").bind("change", setCheck);
-	$("#sn").bind("change", setCheck);
+	
+	$.ajax({
+		data:{rid:string},
+		url:'./model/queryModelProjectTree.do',
+		type:'get'
+	}).done(function(res){
+		console.log(res);
+	
+
+		$.fn.zTree.init($("#treeDemo"), setting, zNodes);
+		setCheck();
+		$("#py").bind("change", setCheck);
+		$("#sy").bind("change", setCheck);
+		$("#pn").bind("change", setCheck);
+		$("#sn").bind("change", setCheck);
+		
+	})
+	
 });

@@ -1,4 +1,6 @@
-package cn.dlb.bim.ifc.engine.cells;
+package cn.dlb.bim.ifc.tree;
+
+import cn.dlb.bim.ifc.engine.cells.Colord;
 
 public class Material {
 	

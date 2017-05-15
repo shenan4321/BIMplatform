@@ -24,10 +24,10 @@ import cn.dlb.bim.ifc.collada.KmzSerializer;
 import cn.dlb.bim.ifc.emf.IdEObject;
 import cn.dlb.bim.ifc.emf.IfcModelInterface;
 import cn.dlb.bim.ifc.emf.ProjectInfo;
-import cn.dlb.bim.ifc.engine.MaterialGetter;
-import cn.dlb.bim.ifc.engine.cells.Material;
 import cn.dlb.bim.ifc.engine.cells.Vector3d;
 import cn.dlb.bim.ifc.serializers.SerializerException;
+import cn.dlb.bim.ifc.tree.Material;
+import cn.dlb.bim.ifc.tree.MaterialGenerator;
 import cn.dlb.bim.ifc.tree.ProjectTree;
 import cn.dlb.bim.ifc.tree.PropertyGenerator;
 import cn.dlb.bim.models.ifc2x3tc1.IfcProduct;
@@ -165,7 +165,7 @@ public class ModelController {
 		EClass productClass = (EClass) model.getPackageMetaData().getEClassifierCaseInsensitive("IfcProduct");
 		List<IdEObject> projectList = model.getAllWithSubTypes(productClass);
 		
-		MaterialGetter materialGetter = new MaterialGetter(model);
+		MaterialGenerator materialGetter = new MaterialGenerator(model);
 		for (IdEObject ifcProject : projectList) {
 			Material material = materialGetter.getMaterial(((IfcProduct) ifcProject));
 			if (material != null) {

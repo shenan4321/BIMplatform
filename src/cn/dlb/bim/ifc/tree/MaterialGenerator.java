@@ -1,4 +1,4 @@
-package cn.dlb.bim.ifc.engine;
+package cn.dlb.bim.ifc.tree;
 
 import java.util.List;
 
@@ -12,7 +12,6 @@ import com.google.common.collect.HashBiMap;
 import cn.dlb.bim.ifc.emf.IdEObject;
 import cn.dlb.bim.ifc.emf.IfcModelInterface;
 import cn.dlb.bim.ifc.engine.cells.Colord;
-import cn.dlb.bim.ifc.engine.cells.Material;
 import cn.dlb.bim.models.ifc2x3tc1.IfcColourOrFactor;
 import cn.dlb.bim.models.ifc2x3tc1.IfcColourRgb;
 import cn.dlb.bim.models.ifc2x3tc1.IfcMaterial;
@@ -36,11 +35,11 @@ import cn.dlb.bim.models.ifc2x3tc1.IfcSurfaceStyle;
 import cn.dlb.bim.models.ifc2x3tc1.IfcSurfaceStyleElementSelect;
 import cn.dlb.bim.models.ifc2x3tc1.IfcSurfaceStyleRendering;
 
-public class MaterialGetter {
+public class MaterialGenerator {
 	private IfcModelInterface model;
 	private BiMap<IdEObject, IdEObject> materialMap = HashBiMap.create();
 	
-	public MaterialGetter(IfcModelInterface model) {
+	public MaterialGenerator(IfcModelInterface model) {
 		this.model = model;
 		generateMaterialMap();
 	}
@@ -50,24 +49,30 @@ public class MaterialGetter {
 		EClass ifcRelAssociatesMaterialClass = (EClass) model.getPackageMetaData().getEClassifierCaseInsensitive("IfcRelAssociatesMaterial");
 		List<IdEObject> materiallist = model.getAllWithSubTypes(ifcRelAssociatesMaterialClass);
 		for (IdEObject material : materiallist) {
-			EStructuralFeature relatedObjectsEStructuralFeature = ifcRelAssociatesMaterialClass.getEStructuralFeature("RelatedObjects");
-			EStructuralFeature relatingMaterialEStructuralFeature = ifcRelAssociatesMaterialClass.getEStructuralFeature("RelatingMaterial");
-			List relatedObjects = (List) material.eGet(relatedObjectsEStructuralFeature);
-			IdEObject relatingMaterial = (IdEObject) material.eGet(relatingMaterialEStructuralFeature);
+			List relatedObjects = (List) getFeature(material, "RelatedObjects");
+			IdEObject relatingMaterial = (IdEObject) getFeature(material, "RelatingMaterial");
 			for (Object relatedObject : relatedObjects) {
 				if (relatedObject instanceof IdEObject) {
 					materialMap.put(relatingMaterial, (IdEObject) relatedObject);
 				}
 			}
 		}
-		
+	}
+	
+	private Object getFeature(IdEObject origin, String featureName) {
+		EClass eClass = origin.eClass();
+		EStructuralFeature feature = eClass.getEStructuralFeature(featureName);
+		if (feature != null) {
+			return origin.eGet(feature);
+		}
+		return null;
 	}
 	
 	public Material getMaterial(IdEObject ifcProduct) {
 		Material material = null;
 		IfcProductRepresentation ifcProductRepresentation = ((IfcProduct)ifcProduct).getRepresentation();
 		
-		if (ifcProductRepresentation != null) {//TODO 如果找到就返回
+		if (ifcProductRepresentation != null) {
 			material = getRgbProductDefinitionShape(ifcProductRepresentation);
 			if (material != null) {
 				return material;
@@ -90,24 +95,6 @@ public class MaterialGetter {
 			material = getRGBifcMaterialLayer((IfcMaterialLayer) materialInMap);
 		}
 		
-//		EList<IfcRelAssociates> ifcRelAssociateses = ifcProduct.getHasAssociations();
-//		for (IfcRelAssociates ifcRelAssociates : ifcRelAssociateses) {
-//			if (ifcRelAssociates instanceof IfcRelAssociatesMaterial) {
-//				IfcRelAssociatesMaterial ifcRelAssociatesMaterial = (IfcRelAssociatesMaterial) ifcRelAssociates;
-//				IfcMaterialSelect ifcMaterialSelect = ifcRelAssociatesMaterial.getRelatingMaterial();
-//				if (ifcMaterialSelect instanceof IfcMaterial) {
-//					getRGBifcMaterial((IfcMaterial) ifcMaterialSelect);
-//				} else if (ifcMaterialSelect instanceof IfcMaterialList) {
-//					getRGBifcMaterialList((IfcMaterialList) ifcMaterialSelect);
-//				} else if (ifcMaterialSelect instanceof IfcMaterialLayerSetUsage) {
-//					getRGBifcMaterialLayerSetUsage( (IfcMaterialLayerSetUsage) ifcMaterialSelect);
-//				} else if (ifcMaterialSelect instanceof IfcMaterialLayerSet) {
-//					getRGBifcMaterialLayerSet((IfcMaterialLayerSet) ifcMaterialSelect);
-//				} else if (ifcMaterialSelect instanceof IfcMaterialLayer) {
-//					getRGBifcMaterialLayer((IfcMaterialLayer) ifcMaterialSelect);
-//				}
-//			}
-//		}
 		return material;
 	}
 	
@@ -234,7 +221,7 @@ public class MaterialGetter {
 	
 	private Material getRgbSurfaceStyle(IfcSurfaceStyleRendering ifcSurfaceStyleRendering) {
 		Material material = new Material();
-		double transparency = ifcSurfaceStyleRendering.getTransparency();
+		double transparency = 1.0 - ifcSurfaceStyleRendering.getTransparency();
 		IfcColourRgb surfaceColour = ifcSurfaceStyleRendering.getSurfaceColour();
 		double red = surfaceColour.getRed();
 		double green = surfaceColour.getGreen();

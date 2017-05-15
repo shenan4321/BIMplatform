@@ -17,9 +17,9 @@ import cn.dlb.bim.ifc.emf.IdEObject;
 import cn.dlb.bim.ifc.emf.IfcModelInterface;
 import cn.dlb.bim.ifc.emf.IfcModelInterfaceException;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
-import cn.dlb.bim.ifc.engine.MaterialGetter;
-import cn.dlb.bim.ifc.engine.cells.Material;
 import cn.dlb.bim.ifc.shared.ProgressReporter;
+import cn.dlb.bim.ifc.tree.Material;
+import cn.dlb.bim.ifc.tree.MaterialGenerator;
 import cn.dlb.bim.models.geometry.GeometryInfo;
 import cn.dlb.bim.vo.GeometryInfoVo;
 import cn.dlb.bim.vo.ProgressVo;
@@ -92,8 +92,12 @@ public class LongGeometryQueryAction extends LongAction {
 			GeometryInfoVo adaptor = new GeometryInfoVo();
 			GeometryInfo geometryInfo = (GeometryInfo) ifcProduct.eGet(ifcProduct.eClass().getEStructuralFeature("geometry"));
 			if (geometryInfo != null) {
-				Boolean defualtVisiable = !ifcProduct.eClass().isSuperTypeOf(packageMetaData.getEClass("IfcSpace"));
-				MaterialGetter materialGetter = new MaterialGetter(model);
+				Boolean defualtVisiable = !packageMetaData.getEClass("IfcSpace").isSuperTypeOf(ifcProduct.eClass()) 
+						&& !packageMetaData.getEClass("IfcFeatureElementSubtraction").isSuperTypeOf(ifcProduct.eClass());//IfcFeatureElementSubtraction
+				if (!defualtVisiable) {//TODO
+					continue;
+				}
+				MaterialGenerator materialGetter = new MaterialGenerator(model);
 				Material material = materialGetter.getMaterial(ifcProduct);
 				adaptor.transform(geometryInfo, ifcProduct.getOid(), ifcProduct.eClass().getName(), defualtVisiable, material == null ? null : material.getAmbient());
 				geometryList.add(adaptor);

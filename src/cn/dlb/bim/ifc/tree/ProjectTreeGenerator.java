@@ -57,11 +57,13 @@ public class ProjectTreeGenerator {
 				List<IdEObject> ifcRelContainedInSpatialStructureList = (List<IdEObject>) object.eGet(containElementsReference.getEOpposite());
 				for (IdEObject ifcRelContainedInSpatialStructure : ifcRelContainedInSpatialStructureList) {
 					EReference relatedElementsReference = packageMetaData.getEReference(ifcRelContainedInSpatialStructure.eClass().getName(), "RelatedElements");
-					List<IdEObject> subIfcProductList = (List<IdEObject>) ifcRelContainedInSpatialStructure.eGet(relatedElementsReference.getEOpposite());
-					for (IdEObject subIfcProduct : subIfcProductList) {
-						TreeItem subTree = buildTree(subIfcProduct);
-						curTree.getContains().add(subTree);
-						subTree.setParent(curTree);
+					if (relatedElementsReference != null) {
+						List<IdEObject> subIfcProductList = (List<IdEObject>) ifcRelContainedInSpatialStructure.eGet(relatedElementsReference.getEOpposite());
+						for (IdEObject subIfcProduct : subIfcProductList) {
+							TreeItem subTree = buildTree(subIfcProduct);
+							curTree.getContains().add(subTree);
+							subTree.setParent(curTree);
+						}
 					}
 				}
 			}
@@ -75,13 +77,15 @@ public class ProjectTreeGenerator {
 					IdEObject ifcRelAggregates = (IdEObject) ifcRelDecompose;
 					if (isInstanceOf(ifcRelAggregates.eClass(), "IfcRelAggregates")) {
 						EReference relatedObjectsReference = packageMetaData.getEReference(ifcRelAggregates.eClass().getName(), "RelatedObjects");
-						List relatedObjects = (List) ifcRelAggregates.eGet(relatedObjectsReference);
-						for (Object relatedObject : relatedObjects) {
-							if (relatedObject instanceof IdEObject) {
-								IdEObject relatedIdEObject = (IdEObject) relatedObject;
-								TreeItem subTree = buildTree(relatedIdEObject);
-								curTree.getDecomposition().add(subTree);
-								subTree.setParent(curTree);
+						if (relatedObjectsReference != null) {
+							List relatedObjects = (List) ifcRelAggregates.eGet(relatedObjectsReference);
+							for (Object relatedObject : relatedObjects) {
+								if (relatedObject instanceof IdEObject) {
+									IdEObject relatedIdEObject = (IdEObject) relatedObject;
+									TreeItem subTree = buildTree(relatedIdEObject);
+									curTree.getDecomposition().add(subTree);
+									subTree.setParent(curTree);
+								}
 							}
 						}
 					}

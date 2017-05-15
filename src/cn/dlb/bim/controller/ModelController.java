@@ -120,6 +120,7 @@ public class ModelController {
 	}
 	
 	@RequestMapping(value = "queryModelProjectTree", method = RequestMethod.GET)
+	@ResponseBody
 	public Map<String, Object> queryModelTree(@RequestParam("rid")Integer rid) {
 		ResultUtil result = new ResultUtil();
 		IfcModelInterface model = bimService.queryModelByRid(rid);
@@ -131,17 +132,19 @@ public class ModelController {
 	}
 	
 	@RequestMapping(value = "queryModelBuildingStoreyTree", method = RequestMethod.GET)
+	@ResponseBody
 	public Map<String, Object> queryModelBuildingStoreyTree(@RequestParam("rid")Integer rid) {
 		ResultUtil result = new ResultUtil();
 		IfcModelInterface model = bimService.queryModelByRid(rid);
-		ProjectTreeGenerator tree = new ProjectTreeGenerator(model.getPackageMetaData());
-		tree.buildProjectTree(model, ProjectTreeGenerator.KeyWord_IfcBuildingStorey);
+		ProjectTreeGenerator treeGenerator = new ProjectTreeGenerator(model.getPackageMetaData());
+		treeGenerator.buildProjectTree(model, ProjectTreeGenerator.KeyWord_IfcBuildingStorey);
 		result.setSuccess(true);
-		result.setData(tree);
+		result.setData(treeGenerator.getTree());
 		return result.getResult();
 	}
 	
 	@RequestMapping(value = "queryProperty", method = RequestMethod.GET)
+	@ResponseBody
 	public Map<String, Object> queryProperty(@RequestParam("rid")Integer rid//, @RequestParam("oid")Long oid
 			) {
 		ResultUtil result = new ResultUtil();
@@ -158,6 +161,7 @@ public class ModelController {
 	}
 	
 	@RequestMapping(value = "queryMaterial", method = RequestMethod.GET)
+	@ResponseBody
 	public Map<String, Object> queryMaterial(@RequestParam("rid")Integer rid//, @RequestParam("oid")Long oid
 			) {
 		ResultUtil result = new ResultUtil();

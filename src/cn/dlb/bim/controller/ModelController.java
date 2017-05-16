@@ -3,6 +3,8 @@ package cn.dlb.bim.controller;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -87,6 +89,11 @@ public class ModelController {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		modelInfo.setFileName(fileName);
+		modelInfo.setFileSize(file.getSize());
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String dateStr = sdf.format(new Date());
+		modelInfo.setUploadDate(dateStr);
 		int rid = bimService.addRevision(modelInfo, targetFile);
 		result.setSuccess(true);
 		result.setKeyValue("rid", rid);
@@ -100,6 +107,16 @@ public class ModelController {
 		List<ModelInfoVo> modelInfoList = bimService.queryModelInfoByPid(pid);
 		result.setSuccess(true);
 		result.setData(modelInfoList);
+		return result.getResult();
+	}
+	
+	@RequestMapping(value = "queryModelInfoByRid", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> queryModelInfoByRid(@RequestParam("rid")Integer rid) {
+		ResultUtil result = new ResultUtil();
+		ModelInfoVo modelInfo = bimService.queryModelInfoByRid(rid);
+		result.setSuccess(true);
+		result.setData(modelInfo);
 		return result.getResult();
 	}
 	

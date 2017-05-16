@@ -63,6 +63,9 @@ public class IfcModelDbSession extends IfcModelBinary {
 		ifcModelEntity.setPid(modelInfo.getPid());
 		ifcModelEntity.setApplyType(modelInfo.getApplyType());
 		ifcModelEntity.setName(modelInfo.getName());
+		ifcModelEntity.setFileName(modelInfo.getFileName());
+		ifcModelEntity.setFileSize(modelInfo.getFileSize());
+		ifcModelEntity.setUploadDate(modelInfo.getUploadDate());
 
 		Map<Long, IdEObject> geometries = new HashMap<>();
 

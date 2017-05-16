@@ -54,14 +54,14 @@ import cn.dlb.bim.vo.ModelInfoVo;
 
 @Service("BimServiceImpl")
 public class BimServiceImpl implements BimService {
-	
+
 	private static String IFC2X3_SCHEMA_SHORT = "IFC2X3";
 	private static String IFC4_SCHEMA_SHORT = "IFC4";
-	
+
 	@Autowired
 	@Qualifier("PlatformServer")
 	private PlatformServer server;
-	
+
 	@Autowired
 	@Qualifier("IfcModelDaoImpl")
 	private IfcModelDao ifcModelDao;
@@ -76,12 +76,14 @@ public class BimServiceImpl implements BimService {
 
 		for (IdEObject ifcProduct : projectList) {
 			GeometryInfoVo adaptor = new GeometryInfoVo();
-			GeometryInfo geometryInfo = (GeometryInfo) ifcProduct.eGet(ifcProduct.eClass().getEStructuralFeature("geometry"));
+			GeometryInfo geometryInfo = (GeometryInfo) ifcProduct
+					.eGet(ifcProduct.eClass().getEStructuralFeature("geometry"));
 			if (geometryInfo != null) {
 				Boolean defualtVisiable = !ifcProduct.eClass().isSuperTypeOf(packageMetaData.getEClass("IfcSpace"));
 				MaterialGenerator materialGetter = new MaterialGenerator(model);
 				Material material = materialGetter.getMaterial(ifcProduct);
-				adaptor.transform(geometryInfo, ifcProduct.getOid(), ifcProduct.eClass().getName(), defualtVisiable, material == null ? null : material.getAmbient());
+				adaptor.transform(geometryInfo, ifcProduct.getOid(), ifcProduct.eClass().getName(), defualtVisiable,
+						material == null ? null : material.getAmbient());
 				geometryList.add(adaptor);
 			}
 		}
@@ -99,17 +101,17 @@ public class BimServiceImpl implements BimService {
 		} catch (DeserializeException e) {
 			e.printStackTrace();
 		}
-		
+
 		if (schema == null) {
 			return -1;
 		}
-		
+
 		IfcStepDeserializer deserializer = server.getSerializationManager().createIfcStepDeserializer(schema);
 		IfcStepSerializer serializer = server.getSerializationManager().createIfcStepSerializer(schema);
 		int rid = -1;
 		try {
 			deserializer.read(modelFile);
-			
+
 			IfcModelInterface model = deserializer.getModel();
 
 			IRenderEngine renderEngine = server.getRenderEngineFactory().createRenderEngine(schema.getEPackageName());
@@ -119,7 +121,8 @@ public class BimServiceImpl implements BimService {
 
 			PlatformInitDatas platformInitDatas = server.getPlatformInitDatas();
 			model.fixOids(platformInitDatas);
-			IfcModelDbSession session = new IfcModelDbSession(server.getIfcModelDao(), server.getMetaDataManager(), platformInitDatas, null, server.getModelCacheManager());
+			IfcModelDbSession session = new IfcModelDbSession(server.getIfcModelDao(), server.getMetaDataManager(),
+					platformInitDatas, null, server.getModelCacheManager());
 			session.saveIfcModel(model, modelInfo);
 			rid = model.getModelMetaData().getRevisionId();
 		} catch (DeserializeException e) {
@@ -135,7 +138,7 @@ public class BimServiceImpl implements BimService {
 
 	@Override
 	public GlbVo queryGlbByRid(Integer rid) {
-		//如果在文件缓存中直接从文件缓存中取
+		// 如果在文件缓存中直接从文件缓存中取
 		GlbVo glbVo = queryGlbByRidFromCache(rid);
 		if (glbVo != null) {
 			return glbVo;
@@ -144,7 +147,7 @@ public class BimServiceImpl implements BimService {
 		glbVo = queryGlbByRidFromCache(rid);
 		return glbVo;
 	}
-	
+
 	private GlbVo queryGlbByRidFromCache(Integer rid) {
 		GridFSDBFile glbFile = server.getColladaCacheManager().getGlbCache(rid);
 		if (glbFile == null) {
@@ -158,7 +161,7 @@ public class BimServiceImpl implements BimService {
 		}
 		return glbVo;
 	}
-	
+
 	private GlbVo convertFromGridFSDBFile(GridFSDBFile glbFile) throws IOException {
 		DBObject metaData = glbFile.getMetaData();
 		double lon = (double) metaData.get("lon");
@@ -171,13 +174,13 @@ public class BimServiceImpl implements BimService {
 		glbVo.setData(data);
 		return glbVo;
 	}
-	
+
 	private double getDegreeFromCompoundPlaneAngle(EList<Long> values) {
 		if (values.size() > 4) {
 			return 0;
 		}
 		double result = 0.0;
-		double[] level = {60, 60, 1000000};
+		double[] level = { 60, 60, 1000000 };
 		double currentLevel = 1;
 		for (int i = 0; i < values.size(); i++) {
 			Long v = values.get(i);
@@ -204,10 +207,10 @@ public class BimServiceImpl implements BimService {
 		double lat = (double) metaData.get("lat");
 		return new Vector3d(lon, lat, 0);
 	}
-	
+
 	private void generateGlbAndCache(Integer rid) {
 		IfcModelInterface model = queryModelByRid(rid);
-		
+
 		GlbSerializer serializer = new GlbSerializer(server);
 		ProjectInfo projectInfo = new ProjectInfo();
 		projectInfo.setName("bim");
@@ -219,7 +222,7 @@ public class BimServiceImpl implements BimService {
 		} catch (SerializerException e) {
 			e.printStackTrace();
 		}
-		
+
 		double longitude = 0.0;
 		double latitude = 0.0;
 		List<IfcSite> IfcSiteList = model.getAllWithSubTypes(IfcSite.class);
@@ -228,11 +231,11 @@ public class BimServiceImpl implements BimService {
 			longitude = getDegreeFromCompoundPlaneAngle(site.getRefLongitude());
 			latitude = getDegreeFromCompoundPlaneAngle(site.getRefLatitude());
 		}
-		
+
 		ByteArrayInputStream glbInput = new ByteArrayInputStream(glbOutput.toByteArray());
 		server.getColladaCacheManager().saveGlb(glbInput, rid.toString(), rid, longitude, latitude);
 	}
-	
+
 	private Schema preReadSchema(File file) throws IOException, DeserializeException {
 		BufferedReader br = new BufferedReader(new FileReader(file));
 		String line = null;
@@ -262,16 +265,15 @@ public class BimServiceImpl implements BimService {
 		String ifcSchemaVersion = ifcModelEntity.getModelMetaData().getIfcHeader().getIfcSchemaVersion();
 		PackageMetaData packageMetaData = null;
 		if (ifcSchemaVersion.startsWith(IFC2X3_SCHEMA_SHORT)) {
-			packageMetaData = server.getMetaDataManager()
-					.getPackageMetaData(Schema.IFC2X3TC1.getEPackageName());
+			packageMetaData = server.getMetaDataManager().getPackageMetaData(Schema.IFC2X3TC1.getEPackageName());
 		} else {
-			packageMetaData = server.getMetaDataManager()
-					.getPackageMetaData(Schema.IFC4.getEPackageName());
+			packageMetaData = server.getMetaDataManager().getPackageMetaData(Schema.IFC4.getEPackageName());
 		}
 		PlatformInitDatas platformInitDatas = server.getPlatformInitDatas();
-		IfcModelDbSession session = new IfcModelDbSession(server.getIfcModelDao(), server.getMetaDataManager(), platformInitDatas, null, server.getModelCacheManager());
+		IfcModelDbSession session = new IfcModelDbSession(server.getIfcModelDao(), server.getMetaDataManager(),
+				platformInitDatas, null, server.getModelCacheManager());
 		IfcModelInterface model = null;
-		
+
 		try {
 			model = session.get(packageMetaData, rid, new OldQuery(packageMetaData, true));
 		} catch (IfcModelDbException e) {
@@ -279,7 +281,7 @@ public class BimServiceImpl implements BimService {
 		} catch (IfcModelInterfaceException e) {
 			e.printStackTrace();
 		}
-		
+
 		return model;
 	}
 
@@ -287,15 +289,32 @@ public class BimServiceImpl implements BimService {
 	public List<ModelInfoVo> queryModelInfoByPid(Long pid) {
 		List<IfcModelEntity> ifcModelEntityList = ifcModelDao.queryIfcModelEntityByPid(pid);
 		List<ModelInfoVo> result = new ArrayList<>();
-		for (IfcModelEntity ifcModelEntity :ifcModelEntityList) {
+		for (IfcModelEntity ifcModelEntity : ifcModelEntityList) {
 			ModelInfoVo modelInfo = new ModelInfoVo();
 			modelInfo.setName(ifcModelEntity.getName());
 			modelInfo.setPid(ifcModelEntity.getPid());
 			modelInfo.setApplyType(ifcModelEntity.getApplyType());
 			modelInfo.setRid(ifcModelEntity.getRid());
+			modelInfo.setFileName(ifcModelEntity.getFileName());
+			modelInfo.setFileSize(ifcModelEntity.getFileSize());
+			modelInfo.setUploadDate(ifcModelEntity.getUploadDate());
 			result.add(modelInfo);
 		}
 		return result;
+	}
+
+	@Override
+	public ModelInfoVo queryModelInfoByRid(Integer rid) {
+		IfcModelEntity ifcModelEntity = ifcModelDao.queryIfcModelEntityByRid(rid);
+		ModelInfoVo modelInfo = new ModelInfoVo();
+		modelInfo.setName(ifcModelEntity.getName());
+		modelInfo.setPid(ifcModelEntity.getPid());
+		modelInfo.setApplyType(ifcModelEntity.getApplyType());
+		modelInfo.setRid(ifcModelEntity.getRid());
+		modelInfo.setFileName(ifcModelEntity.getFileName());
+		modelInfo.setFileSize(ifcModelEntity.getFileSize());
+		modelInfo.setUploadDate(ifcModelEntity.getUploadDate());
+		return modelInfo;
 	}
 
 	@Override

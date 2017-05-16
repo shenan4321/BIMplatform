@@ -18,4 +18,5 @@ public interface BimService {
 	public IfcModelInterface queryModelByRid(Integer rid);
 	public List<ModelInfoVo> queryModelInfoByPid(Long pid);
 	public void deleteModel(Integer rid);
+	public ModelInfoVo queryModelInfoByRid(Integer rid);
 }

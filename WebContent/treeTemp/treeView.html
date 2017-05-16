@@ -1,6 +1,8 @@
 <ul class="tree-view">
-    <li ng-repeat="item in treeData">
-    	{{item.name}}{{item.ifcClassType}}{{item.oid}}{{item.geometryOid}}
+    <li ng-repeat="item in treeData" data-oid={{item.oid}}>
+	    + <input type="checkbox" name="" id="" data-oid={{item.oid}}>
+	    {{item.ifcClassType}}
+	   	{{item.name}}
     	<ul ng-include = "'./treeTemp/contains.html'"></ul>
     	<ul ng-include = "'./treeTemp/decomposition.html'"></ul>	
     </li>

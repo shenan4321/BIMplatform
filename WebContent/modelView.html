@@ -21,53 +21,12 @@
 .modal-body {
     overflow-y: visible;
 }
-bootstrap.min.c…rtcity-1.0.0:7
-.modal-body {
-    position: relative;
-    padding: 20px;
-}
-.modal-close {
-    display: inline-block;
-    float: right;
-    width: 20px;
-    height: 20px;
-    background: url(public/images/dialog_icon_cross.png);
-    cursor: pointer;
-    margin-right: 5px;
-}
-.close {
-    float: right;
-    font-size: 21px;
-    font-weight: 700;
-    line-height: 1;
-    color: #000;
-    text-shadow: 0 1px 0 #fff;
-    opacity: .2;
-    filter: alpha(opacity=20);
-}
-#propertiesDialog .nav-tabs {
-    font-size: 12px;
-    border-bottom: 1px solid #848484;
-}
 .nav {
     margin-bottom: 0;
     padding-left: 0;
     list-style: none;
 }
-#propertiesDialog .nav>li>a {
-    position: relative;
-    display: block;
-    border-radius: 0;
-    padding: 5px 15px;
-}
-.nav-tabs>li.active>a, .nav-tabs>li.active>a:hover, .nav-tabs>li.active>a:focus {
-    color: #fff;
-    background-color: #184d79;
-    border-left: 1px solid #fff;
-    border-top: 1px solid #fff;
-    border-bottom: 0;
-    cursor: default;
-}
+
 .nav-tabs>li>a {
     margin-right: 2px;
     line-height: 1.42857143;
@@ -77,26 +36,9 @@ bootstrap.min.c…rtcity-1.0.0:7
     background: rgba(52,90,137,0.7) !important;
     color: #fff !important;
 }
-tr {
-    display: table-row;
-    vertical-align: inherit;
-    border-color: inherit;
-}
-#propertiesDialog .table>thead>tr>td, #propertiesDialog .table>tbody>tr>td, #propertiesDialog .table>tfoot>tr>td {
-    border-top: 1px solid #ccc;
-    border-right: 1px solid #ccc;
-    text-align: center;
-    font-size: 12px;
-    padding: 5px;
-    word-break: break-all;
-    word-wrap: break-word;
-}
-.propertiesTable {
-    border-top: 0;
-    border-left: 1px solid #fff;
-    border-right: 1px solid #ccc;
-    border-bottom: 1px solid #ccc;
-    margin-bottom: 19px;
+.nav-slide-o{
+	height:100%;
+	overflow:auto;
 }
 	</style> 
  </head> 
@@ -131,37 +73,170 @@ tr {
 	<div class="nav-slide-o">
 	</div>
 	<div class="nav-slide-o">
-     <div class="modal-body" style="padding-bottom:0">
-			<div class="modal-close close" data-dismiss="modal" style="margin-right: 8px;"></div>	
-		    <ul class="nav nav-tabs">
-		        <li class="active"><a href="#admStorey" data-toggle="tab">属性</a></li>
-		    </ul>
-		    
+     <div class="modal-body" style="">
 		    <div class="tab-content">
-		        <div class="tab-pane fade in active" style="padding-bottom:15px;">
-		        	<div id="propertiesList" style="height: 678px;">
-		            <table class="table propertiesTable">
-		            	<tbody><tr>
-		            		<td width="50%">属性名</td>
-		            		<td width="50%">值</td>
-	            		</tr>
-	            		<tr style="display:none">
-							<td>gloabId</td>
-							<td id="glbId">1zN_w2dCf6tetNVsiQrYUk</td>
-						</tr>
-						<tr>
-							<td>groupId</td>
-							<td id="miscId">65539</td>
-						</tr>
-						<tr>
-							<td>NODEID</td>
-							<td id="miscName">197357</td>
-						</tr>
-		            </tbody></table>
-		            <table class="table propertiesTable" id="propertiesTable" style="margin-top:-20px;">
-		            	
-		            <tbody><tr class="active" oid="1442306" uri="标识数据"><td colspan="2"><b>标识数据</b></td></tr><tr oid="3932676" psetoid="1442306"><td width="50%">部件说明</td><td><span class="value nonEditable"></span></td></tr><tr oid="3015172" psetoid="1442306"><td width="50%">部件代码</td><td><span class="value nonEditable"></span></td></tr><tr class="active" oid="3211778" uri="结构"><td colspan="2"><b>结构</b></td></tr><tr oid="3670532" psetoid="3211778"><td width="50%">结构用途</td><td><span class="value nonEditable">非承重</span></td></tr><tr oid="5964292" psetoid="3211778"><td width="50%">结构</td><td><span class="value nonEditable">false</span></td></tr><tr oid="1769988" psetoid="3211778"><td width="50%">启用分析模型</td><td><span class="value nonEditable">false</span></td></tr><tr class="active" oid="2032130" uri="构造"><td colspan="2"><b>构造</b></td></tr><tr oid="1114628" psetoid="2032130"><td width="50%">在插入点包络</td><td><span class="value nonEditable">不包络</span></td></tr><tr oid="131588" psetoid="2032130"><td width="50%">在端点包络</td><td><span class="value nonEditable">无</span></td></tr><tr oid="1442308" psetoid="2032130"><td width="50%">厚度</td><td><span class="value nonEditable">200</span></td></tr><tr oid="2687492" psetoid="2032130"><td width="50%">功能</td><td><span class="value nonEditable">外部</span></td></tr><tr class="active" oid="2163202" uri="阶段化"><td colspan="2"><b>阶段化</b></td></tr><tr oid="1901060" psetoid="2163202"><td width="50%">创建的阶段</td><td><span class="value nonEditable">新构造</span></td></tr><tr class="active" oid="2425346" uri="尺寸标注"><td colspan="2"><b>尺寸标注</b></td></tr><tr oid="6750724" psetoid="2425346"><td width="50%">长度</td><td><span class="value nonEditable">21000</span></td></tr><tr oid="852484" psetoid="2425346"><td width="50%">面积</td><td><span class="value nonEditable">82.5</span></td></tr><tr oid="3604996" psetoid="2425346"><td width="50%">体积</td><td><span class="value nonEditable">16.5</span></td></tr><tr class="active" oid="1311234" uri="图形"><td colspan="2"><b>图形</b></td></tr><tr oid="5702148" psetoid="1311234"><td width="50%">粗略比例填充颜色</td><td><span class="value nonEditable">0</span></td></tr><tr class="active" oid="66050" uri="限制条件"><td colspan="2"><b>限制条件</b></td></tr><tr oid="2228740" psetoid="66050"><td width="50%">顶部偏移</td><td><span class="value nonEditable">0</span></td></tr><tr oid="2425348" psetoid="66050"><td width="50%">顶部延伸距离</td><td><span class="value nonEditable">0</span></td></tr><tr oid="6291972" psetoid="66050"><td width="50%">已附着底部</td><td><span class="value nonEditable">false</span></td></tr><tr oid="5177860" psetoid="66050"><td width="50%">底部偏移</td><td><span class="value nonEditable">0</span></td></tr><tr oid="6488580" psetoid="66050"><td width="50%">无连接高度</td><td><span class="value nonEditable">4000</span></td></tr><tr oid="2949636" psetoid="66050"><td width="50%">定位线</td><td><span class="value nonEditable">墙中心线</span></td></tr><tr oid="2621956" psetoid="66050"><td width="50%">顶部约束</td><td><span class="value nonEditable">标高: 标高 2</span></td></tr><tr oid="7012868" psetoid="66050"><td width="50%">底部延伸距离</td><td><span class="value nonEditable">0</span></td></tr><tr oid="4915716" psetoid="66050"><td width="50%">与体量相关</td><td><span class="value nonEditable">false</span></td></tr><tr oid="590340" psetoid="66050"><td width="50%">已附着顶部</td><td><span class="value nonEditable">false</span></td></tr><tr oid="6554116" psetoid="66050"><td width="50%">底部限制条件</td><td><span class="value nonEditable">标高: 标高 1</span></td></tr><tr oid="918020" psetoid="66050"><td width="50%">房间边界</td><td><span class="value nonEditable">true</span></td></tr><tr class="active" oid="655874" uri="分析属性"><td colspan="2"><b>分析属性</b></td></tr><tr oid="6816260" psetoid="655874"><td width="50%">粗糙度</td><td><span class="value nonEditable">3</span></td></tr><tr oid="4260356" psetoid="655874"><td width="50%">吸收率</td><td><span class="value nonEditable">0.7</span></td></tr><tr class="active" oid="3080706" uri="Pset_WallCommon"><td colspan="2"><b>Pset_WallCommon</b></td></tr><tr oid="5767684" psetoid="3080706"><td width="50%">ExtendToStructure</td><td><span class="value nonEditable">false</span></td></tr><tr oid="4325892" psetoid="3080706"><td width="50%">Reference</td><td><span class="value nonEditable">常规 - 200mm</span></td></tr><tr oid="5636612" psetoid="3080706"><td width="50%">IsExternal</td><td><span class="value nonEditable">true</span></td></tr><tr oid="1507844" psetoid="3080706"><td width="50%">LoadBearing</td><td><span class="value nonEditable">false</span></td></tr></tbody></table>
-		            </div>
+		        <div class="tab-pane fade in active" >
+		        	<div id="propertiesList">
+		            
+<table  cellspacing=0 cellpadding=0 class="table propertiesTable" id="propertiesTable" border="1" align="center"> 
+   <tbody>
+    <tr class="active" oid="1442306" uri="标识数据">
+     <td colspan="2"><b>标识数据</b></td>
+    </tr>
+    <tr oid="3932676" psetoid="1442306">
+     <td width="50%">部件说明</td>
+     <td><span class="value nonEditable"></span></td>
+    </tr>
+    <tr oid="3015172" psetoid="1442306">
+     <td width="50%">部件代码</td>
+     <td><span class="value nonEditable"></span></td>
+    </tr>
+    <tr class="active" oid="3211778" uri="结构">
+     <td colspan="2"><b>结构</b></td>
+    </tr>
+    <tr oid="3670532" psetoid="3211778">
+     <td width="50%">结构用途</td>
+     <td><span class="value nonEditable">非承重</span></td>
+    </tr>
+    <tr oid="5964292" psetoid="3211778">
+     <td width="50%">结构</td>
+     <td><span class="value nonEditable">false</span></td>
+    </tr>
+    <tr oid="1769988" psetoid="3211778">
+     <td width="50%">启用分析模型</td>
+     <td><span class="value nonEditable">false</span></td>
+    </tr>
+    <tr class="active" oid="2032130" uri="构造">
+     <td colspan="2"><b>构造</b></td>
+    </tr>
+    <tr oid="1114628" psetoid="2032130">
+     <td width="50%">在插入点包络</td>
+     <td><span class="value nonEditable">不包络</span></td>
+    </tr>
+    <tr oid="131588" psetoid="2032130">
+     <td width="50%">在端点包络</td>
+     <td><span class="value nonEditable">无</span></td>
+    </tr>
+    <tr oid="1442308" psetoid="2032130">
+     <td width="50%">厚度</td>
+     <td><span class="value nonEditable">200</span></td>
+    </tr>
+    <tr oid="2687492" psetoid="2032130">
+     <td width="50%">功能</td>
+     <td><span class="value nonEditable">外部</span></td>
+    </tr>
+    <tr class="active" oid="2163202" uri="阶段化">
+     <td colspan="2"><b>阶段化</b></td>
+    </tr>
+    <tr oid="1901060" psetoid="2163202">
+     <td width="50%">创建的阶段</td>
+     <td><span class="value nonEditable">新构造</span></td>
+    </tr>
+    <tr class="active" oid="2425346" uri="尺寸标注">
+     <td colspan="2"><b>尺寸标注</b></td>
+    </tr>
+    <tr oid="6750724" psetoid="2425346">
+     <td width="50%">长度</td>
+     <td><span class="value nonEditable">21000</span></td>
+    </tr>
+    <tr oid="852484" psetoid="2425346">
+     <td width="50%">面积</td>
+     <td><span class="value nonEditable">82.5</span></td>
+    </tr>
+    <tr oid="3604996" psetoid="2425346">
+     <td width="50%">体积</td>
+     <td><span class="value nonEditable">16.5</span></td>
+    </tr>
+    <tr class="active" oid="1311234" uri="图形">
+     <td colspan="2"><b>图形</b></td>
+    </tr>
+    <tr oid="5702148" psetoid="1311234">
+     <td width="50%">粗略比例填充颜色</td>
+     <td><span class="value nonEditable">0</span></td>
+    </tr>
+    <tr class="active" oid="66050" uri="限制条件">
+     <td colspan="2"><b>限制条件</b></td>
+    </tr>
+    <tr oid="2228740" psetoid="66050">
+     <td width="50%">顶部偏移</td>
+     <td><span class="value nonEditable">0</span></td>
+    </tr>
+    <tr oid="2425348" psetoid="66050">
+     <td width="50%">顶部延伸距离</td>
+     <td><span class="value nonEditable">0</span></td>
+    </tr>
+    <tr oid="6291972" psetoid="66050">
+     <td width="50%">已附着底部</td>
+     <td><span class="value nonEditable">false</span></td>
+    </tr>
+    <tr oid="5177860" psetoid="66050">
+     <td width="50%">底部偏移</td>
+     <td><span class="value nonEditable">0</span></td>
+    </tr>
+    <tr oid="6488580" psetoid="66050">
+     <td width="50%">无连接高度</td>
+     <td><span class="value nonEditable">4000</span></td>
+    </tr>
+    <tr oid="2949636" psetoid="66050">
+     <td width="50%">定位线</td>
+     <td><span class="value nonEditable">墙中心线</span></td>
+    </tr>
+    <tr oid="2621956" psetoid="66050">
+     <td width="50%">顶部约束</td>
+     <td><span class="value nonEditable">标高: 标高 2</span></td>
+    </tr>
+    <tr oid="7012868" psetoid="66050">
+     <td width="50%">底部延伸距离</td>
+     <td><span class="value nonEditable">0</span></td>
+    </tr>
+    <tr oid="4915716" psetoid="66050">
+     <td width="50%">与体量相关</td>
+     <td><span class="value nonEditable">false</span></td>
+    </tr>
+    <tr oid="590340" psetoid="66050">
+     <td width="50%">已附着顶部</td>
+     <td><span class="value nonEditable">false</span></td>
+    </tr>
+    <tr oid="6554116" psetoid="66050">
+     <td width="50%">底部限制条件</td>
+     <td><span class="value nonEditable">标高: 标高 1</span></td>
+    </tr>
+    <tr oid="918020" psetoid="66050">
+     <td width="50%">房间边界</td>
+     <td><span class="value nonEditable">true</span></td>
+    </tr>
+    <tr class="active" oid="655874" uri="分析属性">
+     <td colspan="2"><b>分析属性</b></td>
+    </tr>
+    <tr oid="6816260" psetoid="655874">
+     <td width="50%">粗糙度</td>
+     <td><span class="value nonEditable">3</span></td>
+    </tr>
+    <tr oid="4260356" psetoid="655874">
+     <td width="50%">吸收率</td>
+     <td><span class="value nonEditable">0.7</span></td>
+    </tr>
+    <tr class="active" oid="3080706" uri="Pset_WallCommon">
+     <td colspan="2"><b>Pset_WallCommon</b></td>
+    </tr>
+    <tr oid="5767684" psetoid="3080706">
+     <td width="50%">ExtendToStructure</td>
+     <td><span class="value nonEditable">false</span></td>
+    </tr>
+    <tr oid="4325892" psetoid="3080706">
+     <td width="50%">Reference</td>
+     <td><span class="value nonEditable">常规 - 200mm</span></td>
+    </tr>
+    <tr oid="5636612" psetoid="3080706">
+     <td width="50%">IsExternal</td>
+     <td><span class="value nonEditable">true</span></td>
+    </tr>
+    <tr oid="1507844" psetoid="3080706">
+     <td width="50%">LoadBearing</td>
+     <td><span class="value nonEditable">false</span></td>
+    </tr>
+   </tbody>
+  </table> 
 		        </div>
 		    </div>
 		</div>

@@ -39,8 +39,6 @@ function showView(data) {
 }
 
 function sceneJsShow(sceneNodes) {
-	console.log(sceneNodes);
-	
     var sceneViewObj = {
         canvasId:"mySceneCanvas",
         type: "scene",
@@ -136,7 +134,17 @@ function sceneJsShow(sceneNodes) {
     	                      }
     	                      hisPick = {name:hit.name,color:material.getColor()}
     	                      material.setColor({r: 0, g: 1, b: 0});
-    	                      //material.setColor({r: 0.501960784313725, g:0.501960784313725, b: 0.501960784313725});
+    	                      var pTableScope= $('#pTable').scope();
+    	                      pTableScope.oid = hit.name ;
+    	                      $.ajax({
+    	                    	  url:'./model/queryProperty.do',
+    	                    	  type:'GET',
+    	                    	  data:{oid:hit.name,rid:string}
+    	                      }).done(function(data){
+    	                    	  pTableScope.list = data.data  
+    	                    	  $('#pTable').scope().$apply();
+    	                      })
+	                      	  
     	                  });
     	          info.innerHTML = "Pick hit: " + JSON.stringify(hit);
 
@@ -146,9 +154,7 @@ function sceneJsShow(sceneNodes) {
     	          var nodeId = hit.nodeId;
     	          var canvasX = hit.canvasPos[0];
     	          var canvasY = hit.canvasPos[1];
-
-    	      });
-    
+    });
     
   
     var canvas = scene.getCanvas();

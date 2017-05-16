@@ -98,32 +98,34 @@
 								aspect: $(window).width() / $(window).height(),
 								fovy: 37.8493
 							},
-							
-							nodes: [{
-								type: "cameras/pickFlyOrbit",
-		                        zoomSensitivity: 1000,
-		                        
-								nodes: [{
-									type: 'renderer',
-									id: 'main-renderer',
-									clear: {
-										color: true,
-										depth: true,
-										stencil: true
-									},
-									nodes: [{
-										type: 'lights',
-										id: 'my-lights',
-										lights: []
-									},
-									{
-						            	type:"material",
-						            	//color:{ r:0.3, g:0.3, b:1.0 },
-					                	nodes: sceneNodes
-						            }
-									]
-								}]
-							
+							nodes:[{
+								 type:"enable",
+			                     id:"myEnable",
+			                     enabled:true,
+			                     nodes: [{
+										type: "cameras/pickFlyOrbit",
+				                        zoomSensitivity: 1000,
+										nodes: [{
+											type: 'renderer',
+											id: 'main-renderer',
+											clear: {
+												color: true,
+												depth: true,
+												stencil: true
+											},
+											nodes: [{
+												type: 'lights',
+												id: 'my-lights',
+												lights: []
+											},
+											{
+								            	type:"material",
+							                	nodes: sceneNodes
+								            }
+											]
+										}]
+									
+								 }]
 							}]
 						}]
 					}]

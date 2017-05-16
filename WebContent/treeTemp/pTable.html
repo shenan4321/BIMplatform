@@ -1,43 +1,15 @@
-     <div class="modal-body" style="">
-		    <div class="tab-content">
-		        <div class="tab-pane fade in active" >
-		        	<div id="propertiesList">
-		            
-<table  cellspacing=0 cellpadding=0 class="table propertiesTable" id="propertiesTable" border="1" align="center"> 
-   <tbody>
-    <tr class="active" oid="1442306" uri="±êÊ¶Êý¾Ý">
-     <td colspan="2"><b>±êÊ¶Êý¾Ý</b></td>
-    </tr>
-    <tr oid="3932676" psetoid="1442306">
-     <td width="50%">²¿¼þËµÃ÷</td>
-     <td><span class="value nonEditable"></span></td>
-    </tr>
-    <tr oid="3015172" psetoid="1442306">
-     <td width="50%">²¿¼þ´úÂë</td>
-     <td><span class="value nonEditable"></span></td>
-    </tr>
-    <tr class="active" oid="3211778" uri="½á¹¹">
-     <td colspan="2"><b>½á¹¹</b></td>
-    </tr>
-    <tr oid="3670532" psetoid="3211778">
-     <td width="50%">½á¹¹ÓÃÍ¾</td>
-     <td><span class="value nonEditable">·Ç³ÐÖØ</span></td>
-    </tr>
-    <tr oid="5964292" psetoid="3211778">
-     <td width="50%">½á¹¹</td>
-     <td><span class="value nonEditable">false</span></td>
-    </tr>
-    <tr oid="1769988" psetoid="3211778">
-     <td width="50%">ÆôÓÃ·ÖÎöÄ£ÐÍ</td>
-     <td><span class="value nonEditable">false</span></td>
-    </tr>
-    <tr class="active" oid="2032130" uri="¹¹Ôì">
-     <td colspan="2"><b>¹¹Ôì</b></td>
-    </tr>
-   </tbody>
-  </table> 
-		        </div>
-		    </div>
-		</div>
-		
-	</div>
+
+<div id="propertiesList">
+	<div ng-show="!oid" style="text-align:center;font-size:22px;line-height:66px;color:blue;">è¯·ç‚¹å‡»ç‰©ä»¶æ˜¾ç¤ºå±žæ€§</div>
+	<table cellspacing=0 cellpadding=0 class="table propertiesTable" id="propertiesTable" border="1" align="center" ng-show="oid"> 
+  	<tbody>
+	  	<tr class="active" oid="{{list.oid}}">
+	     	<td colspan="2"><b>{{list.name}}</b></td>
+	    </tr>
+	  	<tr  ng-repeat="item in list.propertiySet">
+	     	<td width="50%">{{item.name}}</td>
+	     	<td><span class="value nonEditable">{{item.value}}</span></td>
+	    </tr>
+    </tbody>
+    </table> 
+</div>

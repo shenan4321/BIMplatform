@@ -42,14 +42,15 @@
 	<div class="nav-slide-o">
 	</div>
 	<div class="nav-slide-o">
-		<div ng-controller="myCtrl">
+		<div ng-controller="treeCtrl">
 			<div ng-include="'./treeTemp/treeView.html'"></div>
 		</div>
 	</div>
 	<div class="nav-slide-o">
+	333333
 	</div>
 	<div class="nav-slide-o">
-		<div ng-controller="myCtrl">
+		<div ng-controller="pTableCtrl" id="pTable">
 			<div ng-include="'./treeTemp/pTable.html'"></div>
 		</div>
 	</div>
@@ -63,8 +64,6 @@
 	<div class="nav-slide-o">
 	</div>
 </div>
-
-
 <script type="text/javascript" src="public/js/jquery/2.1.4/jquery-2.1.4.min.js"></script>  
 <script type="text/javascript" src="public/js/progress.js"></script> 
 <script type="text/javascript" src="public/js/websoket.js"></script> 
@@ -83,7 +82,7 @@ function GetQueryString(name){
    var r = window.location.search.substr(1).match(reg);
    if (r!=null) return unescape(r[2]); return null;
 }
-var string = GetQueryString("rid")||2;
+var string = GetQueryString("rid")||4;
 var websocket = new WebsocketBim();
 websocket.init({
 	urlPath:"ws/geometry?rid="+string,

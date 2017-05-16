@@ -10,12 +10,16 @@ import cn.dlb.bim.ifc.emf.IdEObject;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
 
 public class PropertyGenerator {
+	
 	@SuppressWarnings("rawtypes")
-	public void getProperty(PackageMetaData packageMetaData, IdEObject product) {
+	public PropertySet getProperty(PackageMetaData packageMetaData, IdEObject product) {
+		
 		EClass productClass = packageMetaData.getEClass("IfcProduct");
 		if (!productClass.isSuperTypeOf(product.eClass())) {
-			return ;
+			return null;
 		}
+		
+		PropertySet result = null;
 		PropertySetCollection collection = new PropertySetCollection();
 		EReference isDefinedByReference = packageMetaData.getEReference(product.eClass().getName(), "IsDefinedBy");
 		if (isDefinedByReference != null) {
@@ -28,21 +32,22 @@ public class PropertyGenerator {
 						Object relatingPropertyDefinition = ifcRelDefinesByProperties.eGet(relatingPropertyDefinitionEReference);
 						if (relatingPropertyDefinition instanceof IdEObject) {
 							IdEObject ifcPropertySet = (IdEObject) relatingPropertyDefinition;
-							showPropertySet(packageMetaData, ifcPropertySet, collection);
+							result = generatePropertySet(packageMetaData, ifcPropertySet, collection);
 						}
 					}
 				}
 				
 			}
 		}
+		return result;
 	}
 	
 	@SuppressWarnings({ "rawtypes" })
-	public void showPropertySet(PackageMetaData packageMetaData, IdEObject ifcPropertySet, PropertySetCollection collection) {
+	public PropertySet generatePropertySet(PackageMetaData packageMetaData, IdEObject ifcPropertySet, PropertySetCollection collection) {
 		
 		EClass ifcPropertySetClass = packageMetaData.getEClass("IfcPropertySet");
 		if (!ifcPropertySetClass.isSuperTypeOf(ifcPropertySet.eClass())) {
-			return;
+			return null;
 		}
 		
 		Long setOid = ifcPropertySet.getOid();
@@ -56,33 +61,33 @@ public class PropertyGenerator {
 		for (Object hasProperty : hasProperties) {
 			if (hasProperty instanceof IdEObject) {
 				IdEObject ifcPropertySingleValue = (IdEObject) hasProperty;
-				showProperty(packageMetaData, ifcPropertySingleValue, propertySet);
+				generateProperty(packageMetaData, ifcPropertySingleValue, propertySet);
 			}
 		}
 		
+		return propertySet;
+		
 	}
 	
-	public void showProperty(PackageMetaData packageMetaData, IdEObject ifcPropertySingleValue, PropertySet propertySet) {
+	public void generateProperty(PackageMetaData packageMetaData, IdEObject ifcPropertySingleValue, PropertySet propertySet) {
 		EClass ifcPropertySingleValueClass = packageMetaData.getEClass("IfcPropertySingleValue");
 		if (!ifcPropertySingleValueClass.isSuperTypeOf(ifcPropertySingleValue.eClass())) {
 			return;
 		}
-		Long oid = ifcPropertySingleValue.getOid();
+//		Long oid = ifcPropertySingleValue.getOid();
 		String name = (String) ifcPropertySingleValue.eGet(ifcPropertySingleValueClass.getEStructuralFeature("Name"));
-		
 		Object nominalValue = ifcPropertySingleValue.eGet(ifcPropertySingleValueClass.getEStructuralFeature("NominalValue"));
-		
 		if (nominalValue != null) {
 			IdEObject ifcValue = (IdEObject) nominalValue;
 			if (ifcValue.eClass().getEAnnotation("wrapped") != null) {
 				EStructuralFeature wrappedFeature = ifcValue.eClass().getEStructuralFeature("wrappedValue");
 				Object value = ifcValue.eGet(wrappedFeature);
-				
-				System.out.println("Property :  " + oid + ", name :" + name + "value :" + value);
+				Propertry property = new Propertry();
+				property.setName(name);
+				property.setValue(value);
+				propertySet.getPropertiySet().add(property);
 			}
 			
 		}
-		
-		
 	}
 }

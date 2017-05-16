@@ -1,12 +1,13 @@
 package cn.dlb.bim.ifc.tree;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PropertySet {
 	
 	private Long oid;
 	private String name;
-	private List<Propertry> propertiySet;
+	private List<Propertry> propertiySet = new ArrayList<>();
 	
 	public Long getOid() {
 		return oid;

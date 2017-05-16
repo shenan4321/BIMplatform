@@ -30,6 +30,7 @@ import cn.dlb.bim.ifc.tree.Material;
 import cn.dlb.bim.ifc.tree.MaterialGenerator;
 import cn.dlb.bim.ifc.tree.ProjectTreeGenerator;
 import cn.dlb.bim.ifc.tree.PropertyGenerator;
+import cn.dlb.bim.ifc.tree.PropertySet;
 import cn.dlb.bim.models.ifc2x3tc1.IfcProduct;
 import cn.dlb.bim.service.BimService;
 import cn.dlb.bim.service.ProjectService;
@@ -145,17 +146,16 @@ public class ModelController {
 	
 	@RequestMapping(value = "queryProperty", method = RequestMethod.GET)
 	@ResponseBody
-	public Map<String, Object> queryProperty(@RequestParam("rid")Integer rid//, @RequestParam("oid")Long oid
+	public Map<String, Object> queryProperty(@RequestParam("rid")Integer rid, @RequestParam("oid")Long oid
 			) {
 		ResultUtil result = new ResultUtil();
 		IfcModelInterface model = bimService.queryModelByRid(rid);
-		EClass productClass = (EClass) model.getPackageMetaData().getEClassifierCaseInsensitive("IfcProduct");
-		List<IdEObject> productList = model.getAllWithSubTypes(productClass);
 		
-		for (IdEObject ifcProject : productList) {
-			PropertyGenerator p = new PropertyGenerator();
-			p.getProperty(model.getPackageMetaData(), ifcProject);
-		}
+		IdEObject targetObject = model.get(oid);
+		
+		PropertyGenerator propertyGenerator = new PropertyGenerator();
+		PropertySet porpertySet = propertyGenerator.getProperty(model.getPackageMetaData(), targetObject);
+		result.setData(porpertySet);
 		result.setSuccess(true);
 		return result.getResult();
 	}
@@ -166,7 +166,7 @@ public class ModelController {
 			) {
 		ResultUtil result = new ResultUtil();
 		IfcModelInterface model = bimService.queryModelByRid(rid);
-		EClass productClass = (EClass) model.getPackageMetaData().getEClassifierCaseInsensitive("IfcProduct");
+		EClass productClass = (EClass) model.getPackageMetaData().getEClass("IfcProduct");
 		List<IdEObject> projectList = model.getAllWithSubTypes(productClass);
 		
 		MaterialGenerator materialGetter = new MaterialGenerator(model);

@@ -150,9 +150,9 @@ public class ModelController {
 		ResultUtil result = new ResultUtil();
 		IfcModelInterface model = bimService.queryModelByRid(rid);
 		EClass productClass = (EClass) model.getPackageMetaData().getEClassifierCaseInsensitive("IfcProduct");
-		List<IdEObject> projectList = model.getAllWithSubTypes(productClass);
+		List<IdEObject> productList = model.getAllWithSubTypes(productClass);
 		
-		for (IdEObject ifcProject : projectList) {
+		for (IdEObject ifcProject : productList) {
 			PropertyGenerator p = new PropertyGenerator();
 			p.getProperty(model.getPackageMetaData(), ifcProject);
 		}
@@ -187,7 +187,7 @@ public class ModelController {
 		return result.getResult();
 	}
 	
-	@RequestMapping(value = "queryGlbByRid", method = RequestMethod.POST)
+	@RequestMapping(value = "queryGlbByRid", method = RequestMethod.GET)
 	public void queryGlbByRid(@RequestParam("rid")Integer rid, HttpServletResponse response) {
 		GlbVo glbVo = bimService.queryGlbByRid(rid);
 		try {

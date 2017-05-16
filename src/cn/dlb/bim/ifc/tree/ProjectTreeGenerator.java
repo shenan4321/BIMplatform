@@ -34,7 +34,7 @@ public class ProjectTreeGenerator {
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public TreeItem buildTree(IdEObject object) {
-		if (!isInstanceOf(object.eClass(), "IfcObjectDefinition")) {
+		if (!isInstanceOf(object, "IfcObjectDefinition")) {
 			return null;
 		}
 		TreeItem curTree = new TreeItem();
@@ -44,7 +44,7 @@ public class ProjectTreeGenerator {
 		curTree.setIfcClassType(object.eClass().getName());
 		curTree.setSelected(true);
 		
-		if (isInstanceOf(object.eClass(), "IfcProduct")) {
+		if (isInstanceOf(object, "IfcProduct")) {
 			EClass productClass = packageMetaData.getEClass("IfcProduct");
 			GeometryInfo geometryInfo = (GeometryInfo) object.eGet(productClass.getEStructuralFeature("geometry"));
 			if (geometryInfo != null) {
@@ -74,7 +74,7 @@ public class ProjectTreeGenerator {
 			for (Object ifcRelDecompose : ifcRelDecomposes) {
 				if (ifcRelDecompose instanceof IdEObject) {
 					IdEObject ifcRelAggregates = (IdEObject) ifcRelDecompose;
-					if (isInstanceOf(ifcRelAggregates.eClass(), "IfcRelAggregates")) {
+					if (isInstanceOf(ifcRelAggregates, "IfcRelAggregates")) {
 						EReference relatedObjectsReference = packageMetaData.getEReference(ifcRelAggregates.eClass().getName(), "RelatedObjects");
 						if (relatedObjectsReference != null) {
 							List relatedObjects = (List) ifcRelAggregates.eGet(relatedObjectsReference);
@@ -96,9 +96,9 @@ public class ProjectTreeGenerator {
 		return curTree;
 	}
 	
-	private Boolean isInstanceOf(EClass originClass, String type) {
+	private Boolean isInstanceOf(IdEObject originObject, String type) {
 		EClass eClass = packageMetaData.getEClass(type);
-		return eClass.isSuperTypeOf(originClass);
+		return eClass.isSuperTypeOf(originObject.eClass());
 	}
 	
 	public ProjectTree getTree() {

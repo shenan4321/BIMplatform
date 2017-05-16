@@ -73,7 +73,7 @@ function ShopListCtrl($scope, $http, $timeout) {}
 function PetaCtrl($scope, $http, $timeout) {}
 
 function BimProjerctCtrl($scope, $http, $timeout ,$routeParams) {
-	$scope.a = $routeParams.id
+	$scope.rid = $routeParams.id
 }
 
 function BimModelCtrl($scope, $http, $timeout) {}

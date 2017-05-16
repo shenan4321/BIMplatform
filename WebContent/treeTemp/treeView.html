@@ -1,0 +1,7 @@
+<ul class="tree-view">
+    <li ng-repeat="item in treeData">
+    	{{item.name}}{{item.ifcClassType}}{{item.oid}}{{item.geometryOid}}
+    	<ul ng-include = "'./treeTemp/contains.html'"></ul>
+    	<ul ng-include = "'./treeTemp/decomposition.html'"></ul>	
+    </li>
+</ul>

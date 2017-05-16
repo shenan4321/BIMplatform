@@ -1,52 +1,15 @@
-var setting = {
-	check: {
-		enable: true
-	},
-	data: {
-		simpleData: {
-			enable: true
-		}
-	}
-};
-var zNodes =[
-	{ id:1, pId:0, name:"随意勾选 1", open:true}
-];
-
-var code;
-
-function setCheck() {
-	var zTree = $.fn.zTree.getZTreeObj("treeDemo"),
-	py = $("#py").attr("checked")? "p":"",
-	sy = $("#sy").attr("checked")? "s":"",
-	pn = $("#pn").attr("checked")? "p":"",
-	sn = $("#sn").attr("checked")? "s":"",
-	type = { "Y":py + sy, "N":pn + sn};
-	zTree.setting.check.chkboxType = type;
-	showCode('setting.check.chkboxType = { "Y" : "' + type.Y + '", "N" : "' + type.N + '" };');
-}
-function showCode(str) {
-	if (!code) code = $("#code");
-	code.empty();
-	code.append("<li>"+str+"</li>");
-}
-
-$(document).ready(function(){
-	
-	$.ajax({
-		data:{rid:string},
-		url:'./model/queryModelProjectTree.do',
-		type:'get'
-	}).done(function(res){
-		console.log(res);
-	
-
-		$.fn.zTree.init($("#treeDemo"), setting, zNodes);
-		setCheck();
-		$("#py").bind("change", setCheck);
-		$("#sy").bind("change", setCheck);
-		$("#pn").bind("change", setCheck);
-		$("#sn").bind("change", setCheck);
-		
-	})
-	
+var loginApp = angular.module("myApp", []);  
+loginApp.controller('myCtrl', function ($scope, $http) {  
+    
+    $scope.Login=function() {  
+        $http.get('./model/queryModelProjectTree.do?rid='+string).success(function (data,status) {  
+        	console.log(data);
+        	$scope.treeData =data.data.treeRoots;
+        	console.log($scope.treeData);
+        }).error(function (data,status) {  
+        });  
+    }  
+    
+    $scope.Login();
+    
 });

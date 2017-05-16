@@ -66,7 +66,6 @@
         });
        
         var hasTransparency = Math.random()>0.5?false:true;
-       console.log(geometryInfo.color);
         var flags = {
 				type : "flags",
 				flags : {
@@ -78,11 +77,10 @@
 					nodes : [{
 						type : "name",
 						name : geometryInfo.oid,
-						alpha: 1,//透明度
 						nodes : [{
 							type : "material",
 							baseColor: geometryInfo.color ? { r: geometryInfo.color.r , g:geometryInfo.color.g , b:geometryInfo.color.b } : material,
-							//color:geometryInfo.color ? { r: geometryInfo.color.r , g:geometryInfo.color.g , b:geometryInfo.color.b } : material,
+							alpha:  geometryInfo.color ? geometryInfo.color.a  : material.a,
 		        			id:geometryInfo.oid+"geometry",
 							nodes: [{
 			        			type : "geometry",

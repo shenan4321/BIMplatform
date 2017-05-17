@@ -19,13 +19,19 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.common.util.Enumerator;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EClassifier;
+import org.eclipse.emf.ecore.EEnum;
+import org.eclipse.emf.ecore.EEnumLiteral;
+import org.eclipse.emf.ecore.EStructuralFeature;
+import org.eclipse.emf.ecore.impl.EEnumImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cn.dlb.bim.ifc.emf.IdEObject;
 import cn.dlb.bim.ifc.emf.IfcModelInterface;
+import cn.dlb.bim.ifc.emf.PackageMetaData;
 import cn.dlb.bim.ifc.emf.ProjectInfo;
 import cn.dlb.bim.ifc.engine.RenderEngineException;
 import cn.dlb.bim.ifc.engine.cells.Vector3d;
@@ -33,44 +39,6 @@ import cn.dlb.bim.ifc.serializers.SerializerException;
 import cn.dlb.bim.ifc.shared.ProgressReporter;
 import cn.dlb.bim.models.geometry.GeometryData;
 import cn.dlb.bim.models.geometry.GeometryInfo;
-import cn.dlb.bim.models.ifc2x3tc1.IfcBeam;
-import cn.dlb.bim.models.ifc2x3tc1.IfcBuildingElementPart;
-import cn.dlb.bim.models.ifc2x3tc1.IfcBuildingElementProxy;
-import cn.dlb.bim.models.ifc2x3tc1.IfcColumn;
-import cn.dlb.bim.models.ifc2x3tc1.IfcCovering;
-import cn.dlb.bim.models.ifc2x3tc1.IfcCurtainWall;
-import cn.dlb.bim.models.ifc2x3tc1.IfcDistributionElement;
-import cn.dlb.bim.models.ifc2x3tc1.IfcDistributionFlowElement;
-import cn.dlb.bim.models.ifc2x3tc1.IfcDoor;
-import cn.dlb.bim.models.ifc2x3tc1.IfcFeatureElementSubtraction;
-import cn.dlb.bim.models.ifc2x3tc1.IfcFlowController;
-import cn.dlb.bim.models.ifc2x3tc1.IfcFlowFitting;
-import cn.dlb.bim.models.ifc2x3tc1.IfcFlowSegment;
-import cn.dlb.bim.models.ifc2x3tc1.IfcFlowTerminal;
-import cn.dlb.bim.models.ifc2x3tc1.IfcFooting;
-import cn.dlb.bim.models.ifc2x3tc1.IfcFurnishingElement;
-import cn.dlb.bim.models.ifc2x3tc1.IfcMember;
-import cn.dlb.bim.models.ifc2x3tc1.IfcPile;
-import cn.dlb.bim.models.ifc2x3tc1.IfcPlate;
-import cn.dlb.bim.models.ifc2x3tc1.IfcProduct;
-import cn.dlb.bim.models.ifc2x3tc1.IfcProject;
-import cn.dlb.bim.models.ifc2x3tc1.IfcProxy;
-import cn.dlb.bim.models.ifc2x3tc1.IfcRailing;
-import cn.dlb.bim.models.ifc2x3tc1.IfcRamp;
-import cn.dlb.bim.models.ifc2x3tc1.IfcRoof;
-import cn.dlb.bim.models.ifc2x3tc1.IfcSIUnit;
-import cn.dlb.bim.models.ifc2x3tc1.IfcSite;
-import cn.dlb.bim.models.ifc2x3tc1.IfcSlab;
-import cn.dlb.bim.models.ifc2x3tc1.IfcSpace;
-import cn.dlb.bim.models.ifc2x3tc1.IfcStair;
-import cn.dlb.bim.models.ifc2x3tc1.IfcStairFlight;
-import cn.dlb.bim.models.ifc2x3tc1.IfcTransportElement;
-import cn.dlb.bim.models.ifc2x3tc1.IfcUnit;
-import cn.dlb.bim.models.ifc2x3tc1.IfcUnitAssignment;
-import cn.dlb.bim.models.ifc2x3tc1.IfcUnitEnum;
-import cn.dlb.bim.models.ifc2x3tc1.IfcWall;
-import cn.dlb.bim.models.ifc2x3tc1.IfcWallStandardCase;
-import cn.dlb.bim.models.ifc2x3tc1.IfcWindow;
 import cn.dlb.bim.models.store.SIPrefix;
 import cn.dlb.bim.utils.UTF8PrintWriter;
 
@@ -103,7 +71,6 @@ public class ColladaSerializer extends AbstractGeometrySerializer {
 		addConvertor(new MaterialConvertor("IfcRailing", new double[] { 0.137255f, 0.203922f, 0.270588f }, 1.0f));
 		addConvertor(new MaterialConvertor("IfcColumn", new double[] { 0.437255f, 0.603922f, 0.370588f, }, 1.0f));
 		addConvertor(new MaterialConvertor("IfcBuildingElementProxy", new double[] { 0.0f, 0.5f, 0.0f }, 1.0f));
-		addConvertor(new MaterialConvertor("IfcProduct", new double[] { 0.0, 102.0f/255.0f, 102.0f/255.0f }, 1.0f));
 		
 		addConvertor(new MaterialConvertor("IfcBeam", new double[] { 0.137255f, 0.403922f, 0.870588f }, 1.0f));
 //		addConvertor(new Convertor<IfcBeamStandardCase>(IfcBeamStandardCase.class, new double[] { 0.137255f, 0.403922f, 0.870588f }, 1.0f));
@@ -126,6 +93,8 @@ public class ColladaSerializer extends AbstractGeometrySerializer {
 //		addConvertor(new Convertor<IfcSystemFurnitureElement>(IfcSystemFurnitureElement.class, new double[] { 0.8470588235f, 0.427450980392f, 0.0f }, 1.0f));
 		addConvertor(new MaterialConvertor("IfcBuildingElementPart", new double[] { 1.0f, 0.5f, 0.5f }, 1.0f));
 		addConvertor(new MaterialConvertor("IfcDistributionElement", new double[] { 1.0f, 0.5f, 0.5f }, 1.0f));
+		
+		addConvertor(new MaterialConvertor("IfcProduct", new double[] { 0.0, 102.0f/255.0f, 102.0f/255.0f }, 1.0f));
 	}
 
 	// Prepare a transformer for floating-point numbers into a strings, clipping extraneous zeros.
@@ -138,8 +107,8 @@ public class ColladaSerializer extends AbstractGeometrySerializer {
 
 	@Override
 	public void init(IfcModelInterface model, ProjectInfo projectInfo, boolean normalizeOids) throws SerializerException {
-		this.lengthUnitPrefix = getLengthUnitPrefix(model);
 		super.init(model, projectInfo, normalizeOids);
+		this.lengthUnitPrefix = getLengthUnitPrefix(model);
 	}
 
 	@Override
@@ -207,17 +176,16 @@ public class ColladaSerializer extends AbstractGeometrySerializer {
 		
 		EClass productClass = (EClass) model.getPackageMetaData().getEClass("IfcProduct");
 
+		Set<IdEObject> convertedObjects = new HashSet<IdEObject>();
+
 		for (MaterialConvertor materialConvertor : convertors.values()) {
 			String ifcType = materialConvertor.getIfcType();
-			model.getPackageMetaData();
-		}
-		for (IdEObject ifcProduct : model.getAllWithSubTypes(productClass)) {
-			String ifcType = ifcProduct.eClass().getName();
-			MaterialConvertor materialConvertor = convertors.get(ifcType);
-			if (materialConvertor == null) {
-				System.err.println();
+			for (IdEObject ifcProduct : model.getAllWithSubTypes(model.getPackageMetaData().getEClass(ifcType))) {
+				if (!convertedObjects.contains(ifcProduct)) {
+					convertedObjects.add(ifcProduct);
+					setGeometry(out, ifcProduct, materialConvertor.getIfcType());
+				}
 			}
-			setGeometry(out, ifcProduct, materialConvertor.getIfcType());
 		}
 		
 		// Close the section.
@@ -226,7 +194,7 @@ public class ColladaSerializer extends AbstractGeometrySerializer {
 
 	private void setGeometry(PrintWriter out, IdEObject ifcProductObject, String material) throws RenderEngineException, SerializerException {
 		// Mostly just skips IfcOpeningElements which one would probably not want to end up in the Collada file.
-		if (ifcProductObject instanceof IfcFeatureElementSubtraction || ifcProductObject instanceof IfcSpace)
+		if (isInstanceOf(ifcProductObject, "IfcFeatureElementSubtraction") || isInstanceOf(ifcProductObject, "IfcSpace"))
 			return;
 		//
 		GeometryInfo geometryInfo = (GeometryInfo) ifcProductObject.eGet(ifcProductObject.eClass().getEStructuralFeature("geometry"));
@@ -619,71 +587,75 @@ public class ColladaSerializer extends AbstractGeometrySerializer {
 		out.println("  </material>");
 	}
 
-	private static SIPrefix getLengthUnitPrefix(IfcModelInterface model) {
+	private SIPrefix getLengthUnitPrefix(IfcModelInterface model) {
 		SIPrefix lengthUnitPrefix = null;
 		boolean prefixFound = false;
 		Map<Long, IdEObject> objects = model.getObjects();
 		for (IdEObject object : objects.values()) {
-			if (object instanceof IfcProject) {
-				IfcUnitAssignment unitsInContext = ((IfcProject) object).getUnitsInContext();
+			if (isInstanceOf(object, "IfcProject")) {
+				IdEObject unitsInContext = (IdEObject) object.eGet(object.eClass().getEStructuralFeature("UnitsInContext"));
+//				IfcUnitAssignment unitsInContext = ((IfcProject) object).getUnitsInContext();
 				if (unitsInContext != null) {
-					EList<IfcUnit> units = unitsInContext.getUnits();
-					for (IfcUnit unit : units) {
-						if (unit instanceof IfcSIUnit) {
-							IfcSIUnit ifcSIUnit = (IfcSIUnit) unit;
-							IfcUnitEnum unitType = ifcSIUnit.getUnitType();
-							if (unitType == IfcUnitEnum.LENGTHUNIT) {
+					List units = (List) unitsInContext.eGet(unitsInContext.eClass().getEStructuralFeature("Units"));
+//					EList<IfcUnit> units = unitsInContext.getUnits();
+					for (Object unit : units) {
+						IdEObject ifcSIUnit = (IdEObject) unit;
+						if (isInstanceOf(ifcSIUnit, "IfcSIUnit")) {
+							EStructuralFeature feature = ifcSIUnit.eClass().getEStructuralFeature("UnitType");
+							Enumerator unitType = (Enumerator) ifcSIUnit.eGet(feature);
+							if (unitType.getLiteral() == "LENGTHUNIT") {
 								prefixFound = true;
-								switch (ifcSIUnit.getPrefix()) {
-								case EXA:
+								Enumerator prefix = (Enumerator) ifcSIUnit.eGet(ifcSIUnit.eClass().getEStructuralFeature("Prefix"));
+								switch (prefix.getLiteral()) {
+								case "EXA":
 									lengthUnitPrefix = SIPrefix.EXAMETER;
 									break;
-								case PETA:
+								case "PETA":
 									lengthUnitPrefix = SIPrefix.PETAMETER;
 									break;
-								case TERA:
+								case "TERA":
 									lengthUnitPrefix = SIPrefix.TERAMETER;
 									break;
-								case GIGA:
+								case "GIGA":
 									lengthUnitPrefix = SIPrefix.GIGAMETER;
 									break;
-								case MEGA:
+								case "MEGA":
 									lengthUnitPrefix = SIPrefix.MEGAMETER;
 									break;
-								case KILO:
+								case "KILO":
 									lengthUnitPrefix = SIPrefix.KILOMETER;
 									break;
-								case HECTO:
+								case "HECTO":
 									lengthUnitPrefix = SIPrefix.HECTOMETER;
 									break;
-								case DECA:
+								case "DECA":
 									lengthUnitPrefix = SIPrefix.DECAMETER;
 									break;
-								case DECI:
+								case "DECI":
 									lengthUnitPrefix = SIPrefix.DECIMETER;
 									break;
-								case CENTI:
+								case "CENTI":
 									lengthUnitPrefix = SIPrefix.CENTIMETER;
 									break;
-								case MILLI:
+								case "MILLI":
 									lengthUnitPrefix = SIPrefix.MILLIMETER;
 									break;
-								case MICRO:
+								case "MICRO":
 									lengthUnitPrefix = SIPrefix.MICROMETER;
 									break;
-								case NANO:
+								case "NANO":
 									lengthUnitPrefix = SIPrefix.NANOMETER;
 									break;
-								case PICO:
+								case "PICO":
 									lengthUnitPrefix = SIPrefix.PICOMETER;
 									break;
-								case FEMTO:
+								case "FEMTO":
 									lengthUnitPrefix = SIPrefix.FEMTOMETER;
 									break;
-								case ATTO:
+								case "ATTO":
 									lengthUnitPrefix = SIPrefix.ATTOMETER;
 									break;
-								case NULL:
+								case "NULL":
 									lengthUnitPrefix = SIPrefix.METER;
 									break;
 								}
@@ -697,5 +669,11 @@ public class ColladaSerializer extends AbstractGeometrySerializer {
 				break;
 		}
 		return lengthUnitPrefix;
+	}
+	
+	private Boolean isInstanceOf(IdEObject originObject, String type) {
+		PackageMetaData packageMetaData = model.getPackageMetaData();
+		EClass eClass = packageMetaData.getEClass(type);
+		return eClass.isSuperTypeOf(originObject.eClass());
 	}
 }

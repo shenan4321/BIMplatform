@@ -28,6 +28,8 @@ import cn.dlb.bim.ifc.emf.IfcModelInterface;
 import cn.dlb.bim.ifc.emf.ProjectInfo;
 import cn.dlb.bim.ifc.engine.cells.Vector3d;
 import cn.dlb.bim.ifc.serializers.SerializerException;
+import cn.dlb.bim.ifc.tree.BuildingStorey;
+import cn.dlb.bim.ifc.tree.BuildingStoreyGenerator;
 import cn.dlb.bim.ifc.tree.Material;
 import cn.dlb.bim.ifc.tree.MaterialGenerator;
 import cn.dlb.bim.ifc.tree.ProjectTreeGenerator;
@@ -149,15 +151,15 @@ public class ModelController {
 		return result.getResult();
 	}
 	
-	@RequestMapping(value = "queryModelBuildingStoreyTree", method = RequestMethod.GET)
+	@RequestMapping(value = "queryModelBuildingStorey", method = RequestMethod.GET)
 	@ResponseBody
-	public Map<String, Object> queryModelBuildingStoreyTree(@RequestParam("rid")Integer rid) {
+	public Map<String, Object> queryModelBuildingStorey(@RequestParam("rid")Integer rid) {
 		ResultUtil result = new ResultUtil();
 		IfcModelInterface model = bimService.queryModelByRid(rid);
-		ProjectTreeGenerator treeGenerator = new ProjectTreeGenerator(model.getPackageMetaData());
-		treeGenerator.buildProjectTree(model, ProjectTreeGenerator.KeyWord_IfcBuildingStorey);
+		BuildingStoreyGenerator generator = new BuildingStoreyGenerator(model.getPackageMetaData());
+		List<BuildingStorey> buildingStoreys = generator.generateBuildingStorey(model);
 		result.setSuccess(true);
-		result.setData(treeGenerator.getTree());
+		result.setData(buildingStoreys);
 		return result.getResult();
 	}
 	

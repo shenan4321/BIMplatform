@@ -28,4 +28,12 @@ public class PropertySet {
 		this.propertiySet = propertiySet;
 	}
 	
+	public String getText() {
+		String text = "";
+		for (Propertry propertry : propertiySet) {
+			String propertryText = propertry.getText();
+			text += propertryText + ";";
+		}
+		return text;
+	}
 }

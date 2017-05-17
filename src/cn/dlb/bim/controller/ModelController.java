@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import cn.dlb.bim.component.RecordSearchManager;
 import cn.dlb.bim.dao.entity.Project;
 import cn.dlb.bim.ifc.collada.KmzSerializer;
 import cn.dlb.bim.ifc.emf.IdEObject;
@@ -35,6 +36,7 @@ import cn.dlb.bim.ifc.tree.MaterialGenerator;
 import cn.dlb.bim.ifc.tree.ProjectTreeGenerator;
 import cn.dlb.bim.ifc.tree.PropertyGenerator;
 import cn.dlb.bim.ifc.tree.PropertySet;
+import cn.dlb.bim.lucene.IfcProductRecordText;
 import cn.dlb.bim.models.ifc2x3tc1.IfcProduct;
 import cn.dlb.bim.service.BimService;
 import cn.dlb.bim.service.ProjectService;
@@ -53,6 +55,10 @@ public class ModelController {
 	@Autowired
 	@Qualifier("ProjectServiceImpl")
 	private ProjectService projectService;
+	
+	@Autowired
+	@Qualifier("RecordSearchManager")
+	private RecordSearchManager recordSearchManager;
 	
 	@RequestMapping(value = "addModel", method = RequestMethod.POST)
 	@ResponseBody
@@ -242,6 +248,16 @@ public class ModelController {
 		ResultUtil result = new ResultUtil();
 		bimService.setGlbLonlat(rid, lon, lat);
 		result.setSuccess(true);
+		return result.getResult();
+	}
+	
+	@RequestMapping(value = "searchRecord", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> searchRecord(@RequestParam("rid")Integer rid, @RequestParam("keyword")String keyword) {
+		ResultUtil result = new ResultUtil();
+		List<IfcProductRecordText> records = recordSearchManager.search(rid, keyword);
+		result.setSuccess(true);
+		result.setData(records);
 		return result.getResult();
 	}
 	

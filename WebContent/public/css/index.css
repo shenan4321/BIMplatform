@@ -30,8 +30,8 @@ li.li.hover .iconfont1{display:block;}
     line-height: 1.42857143;
     border: 1px solid transparent;
 }
-.table.propertiesTable .active {
-    background: #3ca6e6 !important;
+.table.propertiesTable tr.active {
+    background: #2d5f7e !important;
     color: #fff !important;
     border-bottom: 0;
 }
@@ -55,7 +55,7 @@ li.li.hover .iconfont1{display:block;}
 	}
 #propertiesTable td{
 	padding: 6px 5px;
-	border: 1px solid #bdbdbd;
+	/* background: #fff; */
 }
 .propertiesTable:first-child{
 	border-top:1px solid #000
@@ -78,7 +78,7 @@ li.li.hover .iconfont1{display:block;}
 	transition: all .5s;
 	border-top: 2px solid #a0a0a0;
 	cursor: pointer;
-	background:#3ca6e6;
+	background: #2d5f7e;
 	color:#fff;
 }
 .floor .mui-switch{
@@ -125,6 +125,7 @@ li.li.hover .iconfont1{display:block;}
     width: 92%;
     table-layout: fixed;
     overflow: hidden;
-    border-color: #efefef;
+    background: #fff;
+    border-color: #7f7d7d;
     border-collapse: collapse;
 }

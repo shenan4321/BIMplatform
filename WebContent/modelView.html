@@ -10,18 +10,16 @@
   <meta name="browsermode" content="application" /> 
   <meta name="x5-page-mode" content="app" /> 
   <title>东链博BIM应用Server</title> 
-  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" /> 
-  <link rel="stylesheet" href="public/js/zTree_v3/css/demo.css" type="text/css" /> 
-  <link rel="stylesheet" href="public/js/zTree_v3/css/zTreeStyle/zTreeStyle.css" type="text/css" /> 
+  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />  
   <link rel="stylesheet" href="public/css/format.css" type="text/css" /> 
   <link rel="stylesheet" href="public/css/bim.css" type="text/css" /> 
+  <link rel="stylesheet" href="public/css/guest.css" type="text/css" /> 
   <link rel="stylesheet" href="public/css/index.css" type="text/css" /> 
   <style>
 		html,body,#mySceneCanvas{width:100%;height:100%;overflow:hidden}
 	</style> 
  </head> 
  <body> 
-  <div id="infoDark"></div> 
   <canvas id="mySceneCanvas" width="100%" height="100%"></canvas>  
   <header class="app-header navbar"> 
    <a class="navbar-brand" href="#"></a> 
@@ -35,11 +33,14 @@
     <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 搜索 </p> </a> </li> 
     <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 标注 </p> </a> </li> 
     <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 楼层 </p> </a> </li> 
-    <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 漫游控制 </p> </a> </li> 
+    <!-- <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 漫游控制 </p> </a> </li> --> 
    </ul> 
   </div> 
 <div class="nav-slide">
 	<div class="nav-slide-o">
+		<div ng-controller="fileCtrl">
+			<div ng-include="'./treeTemp/file.html'"></div>
+		</div>
 	</div>
 	<div class="nav-slide-o">
 		<div ng-controller="treeCtrl">
@@ -47,7 +48,7 @@
 		</div>
 	</div>
 	<div class="nav-slide-o">
-	333333
+	
 	</div>
 	<div class="nav-slide-o">
 		<div ng-controller="pTableCtrl" id="pTable">
@@ -57,12 +58,13 @@
 	<div class="nav-slide-o">
 	</div>
 	<div class="nav-slide-o">
-	1111
 	</div>
 	<div class="nav-slide-o">
+		<div ng-controller="floorCtrl" id="pTable">
+			<div ng-include="'./treeTemp/floor.html'"></div>
+		</div>
 	</div>
-	<div class="nav-slide-o">
-	</div>
+<!--<div class="nav-slide-o"></div> -->
 </div>
 <script type="text/javascript" src="public/js/jquery/2.1.4/jquery-2.1.4.min.js"></script>  
 <script type="text/javascript" src="public/js/progress.js"></script> 

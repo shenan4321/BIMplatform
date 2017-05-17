@@ -71,25 +71,22 @@
 				flags : {
 					transparent : true
 				},
+			
 				nodes : [{
-					type: "enable",
-					enabled: true,
+					type : "name",
+					name : geometryInfo.oid,
 					nodes : [{
-						type : "name",
-						name : geometryInfo.oid,
-						nodes : [{
-							type : "material",
-							baseColor: geometryInfo.color ? { r: geometryInfo.color.r , g:geometryInfo.color.g , b:geometryInfo.color.b } : material,
-							alpha:  geometryInfo.color ? geometryInfo.color.a  : material.a,
-		        			id:geometryInfo.oid+"geometry",
-							nodes: [{
-			        			type : "geometry",
-			        			primitive : params.wire ? "lines" : "triangles",
-			                    positions:new Float32Array(positions),
-			                    indices:new Uint16Array(indices),
-			                    normals:new Float32Array(normals)
-			        		}]
-						}]
+						type : "material",
+						baseColor: geometryInfo.color ? { r: geometryInfo.color.r , g:geometryInfo.color.g , b:geometryInfo.color.b } : material,
+						alpha:  geometryInfo.color ? geometryInfo.color.a  : material.a,
+	        			id:geometryInfo.oid+"geometry",
+						nodes: [{
+		        			type : "geometry",
+		        			primitive : params.wire ? "lines" : "triangles",
+		                    positions:new Float32Array(positions),
+		                    indices:new Uint16Array(indices),
+		                    normals:new Float32Array(normals)
+		        		}]
 					}]
 				}]
 			};

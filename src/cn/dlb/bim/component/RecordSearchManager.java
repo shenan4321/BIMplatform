@@ -30,7 +30,7 @@ public class RecordSearchManager {
 	@Qualifier("BimServiceImpl")
 	private BimService bimService;
 	
-	public static Integer Record_limit = 100;
+	public static Integer Record_Limit = Integer.MAX_VALUE;
 	
 	public Boolean isBuildedIndex(Integer rid) {
 		Path indexPath = getIndexPath(rid);
@@ -56,7 +56,7 @@ public class RecordSearchManager {
 		String[] fields = new String[]{"oid", "location", "type", "name", "detail"};
 		
 		for (String field : fields) {
-			result.addAll(search.search(keyword, field, Record_limit));
+			result.addAll(search.search(keyword, field, Record_Limit));
 		}
 		return result;
 	}

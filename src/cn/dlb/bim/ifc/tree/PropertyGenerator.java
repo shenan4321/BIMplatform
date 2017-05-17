@@ -33,7 +33,9 @@ public class PropertyGenerator {
 						if (relatingPropertyDefinition instanceof IdEObject) {
 							IdEObject ifcPropertySet = (IdEObject) relatingPropertyDefinition;
 							PropertySet propertySet = generatePropertySet(packageMetaData, ifcPropertySet, collection);
-							result.add(propertySet);
+							if (propertySet != null) {
+								result.add(propertySet);
+							}
 						}
 					}
 				}

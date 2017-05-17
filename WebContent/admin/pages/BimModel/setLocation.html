@@ -3,8 +3,6 @@
     <li class="active"><a href="#!/BimModel/addModel/{{pid}}">模型管理</a></li>
     <li class="active">添加模型</li>
 </ol>
-
-
 <div class="row">
     <div class="col-md-12">
         <div class="box ">
@@ -12,7 +10,7 @@
                 <h3 class="box-title">设置模型经纬度</h3>
             </div>	
             <form role="form" action="../model/setGlbLonlat.do" method="post" onsubmit="return validateCallback(this,function(res){console.log(res)})" id="setLocationForm" novalidate>
-                <input type="hidden" name="rid" id="{{rid}}">
+                <input type="hidden" name="rid" value="{{rid}}">
                 <div class="box-body">
                		<div class="form-group">
                         <label for="modelName">模型名称</label>

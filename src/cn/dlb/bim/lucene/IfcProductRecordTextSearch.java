@@ -24,7 +24,7 @@ public class IfcProductRecordTextSearch extends AbstractLuceneSearch<IfcProductR
 		List<Document> docs = new ArrayList<Document>();  
         FieldType storedType = new FieldType();  
         storedType.setIndexed(true);  
-        storedType.setStored(false);  
+        storedType.setStored(true);  
         storedType.setTokenized(true); 
         
         FieldType unTokeType = new FieldType();

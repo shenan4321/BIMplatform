@@ -31,9 +31,9 @@ li.li.hover .iconfont1{display:block;}
     border: 1px solid transparent;
 }
 .table.propertiesTable .active {
-    background: rgba(52,90,137,0.7) !important;
+    background: #3ca6e6 !important;
     color: #fff !important;
-
+    border-bottom: 0;
 }
 .nav-slide-o{
 	height:100%;
@@ -51,11 +51,11 @@ li.li.hover .iconfont1{display:block;}
     table-layout: fixed;
     overflow: hidden;
 }
-#propertiesList{ 
-	padding-top: 25px;
+#propertiesList{
 	}
 #propertiesTable td{
-	padding:3px 5px ;
+	padding: 6px 5px;
+	border: 1px solid #bdbdbd;
 }
 .propertiesTable:first-child{
 	border-top:1px solid #000
@@ -125,4 +125,6 @@ li.li.hover .iconfont1{display:block;}
     width: 92%;
     table-layout: fixed;
     overflow: hidden;
+    border-color: #efefef;
+    border-collapse: collapse;
 }

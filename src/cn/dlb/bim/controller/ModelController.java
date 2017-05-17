@@ -173,8 +173,8 @@ public class ModelController {
 		IdEObject targetObject = model.get(oid);
 		
 		PropertyGenerator propertyGenerator = new PropertyGenerator();
-		PropertySet porpertySet = propertyGenerator.getProperty(model.getPackageMetaData(), targetObject);
-		result.setData(porpertySet);
+		List<PropertySet> porpertySetList = propertyGenerator.getProperty(model.getPackageMetaData(), targetObject);
+		result.setData(porpertySetList);
 		result.setSuccess(true);
 		return result.getResult();
 	}

@@ -1,5 +1,6 @@
 package cn.dlb.bim.ifc.tree;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.emf.ecore.EClass;
@@ -12,14 +13,13 @@ import cn.dlb.bim.ifc.emf.PackageMetaData;
 public class PropertyGenerator {
 	
 	@SuppressWarnings("rawtypes")
-	public PropertySet getProperty(PackageMetaData packageMetaData, IdEObject product) {
+	public List<PropertySet> getProperty(PackageMetaData packageMetaData, IdEObject product) {
 		
 		EClass productClass = packageMetaData.getEClass("IfcProduct");
 		if (!productClass.isSuperTypeOf(product.eClass())) {
 			return null;
 		}
-		
-		PropertySet result = null;
+		List<PropertySet> result = new ArrayList<PropertySet>();
 		PropertySetCollection collection = new PropertySetCollection();
 		EReference isDefinedByReference = packageMetaData.getEReference(product.eClass().getName(), "IsDefinedBy");
 		if (isDefinedByReference != null) {
@@ -32,7 +32,8 @@ public class PropertyGenerator {
 						Object relatingPropertyDefinition = ifcRelDefinesByProperties.eGet(relatingPropertyDefinitionEReference);
 						if (relatingPropertyDefinition instanceof IdEObject) {
 							IdEObject ifcPropertySet = (IdEObject) relatingPropertyDefinition;
-							result = generatePropertySet(packageMetaData, ifcPropertySet, collection);
+							PropertySet propertySet = generatePropertySet(packageMetaData, ifcPropertySet, collection);
+							result.add(propertySet);
 						}
 					}
 				}

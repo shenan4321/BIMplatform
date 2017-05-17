@@ -32,6 +32,15 @@ myApp.controller('floorCtrl', function ($scope, $http) {
 				myEnable.setEnabled(!myEnable.getEnabled());
 		   	});
 		}
+		$scope.floorClick = function(item,obj){
+			$scope.isActive = !$scope.isActive;
+			console.log($(obj).attr('class'));
+			angular.forEach(item.oidContains, function(data,index,array){
+				scene.getNode(data + "geometry",function (material) {
+                      material.setAlpha($scope.isActive?0:1);	  
+				});
+			});
+		}
     }); 
 	
 });

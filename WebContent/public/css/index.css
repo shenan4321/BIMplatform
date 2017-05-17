@@ -78,6 +78,8 @@ li.li.hover .iconfont1{display:block;}
 	transition: all .5s;
 	border-top: 2px solid #a0a0a0;
 	cursor: pointer;
+	background:#3ca6e6;
+	color:#fff;
 }
 .floor .mui-switch{
 	vertical-align:middle;
@@ -85,13 +87,15 @@ li.li.hover .iconfont1{display:block;}
 .floor .floor-tittle{
 	font-size: 18px;
 	margin-right: 10px;
-	}
-	.floor ul li:hover,.floor ul li.hover{
-	    background: #3ca6e6;
-    color: #fff;
-	}
+}
+.floor ul li.hover{
+	background: transparent;
+    color: #222;
+}
 .floor ul li:first-child{
 	border-top:0;
+	 color: #222;
+	background: transparent;
 	}	
 	.floor ul li:last-child{
 	border-bottom:2px solid #a0a0a0;

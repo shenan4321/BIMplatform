@@ -2,6 +2,6 @@
 <div class="floor">
 	<ul>
    		<li><span class="floor-tittle">楼层模式</span><input class="mui-switch mui-switch-anim checked" id="muiFloorSwitch" checked="checked" type="checkbox" ng-click="enableTag(enableSign)" name="enableSign" ng-model="enableSign"></li>
-   		<li ng-repeat="item in floorData" ng-click="floorClick(item)"><span>{{item.name}}</span></li>
+   		<li ng-repeat="item in floorData" ng-click="floorClick(item)" ng-class="{true: 'hover', false: ''}[isActive]"><span>{{item.name}}</span></li>
     </ul>
 </div>

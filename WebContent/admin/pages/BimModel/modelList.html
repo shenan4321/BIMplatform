@@ -24,10 +24,7 @@
 
 	window.actionModelListEvents = {
         'click .editModel' : function (e, value, row, index) {
-            $("#dialogBoxModelListEdit").css('zIndex',++Global.data.zIndex).load(Global.baseDir + "dialogModelListEdit.html", function(){
-                $("#dialogBoxModelListEdit").show();
-                new DialogModelListEdit(row);
-            });
+           
         },
         'click .delModel' : function (e, value, row, index) {
         	if(confirm('是否确认删除')){
@@ -64,7 +61,8 @@
 	}
 	
 	function ModelListStausFormatter(value,row) {
-		return '<a class="btn btn-info btn-sm editModel" href="./../modelView.html?rid='+row.rid+'" taget="_blank">查看模型</a>  <button class="btn btn-info btn-sm delModel">删除</button>'
+		console.log(row);
+		return '<a class="btn btn-info btn-sm editModel" href="./../modelView.html?rid='+row.rid+'" taget="_blank">查看模型</a>  <a class="btn btn-danger" href="#!/BimModel/setLocation/'+row.pid+'/'+row.rid+'"}">设置GIS位置</a> <button class="btn btn-warning btn-sm delModel">删除</button>'
 		/* return '<button class="btn btn-info btn-sm editModel">修改</button>　<button class="btn btn-info btn-sm uploadModel">上传BIM模型</button>　<button class="btn btn-info btn-sm delModel">删除</button>' */
     }
 	
@@ -79,10 +77,12 @@
 				{
 					field: 'index',
 					formatter:fmtIdx1,
-					title:'编号'
+					title:'编号',
+					width:80
 				},{
 					field: 'rid',
-					title: '模型rid'
+					title: '模型rid',
+					width:80
 				},{
 					field: 'name',
 					title: '模型名称'
@@ -92,13 +92,12 @@
 					formatter: applyTypeConvert
 				}, {
 					title: '操作',
-					width:250,
+					width:400,
 					formatter: ModelListStausFormatter,
 					events: actionModelListEvents
 				}],
 			method: 'POST',
 			url: "../model/queryModelInfoByPid.do?pid="+pid,
-			sidePagination: "client", //服务端请求
 			showColumns:true,
 			pagination:true,
 			cache: false,

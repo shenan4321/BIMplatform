@@ -181,6 +181,11 @@ config(['$routeProvider',
             controller: BimProjerctCtrl,
             activetab: 'BimProject'
         }).
+        when('/BimModel/setLocation/:id/:rid', {
+            templateUrl: 'pages/BimModel/setLocation.html',
+            controller: BimProjerctCtrl,
+            activetab: 'BimProject'
+        }).
         otherwise({
             redirectTo: '/'
         });

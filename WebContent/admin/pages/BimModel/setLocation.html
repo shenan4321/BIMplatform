@@ -1,0 +1,57 @@
+<ol class="breadcrumb newcrumb">
+    <li><a href="#"><span><i class="fa fontello-home-outline"></i></span>主页</a></li>
+    <li class="active"><a href="#!/BimModel/addModel/{{pid}}">模型管理</a></li>
+    <li class="active">添加模型</li>
+</ol>
+
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="box ">
+            <div class="box-header">
+                <h3 class="box-title">设置模型经纬度</h3>
+            </div>	
+            <form role="form" action="../model/setGlbLonlat.do" method="post" onsubmit="return validateCallback(this,function(res){console.log(res)})" id="setLocationForm" novalidate>
+                <input type="hidden" name="rid" id="{{rid}}">
+                <div class="box-body">
+               		<div class="form-group">
+                        <label for="modelName">模型名称</label>
+                        <input type="text" class="form-control" placeholder="请输入模型名称 " name="name" readonly id="modelName">
+                    </div>
+                    <div class="form-group">
+                        <label for="modelName">经度</label>
+                        <input type="number" class="form-control" placeholder="请输入模型名称 " name="lon" required id="lon" data-max=180>
+                    </div>
+                        <div class="form-group">
+                        <label for="modelName">纬度</label>
+                        <input type="number" class="form-control" placeholder="请输入模型名称 " name="lat" required id="lat"  data-max=90>
+                    </div>
+                </div>
+                <div class="box-footer">
+                    <button class="btn btn-primary" type="submit">提交</button>　
+                    <a class="btn btn-danger" id="backBtn" href="#!/BimModel/modelList/{{pid}}">返回列表</a>　
+                    <a class="btn btn-success" id="seeBtn">查看GIS</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+	$(function(){
+		var routeParam = location.hash.split('/');
+		var rid = routeParam[routeParam.length-1];
+		$.ajax({
+			url:'../model/queryModelInfoByRid.do?rid='+rid,
+			type:'get'
+		}).done(function(res){
+			console.log(res);
+			$('#modelName').val(res.data.name);
+		})
+		
+		$('#seeBtn').click(function(){
+			if ($.html5Validate.isAllpass($('#setLocationForm'))) {
+				window.location.herf="#/";	
+		    }
+		})
+	})
+</script>

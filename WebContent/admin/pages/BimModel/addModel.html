@@ -1,6 +1,6 @@
 <ol class="breadcrumb newcrumb">
     <li><a href="#"><span><i class="fa fontello-home-outline"></i></span>主页</a></li>
-    <li class="active"><a href="#!/BimModel/addModel/{{rid}}">模型管理</a></li>
+    <li class="active"><a href="#!/BimModel/addModel/{{pid}}">模型管理</a></li>
     <li class="active">添加模型</li>
 </ol>
 <!-- 添加模型html -->
@@ -11,7 +11,7 @@
                 <h3 class="box-title">添加模型</h3>
             </div>
             <form role="form" action="../model/addModel.do" enctype="multipart/form-data" method="post" onsubmit="return validateCallback(this,function(res){console.log(res)})" id="addmodelform" novalidate>
-                 <input type="hidden" name="pid" id="pId">
+                 <input type="hidden" name="pid" id="pId" value="{{pid}}">
                 <div class="box-body">
                 	<div class="form-group">
                         <label for="modelImg">上传模型</label>
@@ -37,20 +37,12 @@
                 </div>
                 <div class="box-footer">
                     <button class="btn btn-primary" type="submit">提交</button>　
-                    <a class="btn btn-danger" id="backBtn">返回列表</a>
+                    <a class="btn btn-danger" id="backBtn" href="#!/BimModel/modelList/{{pid}}">返回列表</a>
                 </div>
             </form>
         </div>
     </div>
 </div>
-<script>
-	$(function(){
-		var routeParam = location.hash.split('/');
-		var pid = routeParam[routeParam.length-1];
-		$('#pId').val(pid);
-		$('#backBtn').attr('href',"#!/BimModel/modelList/"+pid);
-	})
-</script>
 
 
 		

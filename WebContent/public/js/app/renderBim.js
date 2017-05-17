@@ -130,7 +130,6 @@ function sceneJsShow(sceneNodes) {
     		console.log(hit);	
     	          scene.getNode(hit.name + "geometry",
     	                  function (material) {
-    	        	  console.log(material);
     	                      if(hisPick.name){
     	                          scene.getNode(hisPick.name + "geometry", function (material) {
     	                              material.setColor(hisPick.color);//之前点过的东西还原

@@ -62,9 +62,9 @@
         background-color: #fff;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4); }
     .mui-switch.checked{
-        border-color: #3ca6e6;
-        box-shadow: #3ca6e6 0 0 0 16px inset;
-        background-color: #3ca6e6; }
+        border-color: #2d5f7e;
+        box-shadow: #2d5f7e 0 0 0 16px inset;
+        background-color: #2d5f7e; }
     .mui-switch.checked:before{
         left: 21px; }
     .mui-switch.mui-switch-animbg {
@@ -73,7 +73,7 @@
         transition: left 0.3s; }
     .mui-switch.mui-switch-animbg.checked {
         box-shadow: #dfdfdf 0 0 0 0 inset;
-        background-color: #3ca6e6;
+        background-color: #2d5f7e;
         transition: border-color 0.4s, background-color ease 0.4s; }
    .mui-switch.mui-switch-animbg.checked:before {
         transition: left 0.3s; }
@@ -82,8 +82,8 @@
     .mui-switch.mui-switch-anim:before {
         transition: left 0.3s; }
     .mui-switch.mui-switch-anim.checked {
-        box-shadow: #3ca6e6 0 0 0 16px inset;
-        background-color: #3ca6e6;
+        box-shadow: #2d5f7e 0 0 0 16px inset;
+        background-color: #2d5f7e;
         transition: border ease 0.4s, box-shadow ease 0.4s, background-color ease 1.2s; }
     .mui-switch.mui-switch-anim.checked:before,{
         transition: left 0.3s; }

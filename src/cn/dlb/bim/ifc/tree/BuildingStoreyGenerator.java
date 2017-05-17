@@ -32,7 +32,7 @@ public class BuildingStoreyGenerator {
 			result.add(buildingStorey);
 		}
 		
-		return null;
+		return result;
 	}
 	
 	private void collectBuildingStorey(IdEObject object, BuildingStorey buildingStorey) {

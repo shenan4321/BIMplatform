@@ -24,7 +24,7 @@ myApp.controller('fileCtrl', function ($scope, $http) {
 });
 
 myApp.controller('floorCtrl', function ($scope, $http) {
-	$http.get('./model/queryModelBuildingStoreyTree.do?rid='+string).success(function (data,status) {
+	$http.get('./model/queryModelBuildingStorey.do?rid='+string).success(function (data,status) {
 		console.log(data);
 		$scope.data = data.data;
     }); 

@@ -1,0 +1,45 @@
+   .list-box{
+        padding: 20px 80px 20px 80px;
+        background-color:rgb(232, 232, 232);
+        border-bottom:1px solid #e5e5e5;
+        position: relative;
+    }
+    .list-box dt{
+        float:left;
+        margin-left: -60px;
+    }
+    .list-box dt .images{
+        width: 60px;
+        height:60px;
+        margin-top: 0rem;
+        background-repeat:no-repeat;
+        background-position:center center;
+        background-size:cover;
+        background-color: aquamarine;
+        border: 1px solid #e5e5e5;
+    }
+    .list-box dd{
+        margin-left: 20px;
+    }
+   .list-box dd h4{
+        font-size: 20px;
+        color:#272727;
+        margin-top: 0rem;
+        margin-bottom: 0px;
+        overflow:hidden;
+        white-space:nowrap;
+        text-overflow:ellipsis;
+        line-height: 25px;
+        vertical-align: top;
+        margin-bottom: 15px;
+    }
+    .list-box dd .text{
+    	font-size:16px;
+    } 
+   .poa-switch{
+    position:absolute;
+    top: 50%;
+    margin-top: -12.5px;
+    right: 20px;
+    margin-left: 0;
+}

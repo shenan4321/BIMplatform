@@ -43,15 +43,23 @@ li.li.hover .iconfont1{display:block;}
 	overflow:auto;
 	overflow-x:hidden;
 }
-.propertiesTable{
-	margin:20px auto;
-	font-size:14px;
-	text-align: center;
-	width:92%
+.propertiesTable {
+    margin: 20px auto;
+    font-size: 14px;
+    text-align: center;
+    width: 92%;
+    table-layout: fixed;
+    overflow: hidden;
 }
+#propertiesList{ 
+	padding-top: 25px;
+	}
 #propertiesTable td{
 	padding:3px 5px ;
 }
+.propertiesTable:first-child{
+	border-top:1px solid #000
+	}
 .tree-view ul{
 	margin-left:10px;
 	font-size:14px;
@@ -83,3 +91,29 @@ li.li.hover .iconfont1{display:block;}
 	.floor ul li:last-child{
 	border-bottom:2px solid #222;
 	}	
+
+.padding-20 {
+    padding: 20px !important;
+}
+.list-item-font {
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-decoration: none;
+}
+.border-bottom-1 {
+    border-bottom: 1px solid #ddd;
+}
+.input-group {
+    display: table;
+    border-collapse: separate;
+}
+.propertiesTable {
+    margin: 20px auto;
+    font-size: 14px;
+    text-align: center;
+    width: 92%;
+    table-layout: fixed;
+    overflow: hidden;
+}

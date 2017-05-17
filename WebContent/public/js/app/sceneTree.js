@@ -30,3 +30,10 @@ myApp.controller('floorCtrl', function ($scope, $http) {
     }); 
 	
 });
+myApp.controller('searchCtrl', function ($scope, $http) {
+	$http.get('./model/queryModelBuildingStorey.do?rid='+string).success(function (data,status) {
+		console.log(data);
+		$scope.data = data.data;
+    }); 
+	
+});

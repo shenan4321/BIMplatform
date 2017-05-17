@@ -25,8 +25,13 @@ myApp.controller('fileCtrl', function ($scope, $http) {
 
 myApp.controller('floorCtrl', function ($scope, $http) {
 	$http.get('./model/queryModelBuildingStorey.do?rid='+string).success(function (data,status) {
-		console.log(data);
-		$scope.data = data.data;
+		$scope.floorData = data.data;
+		$scope.enableTag = function(item){
+			$('#muiFloorSwitch').toggleClass('checked');
+			SceneJS.getScene().getNode("myEnable",function(myEnable){
+				myEnable.setEnabled(!myEnable.getEnabled());
+		   	});
+		}
     }); 
 	
 });

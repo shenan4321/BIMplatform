@@ -150,7 +150,6 @@ function sceneJsShow(sceneNodes) {
     	                      })
 	                      	  
     	                  });
-    	          info.innerHTML = "Pick hit: " + JSON.stringify(hit);
 
     	          // To illustrate, these are the params to expect on the pick hit:
     	          var name = hit.name; // Eg. "object1"

@@ -70,26 +70,31 @@ li.li.hover .iconfont1{display:block;}
 	line-height: 50px;
 	display: block;
 	padding: 0 20px;
-	font-size: 22px;
+	font-size: 18px;
 	color:#222;
 	overflow: hidden;
 	text-align: center;
 	position: relative;
 	transition: all .5s;
-	border-top:2px solid #222;
+	border-top: 2px solid #a0a0a0;
+	cursor: pointer;
 }
 .floor .mui-switch{
 	vertical-align:middle;
 }
 .floor .floor-tittle{
-	font-size: 16px;
+	font-size: 18px;
 	margin-right: 10px;
+	}
+	.floor ul li:hover,.floor ul li.hover{
+	    background: #3ca6e6;
+    color: #fff;
 	}
 .floor ul li:first-child{
 	border-top:0;
 	}	
 	.floor ul li:last-child{
-	border-bottom:2px solid #222;
+	border-bottom:2px solid #a0a0a0;
 	}	
 
 .padding-20 {

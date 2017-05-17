@@ -322,4 +322,13 @@ public class BimServiceImpl implements BimService {
 		ifcModelDao.deleteIdEObjectEntity(rid);
 		ifcModelDao.deleteIfcModelEntity(rid);
 	}
+
+	@Override
+	public void setGlbLonlat(Integer rid, Double lon, Double lat) {
+		GridFSDBFile glbFile = server.getColladaCacheManager().getGlbCache(rid);
+		if (glbFile == null) {
+			generateGlbAndCache(rid);
+		}
+		server.getColladaCacheManager().modifyGlb(rid, lon, lat);
+	}
 }

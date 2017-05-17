@@ -236,6 +236,15 @@ public class ModelController {
 		return result.getResult();
 	}
 	
+	@RequestMapping(value = "setGlbLonlat", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> setGlbLonlat(@RequestParam("rid")Integer rid, @RequestParam("lon")Double lon, @RequestParam("lat")Double lat) {
+		ResultUtil result = new ResultUtil();
+		bimService.setGlbLonlat(rid, lon, lat);
+		result.setSuccess(true);
+		return result.getResult();
+	}
+	
 	@RequestMapping(value = "kml", method = RequestMethod.GET)
 	public void kml(@RequestParam("rid")Integer rid) {
 		IfcModelInterface model = bimService.queryModelByRid(rid);
@@ -250,4 +259,6 @@ public class ModelController {
 			e.printStackTrace();
 		}
 	}
+	
+	
 }

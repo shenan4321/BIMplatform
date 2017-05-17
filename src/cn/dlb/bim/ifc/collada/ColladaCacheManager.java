@@ -24,4 +24,9 @@ public class ColladaCacheManager {
 		MongoGridFs gridFs = server.getMongoGridFs();
 		gridFs.saveGlbFile(glbInput, fileName, rid, lon, lat);
 	}
+	
+	public void modifyGlb(int rid, double lon, double lat) {
+		MongoGridFs gridFs = server.getMongoGridFs();
+		gridFs.modifyGlbFile(rid, lon, lat);
+	}
 }

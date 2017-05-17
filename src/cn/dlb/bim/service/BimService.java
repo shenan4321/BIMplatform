@@ -19,4 +19,5 @@ public interface BimService {
 	public List<ModelInfoVo> queryModelInfoByPid(Long pid);
 	public void deleteModel(Integer rid);
 	public ModelInfoVo queryModelInfoByRid(Integer rid);
+	public void setGlbLonlat(Integer rid, Double lon, Double lat);
 }

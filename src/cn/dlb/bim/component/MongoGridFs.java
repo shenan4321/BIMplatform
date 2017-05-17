@@ -74,4 +74,14 @@ public class MongoGridFs {
 		return gridFsTemplate.findOne(query);
 	}
 	
+	public void modifyGlbFile(int rid, double lon, double lat) {
+		Query query = new Query();
+		query.addCriteria(Criteria.where("metadata.rid").is(rid).andOperator(Criteria.where("metadata." + STORE_BIM_TYPE).is(STORE_GLB_FILE)));
+		GridFSDBFile file = gridFsTemplate.findOne(query);
+		DBObject metaData = file.getMetaData();
+		metaData.put("lon", lon);
+		metaData.put("lat", lat);
+		file.save();
+	}
+	
 }

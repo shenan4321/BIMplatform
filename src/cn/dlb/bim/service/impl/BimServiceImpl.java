@@ -45,7 +45,6 @@ import cn.dlb.bim.ifc.serializers.SerializerException;
 import cn.dlb.bim.ifc.tree.Material;
 import cn.dlb.bim.ifc.tree.MaterialGenerator;
 import cn.dlb.bim.models.geometry.GeometryInfo;
-import cn.dlb.bim.models.ifc2x3tc1.IfcSite;
 import cn.dlb.bim.service.BimService;
 import cn.dlb.bim.utils.BinUtils;
 import cn.dlb.bim.vo.GeometryInfoVo;
@@ -208,6 +207,7 @@ public class BimServiceImpl implements BimService {
 		return new Vector3d(lon, lat, 0);
 	}
 
+	@SuppressWarnings("unchecked")
 	private void generateGlbAndCache(Integer rid) {
 		IfcModelInterface model = queryModelByRid(rid);
 
@@ -225,11 +225,18 @@ public class BimServiceImpl implements BimService {
 
 		double longitude = 0.0;
 		double latitude = 0.0;
-		List<IfcSite> IfcSiteList = model.getAllWithSubTypes(IfcSite.class);
-		if (IfcSiteList.size() > 0) {
-			IfcSite site = IfcSiteList.get(0);
-			longitude = getDegreeFromCompoundPlaneAngle(site.getRefLongitude());
-			latitude = getDegreeFromCompoundPlaneAngle(site.getRefLatitude());
+		EClass ifcSiteClass = model.getPackageMetaData().getEClass("IfcSite");
+		List<IdEObject> ifcSiteList = model.getAllWithSubTypes(ifcSiteClass);
+		if (ifcSiteList.size() > 0) {
+			IdEObject site = ifcSiteList.get(0);
+			Object refLongitudeObject = site.eGet(site.eClass().getEStructuralFeature("RefLongitude"));
+			Object refLatitudeObject = site.eGet(site.eClass().getEStructuralFeature("RefLatitude"));
+			if (refLongitudeObject != null && refLatitudeObject != null) {
+				EList<Long> refLongitude = (EList<Long>) refLongitudeObject;
+				EList<Long> refLatitude = (EList<Long>) refLatitudeObject;
+				longitude = getDegreeFromCompoundPlaneAngle(refLongitude);
+				latitude = getDegreeFromCompoundPlaneAngle(refLatitude);
+			}
 		}
 
 		ByteArrayInputStream glbInput = new ByteArrayInputStream(glbOutput.toByteArray());

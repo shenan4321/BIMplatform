@@ -55,7 +55,31 @@ li.li.hover .iconfont1{display:block;}
 .tree-view ul{
 	margin-left:10px;
 	font-size:14px;
+	white-space: nowrap;
 	}
-.tree-view ul li{margin-left:10px;}
-
-
+.tree-view ul li{margin-left:10px;	white-space: nowrap;}
+.floor li{
+	line-height: 50px;
+	display: block;
+	padding: 0 20px;
+	font-size: 22px;
+	color:#222;
+	overflow: hidden;
+	text-align: center;
+	position: relative;
+	transition: all .5s;
+	border-top:2px solid #222;
+}
+.floor .mui-switch{
+	vertical-align:middle;
+}
+.floor .floor-tittle{
+	font-size: 16px;
+	margin-right: 10px;
+	}
+.floor ul li:first-child{
+	border-top:0;
+	}	
+	.floor ul li:last-child{
+	border-bottom:2px solid #222;
+	}	

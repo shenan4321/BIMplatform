@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -178,7 +177,7 @@ public class ModelController {
 		ResultUtil result = new ResultUtil();
 		IfcModelInterface model = bimService.queryModelByRid(rid);
 		BuildingCellGenerator generator = new BuildingCellGenerator();
-		Collection<BuildingCellContainer> buildingCells = generator.buildBuildingCells(model);
+		List<BuildingCellContainer> buildingCells = generator.buildBuildingCells(model);
 		result.setSuccess(true);
 		result.setData(buildingCells);
 		return result.getResult();

@@ -1,23 +1,25 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
  
-   <form class="search-form">
-     <input class="search-btn" placeholder="请输入词语" id="bv_searchtext" value="wall"  ng-model="key"/> 
-     <button class="btn btn-default" id="btnSearch" type="submit">搜索</button>
+   <form class="search-form" id="searchFrom">
+     <input class="search-btn" placeholder="请输入词语" id="bv_searchtext" value="wall"  ng-model="keyword" required/> 
+     <button class="btn btn-default" id="btnSearch" type="button" ng-click="bimSearch()">搜索</button>
    </form> 
 
+ 
    <div id="searchsummary" class="">
    	 搜索结果:
    </div> 
-   <dl class="type-box cl">
+   
+   <dl class="type-box cl" ng-repeat="item in searchList ">
 	    <dt>
-	    	<div class="images fxm-images"  style="background-image: url({{data.img || 'admin/img/timg.png'}}); display: block;"></div>
+	    	<div class="images fxm-images"  style="background-image: url('public/images/ifc/{{item.type || 'ifc'}}.jpg'); display: block;"></div>
 	   	</dt>
 	    <dd>
-	        <h4>{{data.fileName || '未命名'}}</h4>
-	        <p class="text">{{data.fileSize || '未知大小'}}</p>
+	        <h4>{{item.name || '未命名'}}</h4>
+	        <p class="text">{{item.detail || '未知大小'}}</p>
 	    </dd>
 	    <dd class="poa-switch">
-			<input class="mui-switch mui-switch-anim checked" id="muiSwitch" checked="checked" type="checkbox"   ng-click="enableTag(enableSign)" name="enableSign" ng-model="enableSign">
+			<input class="mui-switch mui-switch-anim checked" id="muiSwitch" checked="checked" type="checkbox"  ng-click="searchShow(item)" ng-model="item.checked">
 	    </dd>
 	</dl>
  

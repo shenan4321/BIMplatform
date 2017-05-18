@@ -93,10 +93,13 @@ myApp.controller('floorCtrl', function ($scope, $http) {
 });
 
 myApp.controller('searchCtrl', function ($scope, $http) {
-	$http.get('./model/searchRecord.do?rid='+string).success(function (data,status) {
-		console.log(data);
-		$scope.data = data.data;
-    }); 
+	$scope.bimSearch = function(){
+		if($.html5Validate.isAllpass($('#searchFrom'))){
+			$http.get('./model/searchRecord.do?rid='+string+'&keyword='+$scope.keyword).success(function (data,status) {
+				$scope.searchList = data.data;
+		    }); 
+		}
+	}
 	
 });
 

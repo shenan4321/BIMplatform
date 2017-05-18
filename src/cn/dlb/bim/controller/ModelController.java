@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,8 @@ import cn.dlb.bim.ifc.emf.IfcModelInterface;
 import cn.dlb.bim.ifc.emf.ProjectInfo;
 import cn.dlb.bim.ifc.engine.cells.Vector3d;
 import cn.dlb.bim.ifc.serializers.SerializerException;
+import cn.dlb.bim.ifc.tree.BuildingCellContainer;
+import cn.dlb.bim.ifc.tree.BuildingCellGenerator;
 import cn.dlb.bim.ifc.tree.BuildingStorey;
 import cn.dlb.bim.ifc.tree.BuildingStoreyGenerator;
 import cn.dlb.bim.ifc.tree.Material;
@@ -166,6 +169,18 @@ public class ModelController {
 		List<BuildingStorey> buildingStoreys = generator.generateBuildingStorey(model);
 		result.setSuccess(true);
 		result.setData(buildingStoreys);
+		return result.getResult();
+	}
+	
+	@RequestMapping(value = "queryBuildingCells", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> queryBuildingCells(@RequestParam("rid")Integer rid) {
+		ResultUtil result = new ResultUtil();
+		IfcModelInterface model = bimService.queryModelByRid(rid);
+		BuildingCellGenerator generator = new BuildingCellGenerator();
+		Collection<BuildingCellContainer> buildingCells = generator.buildBuildingCells(model);
+		result.setSuccess(true);
+		result.setData(buildingCells);
 		return result.getResult();
 	}
 	

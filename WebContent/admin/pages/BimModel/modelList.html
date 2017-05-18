@@ -61,7 +61,6 @@
 	}
 	
 	function ModelListStausFormatter(value,row) {
-		console.log(row);
 		return '<a class="btn btn-info btn-sm editModel" href="./../modelView.html?rid='+row.rid+'" taget="_blank">查看模型</a>  <a class="btn btn-danger" href="#!/BimModel/setLocation/'+row.pid+'/'+row.rid+'"}">设置GIS位置</a> <button class="btn btn-warning btn-sm delModel">删除</button>'
 		/* return '<button class="btn btn-info btn-sm editModel">修改</button>　<button class="btn btn-info btn-sm uploadModel">上传BIM模型</button>　<button class="btn btn-info btn-sm delModel">删除</button>' */
     }

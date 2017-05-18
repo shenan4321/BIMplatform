@@ -250,20 +250,6 @@ li.li.hover .iconfont1{display:block;}
         border-bottom:1px solid #c3c3c3;
         position: relative;
     }
-           .navbar-header {
-            background:#243f60 !important;
-            color: #fff !important;
-            border-radius: 0;
-            border: 0 !important;
-           height: 60px;
-        }
-        .navbar-brandDX{
-            display: inline-block;
-            width: 500px;
-            height: 60px;
-            font-size: 20px;
-            margin: 15px;
-        }
         #luopanBox {
             position: absolute;
             bottom: 29px;

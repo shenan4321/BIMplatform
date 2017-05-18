@@ -139,3 +139,19 @@
 	border-bottom: 1px solid #c3c3c3;
 	font-size: 14px;
 }
+.navbar-brand-txt{
+	
+position: absolute;
+	
+top: 0;
+	
+line-height: 60px;
+	
+font-size: 22px;
+	
+color: #2d353d;
+	
+font-family: "Î¢ÈíÑÅºÚ", Arial, Gotham, "Helvetica Neue", Helvetica, sans-serif;
+	
+font-weight: 800;
+}

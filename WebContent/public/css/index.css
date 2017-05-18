@@ -142,28 +142,105 @@ li.li.hover .iconfont1{display:block;}
 }
 .markbox-top{
     border-bottom: 1px solid #c3c3c3;
-    padding-top: 20px;
-    padding-bottom: 15px;
+    padding-top: 5px;
+    padding-bottom: 14px;
 }
 .mark-text{
     font-size: 18px;
     text-align:center;
     padding: 0 5px;
 }
+.mark-text .mui-switch{
+	margin-right:10px
+}
 .btnmark{
-	padding: 0 5px;
+	/* padding: 0 5px; */
+	/* margin-right: 20px; */
+	/* padding-top: 2px; */
 }
 #btnmark {
     display: inline-block;
     font-size: 14px;
-    width: 80px;
-    height: 34px;
+    width: 66px;
+    height: 27px;
     color: #fff;
     letter-spacing: 1px;
     background: #103956;
-    border-bottom: 1px solid #103956;
+    border: 0;
+    outline: medium;
+    -webkit-appearance: none;
+    float: right;
+    margin-top: 11px;
+    margin-right: 16px;
+    border-radius: 5px;
+    }
+#markerdetail label {
+    margin-top: 5px;
+    font-weight: 400;
+    display: inline-block;
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+.form-control {
+    border-color: #666;
+    background-color: rgba(255,255,255,0.05);
+    color: #fff !important;
+    display: block;
+    width: 100%;
+    height: 34px;
+    font-size: 14px;
+    line-height: 1.428571429;
+    color: #555;
+    vertical-align: middle;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+.mark3{
+	  margin-top: 15px;
+}
+#btnmarkclose {
+    display: inline-block;
+    font-size: 12px;
+    width: 50px;
+    height: 26px;
+    color: #fff;
+    letter-spacing: 1px;
+    background: #103956;
+    border: 0;
     outline: medium;
     -webkit-appearance: none;
     -webkit-border-radius: 0;
-    
+    float: right;
+    margin-right: 2px;
+    }
+    #btnmarkpick {
+    display: inline-block;
+    font-size: 14px;
+    width: 50px;
+    height: 26px;
+    color: #fff;
+    letter-spacing: 1px;
+    background: #103956;
+    border: 0;
+    outline: medium;
+    -webkit-appearance: none;
+    -webkit-border-radius: 0;
+    float: right;
+    margin-right: 5px;
+    }
+    #btnmarkensure {
+    display: inline-block;
+    font-size: 14px;
+    width: 50px;
+    height: 26px;
+    color: #fff;
+    letter-spacing: 1px;
+    background: #103956;
+    border: 0;
+    outline: medium;
+    -webkit-appearance: none;
+    -webkit-border-radius: 0;
+    float: right;
+    margin-right: 5px;
     }

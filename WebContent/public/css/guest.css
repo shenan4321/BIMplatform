@@ -45,8 +45,10 @@
     margin-left: 0;
 }
 
-
-
+.type-box:hover{
+	transform: rotateY(0deg);-webkit-transform: rotateY(0deg);-moz-transform: rotateY(0deg);-o-transform: rotateY(0deg);-ms-transform: rotateY(0deg);z-index: 15;visibility: visible;
+    background: rgba(50, 135, 187, 0.8);
+}
 .type-box{
         padding: 20px 80px 20px 80px;
         background-color:rgb(232, 232, 232);
@@ -86,6 +88,8 @@
     .type-box dd .text{
     	font-size: 14px;
     	color: #635b5b;
+    	font-size: 12px;
+    	padding: 20px 10px;
     } 
    .poa-switch{
     position:absolute;

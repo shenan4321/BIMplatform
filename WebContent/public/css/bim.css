@@ -87,17 +87,45 @@
         transition: border ease 0.4s, box-shadow ease 0.4s, background-color ease 1.2s; }
     .mui-switch.mui-switch-anim.checked:before,{
         transition: left 0.3s; }
+.tree-view{
+	font-size: 12px;
+    padding: 20px 10px;
+}
+.tree-view ul{
+	font-size: 12px;
+	white-space: nowrap;
+}
+.tree-view ul li{margin-left:12px;white-space: nowrap;line-height: 22px;cursor: pointer;}
 span.tree-add-bg {
     display: inline-block;
     width: 12px;
     height: 12px;
-    vertical-align: middle;
-    background: (../images/add.png) no-repeat ;
+    vertical-align: -1px;
+    background: url(../images/add.png) no-repeat;
+    background-size: cover;
+    line-height: 12px;
+    cursor:pointer;
+    margin-right: 5px;
 }
 span.tree-minus-bg{
     display: inline-block;
     width: 12px;
     height: 12px;
-    vertical-align: middle;
-    background: (../images/minus.png) no-repeat ;
-}        
+    vertical-align: -1px;
+    background: url(../images/minus.png) no-repeat;
+    background-size: cover;
+    line-height: 12px;
+    cursor:pointer;
+     margin-right: 5px;
+}   
+span.ifc{
+	display: inline-block;
+    width: 12px;
+    height: 12px;
+    vertical-align: -1px;
+    background: url(../images/ifc12.png) no-repeat;
+    background-size: cover;
+    line-height: 12px;
+    cursor:pointer;
+     margin-right: 5px;
+}     

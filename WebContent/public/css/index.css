@@ -62,12 +62,7 @@ li.li.hover .iconfont1{display:block;}
 .propertiesTable:first-child{
 	border-top:1px solid #000
 	}
-.tree-view ul{
-	margin-left:10px;
-	font-size:14px;
-	white-space: nowrap;
-	}
-.tree-view ul li{margin-left:10px;	white-space: nowrap;}
+
 .floor li{
 	line-height: 50px;
 	display: block;
@@ -96,12 +91,12 @@ li.li.hover .iconfont1{display:block;}
 }
 .floor ul li:first-child{
 	border-top:0;
-	 color: #222;
+	color: #222;
 	background: transparent;
-	}	
-	.floor ul li:last-child{
+}	
+.floor ul li:last-child{
 	border-bottom:2px solid #a0a0a0;
-	}	
+}	
 
 .padding-20 {
     padding: 20px !important;
@@ -145,3 +140,30 @@ li.li.hover .iconfont1{display:block;}
     z-index: 200000;
     cursor:pointer
 }
+.markbox-top{
+    border-bottom: 1px solid #c3c3c3;
+    padding-top: 20px;
+    padding-bottom: 15px;
+}
+.mark-text{
+    font-size: 18px;
+    text-align:center;
+    padding: 0 5px;
+}
+.btnmark{
+	padding: 0 5px;
+}
+#btnmark {
+    display: inline-block;
+    font-size: 14px;
+    width: 80px;
+    height: 34px;
+    color: #fff;
+    letter-spacing: 1px;
+    background: #103956;
+    border-bottom: 1px solid #103956;
+    outline: medium;
+    -webkit-appearance: none;
+    -webkit-border-radius: 0;
+    
+    }

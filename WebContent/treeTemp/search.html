@@ -8,5 +8,17 @@
    <div id="searchsummary" class="">
    	 搜索结果:
    </div> 
+   <dl class="type-box cl">
+	    <dt>
+	    	<div class="images fxm-images"  style="background-image: url({{data.img || 'admin/img/timg.png'}}); display: block;"></div>
+	   	</dt>
+	    <dd>
+	        <h4>{{data.fileName || '未命名'}}</h4>
+	        <p class="text">{{data.fileSize || '未知大小'}}</p>
+	    </dd>
+	    <dd class="poa-switch">
+			<input class="mui-switch mui-switch-anim checked" id="muiSwitch" checked="checked" type="checkbox"   ng-click="enableTag(enableSign)" name="enableSign" ng-model="enableSign">
+	    </dd>
+	</dl>
  
 

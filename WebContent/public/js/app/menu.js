@@ -14,4 +14,8 @@ $(function(){
 	function thisMouseOut(){
 		$('.nav-slide').removeClass('hover');
 	}
+	
+	$('.nav-iconback').click(function(){
+		 thisMouseOut();
+	});
 })

@@ -4,6 +4,7 @@ import java.util.List;
 
 import cn.dlb.bim.dao.entity.IdEObjectEntity;
 import cn.dlb.bim.dao.entity.IfcModelEntity;
+import cn.dlb.bim.dao.entity.ModelLabel;
 
 public interface IfcModelDao {
 	public void insertAllIdEObjectEntity(List<IdEObjectEntity> idEObjectEntitys);
@@ -16,4 +17,11 @@ public interface IfcModelDao {
 	public List<IfcModelEntity> queryIfcModelEntityByPid(Long pid);
 	public void deleteIdEObjectEntity(Integer rid);
 	public void deleteIfcModelEntity(Integer rid);
+	/**
+	 * 标签操作
+	 */
+	public void insertModelLabel(ModelLabel modelLabel);
+	public void deleteModelLabel(Integer labelId);
+	public void modifyModelLabel(ModelLabel modelLabel);
+	public List<ModelLabel> queryAllModelLabelByRid(Integer rid);
 }

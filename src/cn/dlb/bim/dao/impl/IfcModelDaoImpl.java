@@ -6,11 +6,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
 import cn.dlb.bim.dao.IfcModelDao;
 import cn.dlb.bim.dao.entity.IdEObjectEntity;
 import cn.dlb.bim.dao.entity.IfcModelEntity;
+import cn.dlb.bim.dao.entity.ModelLabel;
+import cn.dlb.bim.dao.entity.Project;
 
 @Repository("IfcModelDaoImpl")
 public class IfcModelDaoImpl implements IfcModelDao {
@@ -80,6 +83,41 @@ public class IfcModelDaoImpl implements IfcModelDao {
 		Query query = new Query();
 		query.addCriteria(Criteria.where("rid").is(rid));
 		mongoTemplate.findAllAndRemove(query, IfcModelEntity.class);
+	}
+
+	@Override
+	public void insertModelLabel(ModelLabel modelLabel) {
+		mongoTemplate.save(modelLabel);
+	}
+
+	@Override
+	public void deleteModelLabel(Integer labelId) {
+		Query query = new Query();
+		query.addCriteria(Criteria.where("labelId").is(labelId));
+		mongoTemplate.findAllAndRemove(query, ModelLabel.class);
+	}
+
+	@SuppressWarnings("static-access")
+	@Override
+	public void modifyModelLabel(ModelLabel modelLabel) {
+		Query query = new Query();
+		query.addCriteria(Criteria.where("labelId").is(modelLabel.getLabelId()));
+		mongoTemplate.findAndModify(query, Update.update("name", modelLabel.getName())
+				.update("description", modelLabel.getDescription())
+				.update("developData", modelLabel.getDevelopData())
+				.update("x", modelLabel.getX())
+				.update("y", modelLabel.getY())
+				.update("z", modelLabel.getZ())
+				.update("red", modelLabel.getRed())
+				.update("green", modelLabel.getGreen())
+				.update("blue", modelLabel.getBlue()), ModelLabel.class);
+	}
+
+	@Override
+	public List<ModelLabel> queryAllModelLabelByRid(Integer rid) {
+		Query query = new Query();
+		query.addCriteria(Criteria.where("rid").is(rid));
+		return mongoTemplate.find(query, ModelLabel.class);
 	}
 
 }

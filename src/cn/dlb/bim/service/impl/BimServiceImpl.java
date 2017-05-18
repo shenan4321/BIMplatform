@@ -23,6 +23,7 @@ import cn.dlb.bim.component.PlatformInitDatas;
 import cn.dlb.bim.component.PlatformServer;
 import cn.dlb.bim.dao.IfcModelDao;
 import cn.dlb.bim.dao.entity.IfcModelEntity;
+import cn.dlb.bim.dao.entity.ModelLabel;
 import cn.dlb.bim.ifc.GeometryGenerator;
 import cn.dlb.bim.ifc.collada.GlbSerializer;
 import cn.dlb.bim.ifc.database.IfcModelDbException;
@@ -50,6 +51,7 @@ import cn.dlb.bim.utils.BinUtils;
 import cn.dlb.bim.vo.GeometryInfoVo;
 import cn.dlb.bim.vo.GlbVo;
 import cn.dlb.bim.vo.ModelInfoVo;
+import cn.dlb.bim.vo.ModelLabelVo;
 
 @Service("BimServiceImpl")
 public class BimServiceImpl implements BimService {
@@ -337,5 +339,34 @@ public class BimServiceImpl implements BimService {
 			generateGlbAndCache(rid);
 		}
 		server.getColladaCacheManager().modifyGlb(rid, lon, lat);
+	}
+
+	@Override
+	public void insertModelLabel(ModelLabelVo modelLabel) {
+		ModelLabel labelToSave = modelLabel.getEntity();
+		ifcModelDao.insertModelLabel(labelToSave);
+	}
+
+	@Override
+	public void deleteModelLabel(Integer labelId) {
+		ifcModelDao.deleteModelLabel(labelId);
+	}
+
+	@Override
+	public void modifyModelLabel(ModelLabelVo modelLabel) {
+		ModelLabel labelToModify = modelLabel.getEntity();
+		ifcModelDao.modifyModelLabel(labelToModify);
+	}
+
+	@Override
+	public List<ModelLabelVo> queryAllModelLabelByRid(Integer rid) {
+		List<ModelLabel> modelLabelList = ifcModelDao.queryAllModelLabelByRid(rid);
+		List<ModelLabelVo> result = new ArrayList<>();
+		for (ModelLabel modelLabel : modelLabelList) {
+			ModelLabelVo modelLabelVo = new ModelLabelVo();
+			modelLabelVo.setEntity(modelLabel);
+			result.add(modelLabelVo);
+		}
+		return result;
 	}
 }

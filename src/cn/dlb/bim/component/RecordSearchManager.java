@@ -53,7 +53,12 @@ public class RecordSearchManager {
 		}
 		Path indexPath = getIndexPath(rid);
 		IfcProductRecordTextSearch search = new IfcProductRecordTextSearch(indexPath.toFile());
-		String[] fields = new String[]{"oid", "location", "type", "name", "detail"};
+		String[] fields = new String[]{
+				IfcProductRecordTextSearch.Key_Oid, 
+				IfcProductRecordTextSearch.Key_Location, 
+				IfcProductRecordTextSearch.Key_Type, 
+				IfcProductRecordTextSearch.Key_Name, 
+				IfcProductRecordTextSearch.Key_Detail};
 		
 		for (String field : fields) {
 			result.addAll(search.search(keyword, field, Record_Limit));

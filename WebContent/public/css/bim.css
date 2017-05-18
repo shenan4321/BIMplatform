@@ -4,6 +4,49 @@
 .progress{overflow: hidden;height: 20px;margin-bottom: 20px;background-color: #f5f5f5;border-radius: 4px;-webkit-box-shadow: inset 0 1px 2px rgba(0,0,0,.1);box-shadow: inset 0 1px 2px rgba(0,0,0,.1);}
 .progress-bar{float: left;width: 100%;height: 100%;font-size: 12px;line-height: 20px;color: #fff;text-align: center;background-image: -webkit-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);-webkit-box-shadow: inset 0 -1px 0 rgba(0,0,0,.15);background-size: 40px 40px;box-shadow: inset 0 -1px 0 rgba(0,0,0,.15);-webkit-transition: width .6s ease;transition: width .6s ease;}
  
+.svg-item .sector {
+    transition: all .1s linear;
+    fill: #274b79;
+    stroke:#336CA6
+}
+.svg-item:hover .sector, .svg-item:focus .sector {
+    fill: #ee5126;
+    stroke:#7DA6C7;
+}
+.svg-item-selected .sector{
+	fill:#f5d96c !important;stroke:#ffc059 !important
+}
+.svg-item-selected .decsec{
+	fill:#decc85 !important
+}
+
+.svg-item .svg-txt{
+    transition: all .1s linear;
+    fill:#fff;
+    cursor: pointer;
+    font-family: "Microsoft YaHei";
+}
+.svg-item:hover  .svg-txt,.svg-item:focus  .svg-txt{
+    fill:#333;
+    font-weight:600;
+}
+.decsec{
+    transition: all .1s linear;
+    fill: #2e84db;
+}
+.svg-item:hover .decsec, .svg-item:focus .decsec{
+    fill: #ee5126;
+}
+.svg-item-selected:hover .decsec, .svg-item:focus .decsec{
+    fill: #7DA6C7;
+}
+.svg-item-selected:hover{
+	
+	
+}
+.sector-active{fill:#f5d96c !important;stroke:#fff !important}
+.decsec-active{fill:#decc85 !important}
+ 
  		#infoDark {
     position: absolute;
     bottom: 0px;

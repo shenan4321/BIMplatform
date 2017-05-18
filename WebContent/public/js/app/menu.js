@@ -18,4 +18,6 @@ $(function(){
 	$('.nav-iconback').click(function(){
 		 thisMouseOut();
 	});
+	
+	$('#luopanSvg').luopan({});	
 })

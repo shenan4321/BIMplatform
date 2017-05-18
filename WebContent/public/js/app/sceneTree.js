@@ -44,7 +44,7 @@ myApp.controller('treeCtrl', function ($scope, $http) {
           	  pTableScope.list = data.data  
           	  $('#pTable').scope().$apply();
             })
-      });
+    	});
     }
     
 });
@@ -95,9 +95,32 @@ myApp.controller('floorCtrl', function ($scope, $http) {
 myApp.controller('searchCtrl', function ($scope, $http) {
 	$scope.bimSearch = function(){
 		if($.html5Validate.isAllpass($('#searchFrom'))){
-			$http.get('./model/searchRecord.do?rid='+string+'&keyword='+$scope.keyword).success(function (data,status) {
+			$http.get('./model/searchRecord.do?rid='+string+'&keyword='+$('#searchText').val()).success(function (data,status) {
 				$scope.searchList = data.data;
 		    }); 
+		}
+		$scope.searchShow = function(item){
+			item.checked = !item.checked;
+			SceneJS.getScene().getNode(item.oid + "geometry",function (material) {
+	            if(hisPick.name){
+	                scene.getNode(hisPick.name + "geometry", function (material) {
+	                    material.setColor(hisPick.color);//之前点过的东西还原
+	                });
+	            }
+	            hisPick = {name:item.oid,color:material.getColor()}
+	            material.setColor({r: 0, g: 1, b: 0});
+	            var pTableScope= $('#pTable').scope();
+	            pTableScope.oid = item.oid ;
+	            $.ajax({
+	          	  url:'./model/queryProperty.do',
+	          	  type:'GET',
+	          	  data:{oid:item.oid,rid:string}
+	            }).done(function(data){
+	          	  pTableScope.list = data.data  
+	          	  $('#pTable').scope().$apply();
+	            })
+	    	});
+			
 		}
 	}
 	

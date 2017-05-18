@@ -24,6 +24,19 @@ myApp.controller('treeCtrl', function ($scope, $http) {
 
 myApp.controller('typeCtrl', function($scope, $http){
 	
+	$http.get('./model/queryBuildingCells.do?rid='+string).success(function (data,status) {  
+    	$scope.typeList = data.data;
+    	console.log($scope.typeList);
+    }).error(function (data,status) {  
+    }); 
+	$scope.typeShowTag = function(item){
+		item.checked = !item.checked;
+		angular.forEach(item.oids, function(data,index,array){
+			scene.getNode("flags"+data,function (myEnable) {
+				myEnable.setEnabled(!myEnable.getEnabled());  
+			});
+		});
+	}
 });
 
 

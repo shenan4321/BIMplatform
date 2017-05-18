@@ -42,7 +42,7 @@
         height: 25px;
         position: relative;
         border: 1px solid #dfdfdf;
-        padding-right:0.2rem;
+        padding-right: 0;
         background-color: #fdfdfd;
         box-shadow: #dfdfdf 0 0 0 0 inset;
         border-radius: 20px;
@@ -50,7 +50,8 @@
         display: inline-block;
         -webkit-appearance: none;
         user-select: none;
-        outline: none; }
+        outline: none;
+        }
     .mui-switch:before {
         content: '';
         width: 25px;

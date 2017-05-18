@@ -13,13 +13,40 @@ myApp.controller('fileCtrl', function ($scope, $http) {
 });
 
 myApp.controller('treeCtrl', function ($scope, $http) {      
-    $scope.Login=function() {  
-        $http.get('./model/queryModelProjectTree.do?rid='+string).success(function (data,status) {  
-        	$scope.treeData = data.data.treeRoots;
-        }).error(function (data,status) {  
-        });  
-    }  
-    $scope.Login();
+      
+    $http.get('./model/queryModelProjectTree.do?rid='+string).success(function (data,status) {  
+    	$scope.treeData = data.data.treeRoots;
+    }).error(function (data,status) {  
+    
+    });  
+    
+    $scope.setOidShow = function(item){
+    	if($scope.treeClick){
+    		$scope.treeClick.checked = !$scope.treeClick.checked
+    	}
+    	$scope.treeClick = item;
+    	item.checked = !item.checked;
+    	SceneJS.getScene().getNode(item.oid + "geometry",function (material) {
+            if(hisPick.name){
+                scene.getNode(hisPick.name + "geometry", function (material) {
+                    material.setColor(hisPick.color);//之前点过的东西还原
+                });
+            }
+            hisPick = {name:item.oid,color:material.getColor()}
+            material.setColor({r: 0, g: 1, b: 0});
+            var pTableScope= $('#pTable').scope();
+            pTableScope.oid = item.oid ;
+            $.ajax({
+          	  url:'./model/queryProperty.do',
+          	  type:'GET',
+          	  data:{oid:item.oid,rid:string}
+            }).done(function(data){
+          	  pTableScope.list = data.data  
+          	  $('#pTable').scope().$apply();
+            })
+      });
+    }
+    
 });
 
 myApp.controller('typeCtrl', function($scope, $http){
@@ -66,9 +93,12 @@ myApp.controller('floorCtrl', function ($scope, $http) {
 });
 
 myApp.controller('searchCtrl', function ($scope, $http) {
-	$http.get('./model/queryModelBuildingStorey.do?rid='+string).success(function (data,status) {
+	$http.get('./model/searchRecord.do?rid='+string).success(function (data,status) {
 		console.log(data);
 		$scope.data = data.data;
     }); 
 	
+});
+
+myApp.controller('markCtrl', function ($scope, $http) {
 });

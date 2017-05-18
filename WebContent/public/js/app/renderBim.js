@@ -125,7 +125,7 @@ function sceneJsShow(sceneNodes) {
 
     
     var info = document.getElementById("infoDark");
-    var hisPick = {}; //记录点过的东西
+    window.hisPick = {}; //记录点过的东西
     scene.on("pick",function (hit) {
     		console.log(hit);	
     	          scene.getNode(hit.name + "geometry",

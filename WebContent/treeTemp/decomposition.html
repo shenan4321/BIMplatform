@@ -1,8 +1,8 @@
 <li ng-if="item.decomposition.length!=0">
-	<div><span ng-class="{true:'tree-minus-bg',false:'tree-add-bg'}[item.see]" ng-click="item.see= !item.see" ng-init="item.see=false"></span>decomposition</div>
+	<div class="nopointer"><span ng-class="{true:'tree-minus-bg',false:'tree-add-bg'}[item.see]" ng-click="item.see= !item.see" ng-init="item.see=false"></span>decomposition</div>
 	<div ng-hide="item.see">	
 	<ul ng-repeat="item in item.decomposition" >
- 		<li ng-click=setOidShow(item)><span class="ifc"></span>{{item.ifcClassType}}{{item.name}}</li>
+ 		<li ng-click=setOidShow(item) ng-class="{true:'blue-txt',false:''}[item.checked]"><span class="ifc"></span>{{item.ifcClassType}}{{item.name}}</li>
 		<li>
 			<ul ng-include = "'./treeTemp/contains.html'"></ul>
 	    	<ul ng-include = "'./treeTemp/decomposition.html'"></ul>

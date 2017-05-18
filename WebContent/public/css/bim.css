@@ -51,6 +51,7 @@
         -webkit-appearance: none;
         user-select: none;
         outline: none;
+        cursor: pointer;
         }
     .mui-switch:before {
         content: '';
@@ -130,3 +131,12 @@ span.ifc{
     cursor:pointer;
      margin-right: 5px;
 }     
+.nopointer{cursor: default !important;}
+.ptable{
+	    margin-left: 20px;
+    padding-top: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #c3c3c3;
+    font-size: 13px;
+}
+.blue-txt{color:#569bcd}

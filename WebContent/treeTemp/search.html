@@ -9,8 +9,8 @@
    <div id="searchsummary" class="">
    	 搜索结果:
    </div> 
-   
-   <dl class="type-box cl" ng-repeat="item in searchList ">
+   <div class="search-box-list">
+   <dl class="search-box cl" ng-repeat="item in searchList ">
 	    <dt>
 	    	<div class="images fxm-images"  style="background-image: url('public/images/ifc/{{item.type || 'ifc'}}.jpg'); display: block;"></div>
 	   	</dt>
@@ -22,5 +22,5 @@
 			<input class="mui-switch mui-switch-anim checked" id="muiSwitch" checked="checked" type="checkbox"  ng-click="searchShow(item)" ng-model="item.checked">
 	    </dd>
 	</dl>
- 
+ </div>
 

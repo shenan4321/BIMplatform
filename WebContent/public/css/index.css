@@ -244,15 +244,67 @@ li.li.hover .iconfont1{display:block;}
     float: right;
     margin-right: 5px;
     }
+    .search-box-list{padding: 10px 20px;}
     .search-box{
         padding: 20px 80px 20px 80px;
         background-color:rgb(232, 232, 232);
         border-bottom:1px solid #c3c3c3;
         position: relative;
     }
+    .search-box:hover{
+	transform: rotateY(0deg);-webkit-transform: rotateY(0deg);-moz-transform: rotateY(0deg);-o-transform: rotateY(0deg);-ms-transform: rotateY(0deg);z-index: 15;visibility: visible;
+    background: rgba(50, 135, 187, 0.8);
+}
+.search-box{
+        padding: 20px 80px 20px 80px;
+        background-color:rgb(232, 232, 232);
+        border-bottom:1px solid #c3c3c3;
+        position: relative;
+    }
+    .search-box dt{
+        float:left;
+        margin-left: -60px;
+    }
+    .search-box dt .images{
+        width: 60px;
+        height:60px;
+        margin-top: 0rem;
+        background-repeat:no-repeat;
+        background-position:center center;
+        background-size:cover;
+        background-color: #fff;
+        border: 1px solid #e5e5e5;
+    }
+    .search-box dd{
+        margin-left: 20px;
+    }
+   .search-box dd h4{
+        font-size: 18px;
+        color:#272727;
+        margin-top: 5px;
+        margin-bottom: 0px;
+        overflow:hidden;
+        white-space:nowrap;
+        text-overflow:ellipsis;
+        line-height: 25px;
+        vertical-align: top;
+        margin-bottom: 10px;
+        font-weight: 400;
+    }
+    .search-box dd .text{
+    	font-size: 14px;
+    	color: #635b5b;
+    	font-size: 12px;
+    	white-space: nowrap;
+    	overflow: hidden;
+    	text-overflow: ellipsis;
+    } 
+    
         #luopanBox {
             position: absolute;
             bottom: 29px;
             right: 20px;
             z-index: 20;
         }
+        
+        

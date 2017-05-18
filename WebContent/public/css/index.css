@@ -12,7 +12,7 @@ header.navbar{position: absolute;left: 0;right: 0;height: 60px;top: 0;padding: 0
 li.li:hover{background-color: #103956 !important;}
 li.li.hover{background-color: #103956 !important;}
 li.li.hover .iconfont1{display:block;}
-.li{padding-top: 15px;position: relative;height: 70px;}
+.li{padding-top: 15px;position: relative;padding-bottom: 15px;}
 .font{font-size: 10px;color: #ffffff;text-decoration: none;display: inline-block;text-align: center;display: block;}
 @font-face{font-family: 'iconfont';src: url('../font/iconfont.eot');src: url('../font/iconfont.eot?#iefix') format('embedded-opentype'),url('../font/iconfont.woff') format('woff'),url('../font/iconfont.ttf') format('truetype'),url('../font/iconfont.svg#iconfont') format('svg');}
 .iconfont{font-family:"iconfont" !important;font-size:18px;font-style:normal;margin-bottom: 0px;}
@@ -56,6 +56,8 @@ li.li.hover .iconfont1{display:block;}
 #propertiesTable td{
 	padding: 6px 5px;
 	/* background: #fff; */
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 .propertiesTable:first-child{
 	border-top:1px solid #000

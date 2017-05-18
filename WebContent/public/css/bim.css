@@ -87,4 +87,17 @@
         transition: border ease 0.4s, box-shadow ease 0.4s, background-color ease 1.2s; }
     .mui-switch.mui-switch-anim.checked:before,{
         transition: left 0.3s; }
-         
+span.tree-add-bg {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    vertical-align: middle;
+    background: (../images/add.png) no-repeat ;
+}
+span.tree-minus-bg{
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    vertical-align: middle;
+    background: (../images/minus.png) no-repeat ;
+}        

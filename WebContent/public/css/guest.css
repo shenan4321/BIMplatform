@@ -22,7 +22,7 @@
         margin-left: 20px;
     }
    .list-box dd h4{
-        font-size: 20px;
+        font-size: 18px;
         color:#272727;
         margin-top: 0rem;
         margin-bottom: 0px;
@@ -31,7 +31,8 @@
         text-overflow:ellipsis;
         line-height: 25px;
         vertical-align: top;
-        margin-bottom: 15px;
+        margin-bottom: 10px;
+        padding-top: 5px;
     }
     .list-box dd .text{
     	font-size:16px;
@@ -49,7 +50,7 @@
 .type-box{
         padding: 20px 80px 20px 80px;
         background-color:rgb(232, 232, 232);
-        border-bottom:1px solid #e5e5e5;
+        border-bottom:1px solid #c3c3c3;
         position: relative;
     }
     .type-box dt{
@@ -92,4 +93,44 @@
     margin-top: -12.5px;
     right: 20px;
     margin-left: 0;
+}
+.search-form{
+	font-size:0;
+	width: 260px;
+	margin: 30px auto 20px;
+	display: block;
+}
+.search-btn{
+	display:inline-block;
+	width: 170px;
+	height: 34px;
+	font: 16px/18px arial;
+	line-height: 22px\9;
+	margin: 0;
+	padding: 0 5px;
+	background: #fff;
+	border: 0;
+	outline: 0;
+	-webkit-appearance: none;
+}
+#btnSearch{
+	display:inline-block;
+	font-size:14px;
+	    width: 80px;
+	    height: 34px;
+	    color: #fff;
+	    letter-spacing: 1px;
+	    background: #103956;
+	    border-bottom: 1px solid #103956;
+	    outline: medium;
+	    -webkit-appearance: none;
+	    -webkit-border-radius: 0;
+}
+
+#searchsummary{
+	margin-left: 20px;
+	padding-top:5px;
+	padding-bottom: 15px;
+	margin-right: 20px;
+	border-bottom: 1px solid #c3c3c3;
 }

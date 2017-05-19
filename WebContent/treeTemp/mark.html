@@ -10,7 +10,9 @@
    <label>坐标：</label>
    <input class="form-control bv_marker_input_position" type="text" /> 
    <label>色值：</label> 
-   <input class="full-color"  id="conditioncolor" style="width:70px;height: 20px">
+   <div class="form-group">
+   <input type="text" id="letter-case" class="demo" data-letterCase="uppercase" ng-click="changColor()" >
+   </div>
   <div class="mark3">
     <button class="btnmark" id="btnmarkclose" type="submit">关闭</button>
     <button class="btnmark" id="btnmarkpick" type="submit">选点</button>

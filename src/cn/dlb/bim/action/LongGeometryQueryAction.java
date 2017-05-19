@@ -1,5 +1,7 @@
 package cn.dlb.bim.action;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +12,7 @@ import org.springframework.web.socket.WebSocketSession;
 import com.google.gson.Gson;
 
 import cn.dlb.bim.component.PlatformServer;
+import cn.dlb.bim.dao.entity.IfcModelEntity;
 import cn.dlb.bim.ifc.database.IfcModelDbException;
 import cn.dlb.bim.ifc.database.IfcModelDbSession;
 import cn.dlb.bim.ifc.database.OldQuery;
@@ -17,6 +20,7 @@ import cn.dlb.bim.ifc.emf.IdEObject;
 import cn.dlb.bim.ifc.emf.IfcModelInterface;
 import cn.dlb.bim.ifc.emf.IfcModelInterfaceException;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
+import cn.dlb.bim.ifc.emf.Schema;
 import cn.dlb.bim.ifc.shared.ProgressReporter;
 import cn.dlb.bim.ifc.tree.Material;
 import cn.dlb.bim.ifc.tree.MaterialGenerator;
@@ -26,26 +30,22 @@ import cn.dlb.bim.vo.ProgressVo;
 import cn.dlb.bim.web.ResultUtil;
 
 public class LongGeometryQueryAction extends LongAction {
+	private static String IFC2X3_SCHEMA_SHORT = "IFC2X3";
 
 //	private static final Logger LOGGER = LoggerFactory.getLogger(LongGeometryQueryAction.class);
 
 	private final PlatformServer server;
 	private final Integer rid;
-	private final String schemaName;
 	private int lastPercentProcess = 0;
 
-	public LongGeometryQueryAction(PlatformServer server, Integer rid, String schemaName,
-			WebSocketSession webSocketSession) {
+	public LongGeometryQueryAction(PlatformServer server, Integer rid, WebSocketSession webSocketSession) {
 		super(webSocketSession);
 		this.server = server;
 		this.rid = rid;
-		this.schemaName = schemaName;
 	}
 
 	@Override
 	public void execute() throws IfcModelDbException, IfcModelInterfaceException {
-
-		PackageMetaData packageMetaData = server.getMetaDataManager().getPackageMetaData(schemaName);
 
 		@SuppressWarnings("all")
 		ProgressReporter progressReporter = new ProgressReporter() {
@@ -75,7 +75,15 @@ public class LongGeometryQueryAction extends LongAction {
 				sendWebSocketMessage(msg);
 			}
 		};
-
+		IfcModelEntity ifcModelEntity = server.getIfcModelDao().queryIfcModelEntityByRid(rid);
+		String ifcSchemaVersion = ifcModelEntity.getModelMetaData().getIfcHeader().getIfcSchemaVersion();
+		PackageMetaData packageMetaData = null;
+		if (ifcSchemaVersion.startsWith(IFC2X3_SCHEMA_SHORT)) {
+			packageMetaData = server.getMetaDataManager().getPackageMetaData(Schema.IFC2X3TC1.getEPackageName());
+		} else {
+			packageMetaData = server.getMetaDataManager().getPackageMetaData(Schema.IFC4.getEPackageName());
+		}
+		
 		IfcModelDbSession session = new IfcModelDbSession(server.getIfcModelDao(), server.getMetaDataManager(),
 				server.getPlatformInitDatas(), progressReporter, server.getModelCacheManager());
 		IfcModelInterface model = session.get(packageMetaData, rid, new OldQuery(packageMetaData, true));
@@ -107,26 +115,22 @@ public class LongGeometryQueryAction extends LongAction {
 		sendWebSocketMessage(geometryList);
 	}
 
+	@SuppressWarnings("resource")
 	public void sendWebSocketMessage(List<GeometryInfoVo> msg) {
 		if (webSocketSession == null || !webSocketSession.isOpen()) {
 			return;
 		}
 		Gson gson = new Gson();
-		String jsonStr = gson.toJson(msg);
-		//TODO
-//		try {
-//			JsonWriter w = new JsonWriter(new OutputStreamWriter(new FileOutputStream(new File(""))));
-//			w.beginArray();
-//			w.name("").va
-//		} catch (FileNotFoundException e1) {
-//			// TODO Auto-generated catch block
-//			e1.printStackTrace();
-//		}
-		TextMessage message = new TextMessage(jsonStr);
 		try {
-			webSocketSession.sendMessage(message);
+			for (GeometryInfoVo info : msg) {
+				String jsonStr = gson.toJson(info);
+				TextMessage message = new TextMessage(jsonStr);
+				webSocketSession.sendMessage(message);
+			}
 			webSocketSession.close();
-		} catch (Exception e) {
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}

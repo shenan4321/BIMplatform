@@ -1,9 +1,12 @@
 package cn.dlb.bim.vo;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+
+import com.google.gson.stream.JsonWriter;
 
 import cn.dlb.bim.ifc.engine.cells.Colord;
 import cn.dlb.bim.models.geometry.GeometryInfo;
@@ -32,6 +35,58 @@ public class GeometryInfoVo {
 			max = new Vector3f(0, 0, 0);
 			min = new Vector3f(0, 0, 0);
 		}
+		public void writeJson(JsonWriter jsonWriter) throws IOException {
+			jsonWriter.beginObject();
+			jsonWriter.name("max");
+			max.writeJson(jsonWriter);
+			jsonWriter.name("min");
+			min.writeJson(jsonWriter);
+			jsonWriter.endObject();
+		}
+	}
+	
+	public void writeJson(JsonWriter jsonWriter) throws IOException {
+		jsonWriter.beginObject();
+		
+		jsonWriter.name("oid").value(oid);
+		
+		jsonWriter.name("indices");
+		jsonWriter.beginArray();
+		for (int i : indices) {
+			jsonWriter.beginObject();
+			jsonWriter.name("i").value(i);
+			jsonWriter.endObject();
+		}
+		jsonWriter.endArray();
+		jsonWriter.name("vertices");
+		jsonWriter.beginArray();
+		for (float v : vertices) {
+			jsonWriter.beginObject();
+			jsonWriter.name("v").value(v);
+			jsonWriter.endObject();
+		}
+		jsonWriter.endArray();
+		jsonWriter.name("normals");
+		jsonWriter.beginArray();
+		for (float n : normals) {
+			jsonWriter.beginObject();
+			jsonWriter.name("n").value(n);
+			jsonWriter.endObject();
+		}
+		jsonWriter.endArray();
+		
+		jsonWriter.name("bound");
+		bound.writeJson(jsonWriter);
+		
+		jsonWriter.name("typeName").value(typeName);
+		jsonWriter.name("defaultVisiable").value(defaultVisiable);
+		
+		if (color != null) {
+			jsonWriter.name("color");
+			color.writeJson(jsonWriter);
+		}
+		
+		jsonWriter.endObject();
 	}
 	
 	public void init() {

@@ -10,7 +10,9 @@
 
 	function build(params) {
 
-		var coreId = "geometry/ifcmodel_" + (params.wire ? "wire" : "_solid") + Math.random();
+		var geometryInfo = params.geometry_info;
+		
+		var coreId = "geometry/ifcmodel_" + (params.wire ? "wire" : "_solid") + geometryInfo.oid;
 
 		// If a node core already exists for a prim with the given properties,
 		// then for efficiency we'll share that core rather than create another
@@ -18,12 +20,9 @@
 		if (this.getScene().hasCore("geometry", coreId)) {
 			return {
 				type : "geometry",
-				coreId : coreId
+				coreId : geometryInfo.oid
 			};
 		}
-
-		// Otherwise, create a new geometry
-		var geometryInfo = params.geometry_info;
 
 		var positions = geometryInfo.vertices;
 		var indices = geometryInfo.indices;
@@ -64,7 +63,7 @@
             aspect: jQuery(this.getScene().getCanvas()).width() / jQuery(this.getScene().getCanvas()).height(),
             fovy: 37.8493
         });
-       
+
         var hasTransparency = Math.random()>0.5?false:true;
         var flags = {
 				type : "flags",
@@ -80,6 +79,7 @@
 					nodes : [{
 						type : "material",
 						baseColor: geometryInfo.color ? { r: geometryInfo.color.r , g:geometryInfo.color.g , b:geometryInfo.color.b } : material,
+						color:geometryInfo.color ? { r: geometryInfo.color.r , g:geometryInfo.color.g , b:geometryInfo.color.b } : material,
 						alpha:  geometryInfo.color ? geometryInfo.color.a  : material.a,
 	        			id:geometryInfo.oid+"geometry",
 						nodes: [{

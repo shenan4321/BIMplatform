@@ -21,5 +21,7 @@ public interface PlatformInitDatasDao {
 	
 	public PlatformInitDatasEntity queryPlatformInitDatasEntityByPlatformVersionId(String platformVersionId);
 	
-	public void updatePlatformInitDatasEntity(PlatformInitDatasEntity platformInitDatasEntity);
+	public IfcClassLookupEntity findAndIncreateOid(Short cid, Integer increase);
+	
+	public PlatformInitDatasEntity findAndIncreateRevisionId(String platformVersionId, Integer increase);
 }

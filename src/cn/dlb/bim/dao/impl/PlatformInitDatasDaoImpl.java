@@ -63,11 +63,19 @@ public class PlatformInitDatasDaoImpl implements PlatformInitDatasDao {
 	}
 
 	@Override
-	public void updatePlatformInitDatasEntity(PlatformInitDatasEntity platformInitDatasEntity) {
+	public IfcClassLookupEntity findAndIncreateOid(Short cid, Integer increase) {
 		Query query = new Query();
-		query.addCriteria(Criteria.where("platformVersionId").is(platformInitDatasEntity.getPlatformVersionId()));
-		Update update = Update.update("revisionId", platformInitDatasEntity.getRevisionId());
-		mongoTemplate.updateFirst(query, update, PlatformInitDatasEntity.class);
+		query.addCriteria(Criteria.where("cid").is(cid));
+		Update update = new Update().inc("oid", increase);
+		return mongoTemplate.findAndModify(query, update, IfcClassLookupEntity.class);
+	}
+
+	@Override
+	public PlatformInitDatasEntity findAndIncreateRevisionId(String platformVersionId, Integer increase) {
+		Query query = new Query();
+		query.addCriteria(Criteria.where("platformVersionId").is(platformVersionId));
+		Update update = new Update().inc("revisionId", increase);
+		return mongoTemplate.findAndModify(query, update, PlatformInitDatasEntity.class);
 	}
 	
 }

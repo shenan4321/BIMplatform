@@ -38,9 +38,7 @@ public class PlatformInitDatas implements InitializingBean, IfcDataBase {
 	private final EClass[] cidToEclass;
 	private final Map<EClass, Short> eClassToCid;
 	private final Map<EClass, AtomicLong> oidCounters;
-	private AtomicInteger revisionIdCounter;
-	
-	private final Map<EClass, Boolean> oidChanged;//recording witch eclass oidcounter changed
+	private final Map<EClass, Boolean> oidChanged;
 	
 	@Autowired
 	@Qualifier("PlatformInitDatasDaoImpl")
@@ -56,18 +54,17 @@ public class PlatformInitDatas implements InitializingBean, IfcDataBase {
 	}
 	
 	public PlatformInitDatas() {
-		this.oidCounters = new HashMap<EClass, AtomicLong>();
 		this.cidToEclass = new EClass[Short.MAX_VALUE]; 
-		this.eClassToCid = new HashMap<EClass, Short>();
-		this.revisionIdCounter = new AtomicInteger(0);
-		this.oidChanged = new HashMap<EClass, Boolean>();
+		this.eClassToCid = new HashMap<>();
+		this.oidCounters = new HashMap<>();
+		this.oidChanged = new HashMap<>();
 	}
 	
-	private void initCounter(EClass eClass) {
+	private Long getInitCounter(EClass eClass) {
 		ByteBuffer cidBuffer = ByteBuffer.wrap(new byte[8]);
 		cidBuffer.putShort(6, getCidOfEClass(eClass));
 		long startOid = cidBuffer.getLong(0);
-		oidCounters.put(eClass, new AtomicLong(startOid));
+		return startOid;
 	}
 	
 	private void initialize() {
@@ -79,9 +76,7 @@ public class PlatformInitDatas implements InitializingBean, IfcDataBase {
 		PlatformInitDatasEntity platformInitDatasEntity = platformInitDatasDao.queryPlatformInitDatasEntityByPlatformVersionId(PlatformContext.getPlatformVersion());
 		if (platformInitDatasEntity == null) {
 			createPlatformInitDatas();
-		} else {
-			revisionIdCounter.set(platformInitDatasEntity.getRevisionId());
-		}
+		} 
 	}
 	
 	private void initIfcClassLookupTable() {
@@ -94,11 +89,8 @@ public class PlatformInitDatas implements InitializingBean, IfcDataBase {
 				EClass eClass = (EClass) getEClassifier(packageName, className);
 				cidToEclass[ifcClassLookup.getCid()] = eClass;
 				eClassToCid.put(eClass, ifcClassLookup.getCid());
-				long oid = ifcClassLookup.getOid();
-				initCounter(eClass);
-				if (oid > oidCounters.get(eClass).get()) {
-					oidCounters.put(eClass, new AtomicLong(oid));
-				}
+				Long oid = ifcClassLookup.getOid();
+				oidCounters.put(eClass, new AtomicLong(oid));
 			}
 		} else {
 			createClassLookupTable();
@@ -143,6 +135,9 @@ public class PlatformInitDatas implements InitializingBean, IfcDataBase {
 	public long newOid(EClass eClass) {
 		oidChanged.put(eClass, true);
 		return oidCounters.get(eClass).addAndGet(65536);
+//		Short cid = getCidOfEClass(eClass);
+//		IfcClassLookupEntity ifcClassLookupEntity = platformInitDatasDao.findAndIncreateOid(cid, 65536);
+//		return ifcClassLookupEntity.getOid();
 	}
 	
 	public void createClassLookupTable() {
@@ -156,8 +151,7 @@ public class PlatformInitDatas implements InitializingBean, IfcDataBase {
     	    	ifcClassLookup.setPackageClassName(packageMetaData.getEPackage().getName() + "_" + eclass.getName());
     	    	eClassToCid.put(eclass, cidCounter);
     	    	cidToEclass[cidCounter] = eclass;
-    	    	initCounter(eclass);
-    	    	ifcClassLookup.setOid(oidCounters.get(eclass).longValue());
+    	    	ifcClassLookup.setOid(getInitCounter(eclass));
     	    	platformInitDatasDao.insertIfcClassLookup(ifcClassLookup);
     	    	cidCounter++;
     		}
@@ -165,33 +159,26 @@ public class PlatformInitDatas implements InitializingBean, IfcDataBase {
 	}
 	
 	private void createPlatformInitDatas() {
-		revisionIdCounter.set(0);
 		PlatformInitDatasEntity platformInitDatasEntity = new PlatformInitDatasEntity();
 		platformInitDatasEntity.setPlatformVersionId(PlatformContext.getPlatformVersion());
-		platformInitDatasEntity.setRevisionId(revisionIdCounter.get());
+		platformInitDatasEntity.setRevisionId(1);
 		platformInitDatasDao.insertPlatformInitDatasEntity(platformInitDatasEntity);
 	}
 
 	public Integer newRevisionId() {
-		return revisionIdCounter.incrementAndGet();
+		PlatformInitDatasEntity platformInitDatasEntity = platformInitDatasDao.findAndIncreateRevisionId(PlatformContext.getPlatformVersion(), 1);
+		return platformInitDatasEntity.getRevisionId();
 	}
 
-	@Override
 	public void updateDataBase() {
-		PlatformInitDatasEntity platformInitDatasEntity = new PlatformInitDatasEntity();
-		platformInitDatasEntity.setPlatformVersionId(PlatformContext.getPlatformVersion());
-		platformInitDatasEntity.setRevisionId(revisionIdCounter.get());
-		platformInitDatasDao.updatePlatformInitDatasEntity(platformInitDatasEntity);
-		
-		for (EClass eclass : oidChanged.keySet()) {
+		for (EClass eClass : oidChanged.keySet()) {
 			IfcClassLookupEntity ifcClassLookup = new IfcClassLookupEntity();
-			Short cid = eClassToCid.get(eclass);
-			AtomicLong oid = oidCounters.get(eclass);
+			Short cid = eClassToCid.get(eClass);
+			AtomicLong oid = oidCounters.get(eClass);
 			ifcClassLookup.setCid(cid);
 			ifcClassLookup.setOid(oid.get());
 			platformInitDatasDao.updateOidInIfcClassLookup(ifcClassLookup);
 		}
 		oidChanged.clear();
 	}
-
 }

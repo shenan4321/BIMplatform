@@ -118,8 +118,16 @@ websocket.init({
 			}
 		}else{
 			progress.hide();
-			sceneJsShow(data);
+			if(!window.scene){
+				createScene(data);
+				showView(data);
+			}else{
+				showView(data);
+			}
 		}
+	},
+	onclose:function(){
+		bindEvent(); 
 	}
 });
 </script>

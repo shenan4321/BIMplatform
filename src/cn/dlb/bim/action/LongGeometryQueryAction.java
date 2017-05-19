@@ -25,6 +25,7 @@ import cn.dlb.bim.ifc.shared.ProgressReporter;
 import cn.dlb.bim.ifc.tree.Material;
 import cn.dlb.bim.ifc.tree.MaterialGenerator;
 import cn.dlb.bim.models.geometry.GeometryInfo;
+import cn.dlb.bim.models.geometry.Vector3f;
 import cn.dlb.bim.vo.GeometryInfoVo;
 import cn.dlb.bim.vo.ProgressVo;
 import cn.dlb.bim.web.ResultUtil;
@@ -94,8 +95,9 @@ public class LongGeometryQueryAction extends LongAction {
 		
 		List<GeometryInfoVo> geometryList = new ArrayList<>();
 		EClass productClass = (EClass) model.getPackageMetaData().getEClassifierCaseInsensitive("IfcProduct");
-		List<IdEObject> projectList = model.getAllWithSubTypes(productClass);
-
+		List<IdEObject> projectList = model.getAllWithSubTypes(productClass);//耗时
+		
+		double maxZoom = 0;
 		for (IdEObject ifcProduct : projectList) {
 			GeometryInfoVo adaptor = new GeometryInfoVo();
 			GeometryInfo geometryInfo = (GeometryInfo) ifcProduct.eGet(ifcProduct.eClass().getEStructuralFeature("geometry"));
@@ -105,6 +107,8 @@ public class LongGeometryQueryAction extends LongAction {
 				if (!defualtVisiable) {//TODO
 					continue;
 				}
+				Double zoom = maxZoom(geometryInfo.getMinBounds(), geometryInfo.getMaxBounds());
+				maxZoom = Math.max(zoom, maxZoom);
 				MaterialGenerator materialGetter = new MaterialGenerator(model);
 				Material material = materialGetter.getMaterial(ifcProduct);
 				adaptor.transform(geometryInfo, ifcProduct.getOid(), ifcProduct.eClass().getName(), defualtVisiable, material == null ? null : material.getAmbient());
@@ -112,7 +116,21 @@ public class LongGeometryQueryAction extends LongAction {
 			}
 		}
 
+		sendGeometryZoom(maxZoom);
 		sendWebSocketMessage(geometryList);
+	}
+	
+	public Double maxZoom(Vector3f min, Vector3f max) {
+//		Vector3f min = geometryInfo.getMinBounds();
+//		Vector3f max = geometryInfo.getMaxBounds();
+		double minX = min.getX();
+		double minY = min.getY();
+		double maxX = max.getX();
+		double maxY = max.getY();
+		double deltX = Math.abs(maxX - minX);
+		double deltY = Math.abs(maxY - minY);
+		double maxDelt = Math.max(deltX, deltY);
+		return maxDelt;
 	}
 
 	@SuppressWarnings("resource")
@@ -127,11 +145,16 @@ public class LongGeometryQueryAction extends LongAction {
 				TextMessage message = new TextMessage(jsonStr);
 				webSocketSession.sendMessage(message);
 			}
-			webSocketSession.close();
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				webSocketSession.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -151,6 +174,11 @@ public class LongGeometryQueryAction extends LongAction {
 			try {
 				webSocketSession.sendMessage(message);
 			} catch (Exception e) {
+				try {
+					webSocketSession.close();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
 				e.printStackTrace();
 			}
 		}
@@ -168,9 +196,36 @@ public class LongGeometryQueryAction extends LongAction {
 		TextMessage message = new TextMessage(jsonStr);
 		try {
 			webSocketSession.sendMessage(message);
-			webSocketSession.close();
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				webSocketSession.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
+	}
+	
+	public void sendGeometryZoom(Double zoom) {
+		if (webSocketSession == null || !webSocketSession.isOpen()) {
+			return;
+		}
+		ResultUtil result = new ResultUtil();
+		result.setKeyValue("zoom", zoom);
+		result.setSuccess(true);
+		Gson gson = new Gson();
+		String jsonStr = gson.toJson(result.getResult());
+		TextMessage message = new TextMessage(jsonStr);
+		try {
+			webSocketSession.sendMessage(message);
+		} catch (Exception e) {
+			try {
+				webSocketSession.close();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+			e.printStackTrace();
+		} 
 	}
 }

@@ -194,7 +194,7 @@ public class MaterialGenerator {
 					List ifcSurfaceStyleElementSelectList = (List) ifcPresentationStyleSelect.eGet(ifcPresentationStyleSelect.eClass().getEStructuralFeature("Styles"));
 					for (Object ifcSurfaceStyleElementSelectObject : ifcSurfaceStyleElementSelectList) {
 						IdEObject ifcSurfaceStyleElementSelect = (IdEObject) ifcSurfaceStyleElementSelectObject;
-						if (isInstanceOf(ifcSurfaceStyleElementSelect, "IfcSurfaceStyleRendering")) {
+						if (isInstanceOf(ifcSurfaceStyleElementSelect, "IfcSurfaceStyleRendering")) {//TODO IFCSURFACESTYLESHADING
 							material = getRgbSurfaceStyle(ifcSurfaceStyleElementSelect);
 						}
 					}

@@ -19,5 +19,33 @@ $(function(){
 		 thisMouseOut();
 	});
 	
-	$('#luopanSvg').luopan({});	
+	//'./project/queryProjectByRid.do?rid='+string
+	$.ajax({
+		   url:"./project/queryProjectByRid.do?rid="+string,
+		   type:"POST",
+		  dataType:"json",
+		   success:function(data){
+				$.ajax({
+					url:"./model/queryModelInfoByPid.do?pid="+data.data.pid,
+					type:"POST",
+					dataType:"json",
+					success:function(res){
+					var luopanData = [];
+					$.each(res.data,function(){
+						if(this.rid==string){
+							luopanData.push({name:this.name,link:'http://'+location.host+location.pathname+'?rid='+this.rid,selected:true})	
+						}else{
+							luopanData.push({name:this.name,link:'http://'+location.host+location.pathname+'?rid='+this.rid})
+						}
+											
+					})
+					$('#luopanSvg').luopan({
+						data:luopanData,
+					});	
+				}
+		})
+		   }
+		})
+	
+	
 })

@@ -302,7 +302,7 @@ li.li.hover .iconfont1{display:block;}
     
         #luopanBox {
             position: absolute;
-            bottom: 29px;
+            bottom: 100px;
             right: 20px;
             z-index: 20;
         }

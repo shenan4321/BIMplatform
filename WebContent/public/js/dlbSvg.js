@@ -71,28 +71,28 @@ var luopanEvent = {};
                 for(var i=0;i<len;i++){
 
                     var svgItem = document.createElementNS("http://www.w3.org/2000/svg","a");
-                    svgItem.setAttribute('class','svg-item');
+                    svgItem.setAttribute('class',opts.data[i].selected?'svg-item-selected':'svg-item');
                     svgItem.setAttribute('item',"item-"+i);
                     svgItem.setAttribute('role','link');
                     luopanEvent['s'+i] = opts.data[i].onClick;
                     if($.isFunction(opts.data[i].onClick)){
                         svgItem.setAttributeNS('http://www.w3.org/1999/xlink',"xlink:href","javascript:luopanEvent['s"+i+"']("+i+")");
                     }else{
-                        svgItem.setAttributeNS('http://www.w3.org/1999/xlink',"xlink:href","javascript:"+(opts.data[i].link||'void(0)'));
+                        svgItem.setAttributeNS('http://www.w3.org/1999/xlink',"xlink:href","javascript:"+("window.location.href='"+opts.data[i].link+"'"||'void(0)'));
                     }
 
 
                     svgItem.setAttribute('transform','rotate('+angle*i+','+halfWidth+','+halfWidth+')');
                     var path1 = document.createElementNS("http://www.w3.org/2000/svg","path");
                     path1.setAttribute("fill","none");
-                    path1.setAttribute("opacity", '0.7');
+                    path1.setAttribute("opacity", '1.0');
                     path1.setAttribute("class",'sector');
                     path1.setAttribute("d", opts.path1);
 
 
                     var path2 = document.createElementNS("http://www.w3.org/2000/svg","path");
                     path2.setAttribute("fill","none");
-                    path2.setAttribute("opacity", '0.7');
+                    path2.setAttribute("opacity", '1.0');
                     path2.setAttribute("class",'decsec');
                     path2.setAttribute("d", opts.path2);
 

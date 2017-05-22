@@ -127,4 +127,12 @@ myApp.controller('searchCtrl', function ($scope, $http) {
 });
 
 myApp.controller('markCtrl', function ($scope, $http) {
+		
+		$scope.changColor=function(){
+			$('.demo').minicolors();
+		}
+        
+
+
+
 });

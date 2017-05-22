@@ -56,10 +56,10 @@ Ifc.Constants.defaultTypes = [
 
 Ifc.Constants.materials = {
 	IfcSpace: {r: 0.5, g: 0.4, b: 0.1, a: 1.0},
-	IfcRoof: {r: 220/255, g: 37/255, b: 22/255, a: 1},
+	IfcRoof: {r: 70/255, g: 30/255, b: 30/255, a: 1},
 	IfcSlab: {r: 217.0/255, g: 217.0/255, b:217.0/255, a: 0.5},
-	IfcWall: {r: 217.0/255, g: 217.0/255, b: 217.0/255, a:0.6},
-	IfcWallStandardCase: {r: 217.0/255, g: 217.0/255, b: 217.0/255, a: 0.6},
+	IfcWall: {r: 150/255, g: 150/255, b: 104.0/255, a:0.9},
+	IfcWallStandardCase: {r: 146.0/255, g: 72.0/255, b: 38.0/255, a:0.9},
 	IfcDoor: {r: 0.637255, g:  0.603922, b: 0.670588, a: 0.6},
 	IfcWindow: {r: 0, g: 0, b: 0.8, a: 0.5},
 	IfcOpeningElement: {r: 0.137255, g: 0.403922, b: 0.870588, a: 0},

@@ -78,9 +78,9 @@
 					name : geometryInfo.oid,
 					nodes : [{
 						type : "material",
-						baseColor: geometryInfo.color ? { r: geometryInfo.color.r , g:geometryInfo.color.g , b:geometryInfo.color.b } : material,
-						color:geometryInfo.color ? { r: geometryInfo.color.r , g:geometryInfo.color.g , b:geometryInfo.color.b } : material,
-						alpha:  geometryInfo.color ? geometryInfo.color.a  : material.a,
+						baseColor: material,
+						color:material,
+						alpha: material.a,
 	        			id:geometryInfo.oid+"geometry",
 						nodes: [{
 		        			type : "geometry",

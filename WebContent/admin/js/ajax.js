@@ -44,7 +44,6 @@ function validateCallback(form, callback, confirmMsg) {
 				alert(res);
 			});   
 		}
-		
     }
 	return false;
 }

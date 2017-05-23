@@ -1,24 +1,22 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
- 
-   <form class="search-form" id="searchFrom">
-     <input class="search-btn" placeholder="请输入词语" id="searchText" value="wall"  ng-model="keyword" required/> 
-     <button class="btn btn-default" id="btnSearch" type="button" ng-click="bimSearch()">搜索</button>
-   </form> 
-
-   <div id="searchsummary" class="">
-   	 搜索结果:
-   </div> 
-   <div class="search-box-list">
-   <dl class="search-box cl" ng-repeat="item in searchList" 
-   ng-class="{true:'checked'}[item.checked]"
-   ng-init="item.checked=true" ng-click="searchShow(item)">
-	    <dt>
-	    	<div class="images fxm-images" style="background-image: url('public/images/ifc/{{item.type||'ifc'}}.png');"></div>
-	   	</dt>
-	    <dd>
-	        <h4>{{item.name || '未命名'}}</h4>
-	        <p class="text">{{item.detail || '未知大小'}}</p>
-	    </dd>
-	</dl>
- </div>
+<form class="search-form" id="searchFrom">
+  <input class="search-btn" placeholder="请输入词语" id="searchText" value="wall"  ng-model="keyword" required/> 
+  <button class="btn btn-default" id="btnSearch" type="button" ng-click="bimSearch()">搜索</button>
+</form>
+<div id="searchsummary" class="">
+	 搜索结果:
+</div> 
+<div class="search-box-list">
+<dl class="search-box cl" ng-repeat="item in searchList" 
+ng-class="{true:'checked'}[item.checked]"
+ng-init="item.checked=true" ng-click="searchShow(item)">
+  <dt>
+  	<div class="images fxm-images" style="background-image: url('public/images/ifc/{{item.type||'ifc'}}.png');"></div>
+   	</dt>
+    <dd>
+        <h4>{{item.name || '未命名'}}</h4>
+        <p class="text">{{item.detail || '未知大小'}}</p>
+    </dd>
+</dl>
+</div>
 

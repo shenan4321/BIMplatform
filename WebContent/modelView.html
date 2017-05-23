@@ -104,6 +104,7 @@ function GetQueryString(name){
 }
 var string = GetQueryString("rid")||4;
 var websocket = new WebsocketBim();
+window.hisPick = {}; //记录点过的东西
 websocket.init({
 	urlPath:"ws/geometry?rid="+string,
 	onopen:function(msg){
@@ -126,7 +127,7 @@ websocket.init({
 		}
 	},
 	onclose:function(){
-		bindEvent(); 
+		//bindEvent(); 
 	}
 });
 </script>

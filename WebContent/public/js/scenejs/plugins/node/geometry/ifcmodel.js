@@ -48,7 +48,7 @@
 
         var eye = { x: (boundMaxX - boundMinX) * 0.5, y: (boundMaxY - boundMinY) * -1, z: (boundMaxZ - boundMinZ) * 0.5 };
         
-        lookAt.set("eye", eye);
+        //lookAt.set("eye", eye);
 
         var maincamera = this.getScene().getNode("main-camera");
 
@@ -64,35 +64,33 @@
             fovy: 37.8493
         });
 
-        var hasTransparency = Math.random()>0.5?false:true;
-        var flags = {
-				type : "flags",
-				flags : {
-					transparent : true,
-					backfaces:true,
-					enable:true
-				},
-				id : "flags"+geometryInfo.oid,
+        return {
+			type : "flags",
+			flags : {
+				transparent : true,
+				backfaces:true,
+				enable:true
+			},
+			id : "flags"+geometryInfo.oid,
+			nodes : [{
+				type : "name",
+				name : geometryInfo.oid,
 				nodes : [{
-					type : "name",
-					name : geometryInfo.oid,
-					nodes : [{
-						type : "material",
-						baseColor: material,
-						color:material,
-						alpha: material.a,
-	        			id:geometryInfo.oid+"geometry",
-						nodes: [{
-		        			type : "geometry",
-		        			primitive : params.wire ? "lines" : "triangles",
-		                    positions:new Float32Array(positions),
-		                    indices:new Uint16Array(indices),
-		                    normals:new Float32Array(normals)
-		        		}]
-					}]
+					type : "material",
+					baseColor: geometryInfo.color ? { r: geometryInfo.color.r , g:geometryInfo.color.g , b:geometryInfo.color.b } : material,
+					color:geometryInfo.color ? { r: geometryInfo.color.r , g:geometryInfo.color.g , b:geometryInfo.color.b } : material,
+					alpha:  geometryInfo.color ? geometryInfo.color.a  : material.a,
+        			id:geometryInfo.oid+"geometry",
+					nodes: [{
+	        			type : "geometry",
+	        			primitive : params.wire ? "lines" : "triangles",
+	                    positions:new Float32Array(positions),
+	                    indices:new Uint16Array(indices),
+	                    normals:new Float32Array(normals)
+	        		}]
 				}]
-			};
-		return flags;
+			}]
+		};
 	}
 	
 	function convertBase64ToArrayBuffer(base64) {

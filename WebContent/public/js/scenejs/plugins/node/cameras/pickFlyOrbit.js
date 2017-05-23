@@ -171,9 +171,11 @@ require([
                 var lookatArgs = {
                     eye: { x: eye.x, y: eye.y, z: eye.z},
                     look: { x: look.x, y: look.y, z: look.z },
-                    up: { x: 0, y: 1, z: 0 }
+                    up: { x: 0, y: 1, z: -zoom }
                 };
-                lookat.set(lookatArgs);
+                lookat.setEye(lookatArgs.eye);
+                lookat.setLook(lookatArgs.look);
+                lookat.setUp(lookatArgs.up);
                 this.publish("updated", lookatArgs);
 
                 var canvas = this.getScene().getCanvas();
@@ -242,7 +244,7 @@ require([
 
                 function actionMove(posX, posY) {
                     if (dragging) {
-                        yaw += (posX - lastX) * 0.1;
+                        yaw -= (posX - lastX) * 0.1 ;
                         pitch -= (posY - lastY) * 0.1;
                         orbiting = true;
                     }
@@ -283,7 +285,7 @@ require([
                 canvas.addEventListener('DOMMouseScroll', mouseWheel, true);
 
                 function pick(canvasX, canvasY) {
-                    scene.pick(canvasX, canvasY, { rayPick: true });
+                    scene.pick({ canvasPos :[canvasX, canvasY], rayPick: true });
                 }
 
                 var scene = this.getScene();
@@ -293,7 +295,7 @@ require([
 
                         // Some plugins wrap things in this name to
                         // avoid them being picked, such as skyboxes
-                        if (hit.name == "__SceneJS_dontPickMe") {
+                        if (!hit.worldPos || hit.name == "__SceneJS_dontPickMe") {
                             return;
                         }
 
@@ -311,10 +313,32 @@ require([
 
                         flightDist = glmat.vec3.length(vec);
                         flightStartTime = null;
-                        flightDuration = 1000.0 * ((flightDist / 1000) + 1); // extra seconds to ensure arrival
+                        flightDuration = 1000.0 * ((flightDist / 15000) + 1); // extra seconds to ensure arrival
                         flying = true;
 
                         label.setText("[ " + Math.round(endPivot[0]) + ", " + Math.round(endPivot[1]) + ", " + Math.round(endPivot[2]) + " ]");
+                        
+                        scene.getNode(hit.name + "geometry",function (material) {
+                            if(hisPick.name){
+                                scene.getNode(hisPick.name + "geometry", function (material) {
+                                    material.setColor(hisPick.color);//之前点过的东西还原
+                                });
+                            }
+                            hisPick = {name:hit.name,color:material.getColor()}
+                            material.setColor({r: 0.03137255, g: 0.30980392, b: 0.62745098});
+                            var pTableScope= $('#pTable').scope();
+                            pTableScope.oid = hit.name ;
+                            $.ajax({
+                          	  url:'./model/queryProperty.do',
+                          	  type:'GET',
+                          	  data:{oid:hit.name,rid:string}
+                            }).done(function(data){
+                          	  pTableScope.list = data.data  
+                          	  $('#pTable').scope().$apply();
+                            })
+                        	  
+                        });
+                        
                     });
 
                 scene.on("tick",
@@ -364,7 +388,7 @@ require([
 
                             var eye = glmat.vec3.fromValues(0, 0, zoom);
                             var look = glmat.vec3.fromValues(currentPivot[0], currentPivot[1], currentPivot[2]);
-                            //    var up = glmat.vec3.fromValues(0, 1, 0);
+                            //var up = glmat.vec3.fromValues(0, 1, 0);
 
                             var eyeVec = glmat.vec3.create();
                             glmat.vec3.sub(eyeVec, eye, look);

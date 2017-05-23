@@ -1,0 +1,44 @@
+<ol class="breadcrumb newcrumb">
+    <li><a href="#"><span><i class="fa fontello-home-outline"></i></span>主页</a></li>
+    <li><a href="#!/BimProject/projectList">项目管理</a></li>
+    <li class="active">添加x项目</li>
+</ol>
+<!-- 添加项目html -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="box ">
+            <div class="box-header">
+                <h3 class="box-title">修改项目</h3>
+            </div>
+            <form role="form" action="../project/addProject.do" enctype="multipart/form-data" method="post" onsubmit="return validateCallback(this,function(res){console.log(res)})" id="addProjectform" novalidate>
+                <div class="box-body">
+                    <div class="form-group">
+                        <label for="projectName">项目名称</label>
+                        <input type="text" class="form-control" id="projectName" placeholder="请输入项目名称 " name="title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="projectProfile">项目简介</label>
+                        <input type="text" class="form-control" id="projectProfile" placeholder="请输入项目简介" name="description" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="projectName">项目作者</label>
+                        <input type="text" class="form-control" id="projectName" placeholder="请输入项目作者 " name="author" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="projectScore">项目评分</label>
+                        <input type="range" class="form-control" name="stars" id="projectScore" min="0" max="5" value="5" placeholder="请输入项目评分" style="width:200px;" onmousemove="document.getElementById('rangeValue').innerHTML=this.value" required>
+                        <span id="rangeValue">现在是5分</span>　　满分5分
+                    </div>
+                    <div class="form-group">
+                        <label for="projectImg">上传主图</label>
+                        <input type="file" id="projectImg" name="file">
+                    </div>
+                </div>
+                <div class="box-footer">
+                    <button type="btn" class="btn btn-primary" id="addProjectSubmit">提交</button>　
+                    <a type="btn" class="btn btn-danger" id="addProjectSubmit" href="#!/BimProject/projectList">返回列表</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

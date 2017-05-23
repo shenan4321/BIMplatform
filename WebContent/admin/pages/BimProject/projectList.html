@@ -21,10 +21,7 @@
 <script>
 	window.actionProjectListEvents = {
         'click .editProject' : function (e, value, row, index) {
-            $("#dialogBoxProjectListEdit").css('zIndex',++Global.data.zIndex).load(Global.baseDir + "dialogProjectListEdit.html", function(){
-                $("#dialogBoxProjectListEdit").show();
-                new DialogProjectListEdit(row);
-            });
+            
         },
         'click .delProject' : function (e, value, row, index) {
         	if(confirm('是否确认删除')){
@@ -46,7 +43,8 @@
     }
 	
 	function ProjectListStausFormatter(value,row) {
-		return '<a class="btn btn-info btn-sm uploadProject" href="#!/BimModel/modelList/'+row.pid+'">BIM列表</a>　<button class="btn btn-info btn-sm delProject">删除</button>'
+		//'/BimProject/editProject/:pid'
+		return '<a class="btn btn-info btn-sm editModel" href="#!/BimProject/editProject/'+row.pid+'">修改</a>  <a class="btn btn-info btn-sm uploadProject" href="#!/BimModel/modelList/'+row.pid+'">BIM列表</a>　<button class="btn btn-info btn-sm delProject">删除</button>'
 		/* return '<button class="btn btn-info btn-sm editProject">修改</button>　<button class="btn btn-info btn-sm uploadProject">上传BIM模型</button>　<button class="btn btn-info btn-sm delProject">删除</button>' */
     }
 	

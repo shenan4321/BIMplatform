@@ -26,7 +26,16 @@ function validateCallback(form, callback, confirmMsg) {
 		  　　　　} 
 			}).done(function(res) {
 				if(res.success){
-					alert('增加成功');
+					var dialog = art.dialog({
+					    title: '提示',
+					    content: '添加成功',
+					    icon: 'succeed',
+					    follow: document.getElementById('btn2'),
+					    ok: function(){
+					    	dialog.close()
+					    }
+					});
+					setTimeout(function(){dialog.close();dialog=null},2000);
 				}
 			}).fail(function(res) {
 				alert(res);
@@ -38,7 +47,16 @@ function validateCallback(form, callback, confirmMsg) {
 			    data: formData
 			}).done(function(res) {
 				if(res.success){
-					alert('增加成功');
+					var dialog = art.dialog({
+					    title: '提示',
+					    content: '添加成功',
+					    icon: 'succeed',
+					    follow: document.getElementById('btn2'),
+					    ok: function(){
+					    	dialog.close()
+					    }
+					});
+					setTimeout(function(){dialog.close();dialog=null},2000);
 				}
 			}).fail(function(res) {
 				alert(res);

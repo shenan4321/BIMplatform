@@ -1,0 +1,48 @@
+<ol class="breadcrumb newcrumb">
+    <li><a href="#"><span><i class="fa fontello-home-outline"></i></span>主页</a></li>
+    <li class="active"><a href="#!/BimModel/addModel/{{pid}}">模型管理</a></li>
+    <li class="active">添加模型</li>
+</ol>
+<!-- 添加模型html -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="box ">
+            <div class="box-header">
+                <h3 class="box-title">添加模型</h3>
+            </div>
+            <form role="form" action="../model/addModel.do" enctype="multipart/form-data" method="post" onsubmit="return validateCallback(this,function(res){console.log(res)})" id="addmodelform" novalidate>
+                 <input type="hidden" name="pid" id="pId" value="{{pid}}">
+                <div class="box-body">
+                	<div class="form-group">
+                        <label for="modelImg">上传模型</label>
+                        <input type="file"  name="file">
+                    </div>
+                    <div class="form-group">
+                        <label for="modelName">模型名称</label>
+                        <input type="text" class="form-control" placeholder="请输入模型名称 " name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="modelProfile">应用类型</label>
+                        <select id="compassName" class="compassName form-control" name="applyType">
+							<option value="1">结构</option>
+							<option value="2">建筑</option>
+							<option value="3">强电</option>
+							<option value="4">给排水</option>
+							<option value="5">消防</option>
+							<option value="6">停车场</option>
+							<option value="7">暖通</option>
+							<option value="8">弱电</option>
+						</select>
+                    </div>
+                </div>
+                <div class="box-footer">
+                    <button class="btn btn-primary" type="submit">提交</button>　
+                    <a class="btn btn-danger" id="backBtn" href="#!/BimModel/modelList/{{pid}}">返回列表</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+		

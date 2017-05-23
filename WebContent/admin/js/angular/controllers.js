@@ -79,12 +79,13 @@ function BimProjerctCtrl($scope, $http, $timeout ,$routeParams) {
 
 function BimProjerctEditCtrl($scope, $http, $timeout ,$routeParams) {
 	$scope.pid = $routeParams.pid;
-	//
-	$http.post('./../project/queryProject.do',{pid:Number($routeParams.pid)}).success(function (data,status) {
-		console.log(data);
-    	$scope.data = data.data;
-    }); 
-	
+	$http({    
+        method: "POST",    
+        url: "./../project/queryProject.do?pid="+Number($routeParams.pid),
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }  
+	}).success(function (data,status) {
+    	$scope.proData = data.data;
+    });  
 }
 
 function BimModelCtrl($scope, $http, $timeout) {}

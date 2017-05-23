@@ -10,27 +10,30 @@
             <div class="box-header">
                 <h3 class="box-title">修改项目</h3>
             </div>
-            <form role="form" action="../project/addProject.do" enctype="multipart/form-data" method="post" onsubmit="return validateCallback(this,function(res){console.log(res)})" id="addProjectform" novalidate>
+            <form role="form" action="../project/updateProject.do" enctype="multipart/form-data" method="post" onsubmit="return validateCallback(this,function(res){console.log(res)})" id="addProjectform" novalidate>
                 <div class="box-body">
+                	<input type="hidden" value="{{proData.pid}}" name="pid"/>
                     <div class="form-group">
                         <label for="projectName">项目名称</label>
-                        <input type="text" class="form-control" id="projectName" placeholder="请输入项目名称 " name="title" required>
+                        <input type="text" class="form-control" id="projectName" placeholder="请输入项目名称 " name="title" required value="{{proData.title}}">
                     </div>
                     <div class="form-group">
                         <label for="projectProfile">项目简介</label>
-                        <input type="text" class="form-control" id="projectProfile" placeholder="请输入项目简介" name="description" required>
+                        <input type="text" class="form-control" id="projectProfile" placeholder="请输入项目简介" name="description" required value="{{proData.description}}">
                     </div>
                     <div class="form-group">
                         <label for="projectName">项目作者</label>
-                        <input type="text" class="form-control" id="projectName" placeholder="请输入项目作者 " name="author" required>
+                        <input type="text" class="form-control" id="projectName" placeholder="请输入项目作者 " name="author" required value="{{proData.author}}"> 
+                        
                     </div>
                     <div class="form-group">
                         <label for="projectScore">项目评分</label>
-                        <input type="range" class="form-control" name="stars" id="projectScore" min="0" max="5" value="5" placeholder="请输入项目评分" style="width:200px;" onmousemove="document.getElementById('rangeValue').innerHTML=this.value" required>
+                        <input type="range" class="form-control" name="stars" id="projectScore" min="0" max="5" value="{{proData.stars}}" placeholder="请输入项目评分" style="width:200px;" onmousemove="document.getElementById('rangeValue').innerHTML=this.value" required>
                         <span id="rangeValue">现在是5分</span>　　满分5分
                     </div>
                     <div class="form-group">
                         <label for="projectImg">上传主图</label>
+                        <img src="{{proData.picUrl}}" width=100 height=100>
                         <input type="file" id="projectImg" name="file">
                     </div>
                 </div>

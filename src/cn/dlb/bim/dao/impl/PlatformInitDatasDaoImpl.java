@@ -46,7 +46,10 @@ public class PlatformInitDatasDaoImpl implements PlatformInitDatasDao {
 	public void updateOidInIfcClassLookup(IfcClassLookupEntity ifcClassLookup) {
 		Query query = new Query();
 		query.addCriteria(Criteria.where("cid").is(ifcClassLookup.getCid()));
-		Update update = Update.update("oid", ifcClassLookup.getOid());
+		
+		Update update = new Update();
+		update.set("oid", ifcClassLookup.getOid());
+		
 		mongoTemplate.updateFirst(query, update, IfcClassLookupEntity.class);
 	}
 

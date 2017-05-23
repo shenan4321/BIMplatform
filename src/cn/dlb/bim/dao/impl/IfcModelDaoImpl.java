@@ -97,20 +97,23 @@ public class IfcModelDaoImpl implements IfcModelDao {
 		mongoTemplate.findAllAndRemove(query, ModelLabel.class);
 	}
 
-	@SuppressWarnings("static-access")
 	@Override
 	public void modifyModelLabel(ModelLabel modelLabel) {
 		Query query = new Query();
 		query.addCriteria(Criteria.where("labelId").is(modelLabel.getLabelId()));
-		mongoTemplate.findAndModify(query, Update.update("name", modelLabel.getName())
-				.update("description", modelLabel.getDescription())
-				.update("developData", modelLabel.getDevelopData())
-				.update("x", modelLabel.getX())
-				.update("y", modelLabel.getY())
-				.update("z", modelLabel.getZ())
-				.update("red", modelLabel.getRed())
-				.update("green", modelLabel.getGreen())
-				.update("blue", modelLabel.getBlue()), ModelLabel.class);
+		
+		Update update = new Update();
+		update.set("name", modelLabel.getName())
+			.set("description", modelLabel.getDescription())
+			.set("developData", modelLabel.getDevelopData())
+			.set("x", modelLabel.getX())
+			.set("y", modelLabel.getY())
+			.set("z", modelLabel.getZ())
+			.set("red", modelLabel.getRed())
+			.set("green", modelLabel.getGreen())
+			.set("blue", modelLabel.getBlue());
+		
+		mongoTemplate.findAndModify(query, update, ModelLabel.class);
 	}
 
 	@Override

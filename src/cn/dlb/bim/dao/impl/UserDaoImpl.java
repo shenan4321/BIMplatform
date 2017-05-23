@@ -38,12 +38,16 @@ public class UserDaoImpl implements UserDao {
 	public void updateUser(User user) {
 		Query query = new Query();
 		query.addCriteria(Criteria.where("userId").is(user.getUserId()));
-		mongoTemplate.updateFirst(query, Update.update("company", user.getCompany())
-				.update("email", user.getEmail())
-				.update("firstName", user.getFirstName())
-				.update("lastName", user.getLastName())
-				.update("password", user.getPassword())
-				.update("userName", user.getUserName()), User.class);
+		
+		Update update = new Update();
+		update.set("company", user.getCompany())
+			.set("email", user.getEmail())
+			.set("firstName", user.getFirstName())
+			.set("lastName", user.getLastName())
+			.set("password", user.getPassword())
+			.set("userName", user.getUserName());
+		
+		mongoTemplate.updateFirst(query, update, User.class);
 	}
 	
 }

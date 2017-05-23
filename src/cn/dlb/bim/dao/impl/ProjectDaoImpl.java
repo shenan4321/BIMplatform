@@ -40,15 +40,17 @@ public class ProjectDaoImpl implements ProjectDao {
 		mongoTemplate.remove(query, Project.class);
 	}
 
-	@SuppressWarnings("static-access")
 	@Override
 	public void updateProject(Project project) {
 		Query query = new Query();
 		query.addCriteria(Criteria.where("pid").is(project.getPid()));
-		mongoTemplate.findAndModify(query, Update.update("author", project.getAuthor())
-				.update("title", project.getTitle())
-				.update("stars", project.getStars())
-				.update("picUrl", project.getPicUrl()), Project.class);
+		Update update = new Update();
+		update.set("author", project.getAuthor())
+			.set("title", project.getTitle())
+			.set("description", project.getDescription())
+			.set("stars", project.getStars())
+			.set("picUrl", project.getPicUrl());
+		mongoTemplate.findAndModify(query, update, Project.class);
 	}
 
 }

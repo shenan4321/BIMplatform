@@ -725,9 +725,11 @@ public class IfcModelBinary {
 		IdEObject wrappedValue = (IdEObject) value;
 		EStructuralFeature eStructuralFeature = wrappedValue.eClass().getEStructuralFeature("wrappedValue");
 		Short cid = ifcDataBase.getCidOfEClass(wrappedValue.eClass());
+		
 		buffer.order(ByteOrder.LITTLE_ENDIAN);
 		buffer.putShort((short) -cid);
 		buffer.order(ByteOrder.BIG_ENDIAN);
+		
 		writePrimitiveValue(eStructuralFeature, wrappedValue.eGet(eStructuralFeature), buffer);
 		if (eStructuralFeature.getEType() == EcorePackage.eINSTANCE.getEDouble() || eStructuralFeature.getEType() == EcorePackage.eINSTANCE.getEDoubleObject()) {
 			EStructuralFeature fe = wrappedValue.eClass().getEStructuralFeature("wrappedValueAsString");
@@ -753,6 +755,10 @@ public class IfcModelBinary {
 	protected int getExactSize(IdEObject idEObject, PackageMetaData packageMetaData, boolean useUnsetBits) {
 		int size = 0;
 		int bits = 0;
+		
+		if (idEObject.getExpressId() == 15723) {
+			System.out.println();
+		}
 		
 		for (EStructuralFeature eStructuralFeature : idEObject.eClass().getEAllStructuralFeatures()) {
 			if (packageMetaData.useForDatabaseStorage(idEObject.eClass(), eStructuralFeature)) {
@@ -787,7 +793,6 @@ public class IfcModelBinary {
 		if (useUnsetBits) {
 			size += (int) Math.ceil(bits / 8.0);
 		}
-
 		return size;
 	}
 	
@@ -852,8 +857,22 @@ public class IfcModelBinary {
 				EStructuralFeature eStructuralFeature = eObject.eClass().getEStructuralFeature("List");
 				List<?> l = (List<?>)eObject.eGet(eStructuralFeature);
 				for (Object o : l) {
-					if (o instanceof EObject) {
-						refSize += 8;
+					if (o instanceof EObject) {//linfujun: i changed here
+						IdEObject subEObject = (IdEObject) o;
+						if (subEObject.eClass().getEAnnotation("wrapped") != null) {
+							IdEObject wrappedValue = (IdEObject) subEObject;
+							EStructuralFeature wrappedValueFeature = wrappedValue.eClass().getEStructuralFeature("wrappedValue");
+							Object wrappedVal = subEObject.eGet(wrappedValueFeature);
+							refSize += 2 + getPrimitiveSize((EDataType) wrappedValueFeature.getEType(), wrappedVal);
+							if (wrappedValueFeature.getEType() == EcorePackage.eINSTANCE.getEDouble() || wrappedValueFeature.getEType() == EcorePackage.eINSTANCE.getEDoubleObject()) {
+								EStructuralFeature wrappedStringFeature = wrappedValue.eClass().getEStructuralFeature("wrappedValueAsString");
+								String str = (String) subEObject.eGet(wrappedStringFeature);
+								refSize += getPrimitiveSize(EcorePackage.eINSTANCE.getEString(), str);
+							}
+						} else {
+							refSize += 8;
+						}
+//						refSize += 8;
 					} else {
 						refSize += getPrimitiveSize((EDataType) eStructuralFeature.getEType(), o);
 					}

@@ -95,7 +95,7 @@ public class LongGeometryQueryAction extends LongAction {
 		
 		List<GeometryInfoVo> geometryList = new ArrayList<>();
 		EClass productClass = (EClass) model.getPackageMetaData().getEClassifierCaseInsensitive("IfcProduct");
-		List<IdEObject> projectList = model.getAllWithSubTypes(productClass);//耗时
+		List<IdEObject> projectList = model.getAllWithSubTypes(productClass);//耗时TODO
 		
 		double maxZoom = 0;
 		for (IdEObject ifcProduct : projectList) {

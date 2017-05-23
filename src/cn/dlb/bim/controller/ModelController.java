@@ -69,13 +69,13 @@ public class ModelController {
 			HttpServletRequest request// , ModelMap model
 	) {
 		ResultUtil result = new ResultUtil();
-		Long pid = modelInfo.getPid();
-		Project project = projectService.queryProject(pid);
-		if (project == null) {
-			result.setSuccess(false);
-			result.setMsg("project with pid = " + pid + " is null");
-			return result.getResult();
-		}
+//		Long pid = modelInfo.getPid();
+//		Project project = projectService.queryProject(pid);
+//		if (project == null) {
+//			result.setSuccess(false);
+//			result.setMsg("project with pid = " + pid + " is null");
+//			return result.getResult();
+//		}
 		String path = request.getSession().getServletContext().getRealPath("upload/ifc/");
 		String fileName = file.getOriginalFilename();
 		String[] split = fileName.split("\\.");

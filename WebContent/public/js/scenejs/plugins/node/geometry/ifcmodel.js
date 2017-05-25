@@ -29,7 +29,7 @@
 		var normals = geometryInfo.normals;
 		var typeName = geometryInfo.typeName;
 		
-		var material = Ifc.Constants.materials[typeName];
+		var material = Ifc.Constants.materials[typeName] || Ifc.Constants.materials['DEFAULT'];
 //		var transformation = geometryInfo.base64Transformation;
 
 //		var positionsArray = convertBase64ToFloat32Array(basePositions);
@@ -77,9 +77,9 @@
 				name : geometryInfo.oid,
 				nodes : [{
 					type : "material",
-					baseColor: geometryInfo.color ? { r: geometryInfo.color.r , g:geometryInfo.color.g , b:geometryInfo.color.b } : material,
-					color:geometryInfo.color ? { r: geometryInfo.color.r , g:geometryInfo.color.g , b:geometryInfo.color.b } : material,
-					alpha:  geometryInfo.color ? geometryInfo.color.a  : material.a,
+					baseColor: material,
+					color: material,
+					alpha: material.a,
         			id:geometryInfo.oid+"geometry",
 					nodes: [{
 	        			type : "geometry",

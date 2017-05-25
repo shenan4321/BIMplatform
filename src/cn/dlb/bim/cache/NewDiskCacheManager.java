@@ -62,12 +62,12 @@ public class NewDiskCacheManager {
 			diskCacheOutputStream = busyCaching.get(cacheKey);
 		}
 		if (diskCacheOutputStream != null) {
-			try {
-				LOGGER.info("Waiting for " + cacheKey);
-				diskCacheOutputStream.waitForFinish();
-			} catch (InterruptedException e) {
-				LOGGER.error("", e);
-			}
+//			try {
+//				LOGGER.info("Waiting for " + cacheKey);
+//				diskCacheOutputStream.waitForFinish();
+//			} catch (InterruptedException e) {
+//				LOGGER.error("", e);
+//			}
 		}
 		Path file = cacheDir.resolve(cacheKey);
 		if (!Files.exists(file)) {
@@ -91,12 +91,12 @@ public class NewDiskCacheManager {
 			diskCacheOutputStream = busyCaching.get(cacheKey);
 		}
 		if (diskCacheOutputStream != null) {
-			try {
-				LOGGER.info("Waiting for " + cacheKey);
-				diskCacheOutputStream.waitForFinish();
-			} catch (InterruptedException e) {
-				LOGGER.error("", e);
-			}
+//			try {
+//				LOGGER.info("Waiting for " + cacheKey);
+//				diskCacheOutputStream.waitForFinish();
+//			} catch (InterruptedException e) {
+//				LOGGER.error("", e);
+//			}
 		}
 		Path file = cacheDir.resolve(cacheKey);
 		if (!Files.exists(file)) {

@@ -5,8 +5,6 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.server.ServerHttpResponse;
-import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.WebSocketMessage;
@@ -14,16 +12,18 @@ import org.springframework.web.socket.WebSocketSession;
 
 import cn.dlb.bim.action.LongGeometryQueryAction;
 import cn.dlb.bim.component.PlatformServer;
+import cn.dlb.bim.service.BimService;
 
 public class GeometrySocketHandler implements WebSocketHandler {
 	private static final Logger logger = LoggerFactory.getLogger(GeometrySocketHandler.class);  
     
     private static final List<WebSocketSession> users = new ArrayList<WebSocketSession>();
-//	private final IBimService bimService;
+	private final BimService bimService;
 	private final PlatformServer server;
 	
-	public GeometrySocketHandler(PlatformServer server) {
+	public GeometrySocketHandler(PlatformServer server, BimService bimService) {
 		this.server = server;
+		this.bimService = bimService;
 	}
   
     /** 
@@ -34,7 +34,7 @@ public class GeometrySocketHandler implements WebSocketHandler {
         logger.info("connect success...");  
         String rid = session.getAttributes().get("rid").toString();
         Integer ridInt = Integer.valueOf(rid);
-        LongGeometryQueryAction longAction = new LongGeometryQueryAction(server, ridInt, session);
+        LongGeometryQueryAction longAction = new LongGeometryQueryAction(bimService, ridInt, session);
         server.getLongActionManager().startLongAction(longAction);
     }  
   

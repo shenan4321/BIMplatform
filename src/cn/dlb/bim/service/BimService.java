@@ -6,17 +6,18 @@ import java.util.List;
 import cn.dlb.bim.dao.entity.ModelLabel;
 import cn.dlb.bim.ifc.emf.IfcModelInterface;
 import cn.dlb.bim.ifc.engine.cells.Vector3d;
+import cn.dlb.bim.ifc.shared.ProgressReporter;
 import cn.dlb.bim.vo.GeometryInfoVo;
 import cn.dlb.bim.vo.GlbVo;
 import cn.dlb.bim.vo.ModelInfoVo;
 import cn.dlb.bim.vo.ModelLabelVo;
 
 public interface BimService {
-	public List<GeometryInfoVo> queryGeometryInfo(Integer rid);
+	public List<GeometryInfoVo> queryGeometryInfo(Integer rid, ProgressReporter progressReporter);
 	public Integer addRevision(ModelInfoVo modelInfo, File modelFile);
 	public GlbVo queryGlbByRid(Integer rid);
 	public Vector3d queryGlbLonlatByRid(Integer rid);
-	public IfcModelInterface queryModelByRid(Integer rid);
+	public IfcModelInterface queryModelByRid(Integer rid, ProgressReporter progressReporter);
 	public List<ModelInfoVo> queryModelInfoByPid(Long pid);
 	public void deleteModel(Integer rid);
 	public ModelInfoVo queryModelInfoByRid(Integer rid);

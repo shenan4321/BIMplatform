@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,9 +17,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.mongodb.DBObject;
 import com.mongodb.gridfs.GridFSDBFile;
 
+import cn.dlb.bim.cache.DownloadDescriptor;
 import cn.dlb.bim.component.PlatformInitDatas;
 import cn.dlb.bim.component.PlatformServer;
 import cn.dlb.bim.dao.IfcModelDao;
@@ -43,15 +48,18 @@ import cn.dlb.bim.ifc.engine.RenderEngineException;
 import cn.dlb.bim.ifc.engine.cells.Vector3d;
 import cn.dlb.bim.ifc.serializers.IfcStepSerializer;
 import cn.dlb.bim.ifc.serializers.SerializerException;
+import cn.dlb.bim.ifc.shared.ProgressReporter;
 import cn.dlb.bim.ifc.tree.Material;
 import cn.dlb.bim.ifc.tree.MaterialGenerator;
 import cn.dlb.bim.models.geometry.GeometryInfo;
 import cn.dlb.bim.service.BimService;
 import cn.dlb.bim.utils.BinUtils;
+import cn.dlb.bim.utils.JsonUtils;
 import cn.dlb.bim.vo.GeometryInfoVo;
 import cn.dlb.bim.vo.GlbVo;
 import cn.dlb.bim.vo.ModelInfoVo;
 import cn.dlb.bim.vo.ModelLabelVo;
+import cn.dlb.bim.vo.Vector3f;
 
 @Service("BimServiceImpl")
 public class BimServiceImpl implements BimService {
@@ -68,9 +76,22 @@ public class BimServiceImpl implements BimService {
 	private IfcModelDao ifcModelDao;
 
 	@Override
-	public List<GeometryInfoVo> queryGeometryInfo(Integer rid) {
-		IfcModelInterface model = queryModelByRid(rid);
-		List<GeometryInfoVo> geometryList = new ArrayList<>();
+	public List<GeometryInfoVo> queryGeometryInfo(Integer rid, ProgressReporter progressReporter) {
+		List<GeometryInfoVo> result = null;
+		DownloadDescriptor downloadDescriptor = new DownloadDescriptor(rid, "queryGeometryInfo");
+		if (server.getDiskCacheManager().contains(downloadDescriptor)) {
+			byte[] dataBytes = server.getDiskCacheManager().getData(downloadDescriptor);
+			try {
+				result = JsonUtils.readList(dataBytes, GeometryInfoVo.class);
+			} catch (IOException e) {
+				server.getDiskCacheManager().remove(downloadDescriptor);
+				e.printStackTrace();
+			}
+			return result;
+		}
+		
+		IfcModelInterface model = queryModelByRid(rid, progressReporter);
+		result = new ArrayList<>();
 		PackageMetaData packageMetaData = model.getPackageMetaData();
 		EClass productClass = (EClass) model.getPackageMetaData().getEClassifierCaseInsensitive("IfcProduct");
 		List<IdEObject> projectList = model.getAllWithSubTypes(productClass);
@@ -80,15 +101,26 @@ public class BimServiceImpl implements BimService {
 			GeometryInfo geometryInfo = (GeometryInfo) ifcProduct
 					.eGet(ifcProduct.eClass().getEStructuralFeature("geometry"));
 			if (geometryInfo != null) {
-				Boolean defualtVisiable = !ifcProduct.eClass().isSuperTypeOf(packageMetaData.getEClass("IfcSpace"));
+				Boolean defualtVisiable = !packageMetaData.getEClass("IfcSpace").isSuperTypeOf(ifcProduct.eClass()) 
+						&& !packageMetaData.getEClass("IfcFeatureElementSubtraction").isSuperTypeOf(ifcProduct.eClass());//IfcFeatureElementSubtraction
+				if (!defualtVisiable) {//TODO
+					continue;
+				}
 				MaterialGenerator materialGetter = new MaterialGenerator(model);
 				Material material = materialGetter.getMaterial(ifcProduct);
 				adaptor.transform(geometryInfo, ifcProduct.getOid(), ifcProduct.eClass().getName(), defualtVisiable,
 						material == null ? null : material.getAmbient());
-				geometryList.add(adaptor);
+				result.add(adaptor);
 			}
 		}
-		return geometryList;
+		
+		try {
+			JsonUtils.objectToJson(server.getDiskCacheManager().startCaching(downloadDescriptor), result);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} 
+		
+		return result;
 	}
 
 	@Override
@@ -211,7 +243,7 @@ public class BimServiceImpl implements BimService {
 
 	@SuppressWarnings("unchecked")
 	private void generateGlbAndCache(Integer rid) {
-		IfcModelInterface model = queryModelByRid(rid);
+		IfcModelInterface model = queryModelByRid(rid, null);
 
 		GlbSerializer serializer = new GlbSerializer(server);
 		ProjectInfo projectInfo = new ProjectInfo();
@@ -269,7 +301,7 @@ public class BimServiceImpl implements BimService {
 	}
 
 	@Override
-	public IfcModelInterface queryModelByRid(Integer rid) {
+	public IfcModelInterface queryModelByRid(Integer rid, ProgressReporter progressReporter) {
 		IfcModelEntity ifcModelEntity = ifcModelDao.queryIfcModelEntityByRid(rid);
 		String ifcSchemaVersion = ifcModelEntity.getModelMetaData().getIfcHeader().getIfcSchemaVersion();
 		PackageMetaData packageMetaData = null;
@@ -280,7 +312,7 @@ public class BimServiceImpl implements BimService {
 		}
 		PlatformInitDatas platformInitDatas = server.getPlatformInitDatas();
 		IfcModelDbSession session = new IfcModelDbSession(server.getIfcModelDao(), server.getMetaDataManager(),
-				platformInitDatas, null, server.getModelCacheManager());
+				platformInitDatas, progressReporter, server.getModelCacheManager());
 		IfcModelInterface model = null;
 
 		try {

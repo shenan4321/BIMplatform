@@ -44,7 +44,7 @@ public class RecordSearchManager {
 	public List<IfcProductRecordText> search(Integer rid, String keyword) {
 		List<IfcProductRecordText> result = new ArrayList<>();
 		if (!isBuildedIndex(rid)) {
-			IfcModelInterface model = bimService.queryModelByRid(rid);
+			IfcModelInterface model = bimService.queryModelByRid(rid, null);
 			if (model != null) {
 				buildIndex(rid, model);
 			} else {

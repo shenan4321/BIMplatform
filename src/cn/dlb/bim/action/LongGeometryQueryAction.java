@@ -2,32 +2,20 @@ package cn.dlb.bim.action;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.emf.ecore.EClass;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import com.google.gson.Gson;
 
-import cn.dlb.bim.component.PlatformServer;
-import cn.dlb.bim.dao.entity.IfcModelEntity;
 import cn.dlb.bim.ifc.database.IfcModelDbException;
-import cn.dlb.bim.ifc.database.IfcModelDbSession;
-import cn.dlb.bim.ifc.database.OldQuery;
-import cn.dlb.bim.ifc.emf.IdEObject;
-import cn.dlb.bim.ifc.emf.IfcModelInterface;
 import cn.dlb.bim.ifc.emf.IfcModelInterfaceException;
-import cn.dlb.bim.ifc.emf.PackageMetaData;
-import cn.dlb.bim.ifc.emf.Schema;
 import cn.dlb.bim.ifc.shared.ProgressReporter;
-import cn.dlb.bim.ifc.tree.Material;
-import cn.dlb.bim.ifc.tree.MaterialGenerator;
-import cn.dlb.bim.models.geometry.GeometryInfo;
-import cn.dlb.bim.models.geometry.Vector3f;
+import cn.dlb.bim.service.BimService;
 import cn.dlb.bim.vo.GeometryInfoVo;
 import cn.dlb.bim.vo.ProgressVo;
+import cn.dlb.bim.vo.Vector3f;
 import cn.dlb.bim.web.ResultUtil;
 
 public class LongGeometryQueryAction extends LongAction {
@@ -35,13 +23,13 @@ public class LongGeometryQueryAction extends LongAction {
 
 //	private static final Logger LOGGER = LoggerFactory.getLogger(LongGeometryQueryAction.class);
 
-	private final PlatformServer server;
+	private final BimService bimService;
 	private final Integer rid;
 	private int lastPercentProcess = 0;
 
-	public LongGeometryQueryAction(PlatformServer server, Integer rid, WebSocketSession webSocketSession) {
+	public LongGeometryQueryAction(BimService bimService, Integer rid, WebSocketSession webSocketSession) {
 		super(webSocketSession);
-		this.server = server;
+		this.bimService = bimService;
 		this.rid = rid;
 	}
 
@@ -76,57 +64,29 @@ public class LongGeometryQueryAction extends LongAction {
 				sendWebSocketMessage(msg);
 			}
 		};
-		IfcModelEntity ifcModelEntity = server.getIfcModelDao().queryIfcModelEntityByRid(rid);
-		String ifcSchemaVersion = ifcModelEntity.getModelMetaData().getIfcHeader().getIfcSchemaVersion();
-		PackageMetaData packageMetaData = null;
-		if (ifcSchemaVersion.startsWith(IFC2X3_SCHEMA_SHORT)) {
-			packageMetaData = server.getMetaDataManager().getPackageMetaData(Schema.IFC2X3TC1.getEPackageName());
-		} else {
-			packageMetaData = server.getMetaDataManager().getPackageMetaData(Schema.IFC4.getEPackageName());
-		}
 		
-		IfcModelDbSession session = new IfcModelDbSession(server.getIfcModelDao(), server.getMetaDataManager(),
-				server.getPlatformInitDatas(), progressReporter, server.getModelCacheManager());
-		IfcModelInterface model = session.get(packageMetaData, rid, new OldQuery(packageMetaData, true));
+		List<GeometryInfoVo> geometryList = bimService.queryGeometryInfo(rid, progressReporter);
 		
-		if (model == null) {
+		if (geometryList == null) {
 			sendErrorWebSocketClose(rid);
 		}
 		
-		List<GeometryInfoVo> geometryList = new ArrayList<>();
-		EClass productClass = (EClass) model.getPackageMetaData().getEClassifierCaseInsensitive("IfcProduct");
-		List<IdEObject> projectList = model.getAllWithSubTypes(productClass);//耗时TODO
 		
 		double maxZoom = 0;
-		for (IdEObject ifcProduct : projectList) {
-			GeometryInfoVo adaptor = new GeometryInfoVo();
-			GeometryInfo geometryInfo = (GeometryInfo) ifcProduct.eGet(ifcProduct.eClass().getEStructuralFeature("geometry"));
-			if (geometryInfo != null) {
-				Boolean defualtVisiable = !packageMetaData.getEClass("IfcSpace").isSuperTypeOf(ifcProduct.eClass()) 
-						&& !packageMetaData.getEClass("IfcFeatureElementSubtraction").isSuperTypeOf(ifcProduct.eClass());//IfcFeatureElementSubtraction
-				if (!defualtVisiable) {//TODO
-					continue;
-				}
-				Double zoom = maxZoom(geometryInfo.getMinBounds(), geometryInfo.getMaxBounds());
-				maxZoom = Math.max(zoom, maxZoom);
-				MaterialGenerator materialGetter = new MaterialGenerator(model);
-				Material material = materialGetter.getMaterial(ifcProduct);
-				adaptor.transform(geometryInfo, ifcProduct.getOid(), ifcProduct.eClass().getName(), defualtVisiable, material == null ? null : material.getAmbient());
-				geometryList.add(adaptor);
-			}
+		for (GeometryInfoVo geometry : geometryList) {
+			Double zoom = maxZoom(geometry.getBound().min, geometry.getBound().max);
+			maxZoom = Math.max(zoom, maxZoom);
 		}
 
-		sendGeometryZoom(maxZoom);
+		sendGeometryZoom(40000.0);
 		sendWebSocketMessage(geometryList);
 	}
 	
 	public Double maxZoom(Vector3f min, Vector3f max) {
-//		Vector3f min = geometryInfo.getMinBounds();
-//		Vector3f max = geometryInfo.getMaxBounds();
-		double minX = min.getX();
-		double minY = min.getY();
-		double maxX = max.getX();
-		double maxY = max.getY();
+		double minX = min.x;
+		double minY = min.y;
+		double maxX = max.x;
+		double maxY = max.y;
 		double deltX = Math.abs(maxX - minX);
 		double deltY = Math.abs(maxY - minY);
 		double maxDelt = Math.max(deltX, deltY);

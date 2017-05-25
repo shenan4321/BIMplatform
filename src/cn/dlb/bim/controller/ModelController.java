@@ -144,7 +144,7 @@ public class ModelController {
 	public Map<String, Object> queryGeometryInfo(@RequestParam("rid") Integer rid) {
 		ResultUtil result = new ResultUtil();
 		result.setSuccess(true);
-		result.setKeyValue("geometries", bimService.queryGeometryInfo(rid));
+		result.setKeyValue("geometries", bimService.queryGeometryInfo(rid, null));
 		return result.getResult();
 	}
 	
@@ -152,7 +152,7 @@ public class ModelController {
 	@ResponseBody
 	public Map<String, Object> queryModelTree(@RequestParam("rid")Integer rid) {
 		ResultUtil result = new ResultUtil();
-		IfcModelInterface model = bimService.queryModelByRid(rid);
+		IfcModelInterface model = bimService.queryModelByRid(rid, null);
 		ProjectTreeGenerator treeGenerator = new ProjectTreeGenerator(model.getPackageMetaData());
 		treeGenerator.buildProjectTree(model, ProjectTreeGenerator.KeyWord_IfcProject);
 		result.setSuccess(true);
@@ -164,7 +164,7 @@ public class ModelController {
 	@ResponseBody
 	public Map<String, Object> queryModelBuildingStorey(@RequestParam("rid")Integer rid) {
 		ResultUtil result = new ResultUtil();
-		IfcModelInterface model = bimService.queryModelByRid(rid);
+		IfcModelInterface model = bimService.queryModelByRid(rid, null);
 		BuildingStoreyGenerator generator = new BuildingStoreyGenerator(model.getPackageMetaData());
 		List<BuildingStorey> buildingStoreys = generator.generateBuildingStorey(model);
 		result.setSuccess(true);
@@ -176,7 +176,7 @@ public class ModelController {
 	@ResponseBody
 	public Map<String, Object> queryBuildingCells(@RequestParam("rid")Integer rid) {
 		ResultUtil result = new ResultUtil();
-		IfcModelInterface model = bimService.queryModelByRid(rid);
+		IfcModelInterface model = bimService.queryModelByRid(rid, null);
 		BuildingCellGenerator generator = new BuildingCellGenerator();
 		List<BuildingCellContainer> buildingCells = generator.buildBuildingCells(model);
 		result.setSuccess(true);
@@ -189,7 +189,7 @@ public class ModelController {
 	public Map<String, Object> queryProperty(@RequestParam("rid")Integer rid, @RequestParam("oid")Long oid
 			) {
 		ResultUtil result = new ResultUtil();
-		IfcModelInterface model = bimService.queryModelByRid(rid);
+		IfcModelInterface model = bimService.queryModelByRid(rid, null);
 		
 		IdEObject targetObject = model.get(oid);
 		
@@ -205,7 +205,7 @@ public class ModelController {
 	public Map<String, Object> queryMaterial(@RequestParam("rid")Integer rid//, @RequestParam("oid")Long oid
 			) {
 		ResultUtil result = new ResultUtil();
-		IfcModelInterface model = bimService.queryModelByRid(rid);
+		IfcModelInterface model = bimService.queryModelByRid(rid, null);
 		EClass productClass = (EClass) model.getPackageMetaData().getEClass("IfcProduct");
 		List<IdEObject> projectList = model.getAllWithSubTypes(productClass);
 		
@@ -315,7 +315,7 @@ public class ModelController {
 	
 	@RequestMapping(value = "kml", method = RequestMethod.GET)
 	public void kml(@RequestParam("rid")Integer rid) {
-		IfcModelInterface model = bimService.queryModelByRid(rid);
+		IfcModelInterface model = bimService.queryModelByRid(rid, null);
 		KmzSerializer serializer = new KmzSerializer();
 		ProjectInfo projectInfo = new ProjectInfo();
 		projectInfo.setName("bim");

@@ -9,7 +9,9 @@ public class Colord {
 	public double r;
 	public double g;
 	public double b;
-	private double a;
+	public double a;
+	
+	public Colord() {}
 	
 	public Colord(double r, double g, double b, double a) {
 		this.r = r;
@@ -34,19 +36,4 @@ public class Colord {
 		jsonWriter.endObject();
 	}
 
-	public double r() {
-		return r;
-	}
-
-	public double g() {
-		return g;
-	}
-
-	public double b() {
-		return b;
-	}
-	
-	public double a() {
-		return a;
-	}
 }

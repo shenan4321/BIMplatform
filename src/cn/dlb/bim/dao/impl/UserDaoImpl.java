@@ -33,7 +33,6 @@ public class UserDaoImpl implements UserDao {
 		mongoTemplate.remove(user);
 	}
 
-	@SuppressWarnings("static-access")
 	@Override
 	public void updateUser(User user) {
 		Query query = new Query();

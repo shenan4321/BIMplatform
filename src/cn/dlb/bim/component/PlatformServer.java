@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 
 import cn.dlb.bim.PlatformContext;
 import cn.dlb.bim.cache.ModelCacheManager;
+import cn.dlb.bim.cache.NewDiskCacheManager;
 import cn.dlb.bim.dao.IfcModelDao;
 import cn.dlb.bim.ifc.SerializationManager;
 import cn.dlb.bim.ifc.collada.ColladaCacheManager;
@@ -26,6 +27,7 @@ public class PlatformServer {
 	private final ColladaCacheManager colladaCacheManager;
 	private final ColladaProcessFactory colladaProcessFactory;
 	private final ModelCacheManager modelCacheManager;
+	private final NewDiskCacheManager diskCacheManager;
 	
 	@Autowired
 	private MongoGridFs mongoGridFs;
@@ -43,6 +45,7 @@ public class PlatformServer {
 		colladaCacheManager = new ColladaCacheManager(this);
 		colladaProcessFactory = new ColladaProcessFactory();
 		modelCacheManager = new ModelCacheManager();
+		diskCacheManager = new NewDiskCacheManager(PlatformContext.getDiskCachepath());
 		
 		initialize();
 	}
@@ -92,4 +95,9 @@ public class PlatformServer {
 	public ModelCacheManager getModelCacheManager() {
 		return modelCacheManager;
 	}
+
+	public NewDiskCacheManager getDiskCacheManager() {
+		return diskCacheManager;
+	}
+	
 }

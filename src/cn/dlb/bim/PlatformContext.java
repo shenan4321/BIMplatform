@@ -14,6 +14,7 @@ public class PlatformContext {
 	private final static Path classRootPath;
 	private final static Path userPath;
 	private final static Path tempPath;
+	private final static Path diskCachePath;
 	private final static String classLocation;
 	
 //	private static final String userPath;
@@ -35,6 +36,7 @@ public class PlatformContext {
 		resourceBase = userPath.resolve("WebContent/").toString();
 		descriptor = userPath.resolve("WebContent/WEB-INF/web.xml").toString();
 		tempPath = new File(tempPathStr).toPath();
+		diskCachePath = tempPath.resolve("cache/");
 	}
 	
 	public static String getPlatformVersion() {
@@ -73,4 +75,8 @@ public class PlatformContext {
 		return serverPort;
 	}
 
+	public static Path getDiskCachepath() {
+		return diskCachePath;
+	}
+	
 }

@@ -5,8 +5,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.util.ArrayList;
-import java.util.List;
 
 import com.google.gson.stream.JsonWriter;
 
@@ -26,23 +24,6 @@ public class GeometryInfoVo {
 	
 	public GeometryInfoVo() {
 		init();
-	}
-	
-	public class Bound {
-		public Vector3f max;
-		public Vector3f min;
-		public Bound() {
-			max = new Vector3f(0, 0, 0);
-			min = new Vector3f(0, 0, 0);
-		}
-		public void writeJson(JsonWriter jsonWriter) throws IOException {
-			jsonWriter.beginObject();
-			jsonWriter.name("max");
-			max.writeJson(jsonWriter);
-			jsonWriter.name("min");
-			min.writeJson(jsonWriter);
-			jsonWriter.endObject();
-		}
 	}
 	
 	public void writeJson(JsonWriter jsonWriter) throws IOException {

@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.mongodb.DBObject;
 import com.mongodb.gridfs.GridFSDBFile;
 
-import cn.dlb.bim.cache.DownloadDescriptor;
+import cn.dlb.bim.cache.CacheDescriptor;
 import cn.dlb.bim.component.PlatformInitDatas;
 import cn.dlb.bim.component.PlatformServer;
 import cn.dlb.bim.dao.IfcModelDao;
@@ -49,11 +49,20 @@ import cn.dlb.bim.ifc.engine.cells.Vector3d;
 import cn.dlb.bim.ifc.serializers.IfcStepSerializer;
 import cn.dlb.bim.ifc.serializers.SerializerException;
 import cn.dlb.bim.ifc.shared.ProgressReporter;
+import cn.dlb.bim.ifc.tree.BuildingCellContainer;
+import cn.dlb.bim.ifc.tree.BuildingCellGenerator;
+import cn.dlb.bim.ifc.tree.BuildingStorey;
+import cn.dlb.bim.ifc.tree.BuildingStoreyGenerator;
 import cn.dlb.bim.ifc.tree.Material;
 import cn.dlb.bim.ifc.tree.MaterialGenerator;
+import cn.dlb.bim.ifc.tree.ProjectTree;
+import cn.dlb.bim.ifc.tree.ProjectTreeGenerator;
+import cn.dlb.bim.ifc.tree.PropertyGenerator;
+import cn.dlb.bim.ifc.tree.PropertySet;
 import cn.dlb.bim.models.geometry.GeometryInfo;
 import cn.dlb.bim.service.BimService;
 import cn.dlb.bim.utils.BinUtils;
+import cn.dlb.bim.utils.CacheUtils;
 import cn.dlb.bim.utils.JsonUtils;
 import cn.dlb.bim.vo.GeometryInfoVo;
 import cn.dlb.bim.vo.GlbVo;
@@ -77,16 +86,10 @@ public class BimServiceImpl implements BimService {
 
 	@Override
 	public List<GeometryInfoVo> queryGeometryInfo(Integer rid, ProgressReporter progressReporter) {
-		List<GeometryInfoVo> result = null;
-		DownloadDescriptor downloadDescriptor = new DownloadDescriptor(rid, "queryGeometryInfo");
-		if (server.getDiskCacheManager().contains(downloadDescriptor)) {
-			byte[] dataBytes = server.getDiskCacheManager().getData(downloadDescriptor);
-			try {
-				result = JsonUtils.readList(dataBytes, GeometryInfoVo.class);
-			} catch (IOException e) {
-				server.getDiskCacheManager().remove(downloadDescriptor);
-				e.printStackTrace();
-			}
+		CacheDescriptor cacheDescriptor = new CacheDescriptor("queryGeometryInfo", rid);
+		CacheUtils<GeometryInfoVo> utils = new CacheUtils<>(server.getDiskCacheManager());
+		List<GeometryInfoVo> result = utils.readListFromCache(cacheDescriptor, GeometryInfoVo.class);
+		if (result != null) {
 			return result;
 		}
 		
@@ -114,11 +117,7 @@ public class BimServiceImpl implements BimService {
 			}
 		}
 		
-		try {
-			JsonUtils.objectToJson(server.getDiskCacheManager().startCaching(downloadDescriptor), result);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} 
+		utils.cacheList(cacheDescriptor, result);
 		
 		return result;
 	}
@@ -328,8 +327,15 @@ public class BimServiceImpl implements BimService {
 
 	@Override
 	public List<ModelInfoVo> queryModelInfoByPid(Long pid) {
+		CacheDescriptor cacheDescriptor = new CacheDescriptor("queryModelInfoByPid", pid);
+		CacheUtils<ModelInfoVo> utils = new CacheUtils<>(server.getDiskCacheManager());
+		List<ModelInfoVo> result = utils.readListFromCache(cacheDescriptor, ModelInfoVo.class);
+		if (result != null) {
+			return result;
+		}
+		
 		List<IfcModelEntity> ifcModelEntityList = ifcModelDao.queryIfcModelEntityByPid(pid);
-		List<ModelInfoVo> result = new ArrayList<>();
+		result = new ArrayList<>();
 		for (IfcModelEntity ifcModelEntity : ifcModelEntityList) {
 			ModelInfoVo modelInfo = new ModelInfoVo();
 			modelInfo.setName(ifcModelEntity.getName());
@@ -341,21 +347,34 @@ public class BimServiceImpl implements BimService {
 			modelInfo.setUploadDate(ifcModelEntity.getUploadDate());
 			result.add(modelInfo);
 		}
+		
+		utils.cacheList(cacheDescriptor, result);
+		
 		return result;
 	}
 
 	@Override
 	public ModelInfoVo queryModelInfoByRid(Integer rid) {
+		CacheDescriptor cacheDescriptor = new CacheDescriptor("queryModelInfoByRid", rid);
+		CacheUtils<ModelInfoVo> utils = new CacheUtils<>(server.getDiskCacheManager());
+		ModelInfoVo result = utils.readObjectFromCache(cacheDescriptor, ModelInfoVo.class);
+		if (result != null) {
+			return result;
+		}
+		
 		IfcModelEntity ifcModelEntity = ifcModelDao.queryIfcModelEntityByRid(rid);
-		ModelInfoVo modelInfo = new ModelInfoVo();
-		modelInfo.setName(ifcModelEntity.getName());
-		modelInfo.setPid(ifcModelEntity.getPid());
-		modelInfo.setApplyType(ifcModelEntity.getApplyType());
-		modelInfo.setRid(ifcModelEntity.getRid());
-		modelInfo.setFileName(ifcModelEntity.getFileName());
-		modelInfo.setFileSize(ifcModelEntity.getFileSize());
-		modelInfo.setUploadDate(ifcModelEntity.getUploadDate());
-		return modelInfo;
+		result = new ModelInfoVo();
+		result.setName(ifcModelEntity.getName());
+		result.setPid(ifcModelEntity.getPid());
+		result.setApplyType(ifcModelEntity.getApplyType());
+		result.setRid(ifcModelEntity.getRid());
+		result.setFileName(ifcModelEntity.getFileName());
+		result.setFileSize(ifcModelEntity.getFileSize());
+		result.setUploadDate(ifcModelEntity.getUploadDate());
+		
+		utils.cacheObject(cacheDescriptor, result);
+		
+		return result;
 	}
 
 	@Override
@@ -392,13 +411,97 @@ public class BimServiceImpl implements BimService {
 
 	@Override
 	public List<ModelLabelVo> queryAllModelLabelByRid(Integer rid) {
+		CacheDescriptor downloadDescriptor = new CacheDescriptor("queryAllModelLabelByRid", rid);
+		CacheUtils<ModelLabelVo> utils = new CacheUtils<>(server.getDiskCacheManager());
+		List<ModelLabelVo> result = utils.readListFromCache(downloadDescriptor, ModelLabelVo.class);
+		if (result != null) {
+			return result;
+		}
+		
 		List<ModelLabel> modelLabelList = ifcModelDao.queryAllModelLabelByRid(rid);
-		List<ModelLabelVo> result = new ArrayList<>();
+		result = new ArrayList<>();
 		for (ModelLabel modelLabel : modelLabelList) {
 			ModelLabelVo modelLabelVo = new ModelLabelVo();
 			modelLabelVo.setEntity(modelLabel);
 			result.add(modelLabelVo);
 		}
+		
+		utils.cacheList(downloadDescriptor, result);
+		
+		return result;
+	}
+
+	@Override
+	public ProjectTree queryModelTree(Integer rid) {
+		CacheDescriptor downloadDescriptor = new CacheDescriptor("queryModelTree", rid);
+		CacheUtils<ProjectTree> utils = new CacheUtils<>(server.getDiskCacheManager());
+		ProjectTree result = utils.readObjectFromCache(downloadDescriptor, ProjectTree.class);
+		if (result != null) {
+			return result;
+		}	
+		
+		IfcModelInterface model = queryModelByRid(rid, null);
+		ProjectTreeGenerator treeGenerator = new ProjectTreeGenerator(model.getPackageMetaData());
+		treeGenerator.buildProjectTree(model, ProjectTreeGenerator.KeyWord_IfcProject);
+		result = treeGenerator.getTree();
+		
+		utils.cacheObject(downloadDescriptor, result);
+		
+		return result;
+	}
+
+	@Override
+	public List<BuildingStorey> queryModelBuildingStorey(Integer rid) {
+		CacheDescriptor downloadDescriptor = new CacheDescriptor("queryModelBuildingStorey", rid);
+		CacheUtils<BuildingStorey> utils = new CacheUtils<>(server.getDiskCacheManager());
+		List<BuildingStorey> result = utils.readListFromCache(downloadDescriptor, BuildingStorey.class);
+		if (result != null) {
+			return result;
+		}	
+		
+		IfcModelInterface model = queryModelByRid(rid, null);
+		BuildingStoreyGenerator generator = new BuildingStoreyGenerator(model.getPackageMetaData());
+		result = generator.generateBuildingStorey(model);
+		
+		utils.cacheList(downloadDescriptor, result);
+		
+		return result;
+	}
+
+	@Override
+	public List<BuildingCellContainer> queryBuildingCells(Integer rid) {
+		CacheDescriptor downloadDescriptor = new CacheDescriptor("queryBuildingCells", rid);
+		CacheUtils<BuildingCellContainer> utils = new CacheUtils<>(server.getDiskCacheManager());
+		List<BuildingCellContainer> result = utils.readListFromCache(downloadDescriptor, BuildingCellContainer.class);
+		if (result != null) {
+			return result;
+		}		
+		
+		IfcModelInterface model = queryModelByRid(rid, null);
+		BuildingCellGenerator generator = new BuildingCellGenerator();
+		result = generator.buildBuildingCells(model);
+		
+		utils.cacheList(downloadDescriptor, result);
+		
+		return result;
+	}
+
+	@Override
+	public List<PropertySet> queryProperty(Integer rid, Long oid) {
+		CacheDescriptor downloadDescriptor = new CacheDescriptor("queryProperty", rid, oid);
+		CacheUtils<PropertySet> utils = new CacheUtils<>(server.getDiskCacheManager());
+		List<PropertySet> result = utils.readListFromCache(downloadDescriptor, PropertySet.class);
+		if (result != null) {
+			return result;
+		}
+		
+		IfcModelInterface model = queryModelByRid(rid, null);
+		IdEObject targetObject = model.get(oid);
+		PropertyGenerator propertyGenerator = new PropertyGenerator();
+		result = propertyGenerator.getProperty(model.getPackageMetaData(), targetObject);
+
+		utils.cacheList(downloadDescriptor, result);
+		
 		return result;
 	}
 }

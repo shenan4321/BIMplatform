@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import cn.dlb.bim.component.RecordSearchManager;
-import cn.dlb.bim.dao.entity.Project;
 import cn.dlb.bim.ifc.collada.KmzSerializer;
 import cn.dlb.bim.ifc.emf.IdEObject;
 import cn.dlb.bim.ifc.emf.IfcModelInterface;
@@ -35,6 +34,7 @@ import cn.dlb.bim.ifc.tree.BuildingStorey;
 import cn.dlb.bim.ifc.tree.BuildingStoreyGenerator;
 import cn.dlb.bim.ifc.tree.Material;
 import cn.dlb.bim.ifc.tree.MaterialGenerator;
+import cn.dlb.bim.ifc.tree.ProjectTree;
 import cn.dlb.bim.ifc.tree.ProjectTreeGenerator;
 import cn.dlb.bim.ifc.tree.PropertyGenerator;
 import cn.dlb.bim.ifc.tree.PropertySet;
@@ -152,11 +152,9 @@ public class ModelController {
 	@ResponseBody
 	public Map<String, Object> queryModelTree(@RequestParam("rid")Integer rid) {
 		ResultUtil result = new ResultUtil();
-		IfcModelInterface model = bimService.queryModelByRid(rid, null);
-		ProjectTreeGenerator treeGenerator = new ProjectTreeGenerator(model.getPackageMetaData());
-		treeGenerator.buildProjectTree(model, ProjectTreeGenerator.KeyWord_IfcProject);
+		ProjectTree tree = bimService.queryModelTree(rid);
 		result.setSuccess(true);
-		result.setData(treeGenerator.getTree());
+		result.setData(tree);
 		return result.getResult();
 	}
 	
@@ -164,9 +162,7 @@ public class ModelController {
 	@ResponseBody
 	public Map<String, Object> queryModelBuildingStorey(@RequestParam("rid")Integer rid) {
 		ResultUtil result = new ResultUtil();
-		IfcModelInterface model = bimService.queryModelByRid(rid, null);
-		BuildingStoreyGenerator generator = new BuildingStoreyGenerator(model.getPackageMetaData());
-		List<BuildingStorey> buildingStoreys = generator.generateBuildingStorey(model);
+		List<BuildingStorey> buildingStoreys = bimService.queryModelBuildingStorey(rid);
 		result.setSuccess(true);
 		result.setData(buildingStoreys);
 		return result.getResult();
@@ -176,9 +172,7 @@ public class ModelController {
 	@ResponseBody
 	public Map<String, Object> queryBuildingCells(@RequestParam("rid")Integer rid) {
 		ResultUtil result = new ResultUtil();
-		IfcModelInterface model = bimService.queryModelByRid(rid, null);
-		BuildingCellGenerator generator = new BuildingCellGenerator();
-		List<BuildingCellContainer> buildingCells = generator.buildBuildingCells(model);
+		List<BuildingCellContainer> buildingCells = bimService.queryBuildingCells(rid);
 		result.setSuccess(true);
 		result.setData(buildingCells);
 		return result.getResult();
@@ -189,12 +183,7 @@ public class ModelController {
 	public Map<String, Object> queryProperty(@RequestParam("rid")Integer rid, @RequestParam("oid")Long oid
 			) {
 		ResultUtil result = new ResultUtil();
-		IfcModelInterface model = bimService.queryModelByRid(rid, null);
-		
-		IdEObject targetObject = model.get(oid);
-		
-		PropertyGenerator propertyGenerator = new PropertyGenerator();
-		List<PropertySet> porpertySetList = propertyGenerator.getProperty(model.getPackageMetaData(), targetObject);
+		List<PropertySet> porpertySetList = bimService.queryProperty(rid, oid);
 		result.setData(porpertySetList);
 		result.setSuccess(true);
 		return result.getResult();

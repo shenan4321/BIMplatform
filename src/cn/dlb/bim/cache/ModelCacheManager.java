@@ -3,7 +3,7 @@ package cn.dlb.bim.cache;
 import cn.dlb.bim.ifc.emf.IfcModelInterface;
 
 public class ModelCacheManager {
-	private final static int cacheSize = 1000;
+	private final static int cacheSize = 10;//根据服务器性能配置
 	LRUCache<Integer, IfcModelInterface> modelCache = new LRUCache<>(cacheSize);
 	
 	public IfcModelInterface getIfcModel(Integer rid) {

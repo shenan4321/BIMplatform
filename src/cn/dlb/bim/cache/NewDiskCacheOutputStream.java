@@ -34,9 +34,9 @@ public class NewDiskCacheOutputStream extends RemovableFileOutputStream {
 	private Path file;
 	private Path tempFile;
 	private final CountDownLatch latch = new CountDownLatch(1);
-	private final DownloadDescriptor downloadDescriptor;
+	private final CacheDescriptor downloadDescriptor;
 
-	public NewDiskCacheOutputStream(NewDiskCacheManager diskCacheManager, Path file, DownloadDescriptor downloadDescriptor) throws FileNotFoundException {
+	public NewDiskCacheOutputStream(NewDiskCacheManager diskCacheManager, Path file, CacheDescriptor downloadDescriptor) throws FileNotFoundException {
 		super(file.getParent().resolve(file.getFileName().toString() + ".__tmp"));
 		this.tempFile = file.getParent().resolve(file.getFileName().toString() + ".__tmp");
 		this.diskCacheManager = diskCacheManager;
@@ -44,7 +44,7 @@ public class NewDiskCacheOutputStream extends RemovableFileOutputStream {
 		this.downloadDescriptor = downloadDescriptor;
 	}
 	
-	public DownloadDescriptor getDownloadDescriptor() {
+	public CacheDescriptor getDownloadDescriptor() {
 		return downloadDescriptor;
 	}
 	

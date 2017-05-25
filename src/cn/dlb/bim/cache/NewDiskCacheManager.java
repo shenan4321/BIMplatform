@@ -43,7 +43,7 @@ public class NewDiskCacheManager {
 		}
 	}
 	
-	public boolean contains(DownloadDescriptor downloadDescriptor) {
+	public boolean contains(CacheDescriptor downloadDescriptor) {
 		String cacheKey = downloadDescriptor.getCacheKey();
 		synchronized (busyCaching) {
 			if (busyCaching.containsKey(cacheKey)) {
@@ -55,7 +55,7 @@ public class NewDiskCacheManager {
 		}
 	}
 	
-	public DataSource get(DownloadDescriptor downloadDescriptor) {
+	public DataSource get(CacheDescriptor downloadDescriptor) {
 		String cacheKey = downloadDescriptor.getCacheKey();
 		NewDiskCacheOutputStream diskCacheOutputStream = null;
 		synchronized (busyCaching) {
@@ -84,7 +84,7 @@ public class NewDiskCacheManager {
 		return null;
 	}
 	
-	public byte[] getData(DownloadDescriptor downloadDescriptor) {
+	public byte[] getData(CacheDescriptor downloadDescriptor) {
 		String cacheKey = downloadDescriptor.getCacheKey();
 		NewDiskCacheOutputStream diskCacheOutputStream = null;
 		synchronized (busyCaching) {
@@ -130,7 +130,7 @@ public class NewDiskCacheManager {
 		return null;
 	}
 
-	public NewDiskCacheOutputStream startCaching(DownloadDescriptor downloadDescriptor) {
+	public NewDiskCacheOutputStream startCaching(CacheDescriptor downloadDescriptor) {
 		try {
 			String cacheKey = downloadDescriptor.getCacheKey();
 			LOGGER.info("Start caching " + cacheKey);
@@ -181,7 +181,7 @@ public class NewDiskCacheManager {
 		}
 	}
 	
-	public void remove(DownloadDescriptor downloadDescriptor) {
+	public void remove(CacheDescriptor downloadDescriptor) {
 		String cacheKey = downloadDescriptor.getCacheKey();
 		LOGGER.info("Removing cache " + cacheKey);
 		cachedFileNames.remove(cacheKey);

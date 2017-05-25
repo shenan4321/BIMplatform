@@ -19,6 +19,11 @@ public class JsonUtils {
 		return objectMapper.readValue(dataBytes, javaType);
 	}
 	
+	public static <T> T readObject(byte[] dataBytes, Class<T> classType) throws JsonParseException, JsonMappingException, IOException {
+		ObjectMapper objectMapper = new ObjectMapper();
+		return objectMapper.readValue(dataBytes, classType);
+	}
+	
 	public static void objectToJson(OutputStream out, Object value) throws JsonGenerationException, JsonMappingException, IOException {
 		ObjectMapper objectMapper = new ObjectMapper();
 		objectMapper.writeValue(out, value);

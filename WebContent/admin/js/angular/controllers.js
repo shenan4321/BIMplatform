@@ -73,8 +73,8 @@ function ShopListCtrl($scope, $http, $timeout) {}
 function PetaCtrl($scope, $http, $timeout) {}
 
 function BimProjerctCtrl($scope, $http, $timeout ,$routeParams) {
-	$scope.pid = $routeParams.id
-	$scope.rid = $routeParams.rid
+	$scope.pid = $routeParams.id;
+	$scope.rid = $routeParams.rid;
 }
 
 function BimProjerctEditCtrl($scope, $http, $timeout ,$routeParams) {
@@ -88,4 +88,14 @@ function BimProjerctEditCtrl($scope, $http, $timeout ,$routeParams) {
     });  
 }
 
-function BimModelCtrl($scope, $http, $timeout) {}
+function BimModelEditCtrl($scope, $http, $timeout) {
+	$scope.pid = $routeParams.id;
+	$scope.rid = $routeParams.rid;
+	$http({    
+        method: "POST",    
+        url: "./../model/queryModelInfoByRid.do?rid="+Number($routeParams.rid),
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }  
+	}).success(function (data,status) {
+    	$scope.modelData = data.data;
+    });  
+}

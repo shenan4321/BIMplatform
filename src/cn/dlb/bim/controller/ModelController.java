@@ -109,9 +109,10 @@ public class ModelController {
 	}
 	
 	@RequestMapping(value = "convertIfcToGlb", method = RequestMethod.POST)
-	public void convertIfcToGlb(@RequestParam(value = "file", required = true) MultipartFile file,
+	@ResponseBody
+	public Map<String, Object> convertIfcToGlb(@RequestParam(value = "file", required = true) MultipartFile file,
 			HttpServletRequest request, HttpServletResponse response) throws IOException {//不存档
-		
+		ResultUtil result = new ResultUtil();
 		String path = request.getSession().getServletContext().getRealPath("upload/ifc/");
 		String fileName = file.getOriginalFilename();
 		String[] split = fileName.split("\\.");
@@ -120,8 +121,9 @@ public class ModelController {
 			suffix = split[split.length - 1];
 		}
 		if (suffix == null || !suffix.equals("ifc")) {
-			response.sendError(404);
-			return;
+			result.setSuccess(false);
+			result.setMsg("suffix : " + suffix + " is not be supported");
+			return result.getResult();
 		} 
 		String newFileName = fileName.substring(0, fileName.lastIndexOf("."));
 		newFileName += "-" + System.currentTimeMillis();
@@ -135,10 +137,19 @@ public class ModelController {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		ByteArrayOutputStream byteArrayOutputStream = bimService.convertIfcToGlb(targetFile);
+		Long glbId = bimService.convertIfcToGlbOffline(targetFile);
+		
+		result.setSuccess(true);
+		result.setKeyValue("glbId", glbId);;
+		return result.getResult();
+	}
+	
+	@RequestMapping(value = "queryGlbByGlbId", method = RequestMethod.GET)
+	public void queryGlbByRid(@RequestParam("glbId")Long glbId, HttpServletResponse response) {
+		GlbVo glbVo = bimService.queryGlbByGlbId(glbId);
 		try {
 			OutputStream os = response.getOutputStream();
-			os.write(byteArrayOutputStream.toByteArray());
+			os.write(glbVo.getData());
 			os.close();
 		} catch (IOException e) {
 			e.printStackTrace();

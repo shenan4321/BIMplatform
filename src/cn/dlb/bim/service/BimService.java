@@ -48,5 +48,11 @@ public interface BimService {
 	 * @param modelFile
 	 * @return
 	 */
-	public ByteArrayOutputStream convertIfcToGlb(File modelFile);
+	public Long convertIfcToGlbOffline(File modelFile);
+	/**
+	 * 查询glb
+	 * @param glbId
+	 * @return
+	 */
+	public GlbVo queryGlbByGlbId(Long glbId);
 }

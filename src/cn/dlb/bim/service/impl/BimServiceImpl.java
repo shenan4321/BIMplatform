@@ -503,8 +503,8 @@ public class BimServiceImpl implements BimService {
 	}
 	
 	@Override
-	public ByteArrayOutputStream convertIfcToGlb(File modelFile) {
-
+	public Long convertIfcToGlbOffline(File modelFile) {
+		Long glbId = -1l;
 		Schema schema = null;
 		try {
 			schema = preReadSchema(modelFile);
@@ -537,6 +537,27 @@ public class BimServiceImpl implements BimService {
 			glbOutput = new ByteArrayOutputStream();
 			glbSerializer.init(model, projectInfo, true);
 			glbSerializer.writeToOutputStream(glbOutput, null);
+			
+			double longitude = 0.0;
+			double latitude = 0.0;
+			EClass ifcSiteClass = model.getPackageMetaData().getEClass("IfcSite");
+			List<IdEObject> ifcSiteList = model.getAllWithSubTypes(ifcSiteClass);
+			if (ifcSiteList.size() > 0) {
+				IdEObject site = ifcSiteList.get(0);
+				Object refLongitudeObject = site.eGet(site.eClass().getEStructuralFeature("RefLongitude"));
+				Object refLatitudeObject = site.eGet(site.eClass().getEStructuralFeature("RefLatitude"));
+				if (refLongitudeObject != null && refLatitudeObject != null) {
+					EList<Long> refLongitude = (EList<Long>) refLongitudeObject;
+					EList<Long> refLatitude = (EList<Long>) refLatitudeObject;
+					longitude = getDegreeFromCompoundPlaneAngle(refLongitude);
+					latitude = getDegreeFromCompoundPlaneAngle(refLatitude);
+				}
+			}
+
+			ByteArrayInputStream glbInput = new ByteArrayInputStream(glbOutput.toByteArray());
+			MongoGridFs gridFs = server.getMongoGridFs();
+			glbId = IdentifyManager.getIdentifyManager().nextId(IdentifyManager.OFFLINE_GLB_KEY);
+			gridFs.saveGlbOffline(glbInput, modelFile.getName(), glbId, longitude, latitude);
 
 		} catch (DeserializeException e) {
 			e.printStackTrace();
@@ -546,6 +567,19 @@ public class BimServiceImpl implements BimService {
 			e.printStackTrace();
 		}
 
-		return glbOutput;
+		return glbId;
+	}
+
+	@Override
+	public GlbVo queryGlbByGlbId(Long glbId) {
+		GlbVo glbVo = null;
+		MongoGridFs gridFs = server.getMongoGridFs();
+		GridFSDBFile glbFile = gridFs.findGlbFileOffline(glbId);
+		try {
+			glbVo = convertFromGridFSDBFile(glbFile);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return glbVo;
 	}
 }

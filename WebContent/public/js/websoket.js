@@ -1,9 +1,7 @@
 function WebsocketBim(){
     this.socket = null;
     this.code = new Date().getTime()+""+Math.floor(Math.random() * ( 1000 + 1));
-    
     this.options = {
-        
         dataType:"json",
         onmessage:function(msg){
             return msg;
@@ -42,7 +40,7 @@ WebsocketBim.prototype.init = function(options){
 
         //连接发生错误的回调方法
         this.socket.onerror = function (event) {
-            options.onerror(event.data);
+        	options.onerror(event.data);
         };
 
         //连接成功建立的回调方法
@@ -65,12 +63,6 @@ WebsocketBim.prototype.init = function(options){
             options.onclose(event.data);
         };
 
-        //监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常。
-        window.onbeforeunload = function () {
-            if(this.socket){
-                this.socket.close();
-            }
-        }
     }
 };
 

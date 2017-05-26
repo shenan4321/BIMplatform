@@ -10,7 +10,7 @@
 	
 	var defaluts = {
 		progress:0,
-		max:0,
+		max:100,
 		title:'正在读取中'
 	};
 	

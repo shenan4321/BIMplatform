@@ -29,6 +29,8 @@ function showView(geom) {
 	    	   	});
         	}
 }
+
+
 var yaw = 0;
 var  pitch=
 	35.89999999999978,
@@ -44,7 +46,12 @@ function createScene(sceneNodes){
 	 var sceneViewObj = {
 		        canvasId:"mySceneCanvas",
 		        type: "scene",
-		        nodes: [{
+		        nodes: [
+					{
+					    type:"skybox/clouds",
+					    size:5000 // Box half-size on each axis - default is 5000
+					},
+					{
 		        	type: "cameras/pickFlyOrbit",
 		        	showCursor: true,
 		            id:'cameras',

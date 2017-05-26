@@ -76,6 +76,15 @@ require([
             }
         })();
 
+        var vecCrossProduct = function(a, b) { var r = SceneJS_math_cross3Vec3([a.x, a.y, a.z], [b.x, b.y, b.z]); return {x:r[0], y:r[1], z:r[2]}; };
+        var vecMultiplyScalar = function(a, m) { return {x:a.x*m, y:a.y*m, z:a.z*m}; };
+        var vecSubtract = function (a, b) { return { x: a.x - b.x, y: a.y - b.y, z: a.z - b.z }; };
+        var vecMagnitude = function(v) { var x = v.x, y = v.y, z = v.z; return Math.sqrt(x*x + y*y + z*z); };
+        var vecNormalize = function(v) { return vecMultiplyScalar(v, 1/vecMagnitude(v)); };
+        var vecNegate = function(v) { return {x:-v.x, y:-v.y, z:-v.z}; };
+        var vecAdd = function (a, b) { return { x: a.x + b.x, y: a.y + b.y, z: a.z + b.z }; };
+        var sphericalCoords = function(eye) {var r= vecMagnitude(eye)||1;var phi   = Math.acos(eye.z / r);var theta = Math.atan2(eye.y, eye.x);return {phi: phi, theta: theta};};
+
         SceneJS.Types.addType("cameras/pickFlyOrbit", {
 
             construct: function (params) {
@@ -189,6 +198,7 @@ require([
                 var yaw = params.yaw || 0;
                 var pitch = params.pitch || 0;
 
+                var direction = 1;
                 var startPivot;
                 var currentPivot = glmat.vec3.fromValues(look.x || 0, look.y || 0, look.z || 0);
                 var endPivot = glmat.vec3.fromValues(look.x || 0, look.y || 0, look.z || 0);
@@ -244,7 +254,7 @@ require([
 
                 function actionMove(posX, posY) {
                     if (dragging) {
-                        yaw -= (posX - lastX) * 0.1 ;
+                        yaw -= (posX - lastX) * direction * 0.1 ;
                         pitch -= (posY - lastY) * 0.1;
                         orbiting = true;
                     }
@@ -415,6 +425,28 @@ require([
                                 label.setShown(true);
                             }
 
+                            var radius = vecMagnitude(lookat.getEye());
+                			var phiTheta = sphericalCoords(lookat.getEye());
+                			var startPhi = phiTheta.phi;
+                			var startTheta = phiTheta.theta;
+                			var PI_2 = 2*Math.PI;
+                			var phi = pitch * 0.5 + startPhi;
+                			while(phi > PI_2) phi -= PI_2;
+                			while(phi < 0   ) phi += PI_2;
+                			if(phi > Math.PI) {
+                				if (direction != -1) {
+                					direction = -1;
+                					lookat.setUp({x: 0, y:1, z: -zoom});
+                				}
+                			} else {
+                				if (this.direction != 1) {
+                					direction = 1;
+                					lookat.setUp({x: 0, y:-1, z: -zoom});
+                				}
+                			}
+                            
+                			console.log(direction);
+                            
                             var eye = glmat.vec3.fromValues(0, 0, zoom);
                             var look = glmat.vec3.fromValues(currentPivot[0], currentPivot[1], currentPivot[2]);
                             //var up = glmat.vec3.fromValues(0, 1, 0);
@@ -431,16 +463,19 @@ require([
 
                             glmat.vec3.transformMat4(eye3, eye, mat);
 
+                            
                             // Update view transform
                             lookat.setLook({x: look[0], y: look[1], z: look[2] });
                             lookat.setEye({x: look[0] - eye3[0], y: look[1] - eye3[1], z: look[2] - eye3[2] });
+                            
+                            //lookat.setEye({x: eyeVec[0], y: eyeVec[1], z: eyeVec[2] });
 
-                            var lookatArgs = {
+                            /*var lookatArgs = {
                                 eye: {x: look[0], y: look[1], z: look[2] },
                                 look: {x: look[0] - eye3[0], y: look[1] - eye3[1], z: look[2] - eye3[2] }
-                            };
+                            };*/
 
-                            self.publish("updated", lookatArgs);
+                            //self.publish("updated", lookatArgs);
 
                             // Rotate complete
                             orbiting = false;

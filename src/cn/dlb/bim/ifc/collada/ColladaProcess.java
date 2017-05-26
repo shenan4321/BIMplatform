@@ -16,7 +16,7 @@ public class ColladaProcess {
 	private Collada2GLTFConfiguration configuration = new Collada2GLTFConfiguration(); 
 
 	public ColladaProcess(Path executeFile, Path file, Path basePath){
-		this.configuration = new Collada2GLTFConfiguration(executeFile.getFileName().toString(), file.getFileName().toString());
+		this.configuration = new Collada2GLTFConfiguration(executeFile.toFile().getAbsolutePath(), file.toFile().getAbsolutePath());
 		this.basePath = basePath;
 	}
 	

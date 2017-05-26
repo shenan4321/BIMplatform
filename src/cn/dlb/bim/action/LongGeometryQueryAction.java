@@ -71,29 +71,44 @@ public class LongGeometryQueryAction extends LongAction {
 			sendErrorWebSocketClose(rid);
 		}
 		
-		
-		double maxZoom = 0;
+		Vector3f maxVec = new Vector3f(Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE);
+		Vector3f minVec = new Vector3f(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
 		for (GeometryInfoVo geometry : geometryList) {
-			Double zoom = maxZoom(geometry.getBound().min, geometry.getBound().max);
-			maxZoom = Math.max(zoom, maxZoom);
+			maxVec = maxVector(maxVec, geometry.getBound().max);
+			minVec = minVector(minVec, geometry.getBound().min);
 		}
-
-		sendGeometryZoom(40000.0);
+		Double zoom = maxZoom(minVec, maxVec);
+		Vector3f middle = middle(minVec, maxVec);
+		sendGeometryParam(zoom, middle);
 		sendWebSocketMessage(geometryList);
 	}
 	
+	public Vector3f maxVector(Vector3f a, Vector3f b) {
+		double maxX = Math.max(a.x, b.x);
+		double maxY = Math.max(a.y, b.y);
+		double maxZ = Math.max(a.z, b.z);
+		return new Vector3f(maxX, maxY, maxZ);
+	}
+	
+	public Vector3f minVector(Vector3f a, Vector3f b) {
+		double minX = Math.min(a.x, b.x);
+		double minY = Math.min(a.y, b.y);
+		double minZ = Math.min(a.z, b.z);
+		return new Vector3f(minX, minY, minZ);
+	}
+	
 	public Double maxZoom(Vector3f min, Vector3f max) {
-		double minX = min.x;
-		double minY = min.y;
-		double maxX = max.x;
-		double maxY = max.y;
-		double deltX = Math.abs(maxX - minX);
-		double deltY = Math.abs(maxY - minY);
-		double maxDelt = Math.max(deltX, deltY);
+		double deltX = Math.abs(max.x - min.x);
+		double deltY = Math.abs(max.y - min.y);
+		double deltZ = Math.abs(max.z - min.z);
+		double maxDelt = Math.max(Math.max(deltX, deltY), deltZ);
 		return maxDelt;
 	}
+	
+	private Vector3f middle(Vector3f min, Vector3f max) {
+		return new Vector3f((min.x + max.x)/2.0, (min.y + max.y)/2.0, (min.z + max.z)/2.0);
+	}
 
-	@SuppressWarnings("resource")
 	public void sendWebSocketMessage(List<GeometryInfoVo> msg) {
 		if (webSocketSession == null || !webSocketSession.isOpen()) {
 			return;
@@ -167,12 +182,13 @@ public class LongGeometryQueryAction extends LongAction {
 		}
 	}
 	
-	public void sendGeometryZoom(Double zoom) {
+	public void sendGeometryParam(Double zoom, Vector3f middle) {
 		if (webSocketSession == null || !webSocketSession.isOpen()) {
 			return;
 		}
 		ResultUtil result = new ResultUtil();
 		result.setKeyValue("zoom", zoom);
+		result.setKeyValue("middle", middle);
 		result.setSuccess(true);
 		Gson gson = new Gson();
 		String jsonStr = gson.toJson(result.getResult());

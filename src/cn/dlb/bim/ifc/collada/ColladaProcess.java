@@ -98,7 +98,7 @@ public class ColladaProcess {
 		{
 			ArrayList<String> list = new ArrayList<String>();
 			// Add the application.
-			list.add("D:\\collada2gltf-web-service-master\\collada2gltf\\win32\\collada2gltf.exe");
+			list.add(executeFile);
 			// Required parameters.
 			if (fileName != null)
 				list.addAll(Arrays.asList(new String[] {"-f", String.format("\"%s\"", fileName)}));

@@ -1,29 +1,31 @@
 <ol class="breadcrumb newcrumb">
     <li><a href="#"><span><i class="fa fontello-home-outline"></i></span>主页</a></li>
     <li class="active"><a href="#!/BimModel/addModel/{{pid}}">模型管理</a></li>
-    <li class="active">添加模型</li>
+    <li class="active">修改模型</li>
 </ol>
 <!-- 添加模型html -->
 <div class="row">
     <div class="col-md-12">
         <div class="box ">
             <div class="box-header">
-                <h3 class="box-title">添加模型</h3>
+                <h3 class="box-title">修改模型</h3>
             </div>
-            <form role="form" action="../model/addModel.do" enctype="multipart/form-data" method="post" onsubmit="return validateCallback(this,function(res){console.log(res)})" id="addmodelform" novalidate>
+            <form role="form" action="../model/editModel.do" enctype="multipart/form-data" method="post" onsubmit="return validateCallback(this,function(res){console.log(res)})" id="editmodelform" novalidate>
                  <input type="hidden" name="pid" id="pId" value="{{pid}}">
+                 <input type="hidden" name="rid" id="rId" value="{{rid}}">
                 <div class="box-body">
                 	<div class="form-group">
-                        <label for="modelImg">上传模型</label>
+                        <label for="modelImg">修改模型</label>
+                        <img src="{{modelData.picUrl}}" width=100 height=100>
                         <input type="file"  name="file">
                     </div>
                     <div class="form-group">
                         <label for="modelName">模型名称</label>
-                        <input type="text" class="form-control" placeholder="请输入模型名称 " name="name" required>
+                        <input type="text" class="form-control" placeholder="请输入模型名称 " name="name" required value="{{modelData.name}}">
                     </div>
                     <div class="form-group">
                         <label for="modelProfile">应用类型</label>
-                        <select id="compassName" class="compassName form-control" name="applyType">
+                        <select id="compassName" class="compassName form-control" name="applyType" >
 							<option value="1">结构</option>
 							<option value="2">建筑</option>
 							<option value="3">强电</option>

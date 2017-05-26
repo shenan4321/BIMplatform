@@ -191,6 +191,11 @@ config(['$routeProvider',
             controller: BimProjerctEditCtrl,
             activetab: 'BimProject'
         }).
+        when('/BimModel/editModel/:id/:rid', {
+            templateUrl: 'pages/BimModel/editModel.html',
+            controller: BimModelEditCtrl,
+            activetab: 'BimProject'
+        }).
         otherwise({
             redirectTo: '/'
         });

@@ -1,5 +1,6 @@
 package cn.dlb.bim.controller;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -29,14 +30,10 @@ import cn.dlb.bim.ifc.emf.ProjectInfo;
 import cn.dlb.bim.ifc.engine.cells.Vector3d;
 import cn.dlb.bim.ifc.serializers.SerializerException;
 import cn.dlb.bim.ifc.tree.BuildingCellContainer;
-import cn.dlb.bim.ifc.tree.BuildingCellGenerator;
 import cn.dlb.bim.ifc.tree.BuildingStorey;
-import cn.dlb.bim.ifc.tree.BuildingStoreyGenerator;
 import cn.dlb.bim.ifc.tree.Material;
 import cn.dlb.bim.ifc.tree.MaterialGenerator;
 import cn.dlb.bim.ifc.tree.ProjectTree;
-import cn.dlb.bim.ifc.tree.ProjectTreeGenerator;
-import cn.dlb.bim.ifc.tree.PropertyGenerator;
 import cn.dlb.bim.ifc.tree.PropertySet;
 import cn.dlb.bim.lucene.IfcProductRecordText;
 import cn.dlb.bim.models.ifc2x3tc1.IfcProduct;
@@ -109,6 +106,43 @@ public class ModelController {
 		result.setSuccess(true);
 		result.setKeyValue("rid", rid);
 		return result.getResult();
+	}
+	
+	@RequestMapping(value = "convertIfcToGlb", method = RequestMethod.POST)
+	public void convertIfcToGlb(@RequestParam(value = "file", required = true) MultipartFile file,
+			HttpServletRequest request, HttpServletResponse response) throws IOException {//不存档
+		
+		String path = request.getSession().getServletContext().getRealPath("upload/ifc/");
+		String fileName = file.getOriginalFilename();
+		String[] split = fileName.split("\\.");
+		String suffix = null;
+		if (split.length >= 2) {
+			suffix = split[split.length - 1];
+		}
+		if (suffix == null || !suffix.equals("ifc")) {
+			response.sendError(404);
+			return;
+		} 
+		String newFileName = fileName.substring(0, fileName.lastIndexOf("."));
+		newFileName += "-" + System.currentTimeMillis();
+		newFileName += "." + suffix;
+		File targetFile = new File(path, newFileName);
+		if (!targetFile.exists()) {
+			targetFile.mkdirs();
+		}
+		try {
+			file.transferTo(targetFile);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		ByteArrayOutputStream byteArrayOutputStream = bimService.convertIfcToGlb(targetFile);
+		try {
+			OutputStream os = response.getOutputStream();
+			os.write(byteArrayOutputStream.toByteArray());
+			os.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	@RequestMapping(value = "queryModelInfoByPid", method = RequestMethod.POST)
@@ -316,6 +350,5 @@ public class ModelController {
 			e.printStackTrace();
 		}
 	}
-	
 	
 }

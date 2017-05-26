@@ -84,4 +84,19 @@ public class MongoGridFs {
 		file.save();
 	}
 	
+	public GridFSFile saveGlbOffline(InputStream inputStream, String fileName, Long id, double lon, double lat) {
+		DBObject metaData = new BasicDBObject("offline", true);
+		metaData.put("id", id);
+		metaData.put(STORE_BIM_TYPE, STORE_GLB_FILE);
+		metaData.put("lon", lon);
+		metaData.put("lat", lat);
+		return gridFsTemplate.store(inputStream, fileName, metaData);
+	}
+	
+	public GridFSDBFile findGlbFileOffline(Long id) {
+		Query query = new Query();
+		query.addCriteria(Criteria.where("metadata.id").is(id).andOperator(Criteria.where("metadata." + STORE_BIM_TYPE).is(STORE_GLB_FILE)));
+		return gridFsTemplate.findOne(query);
+	}
+	
 }

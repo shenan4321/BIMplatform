@@ -7,7 +7,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,13 +16,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.mongodb.DBObject;
 import com.mongodb.gridfs.GridFSDBFile;
+import com.mongodb.gridfs.GridFSFile;
 
 import cn.dlb.bim.cache.CacheDescriptor;
+import cn.dlb.bim.component.MongoGridFs;
 import cn.dlb.bim.component.PlatformInitDatas;
 import cn.dlb.bim.component.PlatformServer;
 import cn.dlb.bim.dao.IfcModelDao;
@@ -63,12 +61,11 @@ import cn.dlb.bim.models.geometry.GeometryInfo;
 import cn.dlb.bim.service.BimService;
 import cn.dlb.bim.utils.BinUtils;
 import cn.dlb.bim.utils.CacheUtils;
-import cn.dlb.bim.utils.JsonUtils;
+import cn.dlb.bim.utils.IdentifyManager;
 import cn.dlb.bim.vo.GeometryInfoVo;
 import cn.dlb.bim.vo.GlbVo;
 import cn.dlb.bim.vo.ModelInfoVo;
 import cn.dlb.bim.vo.ModelLabelVo;
-import cn.dlb.bim.vo.Vector3f;
 
 @Service("BimServiceImpl")
 public class BimServiceImpl implements BimService {
@@ -503,5 +500,52 @@ public class BimServiceImpl implements BimService {
 		utils.cacheList(downloadDescriptor, result);
 		
 		return result;
+	}
+	
+	@Override
+	public ByteArrayOutputStream convertIfcToGlb(File modelFile) {
+
+		Schema schema = null;
+		try {
+			schema = preReadSchema(modelFile);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (DeserializeException e) {
+			e.printStackTrace();
+		}
+
+		if (schema == null) {
+			return null;
+		}
+		ByteArrayOutputStream glbOutput = null;
+		IfcStepDeserializer deserializer = server.getSerializationManager().createIfcStepDeserializer(schema);
+		IfcStepSerializer serializer = server.getSerializationManager().createIfcStepSerializer(schema);
+		try {
+			deserializer.read(modelFile);
+
+			IfcModelInterface model = deserializer.getModel();
+
+			IRenderEngine renderEngine = server.getRenderEngineFactory().createRenderEngine(schema.getEPackageName());
+
+			GeometryGenerator generator = new GeometryGenerator(model, serializer, renderEngine);
+			generator.generateForAllElements();
+			
+			GlbSerializer glbSerializer = new GlbSerializer(server);
+			ProjectInfo projectInfo = new ProjectInfo();
+			projectInfo.setName("bim");
+			projectInfo.setAuthorName("linfujun");
+			glbOutput = new ByteArrayOutputStream();
+			glbSerializer.init(model, projectInfo, true);
+			glbSerializer.writeToOutputStream(glbOutput, null);
+
+		} catch (DeserializeException e) {
+			e.printStackTrace();
+		} catch (RenderEngineException e) {
+			e.printStackTrace();
+		} catch (SerializerException e) {
+			e.printStackTrace();
+		}
+
+		return glbOutput;
 	}
 }

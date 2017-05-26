@@ -1,5 +1,6 @@
 package cn.dlb.bim.service;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
@@ -41,4 +42,11 @@ public interface BimService {
 	public List<BuildingStorey> queryModelBuildingStorey(Integer rid);
 	public List<BuildingCellContainer> queryBuildingCells(Integer rid);
 	public List<PropertySet> queryProperty(Integer rid, Long oid);
+	
+	/**
+	 * 转换ifc不存档
+	 * @param modelFile
+	 * @return
+	 */
+	public ByteArrayOutputStream convertIfcToGlb(File modelFile);
 }

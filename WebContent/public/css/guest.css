@@ -149,9 +149,21 @@ line-height: 60px;
 	
 font-size: 22px;
 	
-color: #2d353d;
+color: #03A9F4;
 	
 font-family: "Î¢ÈíÑÅºÚ", Arial, Gotham, "Helvetica Neue", Helvetica, sans-serif;
 	
 font-weight: 800;
+	
+margin-left: 20px;
+}
+.navbar-brand-txt1{
+ position: absolute;
+    top: 0;
+    left: 235px;
+    line-height: 60px;
+    font-size: 23px;
+    color: #2d353d;
+    font-family: Î¢ÈíÑÅºÚ, Arial, Gotham, &quot;Helvetica Neue&quot;, Helvetica, sans-serif;
+    font-weight: 800;
 }

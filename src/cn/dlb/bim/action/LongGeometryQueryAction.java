@@ -120,7 +120,7 @@ public class LongGeometryQueryAction extends LongAction {
 				String jsonStr = gson.toJson(info);
 				TextMessage message = new TextMessage(jsonStr);
 				progressReporter.setTitle("Transferring");
-				progressReporter.update(progress++, msg.size());
+				progressReporter.update(++progress, msg.size());
 				webSocketSession.sendMessage(message);
 			}
 		} catch (FileNotFoundException e1) {

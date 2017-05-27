@@ -141,6 +141,26 @@
 }
 .navbar-brand-txt{
 	
+<<<<<<< HEAD
+    position: absolute;
+    top: 0;
+    line-height: 60px;
+    font-size: 30px;
+    color: #2d353d;
+    font-family: "Î¢ÈíÑÅºÚ", Arial, Gotham, "Helvetica Neue", Helvetica, sans-serif;
+    font-weight: 800;
+    margin-left: 20px;
+}
+.navbar-brand-txt1{
+ position: absolute;
+    top: 0;
+    left: 235px;
+    line-height: 60px;
+    font-size: 20px;
+    color: #2d353d;
+    font-family: Î¢ÈíÑÅºÚ, Arial, Gotham,;Helvetica Neue&quot;, Helvetica, sans-serif;
+    font-weight: 800;
+=======
 position: absolute;
 	
 top: 0;
@@ -168,4 +188,5 @@ margin-left: 20px;
  Helvetica Neue&quot;,
  Helvetica, sans-serif;
  font-weight: 800;
+>>>>>>> aeed4cc688013eafaeb8d8422d59c084d1eead17
 }

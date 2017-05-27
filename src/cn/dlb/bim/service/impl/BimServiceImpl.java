@@ -38,6 +38,7 @@ import cn.dlb.bim.ifc.deserializers.StepParser;
 import cn.dlb.bim.ifc.emf.IdEObject;
 import cn.dlb.bim.ifc.emf.IfcModelInterface;
 import cn.dlb.bim.ifc.emf.IfcModelInterfaceException;
+import cn.dlb.bim.ifc.emf.OfflineOidProvider;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
 import cn.dlb.bim.ifc.emf.ProjectInfo;
 import cn.dlb.bim.ifc.emf.Schema;
@@ -529,6 +530,7 @@ public class BimServiceImpl implements BimService {
 
 			GeometryGenerator generator = new GeometryGenerator(model, serializer, renderEngine);
 			generator.generateForAllElements();
+			model.fixOids(new OfflineOidProvider());
 			
 			GlbSerializer glbSerializer = new GlbSerializer(server);
 			ProjectInfo projectInfo = new ProjectInfo();

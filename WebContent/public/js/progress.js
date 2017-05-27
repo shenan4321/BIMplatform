@@ -18,7 +18,7 @@
         	var $this = this;
         	var opts = $.extend({}, defaluts, options);
 			if($(".progress").length!=1){
-				var boxHTML = '<div class="progressbars"><div class="progressdiv" id="progressDIV"><div class="text"><span id="progressTitle">正准备上传文件</span> (<span id="progressNum">0</span>/<span id="progressTotal">0</span>)</div>'+
+				var boxHTML = '<div class="progressbars"><div class="progressdiv" id="progressDIV"><div class="text"><span id="progressTitle">loading</span> (<span id="progressNum">0</span>/<span id="progressTotal">0</span>)</div>'+
 		        	'<div class="progress">'+
 		            '<div class="progress-striped"  style="width:0%;" id="progressStriped">'+
 		            '<div class="progress-bar"></div>'+
@@ -33,7 +33,7 @@
     				document.getElementById('progressStriped').style.width = (~~(options.progress/options.max*100))+'%';
         		},
         		hide:function(){
-        			$('.progressbars').remove();
+        			//$('.progressbars').hide();
         		}
         	}
         

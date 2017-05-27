@@ -115,9 +115,6 @@ websocket.init({
 	onmessage:function(data){
 		if(data.progress){
 			progress.update(data);
-			if(data.progress == data.max){
-				progress.hide();
-			}
 		}else if(data.zoom){
 			window.maxZoom = data.zoom;
 			window.middle = data.middle;
@@ -132,7 +129,7 @@ websocket.init({
 		}
 	},
 	onclose:function(){
-		//bindEvent();
+		progress.hide();
 		websocket = null;
 	}
 });

@@ -31,18 +31,21 @@ function showView(geom) {
 }
 
 
-var yaw = 0;
-var  pitch=
-	35.89999999999978,
-minPitch= -80,
-maxPitch=-10,
-zoom=-40000,
-zoomSensitivity=20000,
-eye={ x:-13287.629623413086, y:-112125.818359375, z:13181.4609375},
-look={ x:-13490.2646484375, y:-12278.833984375, z:7655.30322265625};
-
 
 function createScene(sceneNodes){
+	var yaw = 0;
+	var  pitch=35.89999999999978,
+	minPitch= -80,
+	maxPitch=-10,
+	zoom= - (~~(maxZoom/3)),
+	zoomSensitivity= -(~~(maxZoom/15)),
+	//eye={x:middle.x,y: - middle.y* 10,z: maxZoom/5*4},
+	eye = middle,
+	look=middle;
+
+	console.log(zoom);
+	console.log('zoomSensitivity',zoomSensitivity);
+	
 	 var sceneViewObj = {
 		        canvasId:"mySceneCanvas",
 		        type: "scene",

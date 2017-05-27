@@ -93,7 +93,7 @@ require([
 
                 var lookat = this.addNode({
                     type: "lookAt",
-
+                	id:'lookAt',
                     nodes: [
                         {
                             type: "name",
@@ -208,6 +208,8 @@ require([
                 var flightDuration;
                 var flying = false;
                 var orbiting = true;
+                var mouseWheeling = false;
+                
 
                 function mouseDown(event) {
                     lastX = downX = event.clientX;
@@ -274,14 +276,17 @@ require([
                     if (delta) {
                         if (delta < 0) {
                             zoom -= zoomSensitivity;
+                            
                         } else {
                             zoom += zoomSensitivity;
+                            
                         }
                     }
                     if (event.preventDefault) {
                         event.preventDefault();
                     }
                     event.returnValue = false;
+                    mouseWheeling = true;
                     orbiting = true;
                 }
 
@@ -436,17 +441,17 @@ require([
                 			if(phi > Math.PI) {
                 				if (direction != -1) {
                 					direction = -1;
-                					lookat.setUp({x: 0, y:1, z: -zoom});
+                					//lookat.setUp({x: 0, y:1, z: -zoom});
                 				}
                 			} else {
                 				if (this.direction != 1) {
                 					direction = 1;
-                					lookat.setUp({x: 0, y:-1, z: -zoom});
                 				}
                 			}
-                            
-                			console.log(direction);
-                            
+                			
+                			
+                			lookat.setUp({x: 0, y:1, z: Math.abs(zoom)});
+                			
                             var eye = glmat.vec3.fromValues(0, 0, zoom);
                             var look = glmat.vec3.fromValues(currentPivot[0], currentPivot[1], currentPivot[2]);
                             //var up = glmat.vec3.fromValues(0, 1, 0);
@@ -456,6 +461,15 @@ require([
 
                             var mat = glmat.mat4.create();
 
+                            
+                            if(pitch>89.8 && pitch<90){
+                            	pitch = 90.1;
+                            }else if(pitch >= - 90 && pitch < -89.8){
+                            	pitch = -90.133;
+                            }else if( (pitch>179.90 && pitch < 180) || (pitch > -180 && pitch < -179.90)){
+                            	pitch = 0
+                            }
+                            
                             glmat.mat4.rotateY(mat, mat, -yaw * 0.0174532925);
                             glmat.mat4.rotateX(mat, mat, -pitch * 0.0174532925);
 
@@ -466,7 +480,7 @@ require([
                             
                             // Update view transform
                             lookat.setLook({x: look[0], y: look[1], z: look[2] });
-                            lookat.setEye({x: look[0] - eye3[0], y: look[1] - eye3[1], z: look[2] - eye3[2] });
+                            lookat.setEye({x: look[0] - eye3[0], y: look[1] - eye3[1], z: look[2] - eye3[2] });                            
                             
                             //lookat.setEye({x: eyeVec[0], y: eyeVec[1], z: eyeVec[2] });
 

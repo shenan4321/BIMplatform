@@ -120,6 +120,7 @@ websocket.init({
 			}
 		}else if(data.zoom){
 			window.maxZoom = data.zoom;
+			window.middle = data.middle;
 		}else{
 			progress.hide();
 			if(!window.scene){

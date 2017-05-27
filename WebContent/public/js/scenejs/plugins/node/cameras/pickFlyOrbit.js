@@ -450,9 +450,9 @@ require([
                 			}
                 			
                 			
-                			lookat.setUp({x: 0, y:1, z: Math.abs(zoom)});
+                			lookat.setUp({x: 0, y:1, z: Math.abs(zoom)>maxZoom?maxZoom:Math.abs(zoom)});
                 			
-                            var eye = glmat.vec3.fromValues(0, 0, zoom);
+                            var eye = glmat.vec3.fromValues(0, 0, Math.abs(zoom)>maxZoom?maxZoom:Math.abs(zoom));
                             var look = glmat.vec3.fromValues(currentPivot[0], currentPivot[1], currentPivot[2]);
                             //var up = glmat.vec3.fromValues(0, 1, 0);
 

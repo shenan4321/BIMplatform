@@ -118,8 +118,7 @@ websocket.init({
 		}else if(data.zoom){
 			window.maxZoom = data.zoom;
 			window.middle = data.middle;
-		}else{
-			progress.hide();
+		}else{		
 			if(!window.scene){
 				createScene(data);
 				showView(data);
@@ -129,7 +128,7 @@ websocket.init({
 		}
 	},
 	onclose:function(){
-		//progress.hide();
+		progress.hide();
 		websocket = null;
 	}
 });

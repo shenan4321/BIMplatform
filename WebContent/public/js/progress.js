@@ -33,7 +33,7 @@
     				document.getElementById('progressStriped').style.width = (~~(options.progress/options.max*100))+'%';
         		},
         		hide:function(){
-        			//$('.progressbars').hide();
+        			$('.progressbars').hide();
         		}
         	}
         

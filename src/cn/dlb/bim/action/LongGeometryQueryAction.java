@@ -71,8 +71,8 @@ public class LongGeometryQueryAction extends LongAction {
 			sendErrorWebSocketClose(rid);
 		}
 		
-		Vector3f maxVec = new Vector3f(Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE);
-		Vector3f minVec = new Vector3f(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
+		Vector3f maxVec = new Vector3f(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY);
+		Vector3f minVec = new Vector3f(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
 		for (GeometryInfoVo geometry : geometryList) {
 			maxVec = maxVector(maxVec, geometry.getBound().max);
 			minVec = minVector(minVec, geometry.getBound().min);
@@ -80,7 +80,7 @@ public class LongGeometryQueryAction extends LongAction {
 		Double zoom = maxZoom(minVec, maxVec);
 		Vector3f middle = middle(minVec, maxVec);
 		sendGeometryParam(zoom, middle);
-		sendWebSocketMessage(geometryList);
+		sendWebSocketMessage(geometryList, progressReporter);
 	}
 	
 	public Vector3f maxVector(Vector3f a, Vector3f b) {
@@ -109,15 +109,18 @@ public class LongGeometryQueryAction extends LongAction {
 		return new Vector3f((min.x + max.x)/2.0, (min.y + max.y)/2.0, (min.z + max.z)/2.0);
 	}
 
-	public void sendWebSocketMessage(List<GeometryInfoVo> msg) {
+	public void sendWebSocketMessage(List<GeometryInfoVo> msg, ProgressReporter progressReporter) {
 		if (webSocketSession == null || !webSocketSession.isOpen()) {
 			return;
 		}
 		Gson gson = new Gson();
 		try {
+			int progress = 0;
 			for (GeometryInfoVo info : msg) {
 				String jsonStr = gson.toJson(info);
 				TextMessage message = new TextMessage(jsonStr);
+				progressReporter.setTitle("Transferring");
+				progressReporter.update(progress++, msg.size());
 				webSocketSession.sendMessage(message);
 			}
 		} catch (FileNotFoundException e1) {

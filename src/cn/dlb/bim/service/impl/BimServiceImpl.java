@@ -325,15 +325,8 @@ public class BimServiceImpl implements BimService {
 
 	@Override
 	public List<ModelInfoVo> queryModelInfoByPid(Long pid) {
-		CacheDescriptor cacheDescriptor = new CacheDescriptor("queryModelInfoByPid", pid);
-		CacheUtils<ModelInfoVo> utils = new CacheUtils<>(server.getDiskCacheManager());
-		List<ModelInfoVo> result = utils.readListFromCache(cacheDescriptor, ModelInfoVo.class);
-		if (result != null) {
-			return result;
-		}
-		
 		List<IfcModelEntity> ifcModelEntityList = ifcModelDao.queryIfcModelEntityByPid(pid);
-		result = new ArrayList<>();
+		List<ModelInfoVo> result = new ArrayList<>();
 		for (IfcModelEntity ifcModelEntity : ifcModelEntityList) {
 			ModelInfoVo modelInfo = new ModelInfoVo();
 			modelInfo.setName(ifcModelEntity.getName());
@@ -345,23 +338,13 @@ public class BimServiceImpl implements BimService {
 			modelInfo.setUploadDate(ifcModelEntity.getUploadDate());
 			result.add(modelInfo);
 		}
-		
-		utils.cacheList(cacheDescriptor, result);
-		
 		return result;
 	}
 
 	@Override
 	public ModelInfoVo queryModelInfoByRid(Integer rid) {
-		CacheDescriptor cacheDescriptor = new CacheDescriptor("queryModelInfoByRid", rid);
-		CacheUtils<ModelInfoVo> utils = new CacheUtils<>(server.getDiskCacheManager());
-		ModelInfoVo result = utils.readObjectFromCache(cacheDescriptor, ModelInfoVo.class);
-		if (result != null) {
-			return result;
-		}
-		
 		IfcModelEntity ifcModelEntity = ifcModelDao.queryIfcModelEntityByRid(rid);
-		result = new ModelInfoVo();
+		ModelInfoVo result = new ModelInfoVo();
 		result.setName(ifcModelEntity.getName());
 		result.setPid(ifcModelEntity.getPid());
 		result.setApplyType(ifcModelEntity.getApplyType());
@@ -369,9 +352,6 @@ public class BimServiceImpl implements BimService {
 		result.setFileName(ifcModelEntity.getFileName());
 		result.setFileSize(ifcModelEntity.getFileSize());
 		result.setUploadDate(ifcModelEntity.getUploadDate());
-		
-		utils.cacheObject(cacheDescriptor, result);
-		
 		return result;
 	}
 
@@ -409,23 +389,13 @@ public class BimServiceImpl implements BimService {
 
 	@Override
 	public List<ModelLabelVo> queryAllModelLabelByRid(Integer rid) {
-		CacheDescriptor downloadDescriptor = new CacheDescriptor("queryAllModelLabelByRid", rid);
-		CacheUtils<ModelLabelVo> utils = new CacheUtils<>(server.getDiskCacheManager());
-		List<ModelLabelVo> result = utils.readListFromCache(downloadDescriptor, ModelLabelVo.class);
-		if (result != null) {
-			return result;
-		}
-		
 		List<ModelLabel> modelLabelList = ifcModelDao.queryAllModelLabelByRid(rid);
-		result = new ArrayList<>();
+		List<ModelLabelVo> result = new ArrayList<>();
 		for (ModelLabel modelLabel : modelLabelList) {
 			ModelLabelVo modelLabelVo = new ModelLabelVo();
 			modelLabelVo.setEntity(modelLabel);
 			result.add(modelLabelVo);
 		}
-		
-		utils.cacheList(downloadDescriptor, result);
-		
 		return result;
 	}
 

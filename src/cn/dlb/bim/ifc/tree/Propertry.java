@@ -17,7 +17,7 @@ public class Propertry {
 		this.value = value;
 	}
 	
-	public String getText() {
+	public String text() {
 		return name + ":" + value.toString();
 	}
 }

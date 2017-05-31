@@ -95,7 +95,7 @@ public class RecordSearchManager {
 			
 			String detail = "";
 			for (PropertySet propertySet : porpertySetList) {
-				detail += propertySet.getText() + ";";
+				detail += propertySet.text() + ";";
 			}
 			
 			IfcProductRecordText record = new IfcProductRecordText();

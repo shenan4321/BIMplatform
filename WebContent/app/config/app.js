@@ -620,7 +620,8 @@
                 };
             this.open = function () { mask(arguments[0], true) };
             this.close = function () {
-                var callback = arguments[0],
+                var callb
+                ack = arguments[0],
                     closeAll = arguments[1];
                 if (!(callback instanceof Function)) {
                     callback = null;

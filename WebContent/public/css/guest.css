@@ -100,18 +100,18 @@
 }
 .search-form{
 	font-size:0;
-	width: 260px;
+	width: 270px;
 	margin: 30px auto 20px;
 	display: block;
 }
 .search-btn{
 	display:inline-block;
 	width: 170px;
-	height: 34px;
+	height: 38px;
 	font: 14px arial;
 	line-height: 22px\9;
 	margin: 0;
-	padding: 0 5px;
+	padding: 0 10px;
 	background: #fff;
 	border: 0;
 	outline: 0;
@@ -120,17 +120,29 @@
 #btnSearch{
 	display:inline-block;
 	font-size:14px;
-    width: 80px;
-    height: 34px;
-    color: #fff;
-    letter-spacing: 1px;
-    background: #103956;
-    border-bottom: 1px solid #103956;
-    outline: medium;
-    -webkit-appearance: none;
-    -webkit-border-radius: 0;
+	width: 80px;
+	height: 38px;
+	color: #fff;
+	letter-spacing: 1px;
+	background: #103956;
+	border-bottom: 1px solid #103956;
+	outline: none;
+	-webkit-appearance: none;
+	-webkit-border-radius: 0;
 }
-
+#btnPick{
+	display:inline-block;
+	font-size:14px;
+	width: 80px;
+	height: 38px;
+	color: #fff;
+	letter-spacing: 1px;
+	background: #103956;
+	border-bottom: 1px solid #103956;
+	outline: none;
+	-webkit-appearance: none;
+	-webkit-border-radius: 0;
+}
 #searchsummary{
 	margin-left: 20px;
 	padding-top:5px;
@@ -140,14 +152,12 @@
 	font-size: 14px;
 }
 .navbar-brand-txt{
-	
-<<<<<<< HEAD
-    position: absolute;
+        position: absolute;
     top: 0;
     line-height: 60px;
     font-size: 30px;
     color: #2d353d;
-    font-family: "Î¢ÈíÑÅºÚ", Arial, Gotham, "Helvetica Neue", Helvetica, sans-serif;
+    font-family: "å¾®è½¯é›…é»‘", Arial, Gotham, "Helvetica Neue", Helvetica, sans-serif;
     font-weight: 800;
     margin-left: 20px;
 }
@@ -158,35 +168,6 @@
     line-height: 60px;
     font-size: 20px;
     color: #2d353d;
-    font-family: Î¢ÈíÑÅºÚ, Arial, Gotham,;Helvetica Neue&quot;, Helvetica, sans-serif;
-    font-weight: 800;
-=======
-position: absolute;
-	
-top: 0;
-	
-line-height: 60px;
-	
-font-size: 22px;
-	
-color: #03A9F4;
-	
-font-family: microsoft yahei, Arial, Gotham, "Helvetica Neue", Helvetica, sans-serif;
-	
-font-weight: 800;
-	
-margin-left: 20px;
-}
-.navbar-brand-txt1{
- position: absolute;
- top: 0;
- left: 196px;
- line-height: 60px;
- font-size: 23px;
- color: #2d353d;
- font-family:microsoft yahei, Arial, Gotham;
- Helvetica Neue&quot;,
- Helvetica, sans-serif;
- font-weight: 800;
->>>>>>> aeed4cc688013eafaeb8d8422d59c084d1eead17
+	 font-family:microsoft yahei, Arial, Gotham;
+	 font-weight: 800;
 }

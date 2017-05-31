@@ -303,23 +303,33 @@ require([
 
                 function doKeyDown(event){
                 	var keyID = event.keyCode ? event.keyCode :event.which; 
-                	if(keyID === 38 || keyID === 87) { // up arrow and W 
+                	if(keyID === 33 ) { // up arrow and W 
+                		var xyz = lookat.getEye(); 
+            			lookat.setEye({x: xyz.x, y:xyz.y, z: xyz.z+200 })
+                		event.preventDefault(); 
+                	} 
+                	if(keyID === 34) { // right arrow and D 
+                		var xyz = lookat.getEye(); 
+            			lookat.setEye({x: xyz.x, y:xyz.y, z: xyz.z-200 })
+                		event.preventDefault();
+                	} 
+                	if(keyID === 38 ) { // up arrow and W 
                 		var xyz = lookat.getEye(); 
             			lookat.setEye({x: xyz.x, y:xyz.y+200, z: xyz.z })
                 		event.preventDefault(); 
                 	} 
-                	if(keyID === 39 || keyID === 68) { // right arrow and D 
+                	if(keyID === 39) { // right arrow and D 
                 		var xyz = lookat.getEye(); 
             			lookat.setEye({x: xyz.x+200, y:xyz.y, z: xyz.z })
                 		event.preventDefault();
                 	} 
-                	if(keyID === 40 || keyID === 83) { // down arrow and S 
+                	if(keyID === 40) { // down arrow and S 
                 		
                 		var xyz = lookat.getEye(); 
             			lookat.setEye({x: xyz.x, y:xyz.y-200, z: xyz.z })
                 		event.preventDefault(); 
                 	} 
-                	if(keyID === 37 || keyID === 65) { // left arrow and A 
+                	if(keyID === 37) { // left arrow and A 
                 		
                 		var xyz = lookat.getEye(); 
             			lookat.setEye({x: xyz.x-200, y:xyz.y, z: xyz.z })
@@ -450,9 +460,9 @@ require([
                 			}
                 			
                 			
-                			lookat.setUp({x: 0, y:1, z: Math.abs(zoom)>maxZoom?maxZoom:Math.abs(zoom)});
+                			lookat.setUp({x: 0, y:1, z: Math.abs(zoom)>Math.abs(maxZoom) ? Math.abs(maxZoom) : Math.abs(zoom) });
                 			
-                            var eye = glmat.vec3.fromValues(0, 0, Math.abs(zoom)>maxZoom?maxZoom:Math.abs(zoom));
+                            var eye = glmat.vec3.fromValues(0, 0, zoom);
                             var look = glmat.vec3.fromValues(currentPivot[0], currentPivot[1], currentPivot[2]);
                             //var up = glmat.vec3.fromValues(0, 1, 0);
 
@@ -460,15 +470,8 @@ require([
                             glmat.vec3.sub(eyeVec, eye, look);
 
                             var mat = glmat.mat4.create();
-
-                            
-                            if(pitch>89.8 && pitch<90){
-                            	pitch = 90.1;
-                            }else if(pitch >= - 90 && pitch < -89.8){
-                            	pitch = -90.133;
-                            }else if( (pitch>179.90 && pitch < 180) || (pitch > -180 && pitch < -179.90)){
-                            	pitch = 0
-                            }
+                            	
+                           
                             
                             glmat.mat4.rotateY(mat, mat, -yaw * 0.0174532925);
                             glmat.mat4.rotateX(mat, mat, -pitch * 0.0174532925);

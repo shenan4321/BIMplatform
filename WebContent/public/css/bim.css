@@ -187,3 +187,19 @@ span.ifc{
     font-size: 13px;
 }
 .blue-txt{color:#569bcd}
+
+  .location-input-box{font-size: 0;width:260px;margin: 0 auto;display: block;}
+	  .location-input{
+	display: inline-block;
+    width: 153px;
+    border: 1px solid #ccc;
+    height: 32px;
+    font: 14px arial;
+    line-height: 22px\9;
+    margin: 0;
+    padding: 2px 10px;
+    background: #fff;
+    outline: 0;
+    -webkit-appearance: none;
+    border-right: 0;
+    }

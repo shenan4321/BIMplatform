@@ -143,8 +143,7 @@ li.li.hover .iconfont1{display:block;}
 }
 .markbox-top{
     border-bottom: 1px solid #c3c3c3;
-    padding-top: 5px;
-    padding-bottom: 14px;
+    padding: 5px 10px 14px 10px;
 }
 .mark-text{
     font-size: 18px;
@@ -185,9 +184,9 @@ li.li.hover .iconfont1{display:block;}
 .form-control {
     border-color: #666;
     background-color: rgba(255,255,255,0.05);
-    color: #fff !important;
+    color: #222 !important;
     display: block;
-    width: 100%;
+    width: 235px;
     height: 34px;
     font-size: 14px;
     line-height: 1.428571429;
@@ -195,21 +194,22 @@ li.li.hover .iconfont1{display:block;}
     vertical-align: middle;
     background-color: #fff;
     border: 1px solid #ccc;
-    border-radius: 4px;
+    padding-left: 10px;
+    padding-right: 10px;
 }
 .mark3{
-	  margin-top: 15px;
+	  margin-top: 21px;
 }
 #btnmarkclose {
     display: inline-block;
     font-size: 12px;
     width: 50px;
-    height: 26px;
+    height: 30px;
     color: #fff;
     letter-spacing: 1px;
     background: #103956;
     border: 0;
-    outline: medium;
+    outline: 0;
     -webkit-appearance: none;
     -webkit-border-radius: 0;
     float: right;
@@ -219,31 +219,33 @@ li.li.hover .iconfont1{display:block;}
     display: inline-block;
     font-size: 14px;
     width: 50px;
-    height: 26px;
+    height: 30px;
     color: #fff;
     letter-spacing: 1px;
     background: #103956;
     border: 0;
-    outline: medium;
+    outline: 0;
     -webkit-appearance: none;
     -webkit-border-radius: 0;
     float: right;
     margin-right: 5px;
+    cursor:point;
     }
     #btnmarkensure {
     display: inline-block;
     font-size: 14px;
     width: 50px;
-    height: 26px;
+    height: 30px;
     color: #fff;
     letter-spacing: 1px;
     background: #103956;
     border: 0;
-    outline: medium;
+    outline: 0;
     -webkit-appearance: none;
     -webkit-border-radius: 0;
     float: right;
     margin-right: 5px;
+    cursor:point;
     }
     .search-box-list{padding: 0px 20px;}
     .search-box:hover{

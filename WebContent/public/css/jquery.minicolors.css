@@ -1,3 +1,10 @@
+#letter-case{
+    height: 34px;
+    width: 90px;
+    padding-left: 36px;
+    padding-right:10px;
+    border: 1px solid #bfbfbf;
+}
 .minicolors {
 	position: relative;
 }
@@ -73,7 +80,7 @@
 	left: 1px;
 	width: 150px;
 	height: 150px;
-	background: url(../images/jquery.minicolors.png) -120px 0;"WebContent
+	background: url(../images/jquery.minicolors.png) -120px 0;
 	cursor: crosshair;
 }
 
@@ -91,7 +98,7 @@
 }
 
 .minicolors-slider-saturation .minicolors-grid-inner {
-	background: url((../images/jquery.minicolors.png) -270px 0;
+	background: url(../images/jquery.minicolors.png) -270px 0;
 }
 
 .minicolors-slider-brightness .minicolors-grid {
@@ -99,7 +106,7 @@
 }
 
 .minicolors-slider-brightness .minicolors-grid-inner {
-	background: black;
+	background-color: black;
 }
 
 .minicolors-slider-wheel .minicolors-grid {
@@ -113,7 +120,8 @@
 	left: 152px;
 	width: 20px;
 	height: 150px;
-	background: white url((../images/jquery.minicolors.png) 0 0;
+	background-image: url(../images/jquery.minicolors.png) !important;
+	background-color:#fff;
 	cursor: row-resize;
 }
 
@@ -200,10 +208,10 @@
 
 /* Default theme */
 .minicolors-theme-default .minicolors-swatch {
-	top: 5px;
+	top: 8px;
 	left: 5px;
 	width: 18px;
-	height: 18px;	
+	height: 18px;
 }
 .minicolors-theme-default.minicolors-position-right .minicolors-swatch {
 	left: auto;
@@ -214,10 +222,10 @@
 	display: inline-block;
 }
 .minicolors-theme-default .minicolors-input {
-	height: 20px;
+	height: 34px;
 	width: auto;
-	display: inline-block;
 	padding-left: 26px;
+	border: 1px solid #bfbfbf;
 }
 .minicolors-theme-default.minicolors-position-right .minicolors-input {
 	padding-right: 26px;

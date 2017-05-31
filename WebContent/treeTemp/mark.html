@@ -4,18 +4,27 @@
 </div>
   <div id="markerdetail" class="padding-20 bottom-border-1" style="margin-bottom: 30px;"> 
    <label>名称：</label>
-   <input class="form-control bv_marker_input_name" type="text" /> 
+   <input class="form-control bv_marker_input_name" type="text"  placeholder="请填写名称" />
    <label>描述：</label>
-   <input class="form-control bv_marker_input_userdata" type="text" /> 
+   <input class="form-control bv_marker_input_userdata" type="text"  placeholder="请填写描述" />
    <label>坐标：</label>
-   <input class="form-control bv_marker_input_position" type="text" /> 
+   <!-- <input class="form-control bv_marker_input_position" type="text"  placeholder="请选择坐标" /> -->
+   <div class="location-input-box">
+	  <input class="location-input" placeholder="请输入坐标" required="" />
+	  <button class="btn btn-default" id="btnPick" type="button">选取坐标</button>
+   </div>	
    <label>色值：</label> 
    <div class="form-group">
-   <input type="text" id="letter-case" class="demo" data-letterCase="uppercase" ng-click="changColor()" >
+	<input type="text" id="letter-case" class="demo" data-letterCase="uppercase" ng-click="changColor()" placeholder="请选择色值" >
    </div>
   <div class="mark3">
-    <button class="btnmark" id="btnmarkclose" type="submit">关闭</button>
-    <button class="btnmark" id="btnmarkpick" type="submit">选点</button>
+    <!-- <button class="btnmark" id="btnmarkclose" type="submit">关闭</button> -->
     <button class="btnmark" id="btnmarkensure" type="submit">确定</button>
   </div>
   </div>
+  
+  <script>
+  	$(function(){
+  		$('.demo').minicolors();
+  	})
+  </script>

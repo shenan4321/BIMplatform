@@ -1,4 +1,4 @@
-$(function(){
+function initStart(){
 	var thisTime;
 	$('.aside-box li').click(function(){
 		var thisUB	=	$('.aside-box li').index($(this));
@@ -23,7 +23,7 @@ $(function(){
 	$.ajax({
 		   url:"./project/queryProjectByRid.do?rid="+string,
 		   type:"POST",
-		  dataType:"json",
+		   dataType:"json",
 		   success:function(data){
 				$.ajax({
 					url:"./model/queryModelInfoByPid.do?pid="+data.data.pid,
@@ -31,14 +31,13 @@ $(function(){
 					dataType:"json",
 					success:function(res){
 					var luopanData = [];
-					$.each(res.data,function(){
-						if(this.rid==string){
+					$.each(res.data,function(item){
+						if(item.rid==string){
 							luopanData.push({name:this.name,link:'http://'+location.host+location.pathname+'?rid='+this.rid,selected:true})	
 						}else{
 							luopanData.push({name:this.name,link:'http://'+location.host+location.pathname+'?rid='+this.rid})
-						}
-											
-					})
+						}			
+					});
 					$('#luopanSvg').luopan({
 						data:luopanData,
 					});	
@@ -47,5 +46,4 @@ $(function(){
 		   }
 		})
 	
-	
-})
+}

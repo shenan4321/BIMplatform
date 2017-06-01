@@ -73,6 +73,7 @@ myApp.controller('typeCtrl', function($scope, $http){
 		            this["alpha.a"] = 0.6;
 		            var self = this;
 		            var update = function () {
+		            	console.log(item.oids);
 		            	angular.forEach(item.oids, function(data,index,array){
 		         			scene.getNode(data+'geometry',function(mt){
 		         				mt.setAlpha(self["alpha.a"]);
@@ -85,23 +86,17 @@ myApp.controller('typeCtrl', function($scope, $http){
 		        var $closeButton = $('.dg .close-button');
 		        if($closeButton.length==1){
 		        	$closeButton.css('position','relative').after($closeButton.clone().css('position','relative').addClass('cover-button').html('还原'));
-		        	$('.dg .cover-button').click(function(){
-		        		for(var i=0;i<$scope.selectedPlaneBoxEventList.length;i++ ){
-		        			console.log($scope.selectedPlaneBoxEventList[i]);
-		        			gui.remove($scope.selectedPlaneBoxEventList[i]['__controllers'][0]);
-		        		}
-		        	});
 		        }
 				var menuType = new MenuType();
 				$scope.selectedPlaneBoxList.push(item.name);	
 				var menubox = gui.addFolder(item.name+'类透明度');
 		        menubox.add(menuType, 'alpha.a', 0.0, 1.0);
 		        menubox.open();
-		        $scope.selectedPlaneBoxEventList.push(menubox);
 		}
         
-    
-		
+		scene.getNode('614269572geometry',function(mt){
+				mt.setAlpha(0);
+			})
 		
 	}
 	

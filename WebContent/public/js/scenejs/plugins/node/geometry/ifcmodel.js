@@ -54,7 +54,7 @@
 
         var diagonal = Math.sqrt(Math.pow(boundMaxX - boundMinX, 2) + Math.pow(boundMaxY - boundMinY, 2) + Math.pow(boundMaxZ - boundMinZ, 2));
 
-        var far = diagonal * 5; // 5 being a guessed constant that should somehow coincide with the max zoom-out-factor
+        var far = diagonal * 10; // 5 being a guessed constant that should somehow coincide with the max zoom-out-factor
 
         maincamera.setOptics({
             type: 'perspective',

@@ -63,12 +63,12 @@
             aspect: jQuery(this.getScene().getCanvas()).width() / jQuery(this.getScene().getCanvas()).height(),
             fovy: 37.8493
         });
-
+        window.allPoint.push(geometryInfo.oid);
         return {
 			type : "flags",
 			flags : {
 				transparent : true,
-				backfaces:true,
+				backfaces:false,
 				enable:true
 			},
 			id : "flags"+geometryInfo.oid,

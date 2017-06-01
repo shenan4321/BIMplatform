@@ -1,0 +1,144 @@
+@charset "UTF-8";
+
+body{
+	background-image: url(../images/pattern-cover.png);
+}
+
+.page{
+	width: 1300px;
+	background-color: #fafafa;
+	margin: 0 auto;
+	box-shadow: 0 0 30px rgba(0,0,0,0.5);
+}
+
+.header{
+	width: 1300px;
+	background-color: #ffffff;
+	padding: 0 15px;
+	border-bottom: 1px solid #e1e1e1;
+}
+.header .logo{
+	background-image: url(../images/logo_dark.png);
+	width: 359px;
+	height: 56px;
+
+}
+.header .logo a{
+	width: 158px;
+	height: 56px;
+	display: block;
+}
+
+.search{
+	width: 200px;
+	height: 58px;
+	padding-top: 14px;
+	position: relative;
+}
+.search  input{
+	width: 200px;
+	height: 30px;
+	line-height: 30px;
+	border-radius: 20px;
+	border:1px solid #ccd0d4;
+	text-indent: 15px;
+}
+.search  button{
+	width: 15px;
+	height: 15px;
+	border: none;
+	position: absolute;
+	right: 15px;
+	top: 20px;
+	background: none;
+}
+.search  button  span{
+	color: #707478;
+}
+
+.content{
+
+	padding: 15px 25px;
+}
+.content .nav{
+	height: 38px;
+	line-height: 38px;
+}
+.content .nav li{
+	height: 22px;
+	margin-right: 9px;
+	line-height: 22px;
+	border-radius: 3px;
+}
+.content .nav li a{
+	display: block;
+	line-height: 22px;
+	color: #ffffff;
+	background: #b6c2c9;
+	padding:0 5px;
+	text-decoration: none;
+}
+.content .nav li a:hover{
+	text-decoration: none;
+	background: #8e969c;
+}
+.content .nav li .active{
+	background: #8e969c;
+}
+
+.content .gallery{
+ 	width: 1250px;
+ 	height: 800px;
+ 	margin: -10px -10px;
+}
+.content .gallery > div{
+	width: 291px;
+	height: 286px;
+	margin: 10px 10px;
+	border-radius: 3px;
+	box-shadow: 0 0 1px  #ccd0d4;
+	border:1px solid #ccd0d4;
+}
+.content > div .image-inners{
+	position: relative;
+	border-bottom: 1px solid #ccd0d4;
+	
+}
+
+.content > div .image-inners img {
+	width: 289px;
+	height: 200px;
+	opacity:1;filter(alpha=100);
+	
+}
+.content > div .image-inners img:hover {
+	opacity:0.8;filter(alpha=80)
+}
+.content > div .image-inners .image-captions{
+	padding: 0 15px;
+	height: 32px;
+	color: #ffffff;
+	line-height: 32px;
+	text-align: center;
+	position: absolute;
+	top: 15px;
+	left: 0;
+	background: rgba(0,0,0,0.5);
+}
+
+.content > div .image-info{
+	padding: 15px;
+}
+.content > div .image-info .title{
+	padding: 0;
+	margin-bottom: 10px;
+}
+.content > div .image-info .stars{
+
+}
+.content > div .image-info .stars span{
+	color:#999999;
+}
+.content > div .image-info .stars .active{
+	color: #FF8500;
+}

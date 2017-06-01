@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>BimShow | BimViz</title>
+	<meta charset="utf-8" />
+	<!-- BEGIN BASE CSS STYLE -->
+	<link href="asset/css/jquery-ui.min.css" rel="stylesheet">
+	<link href="asset/css/bootstrap.css" rel="stylesheet">
+	<!-- <link href="asset/css/animate.min.css" rel="stylesheet"> -->
+	<link href="asset/css/isotope.css" rel="stylesheet">
+	<link href="asset/css/lightbox.css" rel="stylesheet">
+	<link href="asset/css/base.css" rel="stylesheet">
+	<!-- END BASE CSS STYLE -->
+
+	<!-- BEGIN PAGE LEVEL STYLE -->
+	<link href="asset/css/index.css" rel="stylesheet">
+	<!-- END PAGE LEVEL STYLE -->
+
+</head>
+<body>
+
+<div ng-app="myApp" ng-controller="siteCtrl"> 
+<div class="page">
+	<!-- begin header -->
+	<div class="header clearfix">
+		<div class="logo fl">
+			<a href="#"></a>
+		</div>
+		<div class="search fr">
+			<form>
+				<input type="text" name="" placeholder="Enter keyword" class=".fs-sm">
+				<button type="submit" >
+					<span class="glyphicon glyphicon-search"></span>
+				</button>
+			</form>
+		</div>
+	</div>
+	<!-- end header -->
+	<!-- begin content -->
+	<div class="content clearfix" id="content">
+		<!-- begin nav -->
+		<div class="nav" id="options">
+			<ul class="nav nav-pills clearfix" id="filter" data-option-key="filter">
+  				<li class="fl" role="presentation"><a class="active" href="#show-all" data-option-value="*">All</a></li>
+  				<li class="fl" role="presentation"><a href="#building" data-option-value=".building">Building</a></li>
+  				<li class="fl" role="presentation"><a href="#site" data-option-value=".site">Site</a></li>
+  				<li class="fl" role="presentation"><a href="#metro" data-option-value=".metro">Metro</a></li>
+  				<li class="fl" role="presentation"><a href="#factory" data-option-value=".factory">Factory</a></li>
+  				<li class="fl" role="presentation"><a href="#electromechanical" data-option-value=".electromechanical">Electromechanical</a></li>
+  				<li class="fl" role="presentation"><a href="#big" data-option-value=".big">Big Building</a></li>
+  				<li class="fl" role="presentation"><a href="#part" data-option-value=".part">Part</a></li>
+  				<li class="fl" role="presentation"><a href="#others" data-option-value=".others">Others</a></li>
+			</ul>
+		</div>
+		<!-- end nav -->
+		<div class="gallery clearfix" id="gallery">
+			<div class="building fl"  ng-repeat="it in prolist" data-href="{{it.pid}}">
+				<div class="image-inners">
+					<a ng-href="/BIMplatform/modelView.html?pid={{it.pid}}" ><img ng-src="{{it.picUrl}}"></a>
+					<span class="image-captions fs-md">{{it.title}}</span>
+				</div>
+				<div class="image-info">
+					<h4 class="title fs-sm">House</h4>
+					<div class="stars">
+						<!-- begin five-pointed star -->
+						<div class="fl">
+						 <span class="glyphicon glyphicon-star active" ng-if="0< it.stars"></span>
+						 <span class="glyphicon glyphicon-star active" ng-if="1< it.stars"></span>
+						 <span class="glyphicon glyphicon-star active" ng-if="2< it.stars"></span>
+						 <span class="glyphicon glyphicon-star active" ng-if="3< it.stars"></span>
+						 <span class="glyphicon glyphicon-star active" ng-if="4< it.stars"></span>
+						</div>
+						<!-- end five-pointed star -->
+						<div class="fr fs-xs">
+							<span>by <a href="#">{{it.author}}</a></span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+	<!-- end content -->
+
+
+	<script type="text/javascript" src="asset/js/jquery-1.9.1.min.js"></script>
+	<script type="text/javascript" src="asset/js/jquery-migrate-1.1.0.min.js"></script>
+	<script type="text/javascript" src="asset/js/bootstrap.js"></script>
+	<script type="text/javascript" src="asset/js/jquery.cookie.js"></script>
+	<script type="text/javascript" src="asset/js/jquery.isotope.min.js"></script>
+	<script type="text/javascript" src="public/js/angularjs/1.4.4/angular.min.js"></script>
+
+  	<script>
+
+  		$('#filter a').click(function(){
+  			$('#filter a').removeClass("active");
+  			$(this).addClass("active");
+
+  			var selector = $(this).attr('data-option-value');
+  			$('#gallery').isotope({ filter: selector });
+  			return false;
+
+		});
+  		var app = angular.module('myApp', []);
+  		
+  		app.controller('siteCtrl', function($scope, $http) {
+  			$http({
+  				method: 'POST',
+  				url: 'project/queryAllProject.do'
+  			}).then(function successCallback(response) {
+  					$scope.prolist = response.data.data;
+  				}, function errorCallback(response) {
+  					// 请求失败执行代码
+  			});
+  		  
+  		});
+  	</script>	
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,83 @@
+/*css初始化 start*/
+
+html, body, ul, li, ol, dl, dd, dt, p, h1, h2, h3, h4, h5, h6, form, fieldset, legend, img {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font: 12px/1.5 'Microsoft YaHei','宋体', Tahoma, Arial, sans-serif;
+    
+}
+
+/*去除input的框  ctrl + / */
+fieldset, img, input, button {
+    padding: 0;
+    margin: 0;
+    outline-style: none;
+
+}
+
+ul, ol {
+    list-style: none;
+}
+
+input {
+    padding-top: 0;
+    padding-bottom: 0;
+    font-family: "SimSun", "宋体"; /*新宋体*/
+}
+
+select, input, textarea {
+    font-size: 12px;
+    margin: 0;
+
+}
+
+/*禁止缩放*/
+textarea {
+    resize: none;
+}
+
+/*让图片基线对齐*/
+img {
+    border: 0;
+    vertical-align: middle;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+.clearfix:after {
+    content: "";
+    display: block;
+    visibility: hidden;
+    height: 0;
+    clear: both;
+}
+.clearfix {
+    zoom: 1;
+}
+
+.fl{
+    float: left;
+}
+.fr{
+    float: right;
+}
+
+
+.fs-xs{
+    font-size: 12px;
+ }
+.fs-sm{
+    font-size: 14px;
+ }
+.fs-md{
+    font-size: 16px;
+ }
+.fs-lg{
+    font-size: 18px;
+ }
+

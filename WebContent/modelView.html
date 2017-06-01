@@ -32,7 +32,6 @@
    <a class="navbar-brand" href="#"></a> 
    <a class="navbar-brand-txt" href="#">东链博BIM</a>
    <a class="navbar-brand-txt1" href="#">应用Server</a>
-  
   </header> 
   <div class="aside-menu-box"> 
    <ul class="aside-box"> 
@@ -41,7 +40,7 @@
     <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 类型 </p> </a> </li> 
     <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 属性 </p> </a> </li> 
     <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 搜索 </p> </a> </li> 
-    <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 标注 </p> </a> </li> 
+    <!-- <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 标注 </p> </a> </li>  -->
     <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 楼层 </p> </a> </li> 
     <!-- <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 漫游控制 </p> </a> </li> --> 
    </ul> 
@@ -73,11 +72,11 @@
 			<div ng-include="'./treeTemp/search.html'"></div>
 		</div>
 	</div>
-	<div class="nav-slide-o">
+<!-- 	<div class="nav-slide-o">
 	<div ng-controller="markCtrl">
 			<div ng-include="'./treeTemp/mark.html'"></div>
 		</div>
-	</div>
+	</div> -->
 	<div class="nav-slide-o">
 		<div ng-controller="floorCtrl" id="pTable">
 			<div ng-include="'./treeTemp/floor.html'"></div>
@@ -100,6 +99,7 @@
 <script src="public/js/html5validate.js" type="text/javascript"></script>
 <script src="public/js/color/jquery.minicolors.js" type="text/javascript"></script>
 <script src="public/js/dlbSvg.js" type="text/javascript"></script>
+<script src="public/js/datgui/dat.gui.min.js" type="text/javascript"></script>
 <script>
 function GetQueryString(name){
    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)","i");
@@ -108,7 +108,9 @@ function GetQueryString(name){
 }
 var string = GetQueryString("rid")||4;
 var websocket = new WebsocketBim();
+var gui; //全局的控制面板
 window.hisPick = {}; //记录点过的东西
+window.allPoint = [];
 websocket.init({
 	urlPath:"ws/geometry?rid="+string,
 	onopen:function(msg){
@@ -132,6 +134,30 @@ websocket.init({
 	onclose:function(){
 		progress.hide();
 		websocket = null;
+		
+		
+        var Menus = function () {
+            this.message = "Directional light";
+            this["alpha.a"] = 0.6;
+            var self = this;
+            var update = function () {
+
+            	 for(var i=0;i<allPoint.length;i++){
+         			scene.getNode(allPoint[i]+'geometry',function(mt){
+         	            	mt.setAlpha(self["alpha.a"]);
+         			})
+         		}
+                requestAnimationFrame(update);
+            };
+
+            update();
+        };
+        gui = new dat.GUI();
+        var menu = new Menus();
+        var color = gui.addFolder('设置总体透明度');
+        color.add(menu, 'alpha.a', 0.0, 1.0);
+        color.open();
+        
 	}
 });
 //监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常。

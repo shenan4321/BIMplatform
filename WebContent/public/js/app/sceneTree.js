@@ -53,7 +53,6 @@ myApp.controller('typeCtrl', function($scope, $http){
 	
 	$http.get('./model/queryBuildingCells.do?rid='+string).success(function (data,status) {  
     	$scope.typeList = data.data;
-    	console.log($scope.typeList);
     }).error(function (data,status) {  
     }); 
 	$scope.typeShowTag = function(item){
@@ -64,9 +63,51 @@ myApp.controller('typeCtrl', function($scope, $http){
 			});
 		});
 	}
+	$scope.selectedPlaneBoxList = [];
+	$scope.selectedPlaneBoxEventList = [];
+	$scope.typeShowOpearate = function(item){
+		
+		if($scope.selectedPlaneBoxList.indexOf(item.name)==-1){
+				var MenuType = function () {
+		            this.message = "Directional light";
+		            this["alpha.a"] = 0.6;
+		            var self = this;
+		            var update = function () {
+		            	angular.forEach(item.oids, function(data,index,array){
+		         			scene.getNode(data+'geometry',function(mt){
+		         				mt.setAlpha(self["alpha.a"]);
+		         			})
+		            	});
+		                requestAnimationFrame(update);
+		            };
+		            update();
+		        };
+		        var $closeButton = $('.dg .close-button');
+		        if($closeButton.length==1){
+		        	$closeButton.css('position','relative').after($closeButton.clone().css('position','relative').addClass('cover-button').html('还原'));
+		        	$('.dg .cover-button').click(function(){
+		        		for(var i=0;i<$scope.selectedPlaneBoxEventList.length;i++ ){
+		        			console.log($scope.selectedPlaneBoxEventList[i]);
+		        			gui.remove($scope.selectedPlaneBoxEventList[i]['__controllers'][0]);
+		        		}
+		        	});
+		        }
+				var menuType = new MenuType();
+				$scope.selectedPlaneBoxList.push(item.name);	
+				var menubox = gui.addFolder(item.name+'类透明度');
+		        menubox.add(menuType, 'alpha.a', 0.0, 1.0);
+		        menubox.open();
+		        $scope.selectedPlaneBoxEventList.push(menubox);
+		}
+        
+    
+		
+		
+	}
+	
 });
 
-
+	
 
 myApp.controller('pTableCtrl', function($scope){});
 

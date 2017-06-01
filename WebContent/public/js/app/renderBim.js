@@ -43,17 +43,20 @@ function createScene(sceneNodes){
 	eye = middle,
 	look=middle;
 
-	console.log(zoom);
-	console.log('zoomSensitivity',zoomSensitivity);
 	
 	 var sceneViewObj = {
 		        canvasId:"mySceneCanvas",
 		        type: "scene",
 		        nodes: [
 					{
-					    type:"skybox/clouds",
-					    size:5000 // Box half-size on each axis - default is 5000
-					},
+		                type: "models/backgrounds/gradient",
+		                color: [ // Default color
+		                    0.755, 0.725, 0.745, 1.0, // top left (R,G,B,A)
+		                    0.755, 0.725, 0.745, 1.0, // top left (R,G,B,A)
+		                    0.85, 0.9, 0.98, 1.0, // bottom right
+		                    0.85, 0.9, 0.98, 1.0   // bottom left
+		                ]
+		            },
 					{
 		        	type: "cameras/pickFlyOrbit",
 		        	showCursor: true,
@@ -111,7 +114,7 @@ function createScene(sceneNodes){
 		                                    id:			'sun-light',
 		                                    mode:		'dir',
 		                                    color:		{r: 0.6, g: 0.6, b: 0.6},
-		                                    dir:   		{x: -0.5, y: 0.5, z: -1.0},
+		                                    dir:   		{x: -0.5, y: 1, z: -1.0},
 		                                    diffuse:	true,
 		                                    specular:	true
 		                                }

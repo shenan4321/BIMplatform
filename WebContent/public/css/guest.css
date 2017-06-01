@@ -49,17 +49,17 @@
     background: rgba(50, 135, 187, 0.8);
 }
 .type-box{
-        padding: 20px 80px 20px 80px;
+        padding: 20px 80px 20px 60px;
         border-bottom:1px solid #c3c3c3;
         position: relative;
     }
     .type-box dt{
         float:left;
-        margin-left: -60px;
+        margin-left: -46px;
     }
     .type-box dt .images{
-        width: 60px;
-        height:60px;
+        width: 50px;
+        height: 50px;
         margin-top: 0rem;
         background-repeat:no-repeat;
         background-position:center center;
@@ -68,12 +68,11 @@
         border: 1px solid #e5e5e5;
     }
     .type-box dd{
-        margin-left: 20px;
+        margin-left: 16px;
     }
    .type-box dd h4{
         font-size: 18px;
         color:#272727;
-        margin-top: 5px;
         margin-bottom: 0px;
         overflow:hidden;
         white-space:nowrap;
@@ -82,6 +81,7 @@
         vertical-align: top;
         margin-bottom: 10px;
         font-weight: 400;
+        margin-top:0;
     }
     .type-box dd .text{
     	font-size: 14px;

@@ -9,7 +9,8 @@
 	});
 
 	function build(params) {
-
+		
+		console.log(params);
 		var geometryInfo = params.geometry_info;
 		
 		var coreId = "geometry/ifcmodel_" + (params.wire ? "wire" : "_solid") + geometryInfo.oid;
@@ -26,6 +27,7 @@
 
 		var positions = geometryInfo.vertices;
 		var indices = geometryInfo.indices;
+		var indicesForLinesWireFrame=geometryInfo.indicesForLinesWireFrame;
 		var normals = geometryInfo.normals;
 		var typeName = geometryInfo.typeName;
 		
@@ -87,7 +89,20 @@
 	                    positions:new Float32Array(positions),
 	                    indices:new Uint16Array(indices),
 	                    normals:new Float32Array(normals)
-	        		}]
+	        		},
+	        		{
+						type : "material",
+						baseColor: material,
+						color: {r:0.3,g:0.3,b:0.3},
+	        			id:geometryInfo.oid+"geometryLines",
+						nodes: [{
+		        			type : "geometry",
+		        			primitive : "lines",
+		                    positions:new Float32Array(positions),
+		                    indices:new Uint16Array(indicesForLinesWireFrame),
+		                    normals:new Float32Array(normals)
+		        		}]
+					}]
 				}]
 			}]
 		};

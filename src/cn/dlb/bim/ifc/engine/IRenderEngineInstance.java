@@ -22,4 +22,6 @@ public interface IRenderEngineInstance {
 	RenderEngineGeometry generateGeometry() throws RenderEngineException;
 	double getArea() throws RenderEngineException;
 	double getVolume() throws RenderEngineException;
+	public int getConceptualFaceCnt() throws RenderEngineException;
+	public RenderEngineConceptualFaceProperties getConceptualFaceEx(int index) throws RenderEngineException;
 }

@@ -158,5 +158,13 @@ public class GeometryDataImpl extends IdEObjectImpl implements GeometryData {
 	public void setMaterialIndices(byte[] newMaterialIndices) {
 		eSet(GeometryPackage.Literals.GEOMETRY_DATA__MATERIAL_INDICES, newMaterialIndices);
 	}
+	
+	public byte[] getIndicesForLinesWireFrame() {
+		return (byte[]) eGet(GeometryPackage.Literals.GEOMETRY_DATA__WIREFRAME_INDICES, true);
+	}
+
+	public void setIndicesForLinesWireFrame(byte[] newIndicesForLinesWireFrame) {
+		eSet(GeometryPackage.Literals.GEOMETRY_DATA__WIREFRAME_INDICES, newIndicesForLinesWireFrame);
+	}
 
 } //GeometryDataImpl

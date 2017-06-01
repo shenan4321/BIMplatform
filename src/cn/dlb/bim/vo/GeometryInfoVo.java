@@ -17,6 +17,7 @@ public class GeometryInfoVo {
 	private int[] indices;
 	private float[] vertices;
 	private float[] normals;
+	private int[] indicesForLinesWireFrame;
 	private Bound bound;
 	private String typeName;
 	private Boolean defaultVisiable;
@@ -80,6 +81,7 @@ public class GeometryInfoVo {
 		indices = byteArrayToIntArray(geometryInfo.getData().getIndices());
 		vertices = byteArrayToFloatArray(geometryInfo.getData().getVertices());
 		normals = byteArrayToFloatArray(geometryInfo.getData().getNormals());
+		indicesForLinesWireFrame = byteArrayToIntArray(geometryInfo.getData().getIndicesForLinesWireFrame());
 		double maxX = geometryInfo.getMaxBounds().getX();
 		double maxY = geometryInfo.getMaxBounds().getY();
 		double maxZ = geometryInfo.getMaxBounds().getZ();
@@ -176,5 +178,12 @@ public class GeometryInfoVo {
 	public void setColor(Colord color) {
 		this.color = color;
 	}
-	
+
+	public int[] getIndicesForLinesWireFrame() {
+		return indicesForLinesWireFrame;
+	}
+
+	public void setIndicesForLinesWireFrame(int[] indicesForLinesWireFrame) {
+		this.indicesForLinesWireFrame = indicesForLinesWireFrame;
+	}
 }

@@ -50,7 +50,9 @@ public enum Command {
 	OPEN_MODEL_STREAMING_PARTS,
 	SET_FILTER,
 	GET_AREA, 
-	GET_VOLUME;
+	GET_VOLUME,
+	GET_CONCEPTUAL_FACE_CNT,
+	GET_CONCEPTUAL_FACE_EX;
 
 	private static final Map<Byte, Command> map = initMap();
 	private byte id;

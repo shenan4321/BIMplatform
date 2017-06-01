@@ -38,6 +38,7 @@ import java.util.Set;
 import com.sun.jna.Pointer;
 
 import cn.dlb.bim.ifc.engine.RenderEngineException;
+import cn.dlb.bim.ifc.engine.jvm.IfcEngine.ConceptualFaceProperties;
 import cn.dlb.bim.ifc.engine.jvm.IfcEngine.InstanceTransformationMatrix;
 import cn.dlb.bim.ifc.engine.jvm.IfcEngine.SurfaceProperties;
 
@@ -266,6 +267,29 @@ public class IfcEngineServer extends Thread {
 					out.writeDouble(instanceTransformationMatrix._43);
 					out.writeDouble(instanceTransformationMatrix._44);
 					break;					
+				}
+				case GET_CONCEPTUAL_FACE_CNT: {
+					int modelId = in.readInt();
+					int instanceId = in.readInt();
+					int conceptualFaceCnt = ifcEngine.getConceptualFaceCnt(pointers.get(modelId), pointers.get(instanceId));
+					out.writeInt(conceptualFaceCnt);
+					break;	
+				}
+				case GET_CONCEPTUAL_FACE_EX: {
+					int instanceId = in.readInt();
+					int index = in.readInt();
+					ConceptualFaceProperties conceptualFaceProperties = ifcEngine.getConceptualFaceEx(pointers.get(instanceId), index);
+					out.writeInt(conceptualFaceProperties.getStartIndexTriangles());
+					out.writeInt(conceptualFaceProperties.getNoIndicesTriangles());
+					out.writeInt(conceptualFaceProperties.getStartIndexLines());
+					out.writeInt(conceptualFaceProperties.getNoIndicesLines());
+					out.writeInt(conceptualFaceProperties.getStartIndexPoints());
+					out.writeInt(conceptualFaceProperties.getNoIndicesPoints());
+					out.writeInt(conceptualFaceProperties.getStartIndexFacesPolygons());
+					out.writeInt(conceptualFaceProperties.getNoIndicesFacesPolygons());
+					out.writeInt(conceptualFaceProperties.getStartIndexConceptualFacePolygons());
+					out.writeInt(conceptualFaceProperties.getNoIndicesConceptualFacePolygons());
+					break;	
 				}
 				case CLOSE: {
 					close();

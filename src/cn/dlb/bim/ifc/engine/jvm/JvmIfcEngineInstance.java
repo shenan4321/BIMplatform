@@ -1,6 +1,7 @@
 package cn.dlb.bim.ifc.engine.jvm;
 
 import cn.dlb.bim.ifc.engine.IRenderEngineInstance;
+import cn.dlb.bim.ifc.engine.RenderEngineConceptualFaceProperties;
 import cn.dlb.bim.ifc.engine.RenderEngineException;
 import cn.dlb.bim.ifc.engine.RenderEngineGeometry;
 import cn.dlb.bim.ifc.engine.RenderEngineSurfaceProperties;
@@ -92,6 +93,39 @@ public class JvmIfcEngineInstance implements IRenderEngineInstance {
 				normals[i] = failSafeIfcEngine.readFloat();
 			}
 			return new RenderEngineGeometry(indices, vertices, normals, null, null);
+		}
+	}
+	
+	@Override
+	public int getConceptualFaceCnt() throws RenderEngineException {
+		synchronized (failSafeIfcEngine) {
+			failSafeIfcEngine.writeCommand(Command.GET_CONCEPTUAL_FACE_CNT);
+			failSafeIfcEngine.writeInt(modelId);
+			failSafeIfcEngine.writeInt(instanceId);
+			failSafeIfcEngine.flush();
+			int conceptualFaceCnt = failSafeIfcEngine.readInt();
+			return conceptualFaceCnt;
+		}
+	}
+	
+	@Override
+	public RenderEngineConceptualFaceProperties getConceptualFaceEx(int index) throws RenderEngineException {
+		synchronized (failSafeIfcEngine) {
+			failSafeIfcEngine.writeCommand(Command.GET_CONCEPTUAL_FACE_EX);
+			failSafeIfcEngine.writeInt(instanceId);
+			failSafeIfcEngine.writeInt(index);
+			failSafeIfcEngine.flush();
+			int startIndexTriangles = failSafeIfcEngine.readInt();
+			int noIndicesTriangles = failSafeIfcEngine.readInt();
+			int startIndexLines = failSafeIfcEngine.readInt();
+			int noIndicesLines = failSafeIfcEngine.readInt();
+			int startIndexPoints = failSafeIfcEngine.readInt();
+			int noIndicesPoints = failSafeIfcEngine.readInt();
+			int startIndexFacesPolygons = failSafeIfcEngine.readInt();
+			int noIndicesFacesPolygons = failSafeIfcEngine.readInt();
+			int startIndexConceptualFacePolygons = failSafeIfcEngine.readInt();
+			int noIndicesConceptualFacePolygons = failSafeIfcEngine.readInt();
+			return new RenderEngineConceptualFaceProperties(startIndexTriangles, noIndicesTriangles, startIndexLines, noIndicesLines, startIndexPoints, noIndicesPoints, startIndexFacesPolygons, noIndicesFacesPolygons, startIndexConceptualFacePolygons, noIndicesConceptualFacePolygons);
 		}
 	}
 }

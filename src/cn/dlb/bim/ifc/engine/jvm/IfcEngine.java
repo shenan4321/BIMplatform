@@ -455,6 +455,74 @@ public class IfcEngine {
 		}
 		
 	}
+	
+	public class ConceptualFaceProperties {
+		private int startIndexTriangles;
+		private int noIndicesTriangles;
+		private int startIndexLines;
+		private int noIndicesLines;
+		private int startIndexPoints;
+		private int noIndicesPoints;
+		private int startIndexFacesPolygons;
+		private int noIndicesFacesPolygons;
+		private int startIndexConceptualFacePolygons;
+		private int noIndicesConceptualFacePolygons;
+		
+		public ConceptualFaceProperties(int startIndexTriangles, int noIndicesTriangles, int startIndexLines, int noIndicesLines, 
+				int startIndexPoints, int noIndicesPoints, int startIndexFacesPolygons, int noIndicesFacesPolygons,
+				int startIndexConceptualFacePolygons, int noIndicesConceptualFacePolygons) {
+			this.startIndexTriangles = startIndexTriangles;
+			this.noIndicesTriangles = noIndicesTriangles;
+			this.startIndexLines = startIndexLines;
+			this.noIndicesLines = noIndicesLines;
+			this.startIndexPoints = startIndexPoints;
+			this.noIndicesPoints = noIndicesPoints;
+			this.startIndexFacesPolygons = startIndexFacesPolygons;
+			this.noIndicesFacesPolygons = noIndicesFacesPolygons;
+			this.startIndexConceptualFacePolygons = startIndexConceptualFacePolygons;
+			this.noIndicesConceptualFacePolygons = noIndicesConceptualFacePolygons;
+		}
+
+		public int getStartIndexTriangles() {
+			return startIndexTriangles;
+		}
+
+		public int getNoIndicesTriangles() {
+			return noIndicesTriangles;
+		}
+
+		public int getStartIndexLines() {
+			return startIndexLines;
+		}
+
+		public int getNoIndicesLines() {
+			return noIndicesLines;
+		}
+
+		public int getStartIndexPoints() {
+			return startIndexPoints;
+		}
+
+		public int getNoIndicesPoints() {
+			return noIndicesPoints;
+		}
+
+		public int getStartIndexFacesPolygons() {
+			return startIndexFacesPolygons;
+		}
+
+		public int getNoIndicesFacesPolygons() {
+			return noIndicesFacesPolygons;
+		}
+
+		public int getStartIndexConceptualFacePolygons() {
+			return startIndexConceptualFacePolygons;
+		}
+
+		public int getNoIndicesConceptualFacePolygons() {
+			return noIndicesConceptualFacePolygons;
+		}
+	}
 
 	/**
 	 * Change the number of segments a circle should be represented as.
@@ -1532,5 +1600,38 @@ public class IfcEngine {
 
 	public double getVolume(Pointer model, Pointer instance) {
 		return engine.GetVolume(instance, Pointer.NULL, Pointer.NULL);
+	}
+	
+	public int getConceptualFaceCnt(Pointer model, Pointer instance) {
+		return engine.getConceptualFaceCnt(instance);
+	}
+	
+	public ConceptualFaceProperties getConceptualFaceEx(Pointer instance, int index) {
+		IntByReference p_startIndexTriangles = new IntByReference();
+		IntByReference p_noIndicesTriangles = new IntByReference();
+		IntByReference p_startIndexLines = new IntByReference();
+		IntByReference p_noIndicesLines = new IntByReference();
+		IntByReference p_startIndexPoints = new IntByReference();
+		IntByReference p_noIndicesPoints = new IntByReference();
+		IntByReference p_startIndexFacesPolygons = new IntByReference();
+		IntByReference p_noIndicesFacesPolygons = new IntByReference();
+		IntByReference p_startIndexConceptualFacePolygons = new IntByReference();
+		IntByReference p_noIndicesConceptualFacePolygons = new IntByReference();
+		engine.getConceptualFaceEx(instance, index, p_startIndexTriangles, p_noIndicesTriangles, p_startIndexLines,
+				p_noIndicesLines, p_startIndexPoints, p_noIndicesPoints, p_startIndexFacesPolygons, p_noIndicesFacesPolygons,
+				p_startIndexConceptualFacePolygons, p_noIndicesConceptualFacePolygons);
+		int startIndexTriangles = p_startIndexTriangles.getValue();
+		int noIndicesTriangles = p_noIndicesTriangles.getValue();
+		int startIndexLines = p_startIndexLines.getValue();
+		int noIndicesLines = p_noIndicesLines.getValue();
+		int startIndexPoints = p_startIndexPoints.getValue();
+		int noIndicesPoints = p_noIndicesPoints.getValue();
+		int startIndexFacesPolygons = p_startIndexFacesPolygons.getValue();
+		int noIndicesFacesPolygons = p_noIndicesFacesPolygons.getValue();
+		int startIndexConceptualFacePolygons = p_startIndexConceptualFacePolygons.getValue();
+		int noIndicesConceptualFacePolygons = p_noIndicesConceptualFacePolygons.getValue();
+		return new ConceptualFaceProperties(startIndexTriangles, noIndicesTriangles, startIndexLines, noIndicesLines,
+				startIndexPoints, noIndicesPoints, startIndexFacesPolygons, noIndicesFacesPolygons, startIndexConceptualFacePolygons,
+				noIndicesConceptualFacePolygons);
 	}
 }

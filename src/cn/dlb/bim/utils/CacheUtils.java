@@ -57,4 +57,11 @@ public class CacheUtils<T> {
 		return result;
 	}
 	
+	public byte[] readRawCacheData(CacheDescriptor downloadDescriptor) {
+		if (cacheManager.contains(downloadDescriptor)) {
+			return cacheManager.getData(downloadDescriptor);
+		} else {
+			return null;
+		}
+	}
 }

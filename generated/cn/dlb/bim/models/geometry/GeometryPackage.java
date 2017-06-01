@@ -269,6 +269,8 @@ public interface GeometryPackage extends EPackage {
 	 * @ordered
 	 */
 	int GEOMETRY_DATA__MATERIAL_INDICES = 4;
+	
+	int GEOMETRY_DATA__WIREFRAME_INDICES = 5;
 
 	/**
 	 * The number of structural features of the '<em>Data</em>' class.
@@ -277,7 +279,7 @@ public interface GeometryPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int GEOMETRY_DATA_FEATURE_COUNT = 5;
+	int GEOMETRY_DATA_FEATURE_COUNT = 6;//有6个属性原来是5个，加了GEOMETRY_DATA__WIREFRAME_INDICES
 
 	/**
 	 * Returns the meta object for class '{@link cn.dlb.bim.models.geometry.GeometryInfo <em>Info</em>}'.
@@ -495,6 +497,12 @@ public interface GeometryPackage extends EPackage {
 	 * @generated
 	 */
 	EAttribute getGeometryData_MaterialIndices();
+	
+	/**
+	 * linfujun added it
+	 * @return
+	 */
+	EAttribute getGeometryData_WireFrameIndices();
 
 	/**
 	 * Returns the factory that creates the instances of the model.
@@ -683,6 +691,14 @@ public interface GeometryPackage extends EPackage {
 		 * @generated
 		 */
 		EAttribute GEOMETRY_DATA__MATERIAL_INDICES = eINSTANCE.getGeometryData_MaterialIndices();
+		
+		/**
+		 * The meta object literal for the '<em><b>Indices</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute GEOMETRY_DATA__WIREFRAME_INDICES = eINSTANCE.getGeometryData_WireFrameIndices();
 
 	}
 

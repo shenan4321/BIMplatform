@@ -169,5 +169,9 @@ public interface GeometryData extends IdEObject {
 	 * @generated
 	 */
 	void setMaterialIndices(byte[] value);
+	
+	byte[] getIndicesForLinesWireFrame();
+
+	void setIndicesForLinesWireFrame(byte[] newIndicesForLinesWireFrame);
 
 } // GeometryData

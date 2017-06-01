@@ -22,6 +22,7 @@ import cn.dlb.bim.ifc.engine.IRenderEngineInstance;
 import cn.dlb.bim.ifc.engine.IRenderEngineModel;
 import cn.dlb.bim.ifc.engine.IndexFormat;
 import cn.dlb.bim.ifc.engine.Precision;
+import cn.dlb.bim.ifc.engine.RenderEngineConceptualFaceProperties;
 import cn.dlb.bim.ifc.engine.RenderEngineException;
 import cn.dlb.bim.ifc.engine.RenderEngineFilter;
 import cn.dlb.bim.ifc.engine.RenderEngineGeometry;
@@ -64,7 +65,7 @@ public class GeometryGenerator {
 			settings.setIndexFormat(IndexFormat.AUTO_DETECT);
 			settings.setGenerateNormals(true);
 			settings.setGenerateTriangles(true);
-			settings.setGenerateWireFrame(false);
+			settings.setGenerateWireFrame(true);
 			
 			final RenderEngineFilter renderEngineFilter = new RenderEngineFilter();
 			
@@ -122,13 +123,51 @@ public class GeometryGenerator {
 					
 					GeometryData geometryData = null;
 					geometryData = GeometryFactory.eINSTANCE.createGeometryData();
+					
+					
+					int faceCnt = renderEngineInstance.getConceptualFaceCnt();
+					int[] indicesForFaces = new int[geometry.getIndices().length];
+					int[] indicesForLinesWireFrame = new int[2*geometry.getIndices().length];
+					int[] primitivesForFaces = new int[faceCnt];
+					int noPrimitivesForFaces = 0;
+					int noPrimitivesForWireFrame = 0;
+					for (int i = 0; i < faceCnt; i++) {
+						RenderEngineConceptualFaceProperties conceptualFaceProperties = renderEngineInstance.getConceptualFaceEx(i);
+						int noIndicesTrangles = conceptualFaceProperties.getNoIndicesTriangles();
+						int startIndexTriangles = conceptualFaceProperties.getStartIndexTriangles();
+						int noIndicesFacesPolygons = conceptualFaceProperties.getNoIndicesFacesPolygons();
+						int startIndexFacesPolygons = conceptualFaceProperties.getStartIndexFacesPolygons();
+						int	j = 0;
+						while  (j < noIndicesTrangles) {
+							indicesForFaces[noPrimitivesForFaces * 3 + j] = geometry.getIndices()[startIndexTriangles + j];
+							j++;
+						}
+						noPrimitivesForFaces += noIndicesTrangles/3;
+						primitivesForFaces[i] = noIndicesTrangles / 3;
+						
+						j = 0;
+						int	lastItem = -1;
+						while  (j < noIndicesFacesPolygons) {
+							if	(lastItem >= 0 && geometry.getIndices()[startIndexFacesPolygons+j] >= 0) {
+								indicesForLinesWireFrame[2*noPrimitivesForWireFrame + 0] = lastItem;
+								indicesForLinesWireFrame[2*noPrimitivesForWireFrame + 1] = geometry.getIndices()[startIndexFacesPolygons+j];
+								noPrimitivesForWireFrame++;
+							}
+							lastItem = geometry.getIndices()[startIndexFacesPolygons+j];
+							j++;
+						}
+						
+					}
+					int[] trimIndicesForFaces = Arrays.copyOf(indicesForFaces, 3 * noPrimitivesForFaces);
+					int[] trimIndicesForLinesWireFrame = Arrays.copyOf(indicesForLinesWireFrame, 2 * noPrimitivesForWireFrame);
 
-					geometryData.setIndices(intArrayToByteArray(geometry.getIndices()));
+					geometryData.setIndices(intArrayToByteArray(trimIndicesForFaces));
 					geometryData.setVertices(floatArrayToByteArray(geometry.getVertices()));
 					geometryData.setMaterialIndices(intArrayToByteArray(geometry.getMaterialIndices()));
 					geometryData.setNormals(floatArrayToByteArray(geometry.getNormals()));
+					geometryData.setIndicesForLinesWireFrame(intArrayToByteArray(trimIndicesForLinesWireFrame));
 					
-					geometryInfo.setPrimitiveCount(geometry.getIndices().length / 3);
+					geometryInfo.setPrimitiveCount(trimIndicesForFaces.length / 3);
 
 					if (geometry.getMaterialIndices() != null && geometry.getMaterialIndices().length > 0) {
 						boolean hasMaterial = false;
@@ -136,7 +175,7 @@ public class GeometryGenerator {
 						for (int i = 0; i < geometry.getMaterialIndices().length; ++i) {
 							int c = geometry.getMaterialIndices()[i];
 							for (int j = 0; j < 3; ++j) {
-								int k = geometry.getIndices()[i * 3 + j];
+								int k = trimIndicesForFaces[i * 3 + j];
 								if (c > -1) {
 									hasMaterial = true;
 									for (int l = 0; l < 4; ++l) {
@@ -156,8 +195,8 @@ public class GeometryGenerator {
 						tranformationMatrix = renderEngineInstance.getTransformationMatrix();
 					}
 
-					for (int i = 0; i < geometry.getIndices().length; i++) {
-						processExtends(geometryInfo, tranformationMatrix, geometry.getVertices(), geometry.getIndices()[i] * 3, generateGeometryResult);
+					for (int i = 0; i < trimIndicesForFaces.length; i++) {
+						processExtends(geometryInfo, tranformationMatrix, geometry.getVertices(), trimIndicesForFaces[i] * 3, generateGeometryResult);
 					}
 
 					geometryInfo.setData(geometryData);
@@ -262,6 +301,9 @@ public class GeometryGenerator {
 		}
 		if (geometryData.getMaterials() != null) {
 			hashCode += Arrays.hashCode(geometryData.getMaterials());
+		}
+		if (geometryData.getIndicesForLinesWireFrame() != null) {
+			hashCode += Arrays.hashCode(geometryData.getIndicesForLinesWireFrame());
 		}
 		return hashCode;
 	}

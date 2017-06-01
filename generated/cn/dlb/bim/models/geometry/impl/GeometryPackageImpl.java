@@ -351,6 +351,11 @@ public class GeometryPackageImpl extends EPackageImpl implements GeometryPackage
 	public EAttribute getGeometryData_MaterialIndices() {
 		return (EAttribute) getGeometryData().getEStructuralFeatures().get(4);
 	}
+	
+	@Override
+	public EAttribute getGeometryData_WireFrameIndices() {
+		return (EAttribute) getGeometryData().getEStructuralFeatures().get(5);
+	}
 
 	/**
 	 * <!-- begin-user-doc -->

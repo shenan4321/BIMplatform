@@ -50,6 +50,13 @@ public interface IfcEngineInterface extends Library {
 
 	void setFormat(Pointer modelId, int format, int mask);
 	void setFilter(Pointer modelId, int format, int mask);
+	
+	int getConceptualFaceCnt(Pointer instance);
+	int getConceptualFaceEx(Pointer instance, int index, IntByReference startIndexTriangles,
+			IntByReference noIndicesTriangles, IntByReference startIndexLines, IntByReference noIndicesLines,
+			IntByReference startIndexPoints, IntByReference noIndicesPoints, IntByReference startIndexFacesPolygons,
+			IntByReference noIndicesFacesPolygons, IntByReference startIndexConceptualFacePolygons, 
+			IntByReference noIndicesConceptualFacePolygons);
 
 	void getInstanceTransformationMatrix(Pointer modelId, Pointer instance, 
 			DoubleByReference d11, DoubleByReference d12, DoubleByReference d13, DoubleByReference d14, 

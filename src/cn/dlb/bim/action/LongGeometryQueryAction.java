@@ -3,12 +3,9 @@ package cn.dlb.bim.action;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
-
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
-
 import com.google.gson.Gson;
-
 import cn.dlb.bim.ifc.database.IfcModelDbException;
 import cn.dlb.bim.ifc.emf.IfcModelInterfaceException;
 import cn.dlb.bim.ifc.shared.ProgressReporter;
@@ -26,7 +23,7 @@ public class LongGeometryQueryAction extends LongAction {
 	private final BimService bimService;
 	private final Integer rid;
 	private int lastPercentProcess = 0;
-
+	
 	public LongGeometryQueryAction(BimService bimService, Integer rid, WebSocketSession webSocketSession) {
 		super(webSocketSession);
 		this.bimService = bimService;

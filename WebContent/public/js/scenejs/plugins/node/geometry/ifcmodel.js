@@ -66,6 +66,10 @@
             fovy: 37.8493
         });
         window.allPoint.push(geometryInfo.oid);
+        
+        var positionFloatArray = new Float32Array(positions);
+        var normalsFloatArray = new Float32Array(normals);
+        
         return {
 			type : "flags",
 			flags : {
@@ -86,9 +90,9 @@
 					nodes: [{
 	        			type : "geometry",
 	        			primitive : params.wire ? "lines" : "triangles",
-	                    positions:new Float32Array(positions),
-	                    indices:new Uint16Array(indices),
-	                    normals:new Float32Array(normals)
+	                    positions: positionFloatArray,
+	                    indices: new Uint16Array(indices),
+	                    normals: normalsFloatArray
 	        		},
 	        		{
 						type : "material",
@@ -99,9 +103,9 @@
 						nodes: [{
 		        			type : "geometry",
 		        			primitive : "lines",
-		                    positions:new Float32Array(positions),
-		                    indices:new Uint16Array(indicesForLinesWireFrame),
-		                    normals:new Float32Array(normals)
+		                    positions: positionFloatArray,
+		                    indices: new Uint16Array(indicesForLinesWireFrame),
+		                    normals: normalsFloatArray
 		        		}]
 					}]
 				}]

@@ -57,7 +57,7 @@ Ifc.Constants.defaultTypes = [
 Ifc.Constants.materials = {
 	IfcSpace: {r: 0.5, g: 0.4, b: 0.1, a: 0.6},
 	IfcRoof: {r: 70/255, g: 30/255, b: 30/255, a: 0.7},
-	IfcSlab: {r: 180.0/255, g: 180/255, b:180.0/255, a: 0.7},
+	IfcSlab: {r: 160.0/255, g: 150/255, b:104.0/255, a: 0.7},
 	IfcWall: {r: 150/255, g: 150/255, b: 104.0/255, a:0.6},
 	IfcWallStandardCase: {r: 146.0/255, g: 72.0/255, b: 38.0/255, a:0.6},
 	IfcDoor: {r: 0.637255, g:  0.603922, b: 0.670588, a: 0.6},
@@ -76,7 +76,7 @@ Ifc.Constants.materials = {
 	IfcFlowitting: {r: 0.137255, g: 0.403922, b: 0.870588, a: 0.6},
 	IfcFlowTerminal: {r: 0.137255, g:  0.403922, b: 0.870588, a: 0.6},
 	IfcProxy: {r: 0.0, g: 0.8, b: 0.5, a: 0.9},
-	IfcSite: {r: 0.0, g: 102/255, b: 102/255, a: 0.8},
+	IfcSite: {r: 0.0, g: 102/255, b: 180/255, a: 0.8},
 	IfcLightFixture: {r:  0.137255, g: 0.403922, b:  0.870588, a: 0.6},
 	IfcDuctSegment: {r: 0.137255, g: 0.403922, b:0.870588, a: 0.6},
 	IfcDistributionFlowElement: {r: 0.8470588235, g: 0.427450980392, b: 0, a: 0.6},

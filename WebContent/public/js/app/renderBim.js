@@ -98,15 +98,15 @@ function createScene(sceneNodes){
 		                                {
 		                                    mode:"ambient",
 		                                    color:{ r:0.9, g:0.9, b:0.9},
-		                                    diffuse:false,
-		                                    specular:false
+		                                    diffuse:true,
+		                                    specular:true
 		                                },
 		                                {
 		                                    mode:"dir",
 		                                    color:{ r:1.0, g:1.0, b:1.0 },
 		                                    diffuse:true,
 		                                    specular:true,
-		                                    dir:{ x:-0.5, y:-0.5, z:-1.0 },
+		                                    dir:{ x:-10, y:-10, z:-10 },
 		                                    space:"view"
 		                                },
 		                                {
@@ -114,9 +114,11 @@ function createScene(sceneNodes){
 		                                    id:			'sun-light',
 		                                    mode:		'dir',
 		                                    color:		{r: 0.6, g: 0.6, b: 0.6},
-		                                    dir:   		{x: -0.5, y: 1, z: -1.0},
+		                                    dir:   		{x: 10000, y: -100000, z: 10000.0},
+		                                    pos:   		{x: 10000, y: 100000, z: 10000.0},
 		                                    diffuse:	true,
-		                                    specular:	true
+		                                    specular:	true,
+		                                    space:"world"
 		                                }
 		                            ]
 		                        }]

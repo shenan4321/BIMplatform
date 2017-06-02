@@ -70,7 +70,7 @@
 			type : "flags",
 			flags : {
 				transparent : true,
-				backfaces:false,
+				backfaces:true,
 				enable:true
 			},
 			id : "flags"+geometryInfo.oid,

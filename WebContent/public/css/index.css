@@ -308,5 +308,37 @@ li.li.hover .iconfont1{display:block;}
             right: 20px;
             z-index: 20;
         }
-        
+ .div_project {
+    min-height: 0px;
+    height: 46px;
+    display: inline-block;
+    padding-top: 12px;
+    margin-right: 20px;
+    min-width: 40px;
+    text-align: center;
+    float: right;
+}
+.button_wUyZlQ2 {
+    font-size: 6px;
+    border-radius: 2px;
+    padding-top: 6px;
+    padding-bottom: 1px;
+    height: 23px;
+    width:60px;
+    float: left;
+    margin-left: 15px;
+    background-color: rgb(122, 122, 122);
+    color: #FFF;
+}
+ .div_back {
+    min-height: 0px;
+    height: 46px;
+    display: inline-block;
+    padding-top: 12px;
+    margin-right: -9px;
+    min-width: 40px;
+    text-align: center;
+    float: right;
+}
+
         

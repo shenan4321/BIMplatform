@@ -36,6 +36,7 @@ public class JvmRenderEngineFactory implements IRenderEngineFactory {
 	
 	public JvmRenderEngineFactory(PlatformServer server) {
 		this.server = server;
+		initialize();
 	}
 	
 	public void initialize() {

@@ -11,8 +11,10 @@ import cn.dlb.bim.ifc.SerializationManager;
 import cn.dlb.bim.ifc.collada.ColladaCacheManager;
 import cn.dlb.bim.ifc.collada.ColladaProcessFactory;
 import cn.dlb.bim.ifc.emf.MetaDataManager;
-import cn.dlb.bim.ifc.engine.IRenderEngineFactory;
 import cn.dlb.bim.ifc.engine.jvm.JvmRenderEngineFactory;
+import cn.dlb.bim.ifc.engine.pool.CommonsPoolingRenderEnginePoolFactory;
+import cn.dlb.bim.ifc.engine.pool.RenderEnginePoolFactory;
+import cn.dlb.bim.ifc.engine.pool.RenderEnginePools;
 
 /**
  * @author shenan4321
@@ -23,11 +25,11 @@ public class PlatformServer {
 
 	private final MetaDataManager metaDataManager;
 	private final SerializationManager serializationManager;
-	private final IRenderEngineFactory renderEngineFactory;
 	private final ColladaCacheManager colladaCacheManager;
 	private final ColladaProcessFactory colladaProcessFactory;
 	private final ModelCacheManager modelCacheManager;
 	private final NewDiskCacheManager diskCacheManager;
+	private RenderEnginePools renderEnginePools;
 	
 	@Autowired
 	private MongoGridFs mongoGridFs;
@@ -41,18 +43,17 @@ public class PlatformServer {
 	public PlatformServer() {
 		metaDataManager = new MetaDataManager(PlatformContext.getTempPath());
 		serializationManager = new SerializationManager(this);
-		renderEngineFactory = new JvmRenderEngineFactory(this);
 		colladaCacheManager = new ColladaCacheManager(this);
 		colladaProcessFactory = new ColladaProcessFactory();
 		modelCacheManager = new ModelCacheManager();
 		diskCacheManager = new NewDiskCacheManager(PlatformContext.getDiskCachepath());
+		renderEnginePools = new RenderEnginePools(this, new CommonsPoolingRenderEnginePoolFactory(10), new JvmRenderEngineFactory(this));//先写10
 		
 		initialize();
 	}
 	
 	public void initialize() {
 		metaDataManager.initialize();
-		renderEngineFactory.initialize();
 		colladaProcessFactory.initialize();
 	}
 	
@@ -62,10 +63,6 @@ public class PlatformServer {
 	
 	public SerializationManager getSerializationManager() {
 		return serializationManager;
-	}
-
-	public IRenderEngineFactory getRenderEngineFactory() {
-		return renderEngineFactory;
 	}
 
 	public MongoGridFs getMongoGridFs() {
@@ -98,6 +95,10 @@ public class PlatformServer {
 
 	public NewDiskCacheManager getDiskCacheManager() {
 		return diskCacheManager;
+	}
+
+	public RenderEnginePools getRenderEnginePools() {
+		return renderEnginePools;
 	}
 	
 }

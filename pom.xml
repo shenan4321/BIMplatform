@@ -287,6 +287,14 @@
 			<version>2012_u6</version>
 		</dependency>
 		<!-- lucene及ik分词器 支持  end -->
+		
+		<!-- apache 池化对象支持 -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-pool2</artifactId>
+			<version>2.4.2</version>
+		</dependency>
+		<!-- apache 池化对象支持 end -->
 
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>

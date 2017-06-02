@@ -29,6 +29,7 @@ import cn.dlb.bim.ifc.engine.RenderEngineGeometry;
 import cn.dlb.bim.ifc.engine.RenderEngineSettings;
 import cn.dlb.bim.ifc.engine.cells.GenerateGeometryResult;
 import cn.dlb.bim.ifc.engine.cells.Matrix;
+import cn.dlb.bim.ifc.engine.pool.RenderEnginePool;
 import cn.dlb.bim.ifc.serializers.Serializer;
 import cn.dlb.bim.ifc.serializers.SerializerException;
 import cn.dlb.bim.ifc.serializers.SerializerInputstream;
@@ -42,23 +43,25 @@ public class GeometryGenerator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(GeometryGenerator.class);
 	private IfcModelInterface model;
 	private Serializer serializer;
-	private IRenderEngine renderEngine;
 	private IRenderEngineModel renderEngineModel;
 	private final Map<Integer, GeometryData> hashes = new ConcurrentHashMap<Integer, GeometryData>();
+	private RenderEnginePool renderEnginePool;
 	
 	private final RenderEngineFilter renderEngineFilter = new RenderEngineFilter();
 	private final RenderEngineFilter renderEngineFilterTransformed = new RenderEngineFilter(true);
 
-	public GeometryGenerator(IfcModelInterface model, Serializer serializer, IRenderEngine renderEngine) {
+	public GeometryGenerator(IfcModelInterface model, Serializer serializer, RenderEnginePool renderEnginePool) {
 		this.model = model;
 		this.serializer = serializer;
-		this.renderEngine = renderEngine;
+		this.renderEnginePool = renderEnginePool;
 	}
 
 	public void generateForAllElements() {
 		try {
 			serializer.init(model, null, true);
 			InputStream in = new SerializerInputstream(serializer);
+			
+			IRenderEngine renderEngine = renderEnginePool.borrowObject();
 			renderEngineModel = renderEngine.openModel(in);
 			final RenderEngineSettings settings = new RenderEngineSettings();
 			settings.setPrecision(Precision.SINGLE);
@@ -77,6 +80,11 @@ public class GeometryGenerator {
 			for (IfcProduct ifcProduct : model.getAllWithSubTypes(IfcProduct.class)) {
 				generateGeometry(ifcProduct);
 			}
+			
+			if (renderEngine != null) {
+				renderEnginePool.returnObject(renderEngine);
+			}
+			
 		} catch (SerializerException e) {
 			e.printStackTrace();
 		} catch (RenderEngineException e) {

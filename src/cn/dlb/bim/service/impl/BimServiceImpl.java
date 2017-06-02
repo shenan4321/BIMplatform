@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import com.mongodb.DBObject;
 import com.mongodb.gridfs.GridFSDBFile;
-import com.mongodb.gridfs.GridFSFile;
 
 import cn.dlb.bim.cache.CacheDescriptor;
 import cn.dlb.bim.component.MongoGridFs;
@@ -45,6 +44,8 @@ import cn.dlb.bim.ifc.emf.Schema;
 import cn.dlb.bim.ifc.engine.IRenderEngine;
 import cn.dlb.bim.ifc.engine.RenderEngineException;
 import cn.dlb.bim.ifc.engine.cells.Vector3d;
+import cn.dlb.bim.ifc.engine.pool.RenderEnginePool;
+import cn.dlb.bim.ifc.engine.pool.RenderEnginePools;
 import cn.dlb.bim.ifc.serializers.IfcStepSerializer;
 import cn.dlb.bim.ifc.serializers.SerializerException;
 import cn.dlb.bim.ifc.shared.ProgressReporter;
@@ -143,10 +144,9 @@ public class BimServiceImpl implements BimService {
 			deserializer.read(modelFile);
 
 			IfcModelInterface model = deserializer.getModel();
-
-			IRenderEngine renderEngine = server.getRenderEngineFactory().createRenderEngine(schema.getEPackageName());
-
-			GeometryGenerator generator = new GeometryGenerator(model, serializer, renderEngine);
+			RenderEnginePools renderEnginePools = server.getRenderEnginePools();
+			RenderEnginePool renderEnginePool = renderEnginePools.getRenderEnginePool(schema);
+			GeometryGenerator generator = new GeometryGenerator(model, serializer, renderEnginePool);
 			generator.generateForAllElements();
 
 			PlatformInitDatas platformInitDatas = server.getPlatformInitDatas();
@@ -496,9 +496,9 @@ public class BimServiceImpl implements BimService {
 
 			IfcModelInterface model = deserializer.getModel();
 
-			IRenderEngine renderEngine = server.getRenderEngineFactory().createRenderEngine(schema.getEPackageName());
-
-			GeometryGenerator generator = new GeometryGenerator(model, serializer, renderEngine);
+			RenderEnginePools renderEnginePools = server.getRenderEnginePools();
+			RenderEnginePool renderEnginePool = renderEnginePools.getRenderEnginePool(schema);
+			GeometryGenerator generator = new GeometryGenerator(model, serializer, renderEnginePool);
 			generator.generateForAllElements();
 			model.fixOids(new OfflineOidProvider());
 			

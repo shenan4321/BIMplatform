@@ -71,7 +71,7 @@ var luopanEvent = {};
                 for(var i=0;i<len;i++){
 
                     var svgItem = document.createElementNS("http://www.w3.org/2000/svg","a");
-                    svgItem.setAttribute('class',opts.data[i].selected?'svg-item-selected':'svg-item');
+                    svgItem.setAttribute('class',opts.data[i].selected ?'svg-item-selected':'svg-item');
                     svgItem.setAttribute('item',"item-"+i);
                     svgItem.setAttribute('role','link');
                     luopanEvent['s'+i] = opts.data[i].onClick;

@@ -31,13 +31,14 @@ function initStart(){
 					dataType:"json",
 					success:function(res){
 					var luopanData = [];
-					$.each(res.data,function(item){
+					$.each(res.data,function(index,item){
 						if(item.rid==string){
-							luopanData.push({name:this.name,link:'http://'+location.host+location.pathname+'?rid='+this.rid,selected:true})	
+							luopanData.push({name:this.name,link:'http://'+location.host+location.pathname+'?rid='+item.rid,selected:true})	
 						}else{
-							luopanData.push({name:this.name,link:'http://'+location.host+location.pathname+'?rid='+this.rid})
+							luopanData.push({name:this.name,link:'http://'+location.host+location.pathname+'?rid='+item.rid})
 						}			
 					});
+					console.log(luopanData);
 					$('#luopanSvg').luopan({
 						data:luopanData,
 					});	

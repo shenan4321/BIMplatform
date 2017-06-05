@@ -489,18 +489,26 @@ require([
                 			
                 			
                 			lookat.setUp({x: 0, y:1, z: Math.abs(zoom)>Math.abs(maxZoom) ? Math.abs(maxZoom) : Math.abs(zoom) });
-                			
+
+                			//原点的眼睛
                             var eye = glmat.vec3.fromValues(0, 0, zoom);
+                            //lookat的那个轴
                             var look = glmat.vec3.fromValues(currentPivot[0], currentPivot[1], currentPivot[2]);
                             //var up = glmat.vec3.fromValues(0, 1, 0);
 
+                            
                             var eyeVec = glmat.vec3.create();
+                            
+                            //计算出他们之间 眼睛 那个轴向量
                             glmat.vec3.sub(eyeVec, eye, look);
 
                             var mat = glmat.mat4.create();
                             	
                            
                             console.log(yaw);
+                            console.log(pitch);
+                            
+                            
                             glmat.mat4.rotateY(mat, mat, -yaw * 0.0174532925);
                             glmat.mat4.rotateX(mat, mat, -pitch * 0.0174532925);
 

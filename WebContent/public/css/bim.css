@@ -85,10 +85,10 @@
          }
          
 .mui-switch {
-        width: 45px;
-        height: 25px;
+        width: 38px;
+        height: 21px;
         position: relative;
-        border: 1px solid #dfdfdf;
+        /* border: 1px solid #dfdfdf; */
         padding-right: 0;
         background-color: #fdfdfd;
         box-shadow: #dfdfdf 0 0 0 0 inset;
@@ -102,18 +102,20 @@
         }
     .mui-switch:before {
         content: '';
-        width: 25px;
-        height: 25px;
+        width: 22px;
+        height: 22px;
         position: absolute;
         top: 0px;
         left: 0;
         border-radius: 20px;
         background-color: #fff;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4); }
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+        }
     .mui-switch.checked{
-        border-color: #2d5f7e;
+        /* border-color: #2d5f7e; */
         box-shadow: #2d5f7e 0 0 0 16px inset;
-        background-color: #2d5f7e; }
+        background-color: #2d5f7e;
+        }
     .mui-switch.checked:before{
         left: 21px; }
     .mui-switch.mui-switch-animbg {
@@ -131,9 +133,10 @@
     .mui-switch.mui-switch-anim:before {
         transition: left 0.3s; }
     .mui-switch.mui-switch-anim.checked {
-        box-shadow: #2d5f7e 0 0 0 16px inset;
-        background-color: #2d5f7e;
-        transition: border ease 0.4s, box-shadow ease 0.4s, background-color ease 1.2s; }
+        box-shadow: #90d8ff 0 0 0 16px inset;
+        /* background-color: #2d5f7e; */
+        transition: border ease 0.4s, box-shadow ease 0.4s, background-color ease 1.2s;
+        }
     .mui-switch.mui-switch-anim.checked:before,{
         transition: left 0.3s; }
 .tree-view{

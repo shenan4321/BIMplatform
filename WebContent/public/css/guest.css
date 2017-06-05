@@ -1,5 +1,5 @@
    .list-box{
-        padding: 20px 80px 20px 80px;
+        padding: 10px 80px 10px 80px;
         border-bottom:1px solid #e5e5e5;
         position: relative;
     }
@@ -8,8 +8,8 @@
         margin-left: -60px;
     }
     .list-box dt .images{
-        width: 60px;
-        height:60px;
+        width: 50px;
+        height: 50px;
         margin-top: 0rem;
         background-repeat:no-repeat;
         background-position:center center;
@@ -21,8 +21,8 @@
         margin-left: 20px;
     }
    .list-box dd h4{
-        font-size: 18px;
-        color:#272727;
+        font-size: 14px;
+        color: #fff;
         margin-top: 0rem;
         margin-bottom: 0px;
         overflow:hidden;
@@ -34,7 +34,7 @@
         padding-top: 5px;
     }
     .list-box dd .text{
-    	font-size:16px;
+    	font-size: 12px;
     } 
    .poa-switch{
     position:absolute;
@@ -49,7 +49,7 @@
     background: rgba(50, 135, 187, 0.8);
 }
 .type-box{
-        padding: 20px 80px 20px 60px;
+        padding: 10px 80px 10px 60px;
         border-bottom:1px solid #c3c3c3;
         position: relative;
     }
@@ -58,9 +58,8 @@
         margin-left: -46px;
     }
     .type-box dt .images{
-        width: 50px;
-        height: 50px;
-        margin-top: 0rem;
+        width: 45px;
+        height: 45px;
         background-repeat:no-repeat;
         background-position:center center;
         background-size:cover;
@@ -71,8 +70,8 @@
         margin-left: 16px;
     }
    .type-box dd h4{
-        font-size: 18px;
-        color:#272727;
+        font-size: 14px;
+        color: #fff;
         margin-bottom: 0px;
         overflow:hidden;
         white-space:nowrap;
@@ -85,7 +84,7 @@
     }
     .type-box dd .text{
     	font-size: 14px;
-    	color: #635b5b;
+    	color: #fff;
     	font-size: 12px;
     	white-space: nowrap;
     	overflow: hidden;
@@ -106,11 +105,11 @@
 }
 .search-btn{
 	display:inline-block;
-	width: 170px;
+	width: 120px;
 	height: 38px;
 	font: 14px arial;
 	line-height: 22px\9;
-	margin: 0;
+	margin: 4px;
 	padding: 0 10px;
 	background: #fff;
 	border: 0;

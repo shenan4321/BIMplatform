@@ -7,12 +7,16 @@ import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EStructuralFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cn.dlb.bim.ifc.emf.IdEObject;
 import cn.dlb.bim.ifc.emf.IfcModelInterface;
 import cn.dlb.bim.ifc.emf.IfcModelInterfaceException;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
@@ -37,7 +41,6 @@ import cn.dlb.bim.models.geometry.GeometryData;
 import cn.dlb.bim.models.geometry.GeometryFactory;
 import cn.dlb.bim.models.geometry.GeometryInfo;
 import cn.dlb.bim.models.geometry.Vector3f;
-import cn.dlb.bim.models.ifc2x3tc1.IfcProduct;
 
 public class GeometryGenerator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(GeometryGenerator.class);
@@ -76,8 +79,10 @@ public class GeometryGenerator {
 			renderEngineModel.setFilter(renderEngineFilter);
 			
 			renderEngineModel.generateGeneralGeometry();
+			PackageMetaData packageMetaData = model.getPackageMetaData();
+			EClass productClass = (EClass) model.getPackageMetaData().getEClassifierCaseInsensitive("IfcProduct");
 			
-			for (IfcProduct ifcProduct : model.getAllWithSubTypes(IfcProduct.class)) {
+			for (IdEObject ifcProduct : model.getAllWithSubTypes(productClass)) {
 				generateGeometry(ifcProduct);
 			}
 			
@@ -92,9 +97,15 @@ public class GeometryGenerator {
 		}
 	}
 
-	private GenerateGeometryResult generateGeometry(IfcProduct ifcProduct) {
+	private GenerateGeometryResult generateGeometry(IdEObject ifcProduct) {
 		GenerateGeometryResult generateGeometryResult = new GenerateGeometryResult();
-		if (ifcProduct.getRepresentation() != null && ifcProduct.getRepresentation().getRepresentations().size() != 0) {
+		
+		IdEObject representation = (IdEObject) ifcProduct.eGet(ifcProduct.eClass().getEStructuralFeature("Representation"));
+		if (representation != null) {
+			List<?> representations = (List<?>) representation.eGet(representation.eClass().getEStructuralFeature("Representations"));
+			if (representations.size() == 0) {
+				return generateGeometryResult;
+			}
 			try {
 				IRenderEngineInstance renderEngineInstance = renderEngineModel.getInstanceFromExpressId(ifcProduct.getExpressId());
 				RenderEngineGeometry geometry = renderEngineInstance.generateGeometry();
@@ -222,8 +233,7 @@ public class GeometryGenerator {
 					} else {
 						hashes.put(hash, geometryData);
 					}
-
-					ifcProduct.setGeometry(geometryInfo);
+					ifcProduct.eSet(ifcProduct.eClass().getEStructuralFeature("geometry"), geometryInfo);
 				}
 			} catch (EntityNotFoundException e) {
 				// As soon as we find a representation that is not Curve2D, then we should show a "INFO" message in the log to indicate there could be something wrong

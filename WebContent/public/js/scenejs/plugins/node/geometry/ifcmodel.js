@@ -10,7 +10,6 @@
 
 	function build(params) {
 		
-		console.log(params);
 		var geometryInfo = params.geometry_info;
 		
 		var coreId = "geometry/ifcmodel_" + (params.wire ? "wire" : "_solid") + geometryInfo.oid;

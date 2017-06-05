@@ -84,7 +84,8 @@ require([
         var vecNegate = function(v) { return {x:-v.x, y:-v.y, z:-v.z}; };
         var vecAdd = function (a, b) { return { x: a.x + b.x, y: a.y + b.y, z: a.z + b.z }; };
         var sphericalCoords = function(eye) {var r= vecMagnitude(eye)||1;var phi   = Math.acos(eye.z / r);var theta = Math.atan2(eye.y, eye.x);return {phi: phi, theta: theta};};
-
+        window.currentPiont = [0,0,0];
+        
         SceneJS.Types.addType("cameras/pickFlyOrbit", {
 
             construct: function (params) {
@@ -256,8 +257,10 @@ require([
 
                 function actionMove(posX, posY) {
                     if (dragging) {
-                        yaw -= (posX - lastX) * direction * 0.1 ;
-                        pitch -= (posY - lastY) * 0.1;
+                    	console.log('yaw',yaw);
+                    	console.log('pitch',pitch);
+                        yaw += (posX - lastX)  * 0.1 ;
+                        pitch += (posY - lastY) * 0.1;
                         orbiting = true;
                     }
                     lastX = posX;
@@ -303,37 +306,62 @@ require([
 
                 function doKeyDown(event){
                 	var keyID = event.keyCode ? event.keyCode :event.which; 
-                	if(keyID === 33 ) { // up arrow and W 
-                		var xyz = lookat.getEye(); 
-            			lookat.setEye({x: xyz.x, y:xyz.y, z: xyz.z+200 })
-                		event.preventDefault(); 
-                	} 
-                	if(keyID === 34) { // right arrow and D 
-                		var xyz = lookat.getEye(); 
-            			lookat.setEye({x: xyz.x, y:xyz.y, z: xyz.z-200 })
-                		event.preventDefault();
-                	} 
                 	if(keyID === 38 ) { // up arrow and W 
-                		var xyz = lookat.getEye(); 
-            			lookat.setEye({x: xyz.x, y:xyz.y+200, z: xyz.z })
-                		event.preventDefault(); 
+                		scene.getNode('lookAt',function(look){
+                			var xyz = look.getEye();
+            				var myVec3 = [xyz.x-window.currentPiont[0],xyz.y-window.currentPiont[1],xyz.z-window.currentPiont[2]];
+                            var caluVec = [myVec3[0]*0.875 ,  myVec3[1]*0.875 , myVec3[2]*0.875];
+                            var newVec3 = [caluVec[0]+ window.currentPiont[0],caluVec[1]+window.currentPiont[1],caluVec[2]+window.currentPiont[2]];
+                            look.setEye({x: newVec3[0], y: newVec3[1], z:  newVec3[2] });
+                            event.preventDefault();
+                		})
+                	} 
+            		if(keyID === 40) { // down arrow and S 
+            			scene.getNode('lookAt',function(look){
+                			var xyz = look.getEye();
+                            var myVec3 = [xyz.x-window.currentPiont[0],xyz.y-window.currentPiont[1],xyz.z-window.currentPiont[2]];
+                            /*var r = Math.sqrt(Math.pow(xyz.x-window.currentPiont[0],2)+Math.pow(xyz.y-window.currentPiont[1],2)+Math.pow(xyz.z-window.currentPiont[2],2));
+                            if(r>far){
+                            	return false;
+                            }*/
+                            var caluVec = [myVec3[0]*8/7 ,  myVec3[1]*8/7 , myVec3[2]*8/7];
+                            var newVec3 = [caluVec[0]+window.currentPiont[0],caluVec[1]+window.currentPiont[1],caluVec[2]+window.currentPiont[2]];
+                            look.setEye({x: newVec3[0], y: newVec3[1], z:  newVec3[2] });
+                            event.preventDefault();
+                		})
                 	} 
                 	if(keyID === 39) { // right arrow and D 
-                		var xyz = lookat.getEye(); 
-            			lookat.setEye({x: xyz.x+200, y:xyz.y, z: xyz.z })
-                		event.preventDefault();
+                		scene.getNode('lookAt',function(look){
+                			var xyz = look.getEye();
+                            var x=0 ,y=0, z=0;
+                            var r = Math.sqrt(Math.pow(xyz.x-window.currentPiont[0],2)+Math.pow(xyz.y-window.currentPiont[1],2)+Math.pow(xyz.z-window.currentPiont[2],2));
+                            var thi = Math.atan2(xyz.y-window.currentPiont[1],xyz.x-window.currentPiont[0])*180/Math.PI;
+                            thi = thi+1;
+                            if(thi> 360){
+                            	thi = (thi-360)+1
+                            }
+                            x=window.currentPiont[0]+r*Math.cos(2*Math.PI/360*(thi));
+                            y=window.currentPiont[1]+r*Math.sin(2*Math.PI/360*(thi));
+                            look.setEye({x: x, y:y, z: xyz.z });
+                            event.preventDefault();
+                		})
                 	} 
-                	if(keyID === 40) { // down arrow and S 
-                		
-                		var xyz = lookat.getEye(); 
-            			lookat.setEye({x: xyz.x, y:xyz.y-200, z: xyz.z })
-                		event.preventDefault(); 
-                	} 
+                	
                 	if(keyID === 37) { // left arrow and A 
-                		
-                		var xyz = lookat.getEye(); 
-            			lookat.setEye({x: xyz.x-200, y:xyz.y, z: xyz.z })
-                		event.preventDefault();
+                		scene.getNode('lookAt',function(look){
+                			var xyz = look.getEye();
+                            var x=0 ,y=0, z=0;
+                            var r = Math.sqrt(Math.pow(xyz.x-window.currentPiont[0],2)+Math.pow(xyz.y-window.currentPiont[1],2)+Math.pow(xyz.z-window.currentPiont[2],2));
+                            var thi = Math.atan2(xyz.y-window.currentPiont[1],xyz.x-window.currentPiont[0])*180/Math.PI;
+                            thi = thi-1;
+                            if(thi> 360){
+                            	thi = (thi-360)-1
+                            }
+                            x=window.currentPiont[0]+r*Math.cos(2*Math.PI/360*(thi));
+                            y=window.currentPiont[1]+r*Math.sin(2*Math.PI/360*(thi));
+                            look.setEye({x: x, y:y, z: xyz.z });
+                            event.preventDefault();
+                		})
                 	} 
                 }
 
@@ -371,7 +399,7 @@ require([
                         flying = true;
 
                         label.setText("[ " + Math.round(endPivot[0]) + ", " + Math.round(endPivot[1]) + ", " + Math.round(endPivot[2]) + " ]");
-                        
+                        window.currentPiont = endPivot;
                         scene.getNode(hit.name + "geometry",function (material) {
                             if(hisPick.name){
                                 scene.getNode(hisPick.name + "geometry", function (material) {
@@ -472,7 +500,7 @@ require([
                             var mat = glmat.mat4.create();
                             	
                            
-                            
+                            console.log(yaw);
                             glmat.mat4.rotateY(mat, mat, -yaw * 0.0174532925);
                             glmat.mat4.rotateX(mat, mat, -pitch * 0.0174532925);
 

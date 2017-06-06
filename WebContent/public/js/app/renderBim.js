@@ -32,16 +32,17 @@ function showView(geom) {
 
 
 
-function createScene(sceneNodes){
-	var yaw = 0;
-	var  pitch=35.89999999999978,
-	minPitch= -80,
+function createScene(){
+	var yaw = -24.071999999999747;
+	var  pitch= -88.80199999999668;
+
+	var minPitch= -80,
 	maxPitch=-10,
-	zoom= - (~~(maxZoom/3)),
+	zoom= - (~~(maxZoom/1.5)),
 	zoomSensitivity= -(~~(maxZoom/15)),
 	//eye={x:middle.x,y: - middle.y* 10,z: maxZoom/5*4},
-	eye = middle,
-	look=middle;
+	eye = {x: 4120.287109375, y: -112420.634765625, z: 9389.171752929688},
+	look= middle;
 
 	
 	 var sceneViewObj = {
@@ -61,8 +62,8 @@ function createScene(sceneNodes){
 		        	type: "cameras/pickFlyOrbit",
 		        	showCursor: true,
 		            id:'cameras',
-		            yaw:-20,
-		            pitch:-90.72999999999763,
+		            yaw:yaw,
+		            pitch:pitch,
 		            minPitch:minPitch,
 		            maxPitch:maxPitch,
 		            zoom:zoom,

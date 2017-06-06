@@ -25,18 +25,22 @@
 		            '</div></div></div></div>';
 				$(boxHTML).appendTo("body");
 			}
+        	$this.progressTitle = document.getElementById('progressTitle');
+        	$this.progressNum = document.getElementById('progressNum');
+        	$this.progressTotal = document.getElementById('progressTotal');
+        	$this.progressStriped = document.getElementById('progressStriped');
         	return {
         		update:function(options){
-    				document.getElementById('progressTitle').innerHTML=options.title;
-    			    document.getElementById('progressNum').innerHTML=options.progress;
-    		        document.getElementById('progressTotal').innerHTML=options.max;
-    				document.getElementById('progressStriped').style.width = (~~(options.progress/options.max*100))+'%';
+        			$this.progressTitle.innerHTML=options.title;
+        			$this.progressNum.innerHTML=options.progress;
+        			$this.progressTotal.innerHTML=options.max;
+        			$this.progressStriped.style.width = (~~(options.progress/options.max*100))+'%';
         		},
         		hide:function(){
         			$('.progressbars').hide();
+        			$this = null;
         		}
         	}
-        
     };
 }(jQuery);
 

@@ -210,7 +210,7 @@ require([
                 var flightDuration;
                 var flying = false;
                 var orbiting = true;
-                var mouseWheeling = false;
+                var mouseWheeling = true;
                 
 
                 function mouseDown(event) {
@@ -290,7 +290,7 @@ require([
                         event.preventDefault();
                     }
                     event.returnValue = false;
-                    mouseWheeling = true;
+                    mouseWheeling = false;
                     orbiting = true;
                 }
 
@@ -314,6 +314,7 @@ require([
                             var caluVec = [myVec3[0]*0.875 ,  myVec3[1]*0.875 , myVec3[2]*0.875];
                             var newVec3 = [caluVec[0]+ window.currentPiont[0],caluVec[1]+window.currentPiont[1],caluVec[2]+window.currentPiont[2]];
                             look.setEye({x: newVec3[0], y: newVec3[1], z:  newVec3[2] });
+                            lookat.setEye({x: x, y:y, z: xyz.z });
                             event.preventDefault();
                 		})
                 	} 
@@ -328,6 +329,7 @@ require([
                             var caluVec = [myVec3[0]*8/7 ,  myVec3[1]*8/7 , myVec3[2]*8/7];
                             var newVec3 = [caluVec[0]+window.currentPiont[0],caluVec[1]+window.currentPiont[1],caluVec[2]+window.currentPiont[2]];
                             look.setEye({x: newVec3[0], y: newVec3[1], z:  newVec3[2] });
+                            lookat.setEye({x: x, y:y, z: xyz.z });
                             event.preventDefault();
                 		})
                 	} 
@@ -344,6 +346,8 @@ require([
                             x=window.currentPiont[0]+r*Math.cos(2*Math.PI/360*(thi));
                             y=window.currentPiont[1]+r*Math.sin(2*Math.PI/360*(thi));
                             look.setEye({x: x, y:y, z: xyz.z });
+                            lookat.setEye({x: x, y:y, z: xyz.z });
+                            
                             event.preventDefault();
                 		})
                 	} 
@@ -361,6 +365,7 @@ require([
                             x=window.currentPiont[0]+r*Math.cos(2*Math.PI/360*(thi));
                             y=window.currentPiont[1]+r*Math.sin(2*Math.PI/360*(thi));
                             look.setEye({x: x, y:y, z: xyz.z });
+                            lookat.setEye({x: x, y:y, z: xyz.z });
                             event.preventDefault();
                 		})
                 	} 
@@ -493,12 +498,9 @@ require([
 
                 			
                 			//原点的眼睛
-                			if(mouseWheeling){
-                				var eye = glmat.vec3.fromValues(0, 0, zoom);
-                				
-                			}else{
-                				var eye = glmat.vec3.fromValues(lookat.getEye().x, lookat.getEye().y, lookat.getEye().z);
-                			}
+                			var eye = glmat.vec3.fromValues(0, 0, zoom);
+                			
+                			
                             
                             //lookat的那个轴
                             var look = glmat.vec3.fromValues(currentPivot[0], currentPivot[1], currentPivot[2]);
@@ -528,12 +530,12 @@ require([
                             
                             //lookat.setEye({x: eyeVec[0], y: eyeVec[1], z: eyeVec[2] });
 
-                            /*var lookatArgs = {
+                            var lookatArgs = {
                                 eye: {x: look[0], y: look[1], z: look[2] },
                                 look: {x: look[0] - eye3[0], y: look[1] - eye3[1], z: look[2] - eye3[2] }
-                            };*/
+                            };
 
-                            //self.publish("updated", lookatArgs);
+                            self.publish("updated", lookatArgs);
 
                             // Rotate complete
                             orbiting = false;

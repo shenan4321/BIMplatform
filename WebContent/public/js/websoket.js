@@ -27,6 +27,7 @@ WebsocketBim.prototype.init = function(options){
     }
     if(window.WebSocket){
         this.socket = new WebSocket( url+ (options.urlPath||'') );
+        this.socket.binaryType = "arraybuffer" ;
     }else{
         alert('当前浏览器 不支持 websocket');
         return;
@@ -44,7 +45,12 @@ WebsocketBim.prototype.init = function(options){
 
         //连接成功建立的回调方法
         this.socket.onopen = function (event) {
-            options.onopen(event.data);
+        	if(typeof event.data =='string' ){
+        		options.onopen(JSON.parse(event.data));
+        	}else{
+        		options.onopen(event.data);
+        	}
+            
         };
 
         //接收到消息的回调方法

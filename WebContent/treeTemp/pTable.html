@@ -3,7 +3,7 @@
 	<div ng-show="!oid" class="ptable" >请点击物件显示属性</div>
 	<table cellspacing=0 cellpadding=0 class="table propertiesTable" id="propertiesTable" border="1" align="center" ng-show="oid" ng-repeat="item in list">
 		  	<tr class="active">
-		     	<td colspan="2"><b>{{item.name}}</b></td>
+		     	<th colspan="2"><b>{{item.name}}</b></th>
 	     	</tr>
 	     	<tr ng-repeat="item in item.propertiySet">
 	     		<td width="50%">{{item.name}}</td>

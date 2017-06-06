@@ -55,6 +55,7 @@ li.li.hover .iconfont1{display:block;}
 #propertiesTable td{
 	padding: 6px 5px;
 	/* background: #fff; */
+	color: #272727;
 	overflow: hidden;
 	text-overflow: ellipsis;
 }

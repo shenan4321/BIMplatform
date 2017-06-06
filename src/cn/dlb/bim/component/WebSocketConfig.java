@@ -8,8 +8,8 @@ import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 
 import cn.dlb.bim.service.BimService;
-import cn.dlb.bim.websocket.DlbHandshakeInterceptor;
-import cn.dlb.bim.websocket.DlbWebSocketHandler;
+import cn.dlb.bim.websocket.BinaryGeometryInterceptor;
+import cn.dlb.bim.websocket.BinaryGeometrySocketHandler;
 import cn.dlb.bim.websocket.GeometryInterceptor;
 import cn.dlb.bim.websocket.GeometrySocketHandler;
 
@@ -28,7 +28,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
         /** 
          * 支持websocket 的 connection 
          */  
-//        registry.addHandler(new DlbWebSocketHandler(),"/ws").setAllowedOrigins("*").addInterceptors(new DlbHandshakeInterceptor());  
+        registry.addHandler(new BinaryGeometrySocketHandler(server, bimService),"/ws/binarygeometry").setAllowedOrigins("*").addInterceptors(new BinaryGeometryInterceptor());  
           
         /** 
          * 如不支持websocket的connenction,采用sockjs 

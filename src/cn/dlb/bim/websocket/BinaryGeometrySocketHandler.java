@@ -14,10 +14,21 @@ import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 
-public class DlbWebSocketHandler implements WebSocketHandler {
-	private static final Logger logger = LoggerFactory.getLogger(DlbWebSocketHandler.class);  
+import cn.dlb.bim.action.LongGeometryQueryAction;
+import cn.dlb.bim.component.PlatformServer;
+import cn.dlb.bim.service.BimService;
+
+public class BinaryGeometrySocketHandler implements WebSocketHandler {
+	private static final Logger logger = LoggerFactory.getLogger(BinaryGeometrySocketHandler.class);  
     
     private static final ArrayList<WebSocketSession> users = new ArrayList<WebSocketSession>();  
+    private final PlatformServer server;
+    private final BimService bimService;
+    
+    public BinaryGeometrySocketHandler(PlatformServer server, BimService bimService) {
+    	this.server = server;
+		this.bimService = bimService;
+	}
   
     /** 
      * after connection establish 
@@ -25,6 +36,10 @@ public class DlbWebSocketHandler implements WebSocketHandler {
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {  
         logger.info("connect success...");  
         users.add(session);  
+        String rid = session.getAttributes().get("rid").toString();
+        Integer ridInt = Integer.valueOf(rid);
+        LongGeometryQueryAction longAction = new LongGeometryQueryAction(bimService, ridInt, session);
+        server.getLongActionManager().startLongAction(longAction);
     }  
   
     /** 
@@ -32,7 +47,7 @@ public class DlbWebSocketHandler implements WebSocketHandler {
      */  
     @Override  
     public void handleMessage(WebSocketSession webSocketSession, WebSocketMessage<?> webSocketMessage) throws Exception {  
-    	sendMessageToUsers(new TextMessage(webSocketMessage.getPayload() + "hello"));  
+//    	sendMessageToUsers(new TextMessage(webSocketMessage.getPayload() + "hello"));  
     }  
   
     @Override  
@@ -52,7 +67,7 @@ public class DlbWebSocketHandler implements WebSocketHandler {
   
     @Override  
     public boolean supportsPartialMessages() {  
-        return false;  
+        return true;  
     }  
     /** 
      * 给所有在线用户发送消息 

@@ -3,18 +3,15 @@ package cn.dlb.bim.websocket;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import javax.websocket.OnOpen;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 
-import cn.dlb.bim.action.LongGeometryQueryAction;
+import cn.dlb.bim.action.BinaryGeometryAction;
 import cn.dlb.bim.component.PlatformServer;
 import cn.dlb.bim.service.BimService;
 
@@ -38,8 +35,8 @@ public class BinaryGeometrySocketHandler implements WebSocketHandler {
         users.add(session);  
         String rid = session.getAttributes().get("rid").toString();
         Integer ridInt = Integer.valueOf(rid);
-        LongGeometryQueryAction longAction = new LongGeometryQueryAction(bimService, ridInt, session);
-        server.getLongActionManager().startLongAction(longAction);
+        BinaryGeometryAction action = new BinaryGeometryAction(bimService, ridInt, session);
+        server.getLongActionManager().startLongAction(action);
     }  
   
     /** 

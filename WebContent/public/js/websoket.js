@@ -2,6 +2,7 @@ function WebsocketBim(){
     this.socket = null;
     this.code = new Date().getTime()+""+Math.floor(Math.random() * ( 1000 + 1));
     this.options = {
+        dataType:"json",
         onmessage:function(msg){
             return msg;
         },
@@ -27,7 +28,6 @@ WebsocketBim.prototype.init = function(options){
     }
     if(window.WebSocket){
         this.socket = new WebSocket( url+ (options.urlPath||'') );
-        this.socket.binaryType = "arraybuffer" ;
     }else{
         alert('当前浏览器 不支持 websocket');
         return;
@@ -45,18 +45,17 @@ WebsocketBim.prototype.init = function(options){
 
         //连接成功建立的回调方法
         this.socket.onopen = function (event) {
-        	if(typeof event.data =='string' ){
-        		options.onopen(JSON.parse(event.data));
-        	}else{
-        		options.onopen(event.data);
-        	}
-            
+            options.onopen(event.data);
         };
 
         //接收到消息的回调方法
         this.socket.onmessage = function (event) {
-            //当返回配置为json的时候则配置为json 
-            options.onmessage(event.data);
+            //当返回配置为json的时候则配置为json
+            if(options.dataType=="json"){
+                options.onmessage($.parseJSON(event.data));
+            }else{
+                options.onmessage(event.data);
+            }
         };
 
         //连接关闭的回调方法

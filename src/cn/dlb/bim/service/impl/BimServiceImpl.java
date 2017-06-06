@@ -150,7 +150,6 @@ public class BimServiceImpl implements BimService {
 			generator.generateForAllElements();
 
 			PlatformInitDatas platformInitDatas = server.getPlatformInitDatas();
-			model.fixOids(platformInitDatas);
 			IfcModelDbSession session = new IfcModelDbSession(server.getIfcModelDao(), server.getMetaDataManager(),
 					platformInitDatas, null, server.getModelCacheManager());
 			session.saveIfcModel(model, modelInfo);

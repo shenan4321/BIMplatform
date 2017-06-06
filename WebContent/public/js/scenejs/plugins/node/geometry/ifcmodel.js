@@ -98,7 +98,7 @@
 						baseColor: material,
 						color: {r:0,g:0,b:0},
 						alpha: 0.5,
-	        			id:geometryInfo.oid+"geometryLines",
+	        			id:"geometryLines"+geometryInfo.oid,
 						nodes: [{
 		        			type : "geometry",
 		        			primitive : "lines",

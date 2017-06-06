@@ -22,9 +22,10 @@
  *
  */
 require([
-    SceneJS.getConfigs("pluginPath") + "/lib/gl-matrix-min.js"
+    SceneJS.getConfigs("pluginPath") + "/lib/gl-matrix-min.js",
+    SceneJS.getConfigs("pluginPath") + "/lib/quaternion.js"
 ],
-    function (glmat) {
+    function (glmat,Quaternion) {
 
         // Create target indicator div
 
@@ -259,8 +260,8 @@ require([
                     if (dragging) {
                     	console.log('yaw',yaw);
                     	console.log('pitch',pitch);
-                        yaw += (posX - lastX)  * 0.1 ;
-                        pitch += (posY - lastY) * 0.1;
+                        yaw -= (posX - lastX)  * 0.001;
+                        pitch += (posY - lastY) * 0.001;
                         orbiting = true;
                     }
                     lastX = posX;
@@ -482,7 +483,7 @@ require([
                 					//lookat.setUp({x: 0, y:1, z: -zoom});
                 				}
                 			} else {
-                				if (this.direction != 1) {
+                				if (direction != 1) {
                 					direction = 1;
                 				}
                 			}
@@ -490,8 +491,15 @@ require([
                 			
                 			lookat.setUp({x: 0, y:1, z: Math.abs(zoom)>Math.abs(maxZoom) ? Math.abs(maxZoom) : Math.abs(zoom) });
 
+                			
                 			//原点的眼睛
-                            var eye = glmat.vec3.fromValues(0, 0, zoom);
+                			if(mouseWheeling){
+                				var eye = glmat.vec3.fromValues(0, 0, zoom);
+                				
+                			}else{
+                				var eye = glmat.vec3.fromValues(lookat.getEye().x, lookat.getEye().y, lookat.getEye().z);
+                			}
+                            
                             //lookat的那个轴
                             var look = glmat.vec3.fromValues(currentPivot[0], currentPivot[1], currentPivot[2]);
                             //var up = glmat.vec3.fromValues(0, 1, 0);
@@ -504,13 +512,10 @@ require([
 
                             var mat = glmat.mat4.create();
                             	
-                           
-                            console.log(yaw);
-                            console.log(pitch);
                             
+                            var q = Quaternion.fromEuler(0, -pitch * Math.PI/2 ,-yaw * Math.PI/2);
                             
-                            glmat.mat4.rotateY(mat, mat, -yaw * 0.0174532925);
-                            glmat.mat4.rotateX(mat, mat, -pitch * 0.0174532925);
+                            mat =  q.conjugate().toMatrix4();
 
                             var eye3 = glmat.vec3.create();
 

@@ -6,7 +6,7 @@
 	   	</dt>
 	    <dd>
 	        <h4>{{item.name || '未知类型'}}</h4>
-	        <p class="text">总个数:{{item.oids.length || 0}}</p>
+	        <p class="text">总数:{{item.oids.length || 0}}</p>
 	    </dd>
 	    <dd class="poa-switch">
 			<input ng-class="{true:'mui-switch mui-switch-anim checked',false:'mui-switch mui-switch-anim'}[item.checked]" ng-init="item.checked=true"  checked="checked" type="checkbox"  ng-click="typeShowTag(item)" ng-model="item.typeShowTag">

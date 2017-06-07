@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head> 
+  <meta charset="UTF-8" /> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0" /> 
+  <meta name="screen-orientation" content="portrait" /> 
+  <meta name="x5-orientation" content="portrait" /> 
+  <meta name="full-screen" content="yes" /> 
+  <meta name="x5-fullscreen" content="true" /> 
+  <meta name="browsermode" content="application" /> 
+  <meta name="x5-page-mode" content="app" /> 
+  <title>东链博BIM应用Server</title> 
+  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+  
+<link rel="stylesheet" href="public/css/dist.css" type="text/css" />  
+   <!-- <link rel="stylesheet" href="public/css/format.css" type="text/css" /> 
+  <link rel="stylesheet" href="public/css/bim.css" type="text/css" /> 
+  <link rel="stylesheet" href="public/css/guest.css" type="text/css" /> 
+  <link rel="stylesheet" href="public/css/index.css" type="text/css" /> --> 
+  
+  <link rel="stylesheet" href="public/css/jquery.minicolors.css" type="text/css" /> 
+  <style>
+		html,body,#mySceneCanvas{width:100%;height:100%;overflow:hidden}
+  </style> 
+ </head> 
+ <body>
+ <div id="luopanBox" class="ui-draggable">
+    <div class="luopanBar">
+        <svg xmlns="http://www.w3.org/2000/svg" version="1.1" id="luopanSvg" width="240" height="240">
+            <image x="28" y="28" width="184" height="184" id="luopanSvgImg1" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="./public/images/luopan_bg.png"></image>
+    </div>
+</div>
+  <canvas id="mySceneCanvas" width="100%" height="100%"></canvas>  
+  <header class="app-header navbar"> 
+   <a class="navbar-brand" href="#"></a> 
+   <div class="c-div div_project">
+        <a class="btn action-save c-button button_wUyZlQ2" type="button" href="http://localhost:8080/BIMplatform/admin/index.html#!/">
+         项目管理
+        </a>
+    </div>
+     <div class="c-div div_back">
+        <a class="btn action-save c-button button_wUyZlQ2" type="button" href="http://localhost:8080/BIMplatform/modelList.html">
+            返  回
+        </a>
+    </div>
+  </header> 
+  <div class="aside-menu-box"> 
+   <ul class="aside-box"> 
+    <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 文件 </p> </a> </li> 
+    <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 场景树 </p> </a> </li> 
+    <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 类型 </p> </a> </li> 
+    <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 属性 </p> </a> </li> 
+    <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 搜索 </p> </a> </li> 
+    <!-- <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 标注 </p> </a> </li>  -->
+    <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 楼层 </p> </a> </li> 
+    <!-- <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 漫游控制 </p> </a> </li> --> 
+   </ul> 
+  </div> 
+<div class="nav-slide">
+	<div class="nav-iconback"></div>
+	<div class="nav-slide-o">
+		<div ng-controller="fileCtrl">
+			<div ng-include="'./treeTemp/file.html'"></div>
+		</div>
+	</div>
+	<div class="nav-slide-o">
+		<div ng-controller="treeCtrl">
+			<div ng-include="'./treeTemp/treeView.html'"></div>
+		</div>
+	</div>
+	<div class="nav-slide-o">
+	<div ng-controller="typeCtrl">
+			<div ng-include="'./treeTemp/typeView.html'"></div>
+		</div>
+	</div>
+	<div class="nav-slide-o">
+		<div ng-controller="pTableCtrl" id="pTable">
+			<div ng-include="'./treeTemp/pTable.html'"></div>
+		</div>
+	</div>
+	<div class="nav-slide-o">
+		<div ng-controller="searchCtrl">
+			<div ng-include="'./treeTemp/search.html'"></div>
+		</div>
+	</div>
+<!-- 	<div class="nav-slide-o">
+	<div ng-controller="markCtrl">
+			<div ng-include="'./treeTemp/mark.html'"></div>
+		</div>
+	</div> -->
+	<div class="nav-slide-o">
+		<div ng-controller="floorCtrl" id="pTable">
+			<div ng-include="'./treeTemp/floor.html'"></div>
+		</div>
+	</div>
+<!--<div class="nav-slide-o"></div> -->
+</div>
+<script type="text/javascript" src="public/js/jquery/2.1.4/jquery-2.1.4.min.js"></script>  
+
+<!-- <script type="text/javascript" src="public/js/progress.js"></script>  -->
+<script type="text/javascript" src="public/js/progress.js"></script> 
+<script type="text/javascript" src="public/js/websoketArrayBuffer.js"></script>
+<script src="public/js/ifc/Constants.js"></script>  
+<script src="public/js/ifc/DataInputStreamReader.js"></script> 
+<script src="public/js/ifc/StringView.js" type="text/javascript"></script>
+<script src="public/js/ifc/GeometryLoader.js" type="text/javascript"></script>
+
+
+<script src="public/js/scenejs/scenejs.js"></script> 
+
+
+<script src="public/js/scenejs/plugins/node/geometry/base64util.js"></script> 
+
+<script src="public/js/angularjs/1.4.4/angular.min.js"></script>
+
+<script src="public/js/app/sceneTree.js"></script>
+<script src="public/js/app/renderBim2.js"></script>
+<script src="public/js/dlbSvg.js" type="text/javascript"></script>
+
+
+<script src="public/js/html5validate.js" type="text/javascript"></script>
+<script src="public/js/color/jquery.minicolors.js" type="text/javascript"></script>
+<script src="public/js/datgui/dat.gui.min.js" type="text/javascript"></script>
+<script>
+function GetQueryString(name){
+   var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)","i");
+   var r = window.location.search.substr(1).match(reg);
+   if (r!=null) return unescape(r[2]); return null;
+}
+var websocket = new WebsocketBim();
+var gui; //全局的控制面板
+window.hisPick = {}; //记录点过的东西
+window.allPoint = [];
+var string = GetQueryString("rid");
+if(!string){
+  	var pid= GetQueryString("pid");	
+  	if (pid){
+  		$.ajax({
+			url:"./model/queryModelInfoByPid.do?pid="+pid,
+			type:"POST",
+			dataType:"json", 
+			aysnc:false,
+			success:function(res){
+				if(res.data.length){
+					string = res.data[0].rid;
+				}else{
+					string= 4;
+				}
+				start()
+			}
+  		});		
+  	}
+}else{
+	start()
+}
+
+var geomotryLoad = new GeometryLoader();
+var maxZoom = 1;
+function start(){
+	
+	websocket.init({
+		urlPath:"ws/binarygeometry?rid="+string,
+		onopen:function(msg){
+			window.progress = $.progress();
+		},
+		onmessage:function(res){
+			
+				if(res.progress){
+					progress.update(res);
+				}else if(res.zoom){
+					/* window.maxZoom = data.zoom;
+					window.middle = data.middle; */
+				}else{
+					if(!window.scene){
+						createScene();
+						geomotryLoad.process(res);
+						//showView(data);
+					}else{
+						geomotryLoad.process(res);
+						//showView(data);
+					}	
+			}
+		},
+		onclose:function(){
+			progress.hide();
+			websocket = null;			
+	        var Menus = function () {
+	            this.message = "Directional light";
+	            this["alpha.a"] = 0.6;
+	            var self = this;
+	            var update = function () {
+
+	            	 for(var i=0;i<allPoint.length;i++){
+	         			scene.getNode(allPoint[i]+'geometry',function(mt){
+	         	            	mt.setAlpha(self["alpha.a"]);
+	         			})
+	         		}
+	                requestAnimationFrame(update);
+	            };
+
+	            update();
+	        };
+	        gui = new dat.GUI();
+	        var menu = new Menus();
+	        var color = gui.addFolder('设置总体透明度');
+	        color.add(menu, 'alpha.a', 0.0, 1.0);
+	        color.open();
+	        angular.bootstrap(document,['myApp']);
+	        initStart();
+		}
+	});
+
+}
+//监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常。
+window.onbeforeunload = function () {
+	if(websocket){
+		websocket.send('close');	
+	}
+	
+}
+
+function char2buf(str){
+	var out = new ArrayBuffer(str.length*2);
+	var u16a= new Uint16Array(out);
+	var strs = str.split("");
+	for(var i =0 ; i<strs.length;i++){	u16a[i]=strs[i].charCodeAt();	}
+	return out;	
+}
+	
+function buf2char(buf){
+	var out="";
+	var u16a = new Uint16Array(buf);
+	var single ;
+	for(var i=0 ; i < u16a.length;i++){
+		single = u16a[i].toString(16);
+		while(single.length<4) single = "0".concat(single);
+		out+="\\u"+single;
+		console.log(out);
+	}
+	return eval("'"+out+ "'");
+}
+</script>
+<script src="public/js/app/menu.js"></script>
+ </body>
+</html>

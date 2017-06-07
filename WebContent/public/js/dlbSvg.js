@@ -31,7 +31,7 @@ var luopanEvent = {};
                 var $this = $(this);
 
                 var len = opts.data.length;
-                if(len>12){ alert('做多支持12个菜单，多的菜单我们将不予显示'); len = 12;}
+                
 
                 var angle = 360/len;
                 if(len<4) angle = 120;

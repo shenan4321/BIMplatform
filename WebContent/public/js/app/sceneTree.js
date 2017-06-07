@@ -71,11 +71,16 @@ myApp.controller('typeCtrl', function($scope, $http){
 				var MenuType = function () {
 		            this.message = "Directional light";
 		            this["alpha.a"] = 0.6;
+		            this["color.r"] = Ifc.Constants.materials['Ifc'+item.name].r;
+		            this["color.g"] = Ifc.Constants.materials['Ifc'+item.name].g;
+		            this["color.b"] = Ifc.Constants.materials['Ifc'+item.name].b;
 		            var self = this;
 		            var update = function () {
-		            	console.log(item.oids);
 		            	angular.forEach(item.oids, function(data,index,array){
 		         			scene.getNode(data+'geometry',function(mt){
+		         				
+		         				
+		         				mt.setColor({r:self["color.r"],g:self["color.g"],b:self["color.b"]});
 		         				mt.setAlpha(self["alpha.a"]);
 		         			})
 		            	});
@@ -83,20 +88,19 @@ myApp.controller('typeCtrl', function($scope, $http){
 		            };
 		            update();
 		        };
-		        var $closeButton = $('.dg .close-button');
+		        /*var $closeButton = $('.dg .close-button');
 		        if($closeButton.length==1){
 		        	$closeButton.css('position','relative').after($closeButton.clone().css('position','relative').addClass('cover-button').html('还原'));
-		        }
+		        }*/
 				var menuType = new MenuType();
 				$scope.selectedPlaneBoxList.push(item.name);	
-				var menubox = gui.addFolder(item.name+'类透明度');
+				var menubox = gui.addFolder(item.name+'类');
 		        menubox.add(menuType, 'alpha.a', 0.0, 1.0);
+		        menubox.add(menuType, 'color.r', 0.0, 1.0);
+		        menubox.add(menuType, 'color.g', 0.0, 1.0);
+		        menubox.add(menuType, 'color.b', 0.0, 1.0);
 		        menubox.open();
 		}
-        
-		scene.getNode('614269572geometry',function(mt){
-				mt.setAlpha(0);
-			})
 		
 	}
 	

@@ -323,7 +323,7 @@ public class ModelController {
 	@ResponseBody
 	public Map<String, Object> deleteModelLabel(Integer labelId) {
 		ResultUtil result = new ResultUtil();
-		bimService.deleteModelLabel(labelId);;
+		bimService.deleteModelLabel(labelId);
 		result.setSuccess(true);
 		return result.getResult();
 	}

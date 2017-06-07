@@ -72,9 +72,11 @@ public class BinaryGeometryAction extends LongAction {
 		try {
 			serializer.init(model, model.getPackageMetaData());
 			ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
-			serializer.writeMessage(byteOutputStream, progressReporter);
-			BinaryMessage message = new BinaryMessage(byteOutputStream.toByteArray());
-			webSocketSession.sendMessage(message);
+			while (serializer.writeMessage(byteOutputStream, progressReporter) == true) {
+				BinaryMessage message = new BinaryMessage(byteOutputStream.toByteArray());
+				webSocketSession.sendMessage(message);
+				byteOutputStream.reset();
+			}
 		} catch (SerializerException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -82,7 +84,7 @@ public class BinaryGeometryAction extends LongAction {
 		}
 		
 	}
-
+	
 	public void sendWebSocketMessage(ProgressVo msg) {
 		if (webSocketSession == null || !webSocketSession.isOpen()) {
 			return;

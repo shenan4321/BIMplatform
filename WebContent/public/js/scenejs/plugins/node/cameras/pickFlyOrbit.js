@@ -258,9 +258,7 @@ require([
 
                 function actionMove(posX, posY) {
                     if (dragging) {
-                    	console.log('yaw',yaw);
-                    	console.log('pitch',pitch);
-                        yaw -= (posX - lastX)  * 0.001;
+                        yaw += (posX - lastX)* 0.001;
                         pitch += (posY - lastY) * 0.001;
                         orbiting = true;
                     }

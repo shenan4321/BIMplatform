@@ -109,7 +109,7 @@
 <script src="public/js/scenejs/scenejs.js"></script> 
 
 
-<script src="public/js/scenejs/plugins/node/geometry/base64util.js"></script> 
+ 
 
 <script src="public/js/angularjs/1.4.4/angular.min.js"></script>
 
@@ -118,6 +118,7 @@
 <script src="public/js/dlbSvg.js" type="text/javascript"></script>
 
 
+<script src="public/js/app/menu.js"></script>
 <script src="public/js/html5validate.js" type="text/javascript"></script>
 <script src="public/js/color/jquery.minicolors.js" type="text/javascript"></script>
 <script src="public/js/datgui/dat.gui.min.js" type="text/javascript"></script>
@@ -164,22 +165,10 @@ function start(){
 			window.progress = $.progress();
 		},
 		onmessage:function(res){
-			
-				if(res.progress){
-					progress.update(res);
-				}else if(res.zoom){
-					/* window.maxZoom = data.zoom;
-					window.middle = data.middle; */
-				}else{
-					if(!window.scene){
-						createScene();
-						geomotryLoad.process(res);
-						//showView(data);
-					}else{
-						geomotryLoad.process(res);
-						//showView(data);
-					}	
+			if(!window.scene){
+				createScene();
 			}
+			geomotryLoad.process(res);	
 		},
 		onclose:function(){
 			progress.hide();
@@ -219,27 +208,6 @@ window.onbeforeunload = function () {
 	
 }
 
-function char2buf(str){
-	var out = new ArrayBuffer(str.length*2);
-	var u16a= new Uint16Array(out);
-	var strs = str.split("");
-	for(var i =0 ; i<strs.length;i++){	u16a[i]=strs[i].charCodeAt();	}
-	return out;	
-}
-	
-function buf2char(buf){
-	var out="";
-	var u16a = new Uint16Array(buf);
-	var single ;
-	for(var i=0 ; i < u16a.length;i++){
-		single = u16a[i].toString(16);
-		while(single.length<4) single = "0".concat(single);
-		out+="\\u"+single;
-		console.log(out);
-	}
-	return eval("'"+out+ "'");
-}
 </script>
-<script src="public/js/app/menu.js"></script>
  </body>
 </html>

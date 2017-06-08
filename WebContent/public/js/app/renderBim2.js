@@ -32,13 +32,11 @@ function showView(geom) {
 
 
 
-function createScene(){
+function createScene(middle,zoom){
 	var yaw = -24.071999999999747;
 	var  pitch= -88.80199999999668;
 
-	eye = {x: 4120.287109375, y: -112420.634765625, z: 9389.171752929688};
-
-	
+	eye = {x: 0, y:0, z:0};	
 	 var sceneViewObj = {
 		        canvasId:"mySceneCanvas",
 		        type: "scene",
@@ -59,16 +57,12 @@ function createScene(){
 		            yaw:yaw,
 		            pitch:pitch,
 		            eye:{x:0,y:0,z:0},
+		            zoom:-(zoom*3),
+		            zoomSensitivity:20000,
+		            look:middle,
 		            nodes: [{
 		                type: 'camera',
 		                id: 'main-camera',
-		                optics: {
-		                    type: 'perspective',
-		                    far: 132440.78865666725,
-		                    near: 132.44078865666725,
-		                    aspect: $(window).width() / $(window).height(),
-		                    fovy: 37.8493
-		                },
 		                nodes: [{
 		                    type: 'renderer',
 		                    id: 'main-renderer',

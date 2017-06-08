@@ -38,122 +38,40 @@ function GeometryLoader(bimServerApi, models, viewer, type) {
 	};
 	
 	this.readObject = function(data, geometryType) {
+		var pos1 = data.getPos();
 		var ifcname = data.readUTF8();
-		console.log(ifcname);
+		
+		var pos2 = data.getPos();
+		
 		var rid = data.readInt();
-		console.log(rid);
 		var geometryDataOid = data.readLong();
-		console.log('geometryDataOid',geometryDataOid);
+		
 		data.align8();
-		if (geometryType == 5) {
-			var objectBounds = data.readDoubleArray(6);
-			
-			var transformationMatrix = data.readDoubleArray(16);
-			var geometryDataOid = data.readLong();
-			var coreIds = [geometryDataOid];
-			
-			if (o.state.mode == 0) {
-				console.log("Mode is still 0, should be 1");
-				return;
-			}
-			
-			var oid = o.infoToOid[geometryInfoOid];
-			if (oid == null) {
-				console.log("Not found", geometryInfoOid);
-			} else {
-				o.models[roid].get(oid, function(object){
-					object.gid = geometryInfoOid;
-					if (scene.findNode(geometryInfoOid) != null) {
-						console.log("Node with id " + geometryInfoOid + " already existed");
-						return;
-					}
-					var material = BIMSURFER.Constants.materials[object.getType()];
-					var hasTransparency = false;
-					if (material == null) {
-						console.log("material not found", object.getType());
-						material = BIMSURFER.Constants.materials["DEFAULT"];
-					}
-					if (material.a < 1) {
-						hasTransparency = true;
-					}
-					
-					var enabled = object.trans.mode == 0;
-					
-					var coreNodes = null;
-					
-					var loaded = o.loadedGeometry[geometryDataOid];
-					if (loaded != null) {
-						if (Array.isArray(loaded)) {
-							coreNodes = [];
-							loaded.forEach(function(id){
-								coreNodes.push({
-									type: "geometry",
-									coreId: id
-								});
-							});
-						} else {
-							coreNodes = [{
-								type: "geometry",
-								coreId: geometryDataOid
-							}];
-						}
-					} else {
-						if (o.dataToInfo[geometryDataOid] == null) {
-							o.dataToInfo[geometryDataOid] = [geometryInfoOid];
-						} else {
-							o.dataToInfo[geometryDataOid].push(geometryInfoOid);
-						}
-					}
-
-					var flags = {
-						type : "flags",
-						flags : {
-							transparent : hasTransparency
-						},
-						nodes : [{
-							type: "enable",
-							enabled: enabled,
-							nodes : [{
-								type : "material",
-								baseColor: material,
-								alpha: material.a,
-								nodes : [{
-									type : "name",
-									id : geometryInfoOid,
-									data: {
-										object: object
-									},
-									nodes : [{
-										type: "matrix",
-//										elements: transformationMatrix,//linfujun, i change the code to fix the bug
-										nodes: coreNodes
-									}]
-								}]
-							}]
-						}]
-					};
-					
-					o.modelNode.addNode(flags);
-					
-					o.objectAddedListeners.forEach(function(listener){
-						listener(oid);
-					});
-				});
-			}
-		} else if (geometryType == 3) {
+		if (geometryType == 2) {
 			var coreIds = [];
 			var nrParts = data.readInt();
-			//var objectBounds = data.readFloatArray(6);
-			
+			data.align8();
+			var objectBounds = data.readDoubleArray(6);
+			var nodes = [];
+			var nodesLines = [];
 			for (var i=0; i<nrParts; i++) {
 				var coreId = data.readLong();
 				coreIds.push(coreId);
+				
 				var nrIndices = data.readInt();
 				o.stats.nrPrimitives += nrIndices / 3;
+				
+				console.log('incides',nrIndices);
+				
 				var indices = data.readShortArray(nrIndices);
+				
+				console.log('incides2',indices);
 				data.align4();
 				var nrVertices = data.readInt();
+				
+				console.log('nrVertices',nrVertices);
 				o.stats.nrVertices += nrVertices;
+				
 				var vertices = data.readFloatArray(nrVertices);
 				var nrNormals = data.readInt();
 				o.stats.nrNormals += nrNormals;
@@ -161,49 +79,50 @@ function GeometryLoader(bimServerApi, models, viewer, type) {
 				var nrColors = data.readInt();
 				o.stats.nrColors += nrColors;
 				var colors = data.readFloatArray(nrColors);
-				
-				var geometry = {
-					type: "geometry",
-					primitive: o.type
-				};
-				
-				geometry.coreId = coreId;
-				
-				if (o.type == "lines") {
-					geometry.indices = o.convertToLines(indices);
-				} else {
-					geometry.indices = indices;
-				}
-				geometry.positions = vertices;
-				geometry.normals = normals;
-				
-				if (colors != null && colors.length > 0) {
-					geometry.colors = colors;
-				}
-				o.library.add("node", geometry);
+				nodes.push({type : "geometry",primitive : "triangles",positions: vertices,indices: indices,normals: normals});
+				//nodesLines.push({type : "geometry",primitive : "l",positions: vertices,indices: indices,normals: normals});
 			}
-			o.loadedGeometry[geometryDataOid] = coreIds;
-			if (o.dataToInfo[geometryDataOid] != null) {
-				o.dataToInfo[geometryDataOid].forEach(function(geometryInfoId){
-					var node = scene.findNode(geometryInfoId);
-					if (node != null && node.nodes[0] != null) {
-						coreIds.forEach(function(coreId){
-							node.nodes[0].addNode({
-								type: "geometry",
-								coreId: coreId
-							});
-						});
-					}
+				
+				var material  =  Ifc.Constants.materials[ifcname] || Ifc.Constants.materials['DEFAULT'];
+				
+				window.scene.getNode("my-lights",function(xxx){
+					xxx.addNode({
+						type : "flags",
+						flags : {
+							transparent : true,
+							backfaces:true,
+							enable:true
+						},
+						id : "flags"+geometryDataOid,
+						nodes : [{
+							type : "name",
+							name : geometryDataOid,
+							nodes : [{
+								type : "material",
+								baseColor: material,
+								color: material,
+								alpha: material.a,
+								id:geometryDataOid+"geometry",
+								nodes: nodes
+							}]
+						}]
+					});
 				});
-				delete o.dataToInfo[geometryDataOid];
-			}
-		} else if (geometryType == 1) {
+				
 			
+		} else if (geometryType == 1) {
+			var modelBounds = data.readDoubleArray(6);
+			var oid = data.readLong()
 			var nrIndices = data.readInt();
 			var indices = data.readShortArray(nrIndices);
-			console.log('indices',indices);
-			console.log('nrIndices',nrIndices);
+			
 			o.stats.nrPrimitives += nrIndices / 3;
+			
+			data.align4();
+			
+			var nrIndicesForLinesWireFrame = data.readInt();
+			var IndicesForLinesWireFrame = data.readShortArray(nrIndicesForLinesWireFrame);
+			
 			data.align4();
 			var nrVertices = data.readInt();
 			var vertices = data.readFloatArray(nrVertices);
@@ -214,44 +133,55 @@ function GeometryLoader(bimServerApi, models, viewer, type) {
 			var nrColors = data.readInt();
 			o.stats.nrColors += nrColors;
 			var colors = data.readFloatArray(nrColors);
-			
-			var geometry = {
-				type: "geometry",
-				primitive: o.type
-			};
-			
-			geometry.coreId = geometryDataOid;
-			if (o.type == "lines") {
-				geometry.indices = o.convertToLines(indices);
-			} else {
-				geometry.indices = indices;
-			}
-			geometry.positions = vertices;
-			geometry.normals = normals;
-			
-			if (colors != null && colors.length > 0) {
-				geometry.colors = colors;
-			}
-			console.log(geometry);
-			o.library.add("node", geometry);
-			
-			o.loadedGeometry[geometryDataOid] = true;
-			if (o.dataToInfo[geometryDataOid] != null) {
-				o.dataToInfo[geometryDataOid].forEach(function(geometryInfoId){
-					var node = scene.findNode(geometryInfoId);
-					if (node != null && node.nodes[0] != null) {
-						node.nodes[0].addNode({
-							type: "geometry",
-							coreId: geometryDataOid
-						});
-					}
+			var material  =  Ifc.Constants.materials[ifcname] || Ifc.Constants.materials['DEFAULT'];
+			window.scene.getNode("my-lights",function(xxx){
+				xxx.addNode({
+					type : "flags",
+					flags : {
+						transparent : true,
+						backfaces:true,
+						enable:true
+					},
+					id : "flags"+geometryDataOid,
+					nodes : [{
+						type : "name",
+						name : geometryDataOid,
+						nodes : [{
+							type : "material",
+							baseColor: material,
+							color: material,
+							alpha: material.a,
+							id:geometryDataOid+"geometry",
+							nodes: [{
+								type : "geometry",
+								primitive : "triangles",
+								positions: vertices,
+								indices: indices,
+								normals: normals
+							}]
+						},
+		        		{
+							type : "material",
+							baseColor: material,
+							color: {r:0,g:0,b:0},
+							alpha: 0.5,
+		        			id:"geometryLines"+geometryDataOid,
+							nodes: [{
+			        			type : "geometry",
+			        			primitive : "lines",
+			        			positions: vertices,
+								indices: IndicesForLinesWireFrame,
+								normals: normals
+			        		}]
+						}]
+					}]
 				});
-				delete o.dataToInfo[geometryDataOid];
-			}
+			});
+			
 		}
 
 		o.state.nrObjectsRead++;
-//		o.updateProgress();
+		o.updateProgress();
 	};
 	
 	this.convertToLines = function(indices) {
@@ -397,85 +327,39 @@ function GeometryLoader(bimServerApi, models, viewer, type) {
 			y: (o.modelBounds.max.y + o.modelBounds.min.y) / 2,
 			z: (o.modelBounds.max.z + o.modelBounds.min.z) / 2,
 		};
-
-		o.boundsTranslate = scene.findNode("bounds_translate");
-		var firstModel = false;
-		if (o.boundsTranslate == null) {
-			var firstModel = true;
-			o.boundsTranslate = {
-				id: "bounds_translate",
-				type: "translate",
-				x: -o.center.x,
-				y: -o.center.y,
-				z: -o.center.z,
-				nodes: []
-			}
-			o.boundsTranslate = 
-				
-				window.scene.getNode("my-lights",function(xxx){
-	    	   		xxx.addNode(o.boundsTranslate);
-	    	   	});
-				
+		var zoom = Math.abs(o.modelBounds.max.x - o.modelBounds.min.x);
+		
+		
+		if(!window.scene){
+			createScene(o.center,zoom);
 		}
-		
-		/*o.modelNode = scene.findNode("model_node_" + o.groupId);
-		if (o.modelNode == null) {
-			o.modelNode = {
-				id: "model_node_" + o.groupId,
-				type: "translate",
-				x: 0,
-				y: 0,
-				z: 0,
-				data: {
-					groupId: o.groupId
-				},
-				nodes: []
-			};
-			o.modelNode = o.boundsTranslate.addNode(o.modelNode);
-		}*/
-		
-		if (firstModel) {
+		if (window.scene) {
 			window.scene.getNode("lookAt",function(lookat){
 				var eye = { x: (o.modelBounds.max.x - o.modelBounds.min.x) * 0.5, y: (o.modelBounds.max.y - o.modelBounds.min.y) * -1, z: (o.modelBounds.max.z - o.modelBounds.min.z) * 0.5 };
 				lookat.setEye(eye);
 				lookat.setLook(o.center);
     	   	});
-			
-			
 			window.scene.getNode("main-camera",function(maincamera){
-				var diagonal = Math.sqrt(Math.pow(o.modelBounds.max.x - o.modelBounds.min.x, 2) + Math.pow(o.modelBounds.max.y - o.modelBounds.min.y, 2) + Math.pow(o.modelBounds.max.z - o.modelBounds.min.z, 2));
-				
-				var far = diagonal * 8; // 5 being a guessed constant that should somehow coincide with the max zoom-out-factor
-				
 				maincamera.setOptics({
 					type: 'perspective',
-					far: far,
-					near: far / 1000,
+					far: 900000000,
+					near: 132,
 					aspect: jQuery(window).width() / jQuery(window).height(),
 					fovy: 37.8493
 				});	
-				
-    	   	});
-			
+    	   	});	
 		}
 		o.state.mode = 1;
-//o.state.nrObjects = data.readInt();
-//		o.updateProgress();
-//		console.log("Nr Objects", o.state.nrObjects);
 	};
 	
 	this.process = function(res){
-		//var data = o.todo.shift();
-		//while (data != null) {
-		
 			inputStream = new DataInputStream(res);
 			var messageType = inputStream.readByte();
 			if (messageType == 0) {
 				o.readStart(inputStream);
 			} else if (messageType == 6) {
 				o.readEnd(inputStream);
-			} else {
-				//console.log(11111);
+			} else{
 				o.readObject(inputStream, messageType);
 			}
 			//data = o.todo.shift();

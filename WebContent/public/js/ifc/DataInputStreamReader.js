@@ -52,7 +52,7 @@ var DataInputStream = function(arrayBuffer){
 
 		readInt: function() {
 			var value = $this.dataView.getInt32($this.pos, true);
-			this.pos += 4;
+			$this.pos += 4;
 			return value;
 		},
 

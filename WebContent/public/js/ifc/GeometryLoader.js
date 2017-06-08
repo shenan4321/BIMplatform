@@ -40,7 +40,7 @@ function GeometryLoader(bimServerApi, models, viewer, type) {
 	this.readObject = function(data, geometryType) {
 		var pos1 = data.getPos();
 		var ifcname = data.readUTF8();
-		
+		console.log(ifcname);
 		var pos2 = data.getPos();
 		
 		var rid = data.readInt();
@@ -61,15 +61,12 @@ function GeometryLoader(bimServerApi, models, viewer, type) {
 				var nrIndices = data.readInt();
 				o.stats.nrPrimitives += nrIndices / 3;
 				
-				console.log('incides',nrIndices);
 				
 				var indices = data.readShortArray(nrIndices);
 				
-				console.log('incides2',indices);
 				data.align4();
 				var nrVertices = data.readInt();
 				
-				console.log('nrVertices',nrVertices);
 				o.stats.nrVertices += nrVertices;
 				
 				var vertices = data.readFloatArray(nrVertices);
@@ -111,6 +108,9 @@ function GeometryLoader(bimServerApi, models, viewer, type) {
 				
 			
 		} else if (geometryType == 1) {
+			if (ifcname == "IfcSite") {
+				console.log("IfcSite");
+			}
 			var modelBounds = data.readDoubleArray(6);
 			var oid = data.readLong()
 			var nrIndices = data.readInt();

@@ -12,17 +12,19 @@
   <title>东链博BIM应用Server</title> 
   <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
   
-<link rel="stylesheet" href="public/css/dist.css" type="text/css" />  
-   <!-- <link rel="stylesheet" href="public/css/format.css" type="text/css" /> 
-  <link rel="stylesheet" href="public/css/bim.css" type="text/css" /> 
-  <link rel="stylesheet" href="public/css/guest.css" type="text/css" /> 
-  <link rel="stylesheet" href="public/css/index.css" type="text/css" /> --> 
-  
-  <link rel="stylesheet" href="public/css/jquery.minicolors.css" type="text/css" /> 
+
+     <!-- build:css -->
+  <link rel="stylesheet" href="public/css/format.css" type="text/css" />
+  <link rel="stylesheet" href="public/css/bim.css" type="text/css" />
+  <link rel="stylesheet" href="public/css/guest.css" type="text/css" />
+  <link rel="stylesheet" href="public/css/index.css" type="text/css" />
+     <link rel="stylesheet" href="public/css/jquery.minicolors.css" type="text/css" />
+     <!-- endbuild -->
+
   <style>
 		html,body,#mySceneCanvas{width:100%;height:100%;overflow:hidden}
-  </style> 
- </head> 
+  </style>
+ </head>
  <body>
  <div id="luopanBox" class="ui-draggable">
     <div class="luopanBar">
@@ -30,32 +32,33 @@
             <image x="28" y="28" width="184" height="184" id="luopanSvgImg1" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="./public/images/luopan_bg.png"></image>
     </div>
 </div>
-  <canvas id="mySceneCanvas" width="100%" height="100%"></canvas>  
-  <header class="app-header navbar"> 
-   <a class="navbar-brand" href="#"></a> 
+  <canvas id="mySceneCanvas" width="100%" height="100%"></canvas>
+  <header class="app-header navbar">
+   <a class="navbar-brand" href="#"></a>
    <div class="c-div div_project">
         <a class="btn action-save c-button button_wUyZlQ2" type="button" href="http://localhost:8080/BIMplatform/admin/index.html#!/">
          项目管理
         </a>
+
     </div>
      <div class="c-div div_back">
         <a class="btn action-save c-button button_wUyZlQ2" type="button" href="http://localhost:8080/BIMplatform/modelList.html">
             返  回
         </a>
     </div>
-  </header> 
-  <div class="aside-menu-box"> 
-   <ul class="aside-box"> 
-    <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 文件 </p> </a> </li> 
-    <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 场景树 </p> </a> </li> 
-    <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 类型 </p> </a> </li> 
-    <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 属性 </p> </a> </li> 
-    <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 搜索 </p> </a> </li> 
+  </header>
+  <div class="aside-menu-box">
+   <ul class="aside-box">
+    <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 文件 </p> </a> </li>
+    <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 场景树 </p> </a> </li>
+    <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 类型 </p> </a> </li>
+    <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 属性 </p> </a> </li>
+    <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 搜索 </p> </a> </li>
     <!-- <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 标注 </p> </a> </li>  -->
-    <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 楼层 </p> </a> </li> 
-    <!-- <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 漫游控制 </p> </a> </li> --> 
-   </ul> 
-  </div> 
+    <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 楼层 </p> </a> </li>
+    <!-- <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 漫游控制 </p> </a> </li> -->
+   </ul>
+  </div>
 <div class="nav-slide">
 	<div class="nav-iconback"></div>
 	<div class="nav-slide-o">
@@ -95,26 +98,31 @@
 	</div>
 <!--<div class="nav-slide-o"></div> -->
 </div>
-<script type="text/javascript" src="public/js/jquery/2.1.4/jquery-2.1.4.min.js"></script>  
+<script type="text/javascript" src="public/js/jquery/2.1.4/jquery-2.1.4.min.js"></script>
 
-<!-- <script type="text/javascript" src="public/js/progress.js"></script>  -->
-<script type="text/javascript" src="public/js/progress.js"></script> 
+ <!-- build:js1 -->
+<script type="text/javascript" src="public/js/progress.js"></script>
 <script type="text/javascript" src="public/js/websoket.js"></script>
-<script src="public/js/ifc/Constants.js"></script>  
+ <!-- endbuild -->
 
+ <!-- build:js2 -->
+<script src="public/js/ifc/Constants.js"></script>
+ <!-- endbuild -->
 
-<script src="public/js/scenejs/scenejs.js"></script> 
-
-
-<script src="public/js/scenejs/plugins/node/geometry/base64util.js"></script> 
+<script src="public/js/scenejs/scenejs.js"></script>
 <script src="public/js/angularjs/1.4.4/angular.min.js"></script>
 
+ <!-- build:js3 -->
 <script src="public/js/app/sceneTree.js"></script>
 <script src="public/js/app/renderBim.js"></script>
-<script src="public/js/dlbSvg.js" type="text/javascript"></script>
+ <!-- endbuild -->
 
+ <!-- build:js4 -->
+<script src="public/js/dlbSvg.js" type="text/javascript"></script>
 <script src="public/js/html5validate.js" type="text/javascript"></script>
 <script src="public/js/color/jquery.minicolors.js" type="text/javascript"></script>
+ <!-- endbuild -->
+
 <script src="public/js/datgui/dat.gui.min.js" type="text/javascript"></script>
 <script>
 function GetQueryString(name){

@@ -39,8 +39,11 @@ import cn.dlb.bim.ifc.emf.IfcModelInterface;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
 import cn.dlb.bim.ifc.serializers.SerializerException;
 import cn.dlb.bim.ifc.shared.ProgressReporter;
+import cn.dlb.bim.ifc.tree.Material;
+import cn.dlb.bim.ifc.tree.MaterialGenerator;
 import cn.dlb.bim.models.geometry.GeometryData;
 import cn.dlb.bim.models.geometry.GeometryInfo;
+import cn.dlb.bim.vo.GeometryInfoVo;
 
 public class BinaryGeometryMessagingSerializer implements MessagingSerializer {
 	private static final byte FORMAT_VERSION = 6;
@@ -119,23 +122,29 @@ public class BinaryGeometryMessagingSerializer implements MessagingSerializer {
 		EClass productClass = model.getPackageMetaData().getEClass("IfcProduct");
 		
 		List<IdEObject> products = model.getAllWithSubTypes(productClass);
-		
-		// First iteration, to determine number of objects with geometry and calculate model bounds
+		List<IdEObject> output = new ArrayList<>();
 		for (IdEObject ifcProduct : products) {
 			GeometryInfo geometryInfo = (GeometryInfo) ifcProduct.eGet(ifcProduct.eClass().getEStructuralFeature("geometry"));
-			if (geometryInfo != null && geometryInfo.getTransformation() != null) {
-				Bounds objectBounds = new Bounds(
-						new Double3(
-							geometryInfo.getMinBounds().getX(), 
-							geometryInfo.getMinBounds().getY(), 
-							geometryInfo.getMinBounds().getZ()), 
-						new Double3(
-							geometryInfo.getMaxBounds().getX(), 
-							geometryInfo.getMaxBounds().getY(), 
-							geometryInfo.getMaxBounds().getZ()));
-				modelBounds.integrate(objectBounds);
-				nrObjects++;
+			if (geometryInfo != null && geometryInfo.getTransformation() != null && !packageMetaData.getEClass("IfcSpace").isSuperTypeOf(ifcProduct.eClass()) 
+					&& !packageMetaData.getEClass("IfcFeatureElementSubtraction").isSuperTypeOf(ifcProduct.eClass())) {
+				output.add(ifcProduct);
 			}
+		}
+		
+		// First iteration, to determine number of objects with geometry and calculate model bounds
+		for (IdEObject ifcProduct : output) {
+			GeometryInfo geometryInfo = (GeometryInfo) ifcProduct.eGet(ifcProduct.eClass().getEStructuralFeature("geometry"));
+			Bounds objectBounds = new Bounds(
+					new Double3(
+						geometryInfo.getMinBounds().getX(), 
+						geometryInfo.getMinBounds().getY(), 
+						geometryInfo.getMinBounds().getZ()), 
+					new Double3(
+						geometryInfo.getMaxBounds().getX(), 
+						geometryInfo.getMaxBounds().getY(), 
+						geometryInfo.getMaxBounds().getZ()));
+			modelBounds.integrate(objectBounds);
+			nrObjects++;
 		}
 		
 		int skip = 4 - (7 % 4);
@@ -146,9 +155,7 @@ public class BinaryGeometryMessagingSerializer implements MessagingSerializer {
 		modelBounds.writeTo(dataOutputStream);
 		dataOutputStream.writeInt(nrObjects);
 		
-//		concreteGeometrySent = new HashMap<Long, Object>();
-		EClass productEClass = packageMetaData.getEClass("IfcProduct");
-		iterator = model.getAllWithSubTypes(productEClass).iterator();
+		iterator = output.iterator();
 		
 		return nrObjects > 0;
 	}
@@ -271,15 +278,22 @@ public class BinaryGeometryMessagingSerializer implements MessagingSerializer {
 				for (int i=0; i<intBuffer.capacity(); i++) {
 					dataOutputStream.writeShort((short)intBuffer.get());
 				}
-				
 				// Aligning to 4-bytes
 				if (intBuffer.capacity() % 2 != 0) {
 					dataOutputStream.writeShort((short)0);
 				}
 				
-//					ByteBuffer indicesForLinesWireFrameBuffer = ByteBuffer.wrap(geometryData.getIndicesForLinesWireFrame());
-//					dataOutputStream.writeInt(indicesForLinesWireFrameBuffer.capacity() / 4);
-//					dataOutputStream.write(indicesForLinesWireFrameBuffer.array());
+				ByteBuffer indicesForLinesWireFrameBuffer = ByteBuffer.wrap(geometryData.getIndicesForLinesWireFrame());
+				indicesForLinesWireFrameBuffer.order(ByteOrder.LITTLE_ENDIAN);
+				dataOutputStream.writeInt(indicesForLinesWireFrameBuffer.capacity() / 4);
+				IntBuffer indicesForLinesWireFrameIntBuffer = indicesForLinesWireFrameBuffer.asIntBuffer();
+				for (int i=0; i<indicesForLinesWireFrameIntBuffer.capacity(); i++) {
+					dataOutputStream.writeShort((short)indicesForLinesWireFrameIntBuffer.get());
+				}
+				// Aligning to 4-bytes
+				if (indicesForLinesWireFrameIntBuffer.capacity() % 2 != 0) {
+					dataOutputStream.writeShort((short)0);
+				}
 				
 				ByteBuffer vertexByteBuffer = ByteBuffer.wrap(geometryData.getVertices());
 				dataOutputStream.writeInt(vertexByteBuffer.capacity() / 4);

@@ -79,6 +79,7 @@ public class BinaryGeometryAction extends LongAction {
 				}
 				byteOutputStream.reset();
 			}
+			webSocketSession.close();
 		} catch (SerializerException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

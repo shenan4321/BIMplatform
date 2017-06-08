@@ -79,7 +79,6 @@ public class GeometryGenerator {
 			renderEngineModel.setFilter(renderEngineFilter);
 			
 			renderEngineModel.generateGeneralGeometry();
-			PackageMetaData packageMetaData = model.getPackageMetaData();
 			EClass productClass = (EClass) model.getPackageMetaData().getEClassifierCaseInsensitive("IfcProduct");
 			
 			for (IdEObject ifcProduct : model.getAllWithSubTypes(productClass)) {
@@ -142,7 +141,6 @@ public class GeometryGenerator {
 					
 					GeometryData geometryData = null;
 					geometryData = GeometryFactory.eINSTANCE.createGeometryData();
-					
 					
 					int faceCnt = renderEngineInstance.getConceptualFaceCnt();
 					int[] indicesForFaces = new int[geometry.getIndices().length];

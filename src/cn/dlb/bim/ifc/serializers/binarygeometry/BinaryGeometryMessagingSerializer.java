@@ -228,7 +228,12 @@ public class BinaryGeometryMessagingSerializer implements MessagingSerializer {
 					int upto = Math.min((part + 1) * maxIndexValues, totalNrIndices);
 					dataOutputStream.writeInt(upto - part * maxIndexValues);
 					for (int i=part * maxIndexValues; i<upto; i++) {
-						dataOutputStream.writeInt(indexCounter++);
+						dataOutputStream.writeShort(indexCounter++);
+					}
+					
+					// Aligning to 4-bytes
+					if ((upto - part * maxIndexValues) % 2 != 0) {
+						dataOutputStream.writeShort((short)0);
 					}
 					
 					dataOutputStream.writeInt((upto - part * maxIndexValues) * 3);

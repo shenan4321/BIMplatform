@@ -187,17 +187,16 @@ public class BinaryGeometryMessagingSerializer implements MessagingSerializer {
 			
 			int rid = model.getModelMetaData().getRevisionId();
 			dataOutputStream.writeInt(rid);
-			
 			dataOutputStream.writeLong(ifcProduct.getOid());
 			
 			// BEWARE, ByteOrder is always LITTLE_ENDIAN, because that's what GPU's seem to prefer, Java's ByteBuffer default is BIG_ENDIAN though!
 			
-			int skip = 8 - ((3 + ifcProduct.eClass().getName().getBytes(Charsets.UTF_8).length) % 8);
+			int skip = 8 - ((7 + ifcProduct.eClass().getName().getBytes(Charsets.UTF_8).length) % 8);//writeUTF 前两位是用于表示字符串长度
 			if(skip != 0 && skip != 8) {
 				dataOutputStream.write(new byte[skip]);
 			}
 			
-			dataOutputStream.write(geometryInfo.getTransformation());
+//			dataOutputStream.write(geometryInfo.getTransformation());
 			
 			if (reuse != null && reuse instanceof Long) {
 				// Reused geometry, only send the id of the reused geometry data
@@ -223,6 +222,10 @@ public class BinaryGeometryMessagingSerializer implements MessagingSerializer {
 					ByteBuffer indicesBuffer = ByteBuffer.wrap(geometryData.getIndices());
 					indicesBuffer.order(ByteOrder.LITTLE_ENDIAN);
 					IntBuffer indicesIntBuffer = indicesBuffer.asIntBuffer();
+					
+//					ByteBuffer indicesForLinesWireFrameBuffer = ByteBuffer.wrap(geometryData.getIndicesForLinesWireFrame());
+//					indicesForLinesWireFrameBuffer.order(ByteOrder.LITTLE_ENDIAN);
+//					IntBuffer indicesForLinesWireFrameIntBuffer = indicesForLinesWireFrameBuffer.asIntBuffer();
 
 					ByteBuffer vertexBuffer = ByteBuffer.wrap(geometryData.getVertices());
 					vertexBuffer.order(ByteOrder.LITTLE_ENDIAN);
@@ -284,8 +287,21 @@ public class BinaryGeometryMessagingSerializer implements MessagingSerializer {
 					dataOutputStream.writeLong(geometryData.getOid());
 					
 					ByteBuffer indicesBuffer = ByteBuffer.wrap(geometryData.getIndices());
+					indicesBuffer.order(ByteOrder.LITTLE_ENDIAN);
 					dataOutputStream.writeInt(indicesBuffer.capacity() / 4);
-					dataOutputStream.write(indicesBuffer.array());
+					IntBuffer intBuffer = indicesBuffer.asIntBuffer();
+					for (int i=0; i<intBuffer.capacity(); i++) {
+						dataOutputStream.writeShort((short)intBuffer.get());
+					}
+					
+					// Aligning to 4-bytes
+					if (intBuffer.capacity() % 2 != 0) {
+						dataOutputStream.writeShort((short)0);
+					}
+					
+//					ByteBuffer indicesForLinesWireFrameBuffer = ByteBuffer.wrap(geometryData.getIndicesForLinesWireFrame());
+//					dataOutputStream.writeInt(indicesForLinesWireFrameBuffer.capacity() / 4);
+//					dataOutputStream.write(indicesForLinesWireFrameBuffer.array());
 					
 					ByteBuffer vertexByteBuffer = ByteBuffer.wrap(geometryData.getVertices());
 					dataOutputStream.writeInt(vertexByteBuffer.capacity() / 4);

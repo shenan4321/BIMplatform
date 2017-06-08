@@ -200,6 +200,11 @@ public class BinaryGeometryMessagingSerializer implements MessagingSerializer {
 
 				int nrParts = (totalNrIndices + maxIndexValues - 1) / maxIndexValues;
 				dataOutputStream.writeInt(nrParts);
+				
+				int skipBound = 4 % 8;
+				if(skipBound != 0 && skipBound != 8) {
+					dataOutputStream.write(new byte[skipBound]);
+				}
 
 				Bounds objectBounds = new Bounds(geometryInfo.getMinBounds(), geometryInfo.getMaxBounds());
 				objectBounds.writeTo(dataOutputStream);

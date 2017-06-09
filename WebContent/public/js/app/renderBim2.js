@@ -114,22 +114,6 @@ function createScene(middle,zoom){
 	    window.scene =  SceneJS.createScene(sceneViewObj);
 	    
 }
-function bindEvent(sceneNodes) {
-/*    window.hisPick = {}; //记录点过的东西
-    scene.on("pick",function (hit) {
-          
-
-          // To illustrate, these are the params to expect on the pick hit:
-          var name = hit.name; // Eg. "object1"
-          var path = hit.path; // Eg. "foo.object1"
-          var nodeId = hit.nodeId;
-          var canvasX = hit.canvasPos[0];
-          var canvasY = hit.canvasPos[1];
-    });
-
-    */
-}
-
 
 function easeOut(t, b, c, d) {
     var ts = (t /= d) * t;

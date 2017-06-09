@@ -412,17 +412,18 @@ require([
                             }
                             hisPick = {name:hit.name,color:material.getColor()}
                             material.setColor({r: 0.03137255, g: 0.30980392, b: 0.62745098});
-                            var pTableScope= $('#pTable').scope();
-                            pTableScope.oid = hit.name ;
-                            $.ajax({
-                          	  url:'./model/queryProperty.do',
-                          	  type:'GET',
-                          	  data:{oid:hit.name,rid:string}
-                            }).done(function(data){
-                          	  pTableScope.list = data.data  
-                          	  $('#pTable').scope().$apply();
-                            })
-                        	  
+                            if(tt){
+	                            var pTableScope= $('#pTable').scope();
+	                            pTableScope.oid = hit.name ;
+	                            $.ajax({
+	                          	  url:'./model/queryProperty.do',
+	                          	  type:'GET',
+	                          	  data:{oid:hit.name,rid:string}
+	                            }).done(function(data){
+	                          	  pTableScope.list = data.data  
+	                          	  $('#pTable').scope().$apply();
+	                            })
+                            }
                         });
                         
                     });

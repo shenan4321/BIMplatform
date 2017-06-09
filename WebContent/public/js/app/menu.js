@@ -1,17 +1,20 @@
 function initStart(){
 	var thisTime;
 	var tt = false;
-	$('.aside-box li').click(function(){
-		var thisUB	=	$('.aside-box li').index($(this));
-		$('.aside-box li').removeClass('hover').eq(thisUB).addClass('hover');
-		//if($.trim($('.nav-slide-o').eq(thisUB).html()) != ""){
-			$('.nav-slide').addClass('hover');
-			$('.nav-slide-o').hide();
-			$('.nav-slide-o').eq(thisUB).show();
-		//}
+	window.asideBoxList = new Array($('.aside-box li').length-1);
+	$('.aside-box li').on('click',function(){
 		if(!tt){
 			angular.bootstrap(document,['myApp']);
 			tt = true;
+		}
+		var $this = $(this);
+		var num = $this.index();
+		$('.aside-box li').removeClass('hover').eq(num).addClass('hover');
+		$('.nav-slide').addClass('hover');
+		$('.nav-slide-o').hide().eq(num).show();
+		if(!asideBoxList[num]){
+			asideBoxList[num] = num;
+			$this.scope().menuClick($this.attr('data-name'));
 		}
 	})
 	

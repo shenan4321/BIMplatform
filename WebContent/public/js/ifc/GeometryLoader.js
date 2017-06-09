@@ -43,12 +43,9 @@ function GeometryLoader(bimServerApi, models, viewer, type) {
 	this.readObject = function(data, geometryType) {
 		var pos1 = data.getPos();
 		var ifcname = data.readUTF8();
-		console.log(ifcname);
 		var pos2 = data.getPos();
-
 		var rid = data.readInt();
 		var geometryDataOid = data.readLong();
-
 		data.align8();
 		if (geometryType == 2) {
 			var coreIds = [];
@@ -60,18 +57,12 @@ function GeometryLoader(bimServerApi, models, viewer, type) {
 			for (var i=0; i<nrParts; i++) {
 				var coreId = data.readLong();
 				coreIds.push(coreId);
-
 				var nrIndices = data.readInt();
 				o.stats.nrPrimitives += nrIndices / 3;
-
-
 				var indices = data.readShortArray(nrIndices);
-
 				data.align4();
 				var nrVertices = data.readInt();
-
 				o.stats.nrVertices += nrVertices;
-
 				var vertices = data.readFloatArray(nrVertices);
 				var nrNormals = data.readInt();
 				o.stats.nrNormals += nrNormals;
@@ -202,7 +193,6 @@ function GeometryLoader(bimServerApi, models, viewer, type) {
 	}
 
 	this.updateProgress = function() {
-		console.log(111);
 		progress.update({title:'transferring',progress:o.state.nrObjectsRead,max:o.state.nrObjects});
 	};
 

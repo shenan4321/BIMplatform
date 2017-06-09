@@ -412,7 +412,7 @@ require([
                             }
                             hisPick = {name:hit.name,color:material.getColor()}
                             material.setColor({r: 0.03137255, g: 0.30980392, b: 0.62745098});
-                            if(tt){
+                            if(window.tt){
 	                            var pTableScope= $('#pTable').scope();
 	                            pTableScope.oid = hit.name ;
 	                            $.ajax({

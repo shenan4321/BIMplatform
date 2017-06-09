@@ -1,6 +1,6 @@
 function initStart(){
 	var thisTime;
-	var tt = false;
+	window.tt = false;
 	window.asideBoxList = new Array($('.aside-box li').length-1);
 	$('.aside-box li').on('click',function(){
 		if(!tt){

@@ -11,12 +11,10 @@
   <meta name="x5-page-mode" content="app" /> 
   <title>东链博BIM应用Server</title> 
   <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
-  
   <link rel="stylesheet" href="public/css/format.css" type="text/css" /> 
   <link rel="stylesheet" href="public/css/bim.css" type="text/css" /> 
   <link rel="stylesheet" href="public/css/guest.css" type="text/css" /> 
   <link rel="stylesheet" href="public/css/index.css" type="text/css" /> 
-  
   <link rel="stylesheet" href="public/css/jquery.minicolors.css" type="text/css" /> 
   <style>
 		html,body,#mySceneCanvas{width:100%;height:100%;overflow:hidden}
@@ -27,6 +25,7 @@
     <div class="luopanBar">
         <svg xmlns="http://www.w3.org/2000/svg" version="1.1" id="luopanSvg" width="240" height="240">
             <image x="28" y="28" width="184" height="184" id="luopanSvgImg1" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="./public/images/luopan_bg.png"></image>
+        </svg>
     </div>
 </div>
   <canvas id="mySceneCanvas" width="100%" height="100%"></canvas>  
@@ -141,14 +140,12 @@ if(!string){
 			dataType:"json", 
 			aysnc:false,
 			success:function(res){
-				if(res.data.length){
-					string = res.data[0].rid;
-				}else{
-					string= 4;
-				}
+				string =res.data.length?res.data[0].rid:4;
 				start()
 			}
   		});		
+  	}else{
+  		rid = 1 
   	}
 }else{
 	start()
@@ -164,28 +161,31 @@ function start(){
 			window.progress = $.progress();
 		},
 		onmessage:function(res){
-			if(!window.scene){
-				createScene();
+			if(typeof(res)=='string'){
+				progress.update(JSON.parse(res));
+			}else{
+				/* if(!window.scene){
+					createScene();
+				} */
+				geomotryLoad.process(res);	
 			}
-			geomotryLoad.process(res);	
 		},
 		onclose:function(){
 			progress.hide();
-			websocket = null;			
+			websocket = null;
+			$('.aside-menu-box').show();
 	        var Menus = function () {
 	            this.message = "Directional light";
 	            this["alpha.a"] = 0.6;
 	            var self = this;
 	            var update = function () {
-
 	            	 for(var i=0;i<allPoint.length;i++){
 	         			scene.getNode(allPoint[i]+'geometry',function(mt){
-	         	            	mt.setAlpha(self["alpha.a"]);
+	         	            mt.setAlpha(self["alpha.a"]);
 	         			})
 	         		}
 	                requestAnimationFrame(update);
 	            };
-
 	            update();
 	        };
 	        gui = new dat.GUI();
@@ -193,7 +193,6 @@ function start(){
 	        var color = gui.addFolder('设置总体透明度');
 	        color.add(menu, 'alpha.a', 0.0, 1.0);
 	        color.open();
-	        angular.bootstrap(document,['myApp']);
 	        initStart();
 		}
 	});

@@ -51,12 +51,13 @@ WebsocketBim.prototype.init = function(options){
 
         //接收到消息的回调方法
         this.socket.onmessage = function (event) {
-            
-            if(typeof(event.data)=="string"){
-                options.onmessage($.parseJSON(event.data));
-            }else{
+            /*console.log(event.data);
+            console.log(typeof(event.data));
+            if(typeof(event.data)=='string'){
+            	options.onmessage(JSON.parse(event.data));
+            }else{*/
                 options.onmessage(event.data);
-            }
+            //}
         };
 
         //连接关闭的回调方法

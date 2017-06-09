@@ -157,9 +157,9 @@ function start(){
 			if(typeof(res)=='string'){
 				progress.update(JSON.parse(res));
 			}else{
-				/* if(!window.scene){
+				if(!window.scene){
 					createScene();
-				} */
+				} 
 				geomotryLoad.process(res);	
 			}
 		},

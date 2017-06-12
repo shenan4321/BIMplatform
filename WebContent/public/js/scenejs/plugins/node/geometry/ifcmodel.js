@@ -64,6 +64,7 @@
             aspect: jQuery(this.getScene().getCanvas()).width() / jQuery(this.getScene().getCanvas()).height(),
             fovy: 37.8493
         });
+        
         window.allPoint.push(geometryInfo.oid);
         
         var positionFloatArray = new Float32Array(positions);

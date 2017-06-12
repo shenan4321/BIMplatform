@@ -5,29 +5,29 @@ SceneJS.setConfigs({
 
 
 function showView(geom) {
-        var boundMinX = 0, boundMinY = 0, boundMinZ = 0,
-            boundMaxX = 0, boundMaxY = 0, boundMaxZ = 0;
-        	if(geom.bound){
-	            boundMinX = Math.min(0, geom.bound.min.x);
-	            boundMinY = Math.min(0, geom.bound.min.y);
-	            boundMinZ = Math.min(0, geom.bound.min.z);
-	            boundMaxX = Math.max(0, geom.bound.max.x);
-	            boundMaxY = Math.max(0, geom.bound.max.y);
-	            boundMaxZ = Math.max(0, geom.bound.max.z);
-	            var node = {
-	                    geometry_info: geom,
-	                    boundMinX : boundMinX,
-	                    boundMinY : boundMinY,
-	                    boundMinZ : boundMinZ,
-	                    boundMaxX : boundMaxX,
-	                    boundMaxY : boundMaxY,
-	                    boundMaxZ : boundMaxZ,
-	                    type:"geometry/ifcmodel"
-	            };
-	            window.scene.getNode("my-lights",function(xxx){
-	    	   		xxx.addNode({type:"material",nodes:[node]});
-	    	   	});
-        	}
+    var boundMinX = 0, boundMinY = 0, boundMinZ = 0,
+        boundMaxX = 0, boundMaxY = 0, boundMaxZ = 0;
+    	if(geom.bound){
+            boundMinX = Math.min(0, geom.bound.min.x);
+            boundMinY = Math.min(0, geom.bound.min.y);
+            boundMinZ = Math.min(0, geom.bound.min.z);
+            boundMaxX = Math.max(0, geom.bound.max.x);
+            boundMaxY = Math.max(0, geom.bound.max.y);
+            boundMaxZ = Math.max(0, geom.bound.max.z);
+            var node = {
+                    geometry_info: geom,
+                    boundMinX : boundMinX,
+                    boundMinY : boundMinY,
+                    boundMinZ : boundMinZ,
+                    boundMaxX : boundMaxX,
+                    boundMaxY : boundMaxY,
+                    boundMaxZ : boundMaxZ,
+                    type:"geometry/ifcmodel"
+            };
+            window.scene.getNode("my-lights",function(xxx){
+    	   		xxx.addNode({type:"material",nodes:[node]});
+    	   	});
+    	}
 }
 
 

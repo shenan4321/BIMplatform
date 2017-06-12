@@ -278,7 +278,6 @@ require([
                     if (delta) {
                         if (delta < 0) {
                             zoom -= zoomSensitivity;
-                            
                         } else {
                             zoom += zoomSensitivity;
                             
@@ -378,30 +377,22 @@ require([
 
                 scene.on("pick",
                     function (hit) {
-
-                        // Some plugins wrap things in this name to
-                        // avoid them being picked, such as skyboxes
                         if (!hit.worldPos || hit.name == "__SceneJS_dontPickMe") {
                             return;
                         }
-
                         startPivot = glmat.vec3.fromValues(currentPivot[0], currentPivot[1], currentPivot[2]);
                         endPivot = hit.worldPos;
-
                         if (indicatorVis) {
                             indicatorVis.setEnabled(true);
                             indicatorPos.setXYZ({x: endPivot[0], y: endPivot[1], z: endPivot[2] });
                             label.setShown(true);
                         }
-
                         var vec = glmat.vec3.create();
                         glmat.vec3.sub(vec, endPivot, startPivot);
-
                         flightDist = glmat.vec3.length(vec);
                         flightStartTime = null;
                         flightDuration = 1000.0 * ((flightDist / 15000) + 1); // extra seconds to ensure arrival
                         flying = true;
-
                         label.setText("[ " + Math.round(endPivot[0]) + ", " + Math.round(endPivot[1]) + ", " + Math.round(endPivot[2]) + " ]");
                         window.currentPiont = endPivot;
                         scene.getNode(hit.name + "geometry",function (material) {
@@ -432,47 +423,26 @@ require([
                     function () {
 
                         if (flying) {
-
                             if (flightStartTime == null) {
                                 flightStartTime = (new Date()).getTime();
                             }
-
                             var timeNow = (new Date()).getTime();
                             var timeElapsed = timeNow - flightStartTime;
-
                             if (timeElapsed >= flightDuration) {
                                 flying = false;
                                 flying = false;
                                 flightStartTime = null;
-
-                                // Hide pick indicator
-                                if (indicatorVis) {
-//                                    indicatorVis.setEnabled(false);
-//                                    label.setShown(false);
-                                }
                             } else {
-
                                 var easedTime = easeOut((timeNow - flightStartTime) / flightDuration, 0, 1, 1);
-
-                                // Continue flight
-                                // Find new pivot point, interpolated on path towards new point
-
                                 glmat.vec3.lerp(currentPivot, startPivot, endPivot, easedTime);
-
-                                // Need to rotate lookat
                                 orbiting = true;
                             }
                         }
-
-
                         if (orbiting) {
-
-                            // Update location of point-of-interest indicator
                             if (indicatorVis) {
                                 indicatorVis.setEnabled(true);
                                 label.setShown(true);
                             }
-
                             var radius = vecMagnitude(lookat.getEye());
                 			var phiTheta = sphericalCoords(lookat.getEye());
                 			var startPhi = phiTheta.phi;
@@ -494,20 +464,11 @@ require([
                 			
                 			
                 			lookat.setUp({x: 0, y:1, z: Math.abs(zoom)>Math.abs(maxZoom) ? Math.abs(maxZoom) : Math.abs(zoom) });
-
-                			
                 			//原点的眼睛
                 			var eye = glmat.vec3.fromValues(0, 0, zoom);
-                			
-                			
-                            
                             //lookat的那个轴
                             var look = glmat.vec3.fromValues(currentPivot[0], currentPivot[1], currentPivot[2]);
-                            //var up = glmat.vec3.fromValues(0, 1, 0);
-
-                            
                             var eyeVec = glmat.vec3.create();
-                            
                             //计算出他们之间 眼睛 那个轴向量
                             glmat.vec3.sub(eyeVec, eye, look);
 

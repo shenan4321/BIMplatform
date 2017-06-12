@@ -159,6 +159,15 @@ function start(){
 			}else{
 				if(!window.scene){
 					createScene();
+					window.scene.getNode("main-camera",function(maincamera){
+						maincamera.setOptics({
+							type: 'perspective',
+							far: 900000000,
+							near: 132,
+							aspect: jQuery(window).width() / jQuery(window).height(),
+							fovy: 37.8493
+						});
+					});
 				} 
 				geomotryLoad.process(res);	
 			}

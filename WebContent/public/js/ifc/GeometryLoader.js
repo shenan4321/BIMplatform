@@ -235,7 +235,7 @@ function GeometryLoader(bimServerApi, models, viewer, type) {
 			window.scene.getNode("main-camera",function(maincamera){
 				maincamera.setOptics({
 					type: 'perspective',
-					far: 900000000,
+					far: 9007199254740992,
 					near: 132,
 					aspect: jQuery(window).width() / jQuery(window).height(),
 					fovy: 37.8493

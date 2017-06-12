@@ -24,7 +24,7 @@ function initStart(){
 	
 	$('.nav-iconback').click(function(){
 		 thisMouseOut();
-		 $('.nav-slide.hover')removeClass('hover');
+		 $('.nav-slide.hover').removeClass('hover');
 	});
 	
 	//'./project/queryProjectByRid.do?rid='+string

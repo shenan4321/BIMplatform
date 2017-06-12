@@ -23,7 +23,7 @@
 		html,body,#mySceneCanvas{width:100%;height:100%;overflow:hidden}
   </style>
  </head>
- <body>
+ <body  ng-controller="myAppCtrl">
  <div id="luopanBox" class="ui-draggable">
     <div class="luopanBar">
         <svg xmlns="http://www.w3.org/2000/svg" version="1.1" id="luopanSvg" width="240" height="240">
@@ -44,52 +44,45 @@
         </a>
     </div>
   </header>
-  <div class="aside-menu-box">
-   <ul class="aside-box">
-    <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 文件 </p> </a> </li>
-    <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 场景树 </p> </a> </li>
-    <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 类型 </p> </a> </li>
-    <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 属性 </p> </a> </li>
-    <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 搜索 </p> </a> </li>
-    <!-- <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 标注 </p> </a> </li>  -->
-    <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 楼层 </p> </a> </li>
-    <!-- <li class="li"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 漫游控制 </p> </a> </li> -->
-   </ul>
-  </div>
+  <div class="aside-menu-box"> 
+   <ul class="aside-box"> 
+    <li class="li" data-name="fileCtrl"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 文件 </p> </a> </li> 
+    <li class="li" data-name="treeCtrl"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 场景树 </p> </a> </li> 
+    <li class="li" data-name="typeCtrl"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 类型 </p> </a> </li> 
+    <li class="li" data-name="pTableCtrl" > <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 属性 </p> </a> </li> 
+    <li class="li" data-name="floorCtrl"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 搜索 </p> </a> </li> 
+    <li class="li" data-name="searchCtrl"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 楼层 </p> </a> </li> 
+   </ul> 
+  </div> 
 <div class="nav-slide">
 	<div class="nav-iconback"></div>
 	<div class="nav-slide-o">
-		<div ng-controller="fileCtrl">
+		<div>
 			<div ng-include="'./treeTemp/file.html'"></div>
 		</div>
 	</div>
 	<div class="nav-slide-o">
-		<div ng-controller="treeCtrl">
+		<div>
 			<div ng-include="'./treeTemp/treeView.html'"></div>
 		</div>
 	</div>
 	<div class="nav-slide-o">
-	<div ng-controller="typeCtrl">
+		<div>
 			<div ng-include="'./treeTemp/typeView.html'"></div>
 		</div>
 	</div>
 	<div class="nav-slide-o">
-		<div ng-controller="pTableCtrl" id="pTable">
+		<div id="pTable">
 			<div ng-include="'./treeTemp/pTable.html'"></div>
 		</div>
 	</div>
 	<div class="nav-slide-o">
-		<div ng-controller="searchCtrl">
+		<div>
 			<div ng-include="'./treeTemp/search.html'"></div>
 		</div>
 	</div>
-<!-- 	<div class="nav-slide-o">
-	<div ng-controller="markCtrl">
-			<div ng-include="'./treeTemp/mark.html'"></div>
-		</div>
-	</div> -->
 	<div class="nav-slide-o">
-		<div ng-controller="floorCtrl" id="pTable">
+		<div>
 			<div ng-include="'./treeTemp/floor.html'"></div>
 		</div>
 	</div>
@@ -164,10 +157,8 @@ function start(){
 			}else{		
 				if(!window.scene){
 					createScene(data);
-					showView(data);
-				}else{
-					showView(data);
 				}
+				showView(data);
 			}
 		},
 		onclose:function(){

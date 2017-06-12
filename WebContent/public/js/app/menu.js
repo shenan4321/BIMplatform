@@ -16,8 +16,15 @@ function initStart(){
 			asideBoxList[num] = num;
 			$this.scope().menuClick($this.attr('data-name'));
 		}
-	})
-	
+	});
+	$('#luopanBox1').on('click',function(){
+		$('#luopanBox1').hide();
+		$('#luopanBox').show();
+	});
+	$('#luopanBox').on('click',function(){
+		$('#luopanBox').hide();
+		$('#luopanBox1').show();
+	});
 	function thisMouseOut(){
 		$('.nav-slide').removeClass('hover');
 	}

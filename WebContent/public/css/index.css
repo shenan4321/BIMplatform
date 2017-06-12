@@ -301,12 +301,23 @@ li.li.hover .iconfont1{display:block;}
     right: 10px;
     margin-left: 0;
 }
-    
+ #luopanBox1  {
+    position: absolute;
+             background-image:url(../images/luopan2.png);
+        height:60px;
+        width:60px;
+            bottom: 100px;
+            right: 20px;
+            z-index: 20;
+           
+ }
         #luopanBox {
             position: absolute;
             bottom: 100px;
             right: 20px;
             z-index: 20;
+            display:none;
+            transform: scale(0.8,0.8);
         }
  .div_project {
     min-height: 0px;
@@ -319,7 +330,7 @@ li.li.hover .iconfont1{display:block;}
     float: right;
 }
 .button_wUyZlQ2 {
-    font-size: 6px;
+    font-size: 12px;
     border-radius: 2px;
     padding-top: 6px;
     padding-bottom: 1px;

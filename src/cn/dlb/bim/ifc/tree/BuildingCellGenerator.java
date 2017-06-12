@@ -6,40 +6,32 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.emf.ecore.EClass;
+
+import cn.dlb.bim.ifc.emf.IdEObject;
 import cn.dlb.bim.ifc.emf.IfcModelInterface;
 
 public class BuildingCellGenerator {
 	
 	public List<BuildingCellContainer> buildBuildingCells(IfcModelInterface ifcModel) {
-		ProjectTreeGenerator treeGenerator = new ProjectTreeGenerator(ifcModel.getPackageMetaData());
-		treeGenerator.buildProjectTree(ifcModel, ProjectTreeGenerator.KeyWord_IfcProject);
-		ProjectTree tree = treeGenerator.getTree();
+		EClass productClass = (EClass) ifcModel.getPackageMetaData().getEClass("IfcProduct");
+		List<IdEObject> productList = ifcModel.getAllWithSubTypes(productClass);
 		Map<String, BuildingCellContainer> containers = new HashMap<>();
-		for (TreeItem item : tree.getTreeRoots()) {
-			processCell(item, containers);
+		for (IdEObject product : productList) {
+			processCell(product, containers);
 		}
 		List<BuildingCellContainer> result = new ArrayList<>();
 		result.addAll(containers.values());
 		return result;
 	}
 	
-	private void processCell(TreeItem item, Map<String, BuildingCellContainer> containers) {
-		if (item.getContains().size() == 0 && item.getDecomposition().size() == 0) {
-			String typeNameWithOutIfc = getTypeNameWithOutIfc(item.getIfcClassType());
-			if (!containers.containsKey(typeNameWithOutIfc)) {
-				BuildingCellContainer cellContainer = new BuildingCellContainer(typeNameWithOutIfc);
-				containers.put(typeNameWithOutIfc, cellContainer);
-			}
-			containers.get(typeNameWithOutIfc).getOids().add(item.getOid());
-		} else if (item.getContains().size() > 0) {
-			for (TreeItem contain : item.getContains()) {
-				processCell(contain, containers);
-			}
-		} else {//item.getDecomposition().size() > 0
-			for (TreeItem decomposition : item.getDecomposition()) {
-				processCell(decomposition, containers);
-			}
+	private void processCell(IdEObject product, Map<String, BuildingCellContainer> containers) {
+		String typeNameWithOutIfc = getTypeNameWithOutIfc(product.eClass().getName());
+		if (!containers.containsKey(typeNameWithOutIfc)) {
+			BuildingCellContainer cellContainer = new BuildingCellContainer(typeNameWithOutIfc);
+			containers.put(typeNameWithOutIfc, cellContainer);
 		}
+		containers.get(typeNameWithOutIfc).getOids().add(product.getOid());
 	}
 	
 	private String getTypeNameWithOutIfc(String ifcTypeName) {

@@ -47,7 +47,6 @@ function initStart(){
 						luopanData.push({name:this.name,link:'http://'+location.host+location.pathname+'?rid='+item.rid})
 					}			
 				});
-				console.log(luopanData);
 				$('#luopanSvg').luopan({
 					data:luopanData,
 				});	

@@ -1,7 +1,1 @@
-<ul class="tree-view">
-   <li ng-repeat="item in treeData" data-oid={{item.oid}}>
-   <span ng-class="{true:'tree-minus-bg',false:'tree-add-bg'}[item.show]" ng-click="item.show=!item.show" ng-init="item.show=false"></span><span class="ifc"></span>{{item.ifcClassType}}{{item.name}}
-   <ul ng-include = "'./treeTemp/contains.html'" ng-show="item.show"></ul>
-   <ul ng-include = "'./treeTemp/decomposition.html'"  ng-show="item.show"></ul>	
-   </li>
-</ul>
+	

@@ -61,7 +61,13 @@
 	</div>
 	<div class="nav-slide-o">
 		<div>
-			<div ng-include="'./treeTemp/treeView.html'"></div>
+			<ul class="tree-view">
+			   <li ng-repeat="item in treeData" data-oid={{item.oid}}>
+			   		<span ng-class="{true:'tree-minus-bg',false:'tree-add-bg'}[item.show]" ng-click="item.show=!item.show" ng-init="item.show=false"></span><span class="ifc"></span>{{item.ifcClassType}}{{item.name}}
+			   		<ul ng-include = "'./treeTemp/contains.html'" ng-if="item.show"></ul>
+					<ul ng-include = "'./treeTemp/decomposition.html'"  ng-if="item.show"></ul>
+			   </li>
+			</ul>
 		</div>
 	</div>
 	<div class="nav-slide-o">
@@ -159,15 +165,6 @@ function start(){
 			}else{
 				if(!window.scene){
 					createScene();
-					window.scene.getNode("main-camera",function(maincamera){
-						maincamera.setOptics({
-							type: 'perspective',
-							far: 900000000,
-							near: 132,
-							aspect: jQuery(window).width() / jQuery(window).height(),
-							fovy: 37.8493
-						});
-					});
 				} 
 				geomotryLoad.process(res);	
 			}

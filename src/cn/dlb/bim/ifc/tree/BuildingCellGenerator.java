@@ -10,15 +10,21 @@ import org.eclipse.emf.ecore.EClass;
 
 import cn.dlb.bim.ifc.emf.IdEObject;
 import cn.dlb.bim.ifc.emf.IfcModelInterface;
+import cn.dlb.bim.ifc.emf.PackageMetaData;
+import cn.dlb.bim.models.geometry.GeometryInfo;
 
 public class BuildingCellGenerator {
 	
 	public List<BuildingCellContainer> buildBuildingCells(IfcModelInterface ifcModel) {
-		EClass productClass = (EClass) ifcModel.getPackageMetaData().getEClass("IfcProduct");
+		PackageMetaData packageMetaData = ifcModel.getPackageMetaData();
+		EClass productClass = (EClass) packageMetaData.getEClass("IfcProduct");
 		List<IdEObject> productList = ifcModel.getAllWithSubTypes(productClass);
 		Map<String, BuildingCellContainer> containers = new HashMap<>();
 		for (IdEObject product : productList) {
-			processCell(product, containers);
+			GeometryInfo geometryInfo = (GeometryInfo) product.eGet(product.eClass().getEStructuralFeature("geometry"));
+			if (geometryInfo != null && geometryInfo.getTransformation() != null && !packageMetaData.getEClass("IfcSpace").isSuperTypeOf(product.eClass())) { 
+				processCell(product, containers);
+			}
 		}
 		List<BuildingCellContainer> result = new ArrayList<>();
 		result.addAll(containers.values());

@@ -75,7 +75,7 @@ function createScene(){
 		                id: 'main-camera',
 		                optics: {
 		                    type: 'perspective',
-		                    far: 9007199254740992,
+		                    far: 900000000,
 		                    near: 132.44078865666725,
 		                    aspect: $(window).width() / $(window).height(),
 		                    fovy: 37.8493

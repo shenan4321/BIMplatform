@@ -11,28 +11,26 @@
   <meta name="x5-page-mode" content="app" /> 
   <title>东链博BIM应用Server</title> 
   <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
-  
-     <!-- build:css -->
-  <link rel="stylesheet" href="public/css/format.css" type="text/css" />
-  <link rel="stylesheet" href="public/css/bim.css" type="text/css" />
-  <link rel="stylesheet" href="public/css/guest.css" type="text/css" />
-  <link rel="stylesheet" href="public/css/index.css" type="text/css" />
-     <link rel="stylesheet" href="public/css/jquery.minicolors.css" type="text/css" />
-     <!-- endbuild -->
+  <link rel="stylesheet" href="public/css/format.css" type="text/css" /> 
+  <link rel="stylesheet" href="public/css/bim.css" type="text/css" /> 
+  <link rel="stylesheet" href="public/css/guest.css" type="text/css" /> 
+  <link rel="stylesheet" href="public/css/index.css" type="text/css" /> 
+  <link rel="stylesheet" href="public/css/jquery.minicolors.css" type="text/css" /> 
   <style>
 		html,body,#mySceneCanvas{width:100%;height:100%;overflow:hidden}
-  </style>
- </head>
+  </style> 
+ </head> 
  <body  ng-controller="myAppCtrl">
  <div id="luopanBox" class="ui-draggable">
     <div class="luopanBar">
         <svg xmlns="http://www.w3.org/2000/svg" version="1.1" id="luopanSvg" width="240" height="240">
             <image x="28" y="28" width="184" height="184" id="luopanSvgImg1" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="./public/images/luopan_bg.png"></image>
+        </svg>
     </div>
 </div>
-  <canvas id="mySceneCanvas" width="100%" height="100%"></canvas>
-  <header class="app-header navbar">
-   <a class="navbar-brand" href="#"></a>
+  <canvas id="mySceneCanvas" width="100%" height="100%"></canvas>  
+  <header class="app-header navbar"> 
+   <a class="navbar-brand" href="#"></a> 
    <div class="c-div div_project">
         <a class="btn action-save c-button button_wUyZlQ2" type="button" href="http://localhost:8080/BIMplatform/admin/index.html#!/">
          项目管理
@@ -43,7 +41,7 @@
             返  回
         </a>
     </div>
-  </header>
+  </header> 
   <div class="aside-menu-box"> 
    <ul class="aside-box"> 
     <li class="li" data-name="fileCtrl"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 文件 </p> </a> </li> 
@@ -63,7 +61,13 @@
 	</div>
 	<div class="nav-slide-o">
 		<div>
-			<div ng-include="'./treeTemp/treeView.html'"></div>
+			<ul class="tree-view">
+			   <li ng-repeat="item in treeData" data-oid={{item.oid}}>
+			   		<span ng-class="{true:'tree-minus-bg',false:'tree-add-bg'}[item.show]" ng-click="item.show=!item.show" ng-init="item.show=false"></span><span class="ifc"></span>{{item.ifcClassType}}{{item.name}}
+			   		<ul ng-include = "'./treeTemp/contains.html'" ng-if="item.show"></ul>
+					<ul ng-include = "'./treeTemp/decomposition.html'"  ng-if="item.show"></ul>
+			   </li>
+			</ul>
 		</div>
 	</div>
 	<div class="nav-slide-o">
@@ -88,25 +92,32 @@
 	</div>
 <!--<div class="nav-slide-o"></div> -->
 </div>
-<script type="text/javascript" src="public/js/jquery/2.1.4/jquery-2.1.4.min.js"></script>
- <!-- build:js1 -->
-<script type="text/javascript" src="public/js/progress.js"></script>
-<script type="text/javascript" src="public/js/websoket.js"></script>
- <!-- endbuild -->
- <!-- build:js2 -->
-<script src="public/js/ifc/Constants.js"></script>
- <!-- endbuild -->
-<script src="public/js/scenejs/scenejs.js"></script>
+<script type="text/javascript" src="public/js/jquery/2.1.4/jquery-2.1.4.min.js"></script>  
+
+<!-- <script type="text/javascript" src="public/js/progress.js"></script>  -->
+<script type="text/javascript" src="public/js/progress.js"></script> 
+<script type="text/javascript" src="public/js/websoketArrayBuffer.js"></script>
+<script src="public/js/ifc/Constants.js"></script>  
+<script src="public/js/ifc/DataInputStreamReader.js"></script> 
+<script src="public/js/ifc/StringView.js" type="text/javascript"></script>
+<script src="public/js/ifc/GeometryLoader.js" type="text/javascript"></script>
+
+
+<script src="public/js/scenejs/scenejs.js"></script> 
+
+
+ 
+
 <script src="public/js/angularjs/1.4.4/angular.min.js"></script>
- <!-- build:js3 -->
+
 <script src="public/js/app/sceneTree.js"></script>
-<script src="public/js/app/renderBim.js"></script>
- <!-- endbuild -->
- <!-- build:js4 -->
+<script src="public/js/app/renderBim2.js"></script>
 <script src="public/js/dlbSvg.js" type="text/javascript"></script>
+
+
+<script src="public/js/app/menu.js"></script>
 <script src="public/js/html5validate.js" type="text/javascript"></script>
 <script src="public/js/color/jquery.minicolors.js" type="text/javascript"></script>
- <!-- endbuild -->
 <script src="public/js/datgui/dat.gui.min.js" type="text/javascript"></script>
 <script>
 function GetQueryString(name){
@@ -128,43 +139,40 @@ if(!string){
 			dataType:"json", 
 			aysnc:false,
 			success:function(res){
-				if(res.data.length){
-					string = res.data[0].rid;
-				}else{
-					string= 4;
-				}
+				string =res.data.length?res.data[0].rid:4;
 				start()
 			}
   		});		
   	}else{
-  		string=1;
+  		rid = 1 
   	}
 }else{
 	start()
 }
+
+var geomotryLoad = new GeometryLoader();
+var maxZoom = 1;
 function start(){
+	
 	websocket.init({
-		urlPath:"ws/geometry?rid="+string,
+		urlPath:"ws/binarygeometry?rid="+string,
 		onopen:function(msg){
 			window.progress = $.progress();
 		},
-		onmessage:function(data){
-			if(data.progress){
-				progress.update(data);
-			}else if(data.zoom){
-				window.maxZoom = data.zoom;
-				window.middle = data.middle;
-			}else{		
+		onmessage:function(res){
+			if(typeof(res)=='string'){
+				progress.update(JSON.parse(res));
+			}else{
 				if(!window.scene){
-					createScene(data);
-				}
-				showView(data);
+					createScene();
+				} 
+				geomotryLoad.process(res);	
 			}
 		},
 		onclose:function(){
 			progress.hide();
+			websocket = null;
 			$('.aside-menu-box').show();
-			websocket = null;			
 	        var Menus = function () {
 	            this.message = "Directional light";
 	            this["alpha.a"] = 0.6;
@@ -172,7 +180,7 @@ function start(){
 	            var update = function () {
 	            	 for(var i=0;i<allPoint.length;i++){
 	         			scene.getNode(allPoint[i]+'geometry',function(mt){
-	         	            	mt.setAlpha(self["alpha.a"]);
+	         	            mt.setAlpha(self["alpha.a"]);
 	         			})
 	         		}
 	                requestAnimationFrame(update);
@@ -187,6 +195,7 @@ function start(){
 	        initStart();
 		}
 	});
+
 }
 //监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常。
 window.onbeforeunload = function () {
@@ -195,7 +204,7 @@ window.onbeforeunload = function () {
 	}
 	
 }
+
 </script>
-<script src="public/js/app/menu.js"></script>
  </body>
 </html>

@@ -38,7 +38,7 @@
         		},
         		hide:function(){
         			$('.progressbars').hide();
-        			$this = null;
+        			//$this = null;
         		}
         	}
     };

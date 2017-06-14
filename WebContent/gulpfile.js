@@ -6,9 +6,9 @@ rename = require('gulp-rename'),
 htmlreplace = require('gulp-html-replace');
 
 var paths={
-    js1:["public/js/progress.js","public/js/websoket.js"],
-    js2:["public/js/ifc/Constants.js"],
-    js3:["public/js/app/sceneTree.js","public/js/app/renderBim.js"],
+    js1:["public/js/progress.js","public/js/websoketArrayBuffer.js"],
+    js2:["public/js/ifc/Constants.js","public/js/ifc/DataInputStreamReader.js","public/js/ifc/StringView.js","public/js/ifc/GeometryLoader.js"],
+    js3:["public/js/app/sceneTree.js","public/js/app/renderBim2.js"],
     js4:["public/js/dlbSvg.js","public/js/html5validate.js","public/js/color/jquery.minicolors.js"]
 };
 var renamejs=['help.js','ifcUtil.js','feature.js','jqueryUtil.js'];

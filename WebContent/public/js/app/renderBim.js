@@ -2,32 +2,30 @@ SceneJS.setConfigs({
     pluginPath:"public/js/scenejs/plugins"
 });
 
-
-
 function showView(geom) {
-    var boundMinX = 0, boundMinY = 0, boundMinZ = 0,
-        boundMaxX = 0, boundMaxY = 0, boundMaxZ = 0;
-    	if(geom.bound){
-            boundMinX = Math.min(0, geom.bound.min.x);
-            boundMinY = Math.min(0, geom.bound.min.y);
-            boundMinZ = Math.min(0, geom.bound.min.z);
-            boundMaxX = Math.max(0, geom.bound.max.x);
-            boundMaxY = Math.max(0, geom.bound.max.y);
-            boundMaxZ = Math.max(0, geom.bound.max.z);
-            var node = {
-                    geometry_info: geom,
-                    boundMinX : boundMinX,
-                    boundMinY : boundMinY,
-                    boundMinZ : boundMinZ,
-                    boundMaxX : boundMaxX,
-                    boundMaxY : boundMaxY,
-                    boundMaxZ : boundMaxZ,
-                    type:"geometry/ifcmodel"
-            };
-            window.scene.getNode("my-lights",function(xxx){
-    	   		xxx.addNode({type:"material",nodes:[node]});
-    	   	});
-    	}
+	var boundMinX = 0, boundMinY = 0, boundMinZ = 0,
+    boundMaxX = 0, boundMaxY = 0, boundMaxZ = 0;
+	if(geom.bound){
+        boundMinX = Math.min(0, geom.bound.min.x);
+        boundMinY = Math.min(0, geom.bound.min.y);
+        boundMinZ = Math.min(0, geom.bound.min.z);
+        boundMaxX = Math.max(0, geom.bound.max.x);
+        boundMaxY = Math.max(0, geom.bound.max.y);
+        boundMaxZ = Math.max(0, geom.bound.max.z);
+        var node = {
+                geometry_info: geom,
+                boundMinX : boundMinX,
+                boundMinY : boundMinY,
+                boundMinZ : boundMinZ,
+                boundMaxX : boundMaxX,
+                boundMaxY : boundMaxY,
+                boundMaxZ : boundMaxZ,
+                type:"geometry/ifcmodel"
+        };
+        window.scene.getNode("my-lights",function(xxx){
+	   		xxx.addNode({type:"material",nodes:[node]});
+	   	});
+	}
 }
 
 
@@ -35,7 +33,6 @@ function showView(geom) {
 function createScene(){
 	var yaw = -24.071999999999747;
 	var  pitch= -88.80199999999668;
-
 	var minPitch= -80,
 	maxPitch=-10,
 	zoom= - (~~(maxZoom/1.5)),
@@ -43,7 +40,8 @@ function createScene(){
 	//eye={x:middle.x,y: - middle.y* 10,z: maxZoom/5*4},
 	eye = {x: 4120.287109375, y: -112420.634765625, z: 9389.171752929688},
 	look= middle;
-
+	$window = $(window);
+	
 	
 	 var sceneViewObj = {
 		        canvasId:"mySceneCanvas",
@@ -77,7 +75,7 @@ function createScene(){
 		                    type: 'perspective',
 		                    far: 900000000,
 		                    near: 132.44078865666725,
-		                    aspect: $(window).width() / $(window).height(),
+		                    aspect: $window.width() / $window.height(),
 		                    fovy: 37.8493
 		                },
 		                nodes: [{
@@ -128,23 +126,10 @@ function createScene(){
 		            }]
 		        }]
 		    };
-	    window.scene =  SceneJS.createScene(sceneViewObj);
-	    
+	    window.scene =  SceneJS.createScene(sceneViewObj);	    
 }
+
 function bindEvent(sceneNodes) {
-/*    window.hisPick = {}; //记录点过的东西
-    scene.on("pick",function (hit) {
-          
-
-          // To illustrate, these are the params to expect on the pick hit:
-          var name = hit.name; // Eg. "object1"
-          var path = hit.path; // Eg. "foo.object1"
-          var nodeId = hit.nodeId;
-          var canvasX = hit.canvasPos[0];
-          var canvasY = hit.canvasPos[1];
-    });
-
-    */
 }
 
 

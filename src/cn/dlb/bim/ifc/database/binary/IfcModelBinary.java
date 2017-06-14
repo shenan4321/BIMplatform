@@ -77,7 +77,6 @@ public class IfcModelBinary {
 			((IdEObjectImpl) idEObject).setRid(rid);
 			((IdEObjectImpl) idEObject).useInverses(false);
 
-			
 			if (StorePackage.eINSTANCE == idEObject.eClass().getEPackage()) {
 				LOGGER.info("Read: " + idEObject.eClass().getName() + " pid=" + query.getPid() + " oid=" + oid);
 			}

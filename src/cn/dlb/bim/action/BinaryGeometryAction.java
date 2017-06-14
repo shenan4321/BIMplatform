@@ -1,16 +1,11 @@
 package cn.dlb.bim.action;
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.List;
-
 import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
-
 import com.google.gson.Gson;
-
 import cn.dlb.bim.ifc.database.IfcModelDbException;
 import cn.dlb.bim.ifc.emf.IfcModelInterface;
 import cn.dlb.bim.ifc.emf.IfcModelInterfaceException;
@@ -18,10 +13,7 @@ import cn.dlb.bim.ifc.serializers.SerializerException;
 import cn.dlb.bim.ifc.serializers.binarygeometry.BinaryGeometryMessagingSerializer;
 import cn.dlb.bim.ifc.shared.ProgressReporter;
 import cn.dlb.bim.service.BimService;
-import cn.dlb.bim.vo.GeometryInfoVo;
 import cn.dlb.bim.vo.ProgressVo;
-import cn.dlb.bim.vo.Vector3f;
-import cn.dlb.bim.web.ResultUtil;
 
 public class BinaryGeometryAction extends LongAction {
 
@@ -49,7 +41,7 @@ public class BinaryGeometryAction extends LongAction {
 			public void update(long progress, long max) {
 				this.progress = progress;
 				this.max = max;
-				ProgressVo msg = new ProgressVo();
+				ProgressVo msg = new ProgressVo();      
 				msg.setTitle(title);
 				msg.setProgress(progress);
 				msg.setMax(max);

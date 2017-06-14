@@ -103,7 +103,7 @@ public class IfcModelDbSession extends IfcModelBinary {
 		
 		modelCacheManager.cacheModel(revisionId, model);
 	}
-
+	
 	public IfcModelInterface get(PackageMetaData packageMetaData, int rid, QueryInterface query)
 			throws IfcModelDbException, IfcModelInterfaceException {
 		if (modelCacheManager.contains(rid)) {

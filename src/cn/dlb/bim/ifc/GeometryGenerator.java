@@ -73,7 +73,7 @@ public class GeometryGenerator {
 			settings.setGenerateTriangles(true);
 			settings.setGenerateWireFrame(true);
 			
-			final RenderEngineFilter renderEngineFilter = new RenderEngineFilter();
+			final RenderEngineFilter renderEngineFilter = new RenderEngineFilter(true);
 			
 			renderEngineModel.setSettings(settings);
 			renderEngineModel.setFilter(renderEngineFilter);
@@ -109,14 +109,14 @@ public class GeometryGenerator {
 				IRenderEngineInstance renderEngineInstance = renderEngineModel.getInstanceFromExpressId(ifcProduct.getExpressId());
 				RenderEngineGeometry geometry = renderEngineInstance.generateGeometry();
 				boolean translate = true;
-				if (geometry == null || geometry.getIndices().length == 0) {
-					renderEngineModel.setFilter(renderEngineFilterTransformed);
-					geometry = renderEngineInstance.generateGeometry();
-					if (geometry != null) {
-						translate = false;
-					}
-					renderEngineModel.setFilter(renderEngineFilter);
-				}
+//				if (geometry == null || geometry.getIndices().length == 0) {
+//					renderEngineModel.setFilter(renderEngineFilterTransformed);
+//					geometry = renderEngineInstance.generateGeometry();
+//					if (geometry != null) {
+//						translate = false;
+//					}
+//					renderEngineModel.setFilter(renderEngineFilter);
+//				}
 				if (geometry != null && geometry.getNrIndices() > 0) {
 					GeometryInfo geometryInfo = null;
 					geometryInfo = GeometryFactory.eINSTANCE.createGeometryInfo();

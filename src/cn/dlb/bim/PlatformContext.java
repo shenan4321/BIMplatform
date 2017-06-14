@@ -16,8 +16,6 @@ public class PlatformContext {
 	private final static Path tempPath;
 	private final static Path diskCachePath;
 	private final static String classLocation;
-	
-//	private static final String userPath;
 	private final static String descriptor;
 	private final static String resourceBase;
 	private final static String contextPath = "/BIMplatform";

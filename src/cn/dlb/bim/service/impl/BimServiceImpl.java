@@ -9,16 +9,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-
 import com.mongodb.DBObject;
 import com.mongodb.gridfs.GridFSDBFile;
-
 import cn.dlb.bim.cache.CacheDescriptor;
 import cn.dlb.bim.component.MongoGridFs;
 import cn.dlb.bim.component.PlatformInitDatas;
@@ -41,7 +38,6 @@ import cn.dlb.bim.ifc.emf.OfflineOidProvider;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
 import cn.dlb.bim.ifc.emf.ProjectInfo;
 import cn.dlb.bim.ifc.emf.Schema;
-import cn.dlb.bim.ifc.engine.IRenderEngine;
 import cn.dlb.bim.ifc.engine.RenderEngineException;
 import cn.dlb.bim.ifc.engine.cells.Vector3d;
 import cn.dlb.bim.ifc.engine.pool.RenderEnginePool;

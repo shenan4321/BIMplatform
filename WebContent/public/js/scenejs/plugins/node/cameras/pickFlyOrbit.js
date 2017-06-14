@@ -421,7 +421,7 @@ require([
 
                 scene.on("tick",
                     function () {
-
+                		
                         if (flying) {
                             if (flightStartTime == null) {
                                 flightStartTime = (new Date()).getTime();

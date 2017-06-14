@@ -136,8 +136,8 @@ function GeometryLoader(bimServerApi, models, viewer, type) {
 				});
 		}
 		o.state.nrObjectsRead++;
-		
-		if(o.state.nrObjectsRead%100==0||o.state.nrObjectsRead==o.state.nrObjects){
+		var step = o.state.nrObjects<100 ? 1 :~~(o.state.nrObjects/100);
+		if(o.state.nrObjectsRead%step==0||o.state.nrObjectsRead==o.state.nrObjects){
 			window.scene.getNode("my-lights",function(xxx){
 				xxx.addNode({type:'material',nodes:o.nodes});
 				o.nodes= [];
@@ -149,7 +149,7 @@ function GeometryLoader(bimServerApi, models, viewer, type) {
 
 
 	this.updateProgress = function() {
-		progress.update({title:'transferring',progress:~~(o.state.nrObjectsRead/(o.state.nrObjects||1)*100),max:100});
+		progress.update({title:'transferring',progress:o.state.nrObjectsRead,max:o.state.nrObjects});
 	};
 
 	this.readStart = function(data){

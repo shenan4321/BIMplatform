@@ -176,7 +176,7 @@ public class BinaryGeometryMessagingSerializer implements MessagingSerializer {
 			
 //			int rid = model.getModelMetaData().getRevisionId();
 //			dataOutputStream.writeInt(rid);
-			dataOutputStream.writeLong(geometryInfo.getOid());
+			dataOutputStream.writeLong(ifcProduct.getOid());
 			
 			// BEWARE, ByteOrder is always LITTLE_ENDIAN, because that's what GPU's seem to prefer, Java's ByteBuffer default is BIG_ENDIAN though!
 			

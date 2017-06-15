@@ -172,15 +172,15 @@ public class BinaryGeometryMessagingSerializer implements MessagingSerializer {
 			}
 			
 			dataOutputStream.writeByte(messageType.getId());
-			dataOutputStream.writeUTF(ifcProduct.eClass().getName());
+//			dataOutputStream.writeUTF(ifcProduct.eClass().getName());
 			
-			int rid = model.getModelMetaData().getRevisionId();
-			dataOutputStream.writeInt(rid);
-			dataOutputStream.writeLong(ifcProduct.getOid());
+//			int rid = model.getModelMetaData().getRevisionId();
+//			dataOutputStream.writeInt(rid);
+			dataOutputStream.writeLong(geometryInfo.getOid());
 			
 			// BEWARE, ByteOrder is always LITTLE_ENDIAN, because that's what GPU's seem to prefer, Java's ByteBuffer default is BIG_ENDIAN though!
 			
-			int skip = 8 - ((7 + ifcProduct.eClass().getName().getBytes(Charsets.UTF_8).length) % 8);//writeUTF 前两位是用于表示字符串长度
+			int skip = 8 - 1;//writeUTF 前两位是用于表示字符串长度
 			if(skip != 0 && skip != 8) {
 				dataOutputStream.write(new byte[skip]);
 			}
@@ -205,13 +205,13 @@ public class BinaryGeometryMessagingSerializer implements MessagingSerializer {
 					int nrParts = (totalNrIndices + maxIndexValues - 1) / maxIndexValues;
 					dataOutputStream.writeInt(nrParts);
 					
-					int skipBound = 4 % 8;
-					if(skipBound != 0 && skipBound != 8) {
-						dataOutputStream.write(new byte[skipBound]);
+					int skipIndices = 4 % 8;
+					if(skipIndices != 0 && skipIndices != 8) {
+						dataOutputStream.write(new byte[skipIndices]);
 					}
 	
-					Bounds objectBounds = new Bounds(geometryInfo.getMinBounds(), geometryInfo.getMaxBounds());
-					objectBounds.writeTo(dataOutputStream);
+//					Bounds objectBounds = new Bounds(geometryInfo.getMinBounds(), geometryInfo.getMaxBounds());
+//					objectBounds.writeTo(dataOutputStream);
 	
 					ByteBuffer indicesBuffer = ByteBuffer.wrap(geometryData.getIndices());
 					indicesBuffer.order(ByteOrder.LITTLE_ENDIAN);
@@ -283,8 +283,8 @@ public class BinaryGeometryMessagingSerializer implements MessagingSerializer {
 					}
 					concreteGeometrySent.put(geometryData.getOid(), arrayList);
 				} else {
-					Bounds objectBounds = new Bounds(geometryInfo.getMinBounds(), geometryInfo.getMaxBounds());
-					objectBounds.writeTo(dataOutputStream);
+//					Bounds objectBounds = new Bounds(geometryInfo.getMinBounds(), geometryInfo.getMaxBounds());
+//					objectBounds.writeTo(dataOutputStream);
 					
 					dataOutputStream.writeLong(geometryData.getOid());
 					

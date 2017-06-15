@@ -377,6 +377,7 @@ require([
 
                 scene.on("pick",
                     function (hit) {
+                	console.log(hit.name);
                         if (!hit.worldPos || hit.name == "__SceneJS_dontPickMe") {
                             return;
                         }

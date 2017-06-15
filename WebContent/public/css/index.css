@@ -317,7 +317,6 @@ li.li.hover .iconfont1{display:block;}
             right: 20px;
             z-index: 20;
             display:none;
-            transform: scale(0.8,0.8);
         }
  .div_project {
     min-height: 0px;

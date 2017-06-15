@@ -18,9 +18,9 @@ var luopanEvent = {};
         foreground: 'red',
         background: 'yellow',
         id:'luopanSvg',
-        width:240,
-        roundWidth:29, //内边环距
-        roundR:5 //内侧宽度
+        width:192,
+        roundWidth:25, //内边环距
+        roundR:4 //内侧宽度
     };
 
     $.fn.extend({
@@ -85,14 +85,14 @@ var luopanEvent = {};
                     svgItem.setAttribute('transform','rotate('+angle*i+','+halfWidth+','+halfWidth+')');
                     var path1 = document.createElementNS("http://www.w3.org/2000/svg","path");
                     path1.setAttribute("fill","none");
-                    path1.setAttribute("opacity", '1.0');
+                    path1.setAttribute("opacity", '0.7');
                     path1.setAttribute("class",'sector');
                     path1.setAttribute("d", opts.path1);
 
 
                     var path2 = document.createElementNS("http://www.w3.org/2000/svg","path");
                     path2.setAttribute("fill","none");
-                    path2.setAttribute("opacity", '1.0');
+                    path2.setAttribute("opacity", '0.7');
                     path2.setAttribute("class",'decsec');
                     path2.setAttribute("d", opts.path2);
 

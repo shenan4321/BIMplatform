@@ -58,7 +58,7 @@ public class BinaryGeometryMessagingSerializer implements MessagingSerializer {
 	private Map<Long, Object> concreteGeometrySent;
 	private Iterator<IdEObject> iterator;
 	private PackageMetaData packageMetaData;
-	private long splitCounter = -1;
+	private long splitCounter = 1;
 
 	@Override
 	public void init(IfcModelInterface model, PackageMetaData packageMetaData) throws SerializerException {
@@ -232,7 +232,7 @@ public class BinaryGeometryMessagingSerializer implements MessagingSerializer {
 					List<Long> arrayList = new ArrayList<Long>();
 					
 					for (int part=0; part<nrParts; part++) {
-						long splitId = splitCounter--;
+						long splitId = splitCounter++;
 						arrayList.add(splitId);
 						dataOutputStream.writeLong(splitId);
 						

@@ -146,7 +146,9 @@ myApp.controller('myAppCtrl', function ($scope, $http) {
 	
 	$scope.searchCtrl = function($scope, $http){
 		$scope.bimSearch = function(){
+			console.log($http);
 			if($.html5Validate.isAllpass($('#searchFrom'))){
+				
 				$http.get('./model/searchRecord.do?rid='+string+'&keyword='+$('#searchText').val()).success(function (data,status) {
 					$scope.searchList = data.data;
 			    }); 

@@ -7,11 +7,10 @@ function GeometryLoader(bimServerApi, models, viewer, type) {
 		nrObjectsRead: 0,
 		nrObjects: 0
 	};
-	o.progressListeners = [];
-	o.objectAddedListeners = [];
-	o.prepareReceived = false;
-	o.todo = [];
-	o.type = type;
+	
+	o.models1 = {}; //临时存储geometryType == 1的二进制变量,以便于3调用
+	o.models2 = {}; //临时存储geometryType == 2的二进制变量,以便于4调用
+	
 	o.stats = {
 		nrPrimitives: 0,
 		nrVertices: 0,
@@ -21,15 +20,14 @@ function GeometryLoader(bimServerApi, models, viewer, type) {
 	o.nodes = [];
 	
 	this.readObject = function(data, geometryType) {
-		var pos1 = data.getPos();
 		var ifcname = data.readUTF8();
-		var pos2 = data.getPos();
-		var rid = data.readInt();
-		var geometryDataOid = data.readLong();
+		var ifcProductOid = data.readLong();//不同的
 		data.align8();
+        var transformationMatrix = data.readDoubleArray(16);
+        console.log('geometryType',geometryType);
 		if (geometryType == 1) {
-			var modelBounds = data.readDoubleArray(6);
-			var oid = data.readLong()
+			
+			var geometryDataOid = data.readLong(); 
 			var nrIndices = data.readInt();
 			var indices = data.readShortArray(nrIndices);
 			data.align4();
@@ -43,7 +41,7 @@ function GeometryLoader(bimServerApi, models, viewer, type) {
 			var nrColors = data.readInt();
 			var colors = data.readFloatArray(nrColors);
 			var material  =  Ifc.Constants.materials[ifcname] || Ifc.Constants.materials['DEFAULT'];
-			
+			o.models1['geo'+geometryDataOid] = {ifcProductOid:ifcProductOid,vertices:vertices,indices:indices,normals:normals,material:material,IndicesForLinesWireFrame:IndicesForLinesWireFrame};
 			o.nodes.push({
 				type : "flags",
 				flags : {
@@ -51,31 +49,36 @@ function GeometryLoader(bimServerApi, models, viewer, type) {
 					backfaces:true,
 					enable:true
 				},
-				id : "flags"+geometryDataOid,
+				id : "flags"+ifcProductOid,
 				nodes : [{
 					type : "name",
-					name : geometryDataOid,
-					nodes : [{
-						type : "material",
-						baseColor: material,
-						color: material,
-						alpha: material.a,
-						id:geometryDataOid+"geometry",
-						nodes: [{
-							type : "geometry",
-							primitive : "triangles",
-							positions: vertices,
-							indices: indices,
-							normals: normals
-						}]
-					},
-						{
+					name : ifcProductOid,
+					nodes:[{
+						type: "matrix",
+						elements: transformationMatrix,
+                        nodes : [{
+                            type : "material",
+                            baseColor: material,
+                            color: material,
+                            alpha: material.a,
+                            id:ifcProductOid+"geometry",
+                            nodes: [{
+                            	id:"geometry"+geometryDataOid,
+                                type : "geometry",
+                                primitive : "triangles",
+                                positions: vertices,
+                                indices: indices,
+                                normals: normals
+                            }]
+                        }
+						,{
 							type : "material",
 							baseColor: material,
 							color: {r:0,g:0,b:0},
 							alpha: 0.5,
-							id:"geometryLines"+geometryDataOid,
+							id:"geometryLines"+ifcProductOid,
 							nodes: [{
+								id:"geometryLine"+geometryDataOid,
 								type : "geometry",
 								primitive : "lines",
 								positions: vertices,
@@ -83,20 +86,22 @@ function GeometryLoader(bimServerApi, models, viewer, type) {
 								normals: normals
 							}]
 						}]
+					}]
+
 				}]
-		});
+			});
 			
 
-		} else {
-				var coreIds = [];
+		} else if(geometryType == 2){
+				//var coreIds = [];
 				var nrParts = data.readInt();
 				data.align8();
-				var objectBounds = data.readDoubleArray(6);
 				var nodes = [];
-				var nodesLines = [];
+				//var nodesLines = [];
+				console.log('nrParts',nrParts);
 				for (var i=0; i<nrParts; i++) {
 					var coreId = data.readLong();
-					coreIds.push(coreId);
+					//coreIds.push(coreId);
 					var nrIndices = data.readInt();
 					var indices = data.readShortArray(nrIndices);
 					data.align4();
@@ -106,12 +111,12 @@ function GeometryLoader(bimServerApi, models, viewer, type) {
 					var normals = data.readFloatArray(nrNormals);
 					var nrColors = data.readInt();
 					var colors = data.readFloatArray(nrColors);
-					nodes.push({type : "geometry",primitive : "triangles",positions: vertices,indices: indices,normals: normals});
+					var gemotry = {type:"geometry",primitive:"triangles",positions: vertices,indices: indices,normals: normals};
+					o.models2['geo'+coreId] = gemotry;//记录splitId(后台)coreId(前端)的记录的变量，以便复用
+					nodes.push(gemotry);
 					//nodesLines.push({type : "geometry",primitive : "l",positions: vertices,indices: indices,normals: normals});
 				}
-
 				var material  =  Ifc.Constants.materials[ifcname] || Ifc.Constants.materials['DEFAULT'];
-
 				o.nodes.push({
 					type : "flags",
 					flags : {
@@ -119,22 +124,121 @@ function GeometryLoader(bimServerApi, models, viewer, type) {
 						backfaces:true,
 						enable:true
 					},
-					id : "flags"+geometryDataOid,
+					id : "flags"+ifcProductOid,
 					nodes : [{
 						type : "name",
-						name : geometryDataOid,
+						name : ifcProductOid,
+						nodes:[{
+							type: "matrix",
+							elements: transformationMatrix,
+							nodes : [{
+								type : "material",
+								baseColor: material,
+								color: material,
+								alpha: material.a,
+								id:ifcProductOid+"geometry",
+								nodes: nodes
+							}]
+						}]
+					}]
+				});
+		}else if(geometryType == 3){
+            var geometryDataOid = data.readLong();
+            var geo = o.models1['geo'+geometryDataOid];
+            var material  =  Ifc.Constants.materials[ifcname] || Ifc.Constants.materials['DEFAULT'];
+			o.nodes.push({
+				type : "flags",
+				flags : {
+					transparent : true,
+					backfaces:true,
+					enable:true
+				},
+				id : "flags"+ifcProductOid,
+				nodes : [{
+					type : "name",
+					name : ifcProductOid,
+					nodes:[{
+						type: "matrix",
+						elements: transformationMatrix,
+                        nodes : [{
+                            type : "material",
+                            baseColor: material,
+                            color: material,
+                            alpha: material.a,
+                            id:ifcProductOid+"geometry",
+                            nodes: [{
+                                type : "geometry",
+                                primitive : "triangles",
+                                positions: geo.vertices,
+                                indices: geo.indices,
+                                normals: geo.normals
+                            }]
+                        }
+						,{
+							type : "material",
+							baseColor: material,
+							color: {r:0,g:0,b:0},
+							alpha: 0.5,
+							id:"geometryLines"+ifcProductOid,
+							nodes: [{
+								type : "geometry",
+								primitive : "lines",
+								positions: geo.vertices,
+								indices: geo.IndicesForLinesWireFrame,
+								normals: geo.normals
+							}]
+						}]
+					}]
+				}]
+			});
+            
+            
+            
+            
+
+		}else{
+            var arraySize = data.readInt();
+            var nodes = [];
+            console.log(arraySize);
+            for (var i=0;i<arraySize;i++) {
+            	var coreId = data.readLong();
+            	console.log('coreId1',coreId);
+            	console.log(o.models2['geo'+coreId])
+                nodes.push(o.models2['geo'+coreId]);
+            }
+            var material  =  Ifc.Constants.materials[ifcname] || Ifc.Constants.materials['DEFAULT'];
+            console.log('transformationMatrix',transformationMatrix);
+            o.nodes.push({
+				type : "flags",
+				flags : {
+					transparent : true,
+					backfaces:true,
+					enable:true
+				},
+				id : "flags"+ifcProductOid,
+				nodes : [{
+					type : "name",
+					name : ifcProductOid,
+					nodes:[{
+						type: "matrix",
+						elements: transformationMatrix,
 						nodes : [{
 							type : "material",
 							baseColor: material,
 							color: material,
 							alpha: material.a,
-							id:geometryDataOid+"geometry",
+							id:ifcProductOid+"geometry",
 							nodes: nodes
 						}]
 					}]
-
-				});
+				}]
+			});
 		}
+
+
+
+
+
 		o.state.nrObjectsRead++;
 		var step = o.state.nrObjects<100 ? 1 :~~(o.state.nrObjects/100);
 		if(o.state.nrObjectsRead%step==0||o.state.nrObjectsRead==o.state.nrObjects){

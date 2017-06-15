@@ -172,7 +172,7 @@ public class BinaryGeometryMessagingSerializer implements MessagingSerializer {
 			}
 			
 			dataOutputStream.writeByte(messageType.getId());
-//			dataOutputStream.writeUTF(ifcProduct.eClass().getName());
+			dataOutputStream.writeUTF(ifcProduct.eClass().getName());
 			
 //			int rid = model.getModelMetaData().getRevisionId();
 //			dataOutputStream.writeInt(rid);
@@ -180,7 +180,7 @@ public class BinaryGeometryMessagingSerializer implements MessagingSerializer {
 			
 			// BEWARE, ByteOrder is always LITTLE_ENDIAN, because that's what GPU's seem to prefer, Java's ByteBuffer default is BIG_ENDIAN though!
 			
-			int skip = 8 - 1;//writeUTF 前两位是用于表示字符串长度
+			int skip = 8 - ((3 + ifcProduct.eClass().getName().getBytes(Charsets.UTF_8).length) % 8);//writeUTF 前两位是用于表示字符串长度
 			if(skip != 0 && skip != 8) {
 				dataOutputStream.write(new byte[skip]);
 			}

@@ -221,10 +221,12 @@ function GeometryLoader() {
 				lookat.setLook(o.center);
 			});
 			window.scene.getNode("main-camera",function(maincamera){
+				var diagonal = Math.sqrt(Math.pow(o.modelBounds.max.x - o.modelBounds.min.x, 2) + Math.pow(o.modelBounds.max.y - o.modelBounds.min.y, 2) + Math.pow(o.modelBounds.max.z - o.modelBounds.min.z, 2));
+				var far = diagonal * 18; // 5 being a guessed constant that should somehow coincide with the max zoom-out-factor
 				maincamera.setOptics({
 					type: 'perspective',
-					far: 900000000,
-					near: 132,
+					far: far,
+					near: far / 1000,
 					aspect: jQuery(window).width() / jQuery(window).height(),
 					fovy: 37.8493
 				});

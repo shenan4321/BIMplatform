@@ -64,8 +64,8 @@ function createScene(){
 		            pitch:pitch,
 		            minPitch:minPitch,
 		            maxPitch:maxPitch,
-		            zoom:zoom,
-		            zoomSensitivity:zoomSensitivity,
+		            //zoom:zoom,
+		            zoomSensitivity:20000,
 		            eye:eye,
 		            look:look,
 		            nodes: [{

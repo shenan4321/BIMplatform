@@ -139,20 +139,27 @@ if(!string){
 			aysnc:false,
 			success:function(res){
 				string =res.data.length?res.data[0].rid:4;
-				start()
+				var maxZoom = 1000;
+				if(!window.scene){
+					createScene();
+				}
+				setTimeout(start,800)
+				
 			}
   		});		
   	}else{
   		rid = 1 
   	}
 }else{
-	start()
+	var maxZoom = 1000;
+	if(!window.scene){
+		createScene();
+	}
+	setTimeout(start,800)
 }
 
-var geomotryLoad = new GeometryLoader();
-var maxZoom = 1;
+
 function start(){
-	
 	websocket.init({
 		urlPath:"ws/binarygeometry?rid="+string,
 		onopen:function(msg){
@@ -162,9 +169,7 @@ function start(){
 			if(typeof(res)=='string'){
 				progress.update(JSON.parse(res));
 			}else{
-				if(!window.scene){
-					createScene();
-				} 
+				
 				geomotryLoad.process(res);	
 			}
 		},

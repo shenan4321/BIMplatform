@@ -35,7 +35,6 @@ function showView(geom) {
 function createScene(middle,zoom){
 	var yaw = -24.071999999999747;
 	var  pitch= -88.80199999999668;
-
 	eye = {x: 0, y:0, z:0};	
 	 var sceneViewObj = {
 		        canvasId:"mySceneCanvas",
@@ -57,9 +56,9 @@ function createScene(middle,zoom){
 		            yaw:yaw,
 		            pitch:pitch,
 		            eye:{x:0,y:0,z:0},
-		            zoom:-(zoom*3),
+		            //zoom:-(zoom*3),
 		            zoomSensitivity:20000,
-		            look:middle,
+		            //look:middle,
 		            nodes: [{
 		                type: 'camera',
 		                id: 'main-camera',
@@ -112,7 +111,11 @@ function createScene(middle,zoom){
 		        }]
 		    };
 	    window.scene =  SceneJS.createScene(sceneViewObj);
-	    
+	    setTimeout(function(){
+	    	window.geomotryLoad = new GeometryLoader();
+	    	window.geomotryLoad.setModels(window.scene.findNode("my-lights"));
+	    },600)
+	     
 }
 
 function easeOut(t, b, c, d) {

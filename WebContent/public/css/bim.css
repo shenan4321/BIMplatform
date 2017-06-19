@@ -137,7 +137,7 @@
         /* background-color: #2d5f7e; */
         transition: border ease 0.4s, box-shadow ease 0.4s, background-color ease 1.2s;
         }
-    .mui-switch.mui-switch-anim.checked:before,{
+    .mui-switch.mui-switch-anim.checked:before{
         transition: left 0.3s; }
 .tree-view{
 	font-size: 12px;

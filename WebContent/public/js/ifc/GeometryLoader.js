@@ -5,8 +5,6 @@ function GeometryLoader() {
 		nrObjectsRead: 0,
 		nrObjects: 0
 	};
-	o.models1 = {}; //临时存储geometryType == 1的二进制变量,以便于3调用
-	o.models2 = {}; //临时存储geometryType == 2的二进制变量,以便于4调用
 	o.stats = {
 		nrPrimitives: 0,
 		nrVertices: 0,
@@ -41,149 +39,111 @@ function GeometryLoader() {
 			var vertices = data.readFloatArray((data.readInt()));
 			var normals = data.readFloatArray((data.readInt()));
 			var colors = data.readFloatArray((data.readInt()));
-			o.models1['geo'+geometryDataOid] = {
-					geometry:[{
-                        type : "geometry",
-                        primitive : "triangles",
-                        positions: vertices,
-                        indices: indices,
-                        normals: normals
-                    }],
-					line:{
-						type : "material",
-						baseColor: material,
-						color: {r:0,g:0,b:0},
-						alpha: 0.5,
-						nodes: [{
-							type : "geometry",
-							primitive : "lines",
-							positions: vertices,
-							indices: IndicesForLinesWireFrame,
-							normals: normals
-						}]
-					}
-			};
-			o.nodes.push({
-				type : "flags",
-				flags : flagsObj,
-				id : "flags"+ifcProductOid,
-				nodes : [{
-					type : "name",
-					name : ifcProductOid,
-					nodes:[{
-						type: "matrix",
-						elements: transformationMatrix,
-                        nodes : [{
-                            type : "material",
-                            baseColor: material,
-                            color: material,
-                            alpha: material.a,
-                            id:ifcProductOid+"geometry",
-                            nodes: o.models1['geo'+geometryDataOid].geometry
-                        },o.models1['geo'+geometryDataOid].line]
-					}]
-				}]
-			});
+			o.library.addNodes([{
+				coreId:'geo'+geometryDataOid,
+			    type : "geometry",
+			    primitive : "triangles",
+			    positions: vertices,
+			    indices: indices,
+			    normals: normals
+			},{
+				coreId:'geoLine'+geometryDataOid,
+				type : "geometry",
+				primitive : "lines",
+				positions: vertices,
+				indices: IndicesForLinesWireFrame,
+				normals: normals
+			}]);
+			this.processGeometry(1,ifcProductOid, [geometryDataOid], material, transformationMatrix)
 		} else if(geometryType == 2){
-				var nrParts = data.readInt();
-				data.align8();
-				var nodes = [];
-				for (var i=0; i<nrParts; i++) {
-					var coreId = data.readLong();
-					var indices = data.readShortArray((data.readInt()));
-					data.align4();
-					var vertices = data.readFloatArray((data.readInt()));
-					var normals = data.readFloatArray((data.readInt()));
-					var colors = data.readFloatArray((data.readInt()));
-					o.models2['geo'+coreId] = {type:"geometry",primitive:"triangles",positions: vertices,indices: indices,normals: normals};
-					nodes.push(o.models2['geo'+coreId]);
-				}
-				o.nodes.push({
-					type : "flags",
-					flags :flagsObj,
-					id : "flags"+ifcProductOid,
-					nodes : [{
-						type : "name",
-						name : ifcProductOid,
-						nodes:[{
-							type: "matrix",
-							elements: transformationMatrix,
-							nodes : [{
-								type : "material",
-								baseColor: material,
-								color: material,
-								alpha: material.a,
-								id:ifcProductOid+"geometry",
-								nodes: nodes
-							}]
-						}]
-					}]
+			var nrParts = data.readInt();
+			data.align8();
+			var nodes = [];
+			for (var i=0; i<nrParts; i++) {
+				var coreId = data.readLong();
+				var indices = data.readShortArray((data.readInt()));
+				data.align4();
+				var vertices = data.readFloatArray((data.readInt()));
+				var normals = data.readFloatArray((data.readInt()));
+				var colors = data.readFloatArray((data.readInt()));
+				o.library.addNode({
+					type:"geometry",
+					primitive:"triangles",
+					positions: vertices,
+					indices: indices,
+					coreId:'geo'+coreId,
+					normals: normals
 				});
+			}
 		}else if(geometryType == 3){
             var geometryDataOid = data.readLong();
-            var geo = o.models1['geo'+geometryDataOid];
-            o.nodes.push({
-				type : "flags",
-				flags : flagsObj,
-				id : "flags"+ifcProductOid,
-				nodes : [{
-					type : "name",
-					name : ifcProductOid,
-					nodes:[{
-						type: "matrix",
-						elements: transformationMatrix,
-                        nodes : [{
-                            type : "material",
-                            baseColor: material,
-                            color: material,
-                            alpha: material.a,
-                            id:ifcProductOid+"geometry",
-                            nodes: geo.geometry
-                        },geo.line]
-					}]
-				}]
-			});
+            this.processGeometry(3,ifcProductOid, [geometryDataOid], material, transformationMatrix)
 		}else{
 			var arraySize = data.readInt();
-            var nodes = [];
+            var coreIds = [];
             for (var i=0;i<arraySize;i++) {
             	var coreId = data.readLong();
-                nodes.push(o.models2['geo'+coreId]);
+                coreIds.push(coreId)
             }
-            o.nodes.push( {
-				type : "flags",
-				flags : flagsObj,
-				id : "flags"+ifcProductOid,
-				nodes : [{
-					type : "name",
-					name : ifcProductOid,
-					nodes:[{
-						type: "matrix",
-						elements: transformationMatrix,
-						nodes : [{
-							type : "material",
-							baseColor: material,
-							color: material,
-							alpha: material.a,
-							id:ifcProductOid+"geometry",
-							nodes: nodes
-						}]
-					}]
-				}]
-			});
+            this.processGeometry(4,ifcProductOid, coreIds, material, transformationMatrix);
 		}
 
 		o.state.nrObjectsRead++;
-		if(o.state.nrObjectsRead%o.step==0||o.state.nrObjectsRead==o.state.nrObjects){
-			o.updateProgress();
-			o.models.addNode({type:'flags',nodes:o.nodes});
-			o.nodes = [];
-			//o.models.addNode(o.nodes);
-			//o.nodes= {};
-		}
+		o.updateProgress();
 		
 	};
 
+	this.processGeometry = function(type,ifcProductOid, coreIds, material, transformationMatrix){
+		
+		var coreNodes = [];
+		var coreNodesLine = [];
+		
+		coreIds.forEach(function(coreId){
+			coreNodes.push({
+				type: "geometry",
+				coreId: 'geo'+coreId
+			});
+			if(type==1||type==3){
+				coreNodesLine.push({
+					type: "geometry",
+					coreId: 'geoLine'+coreId
+				});
+			}
+		});
+		var flags = {
+			type : "flags",
+			flags : flagsObj,
+			id : "flags"+ifcProductOid,
+			nodes : [{
+				type : "name",
+				name : ifcProductOid,
+				nodes:[{
+					type: "matrix",
+					elements: transformationMatrix,
+					nodes : [{
+						type : "material",
+						baseColor:{r:material.r,g:material.g,b:material.b},
+                        color:{r:material.r,g:material.g,b:material.b},
+						alpha: material.a,
+						id:ifcProductOid+"geometry",
+						nodes: coreNodes
+					}]
+				}]
+			}]
+		};
+		
+		if(type==1||type==3){
+			flags.nodes[0].nodes[0].nodes[1] = {
+				type : "material",
+	            color:{r:0,g:0,b:0},
+				alpha:0.5,
+				nodes: coreNodesLine
+			}
+		}
+		
+		o.models.addNode(flags);
+		flags = null;
+	}
 
 	this.updateProgress = function() {
 		progress.update({title:'transferring',progress:o.state.nrObjectsRead,max:o.state.nrObjects});
@@ -232,15 +192,21 @@ function GeometryLoader() {
 				});
 			}); 
 		}
+		o.library = scene.findNode("library");
+		if (o.library == null) {
+			o.library = scene.addNode({
+				id: "library",
+				type: "library"
+			});
+		}
 		o.state.nrObjects = data.readInt();
-		o.step = o.state.nrObjects<100 ? 1 :~~(o.state.nrObjects/100);
+		//o.step = o.state.nrObjects<100 ? 1 :~~(o.state.nrObjects/100);
 	};
 	this.process = function(res){
 		inputStream = new DataInputStream(res);
 		var messageType = inputStream.readByte();
 		if (messageType == 0) {
 			o.readStart(inputStream);
-			
 		}else{
 			o.readObject(inputStream, messageType);
 		}

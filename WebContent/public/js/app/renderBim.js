@@ -62,8 +62,6 @@ function createScene(){
 		            id:'cameras',
 		            yaw:yaw,
 		            pitch:pitch,
-		            minPitch:minPitch,
-		            maxPitch:maxPitch,
 		            //zoom:zoom,
 		            zoomSensitivity:20000,
 		            eye:eye,

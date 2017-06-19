@@ -9,13 +9,14 @@ var paths={
     js1:["public/js/progress.js","public/js/websoketArrayBuffer.js"],
     js2:["public/js/ifc/Constants.js","public/js/ifc/DataInputStreamReader.js","public/js/ifc/StringView.js","public/js/ifc/GeometryLoader.js"],
     js3:["public/js/app/sceneTree.js","public/js/app/renderBim2.js"],
-    js4:["public/js/dlbSvg.js","public/js/html5validate.js","public/js/color/jquery.minicolors.js"]
+    js4:["public/js/dlbSvg.js","public/js/app/menu.js","public/js/html5validate.js","public/js/color/jquery.minicolors.js"]
 };
 var renamejs=['help.js','ifcUtil.js','feature.js','jqueryUtil.js'];
 //压缩css
 gulp.task('minifycss', function() {
     return gulp.src('public/css/*.css')    //需要操作的文件
-        .pipe(rename({suffix: '.min'}))   //rename压缩后的文件名
+        .pipe(concat('dist.min.css'))
+        //.pipe(rename({suffix: '.min'}))   //rename压缩后的文件名
         .pipe(minifycss())   //执行压缩
         .pipe(gulp.dest('public/css'));   //输出文件夹------------------------------------------------------------------------------------
 });
@@ -30,7 +31,6 @@ for(var x in paths){
             return gulp.src(paths['js'+t])      //需要操作的文件
                 .pipe(concat(renamejs[t-1]))    //合并所有js到main.js
                 .pipe(gulp.dest('js'))       //输出到文件夹
-                .pipe(rename({suffix: '.min'}))   //rename压缩后的文件名
                 .pipe(uglify())    //压缩
                 .pipe(gulp.dest('public/dist/js'));  //输出
         });
@@ -55,7 +55,7 @@ gulp.task('default',function() {
     var t= 0;
     for(var x in paths){
         t++;
-        gulp.start( "minifyjs"+t);
+        gulp.start("minifyjs"+t);
     }
     gulp.start('replace');
 });

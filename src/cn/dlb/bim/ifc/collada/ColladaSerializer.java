@@ -21,11 +21,7 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.emf.common.util.Enumerator;
 import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.EClassifier;
-import org.eclipse.emf.ecore.EEnum;
-import org.eclipse.emf.ecore.EEnumLiteral;
 import org.eclipse.emf.ecore.EStructuralFeature;
-import org.eclipse.emf.ecore.impl.EEnumImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +30,7 @@ import cn.dlb.bim.ifc.emf.IfcModelInterface;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
 import cn.dlb.bim.ifc.emf.ProjectInfo;
 import cn.dlb.bim.ifc.engine.RenderEngineException;
+import cn.dlb.bim.ifc.engine.cells.Matrix;
 import cn.dlb.bim.ifc.engine.cells.Vector3d;
 import cn.dlb.bim.ifc.serializers.SerializerException;
 import cn.dlb.bim.ifc.shared.ProgressReporter;
@@ -194,9 +191,11 @@ public class ColladaSerializer extends AbstractGeometrySerializer {
 
 	private void setGeometry(PrintWriter out, IdEObject ifcProductObject, String material) throws RenderEngineException, SerializerException {
 		// Mostly just skips IfcOpeningElements which one would probably not want to end up in the Collada file.
-		if (isInstanceOf(ifcProductObject, "IfcFeatureElementSubtraction") || isInstanceOf(ifcProductObject, "IfcSpace"))
+		if (isInstanceOf(ifcProductObject, "IfcFeatureElementSubtraction") || isInstanceOf(ifcProductObject, "IfcSpace")) {
 			return;
+		}
 		//
+		
 		GeometryInfo geometryInfo = (GeometryInfo) ifcProductObject.eGet(ifcProductObject.eClass().getEStructuralFeature("geometry"));
 		if (geometryInfo != null && geometryInfo.getTransformation() != null) {
 			GeometryData geometryData = geometryInfo.getData();
@@ -459,18 +458,18 @@ public class ColladaSerializer extends AbstractGeometrySerializer {
 	}
 
 	private void printMatrix(PrintWriter out, GeometryInfo geometryInfo) {
-//		ByteBuffer transformation = ByteBuffer.wrap(geometryInfo.getTransformation());
-//		transformation.order(ByteOrder.LITTLE_ENDIAN);
-//		DoubleBuffer doubleBuffer = transformation.asDoubleBuffer();
-//		// Prepare to create the transform matrix.
-//		double[] matrix = new double[16];
-//		// Add the first 16 values of the buffer.
-//		for (int i = 0; i < matrix.length; i++)
-//			matrix[i] = doubleBuffer.get();
-//		// Switch from column-major (x.x ... x.y ... x.z ... 0 ...) to row-major orientation (x.x x.y x.z 0 ...)?
-//		matrix = Matrix.changeOrientation(matrix);
-//		// List all 16 elements of the matrix as a single space-delimited String object.
-//		out.println("    <matrix>" + doubleArrayToSpaceDelimitedString(matrix) + "</matrix>");
+		ByteBuffer transformation = ByteBuffer.wrap(geometryInfo.getTransformation());
+		transformation.order(ByteOrder.LITTLE_ENDIAN);
+		DoubleBuffer doubleBuffer = transformation.asDoubleBuffer();
+		// Prepare to create the transform matrix.
+		double[] matrix = new double[16];
+		// Add the first 16 values of the buffer.
+		for (int i = 0; i < matrix.length; i++)
+			matrix[i] = doubleBuffer.get();
+		// Switch from column-major (x.x ... x.y ... x.z ... 0 ...) to row-major orientation (x.x x.y x.z 0 ...)?
+		matrix = Matrix.changeOrientation(matrix);
+		// List all 16 elements of the matrix as a single space-delimited String object.
+		out.println("    <matrix>" + doubleArrayToSpaceDelimitedString(matrix) + "</matrix>");
 	}
 
 	private void writeEffects(PrintWriter out) {

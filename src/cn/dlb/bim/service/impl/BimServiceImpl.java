@@ -81,15 +81,15 @@ public class BimServiceImpl implements BimService {
 
 	@Override
 	public List<GeometryInfoVo> queryGeometryInfo(Integer rid, ProgressReporter progressReporter) {
-		CacheDescriptor cacheDescriptor = new CacheDescriptor("queryGeometryInfo", rid);
-		CacheUtils<GeometryInfoVo> utils = new CacheUtils<>(server.getDiskCacheManager());
-		List<GeometryInfoVo> result = utils.readListFromCache(cacheDescriptor, GeometryInfoVo.class);
-		if (result != null) {
-			return result;
-		}
+//		CacheDescriptor cacheDescriptor = new CacheDescriptor("queryGeometryInfo", rid);
+//		CacheUtils<GeometryInfoVo> utils = new CacheUtils<>(server.getDiskCacheManager());
+//		List<GeometryInfoVo> result = utils.readListFromCache(cacheDescriptor, GeometryInfoVo.class);
+//		if (result != null) {
+//			return result;
+//		}
 		
 		IfcModelInterface model = queryModelByRid(rid, progressReporter);
-		result = new ArrayList<>();
+		List<GeometryInfoVo> result = new ArrayList<>();
 		PackageMetaData packageMetaData = model.getPackageMetaData();
 		EClass productClass = (EClass) model.getPackageMetaData().getEClassifierCaseInsensitive("IfcProduct");
 		List<IdEObject> projectList = model.getAllWithSubTypes(productClass);
@@ -112,7 +112,7 @@ public class BimServiceImpl implements BimService {
 			}
 		}
 		
-		utils.cacheList(cacheDescriptor, result);
+//		utils.cacheList(cacheDescriptor, result);
 		
 		return result;
 	}
@@ -396,74 +396,74 @@ public class BimServiceImpl implements BimService {
 
 	@Override
 	public ProjectTree queryModelTree(Integer rid) {
-		CacheDescriptor downloadDescriptor = new CacheDescriptor("queryModelTree", rid);
-		CacheUtils<ProjectTree> utils = new CacheUtils<>(server.getDiskCacheManager());
-		ProjectTree result = utils.readObjectFromCache(downloadDescriptor, ProjectTree.class);
-		if (result != null) {
-			return result;
-		}	
+//		CacheDescriptor downloadDescriptor = new CacheDescriptor("queryModelTree", rid);
+//		CacheUtils<ProjectTree> utils = new CacheUtils<>(server.getDiskCacheManager());
+//		ProjectTree result = utils.readObjectFromCache(downloadDescriptor, ProjectTree.class);
+//		if (result != null) {
+//			return result;
+//		}	
 		
 		IfcModelInterface model = queryModelByRid(rid, null);
 		ProjectTreeGenerator treeGenerator = new ProjectTreeGenerator(model.getPackageMetaData());
 		treeGenerator.buildProjectTree(model, ProjectTreeGenerator.KeyWord_IfcProject);
-		result = treeGenerator.getTree();
+		ProjectTree result = treeGenerator.getTree();
 		
-		utils.cacheObject(downloadDescriptor, result);
+//		utils.cacheObject(downloadDescriptor, result);
 		
 		return result;
 	}
 
 	@Override
 	public List<BuildingStorey> queryModelBuildingStorey(Integer rid) {
-		CacheDescriptor downloadDescriptor = new CacheDescriptor("queryModelBuildingStorey", rid);
-		CacheUtils<BuildingStorey> utils = new CacheUtils<>(server.getDiskCacheManager());
-		List<BuildingStorey> result = utils.readListFromCache(downloadDescriptor, BuildingStorey.class);
-		if (result != null) {
-			return result;
-		}	
+//		CacheDescriptor downloadDescriptor = new CacheDescriptor("queryModelBuildingStorey", rid);
+//		CacheUtils<BuildingStorey> utils = new CacheUtils<>(server.getDiskCacheManager());
+//		List<BuildingStorey> result = utils.readListFromCache(downloadDescriptor, BuildingStorey.class);
+//		if (result != null) {
+//			return result;
+//		}	
 		
 		IfcModelInterface model = queryModelByRid(rid, null);
 		BuildingStoreyGenerator generator = new BuildingStoreyGenerator(model.getPackageMetaData());
-		result = generator.generateBuildingStorey(model);
+		List<BuildingStorey> result = generator.generateBuildingStorey(model);
 		
-		utils.cacheList(downloadDescriptor, result);
+//		utils.cacheList(downloadDescriptor, result);
 		
 		return result;
 	}
 
 	@Override
 	public List<BuildingCellContainer> queryBuildingCells(Integer rid) {
-		CacheDescriptor downloadDescriptor = new CacheDescriptor("queryBuildingCells", rid);
-		CacheUtils<BuildingCellContainer> utils = new CacheUtils<>(server.getDiskCacheManager());
-		List<BuildingCellContainer> result = utils.readListFromCache(downloadDescriptor, BuildingCellContainer.class);
-		if (result != null) {
-			return result;
-		}		
+//		CacheDescriptor downloadDescriptor = new CacheDescriptor("queryBuildingCells", rid);
+//		CacheUtils<BuildingCellContainer> utils = new CacheUtils<>(server.getDiskCacheManager());
+//		List<BuildingCellContainer> result = utils.readListFromCache(downloadDescriptor, BuildingCellContainer.class);
+//		if (result != null) {
+//			return result;
+//		}		
 		
 		IfcModelInterface model = queryModelByRid(rid, null);
 		BuildingCellGenerator generator = new BuildingCellGenerator();
-		result = generator.buildBuildingCells(model);
+		List<BuildingCellContainer> result = generator.buildBuildingCells(model);
 		
-		utils.cacheList(downloadDescriptor, result);
+//		utils.cacheList(downloadDescriptor, result);
 		
 		return result;
 	}
 
 	@Override
 	public List<PropertySet> queryProperty(Integer rid, Long oid) {
-		CacheDescriptor downloadDescriptor = new CacheDescriptor("queryProperty", rid, oid);
-		CacheUtils<PropertySet> utils = new CacheUtils<>(server.getDiskCacheManager());
-		List<PropertySet> result = utils.readListFromCache(downloadDescriptor, PropertySet.class);
-		if (result != null) {
-			return result;
-		}
+//		CacheDescriptor downloadDescriptor = new CacheDescriptor("queryProperty", rid, oid);
+//		CacheUtils<PropertySet> utils = new CacheUtils<>(server.getDiskCacheManager());
+//		List<PropertySet> result = utils.readListFromCache(downloadDescriptor, PropertySet.class);
+//		if (result != null) {
+//			return result;
+//		}
 		
 		IfcModelInterface model = queryModelByRid(rid, null);
 		IdEObject targetObject = model.get(oid);
 		PropertyGenerator propertyGenerator = new PropertyGenerator();
-		result = propertyGenerator.getProperty(model.getPackageMetaData(), targetObject);
+		List<PropertySet> result = propertyGenerator.getProperty(model.getPackageMetaData(), targetObject);
 
-		utils.cacheList(downloadDescriptor, result);
+//		utils.cacheList(downloadDescriptor, result);
 		
 		return result;
 	}

@@ -50,30 +50,30 @@ public class ColladaSerializer extends AbstractGeometrySerializer {
 	}
 
 	static {
-		addConvertor(new MaterialConvertor("IfcRoof", new double[] { 153.0/255.0f, 0.0, 51.0/255.0f }, 1.0f));
-		addConvertor(new MaterialConvertor("IfcSlab", new double[] { 217.0/255.0f, 217.0/255.0f, 217.0/255.0f }, 1.0f));
+		addConvertor(new MaterialConvertor("IfcRoof", new double[] { 70/255.0f, 30/255.0f, 30/255.0f }, 1.0f));
+		addConvertor(new MaterialConvertor("IfcSlab", new double[] { 160.0/255.0f, 150/255.0f, 104.0/255.0f }, 1.0f));
 		
-		addConvertor(new MaterialConvertor("IfcWindow", new double[] { 0.2f, 0.2f, 0.8f }, 0.2f));
+		addConvertor(new MaterialConvertor("IfcWindow", new double[] { 0.2f, 0.2f, 0.8f }, 0.3f));
 		addConvertor(new MaterialConvertor("IfcSpace", new double[] { 0.5f, 0.4f, 0.1f }, 0.0f));
-		addConvertor(new MaterialConvertor("IfcDoor", new double[] { 0.637255f, 0.603922f, 0.670588f }, 1.0f));
-		addConvertor(new MaterialConvertor("IfcStair", new double[] { 0.637255f, 0.603922f, 0.670588f }, 1.0f));
+		addConvertor(new MaterialConvertor("IfcDoor", new double[] { 0.637255, 0.603922, 0.670588 }, 1.0f));
+		addConvertor(new MaterialConvertor("IfcStair", new double[] { 0.0, 0.0f, 0.0f }, 1.0f));
 		addConvertor(new MaterialConvertor("IfcStairFlight", new double[] { 0.637255f, 0.603922f, 0.670588f }, 1.0f));
 		addConvertor(new MaterialConvertor("IfcFlowSegment", new double[] { 0.6f, 0.4f, 0.5f }, 1.0f));
-		addConvertor(new MaterialConvertor("IfcFurnishingElement", new double[] { 205.0/255.0f, 104.0/255.0f, 57.0/255.0f }, 1.0f));
-		addConvertor(new MaterialConvertor("IfcPlate", new double[] { 0.437255f, 0.603922f, 0.370588f }, 0.4f));
-		addConvertor(new MaterialConvertor("IfcMember", new double[] { 0.137255f, 0.203922f, 0.270588f }, 1.0f));
-		addConvertor(new MaterialConvertor("IfcWallStandardCase", new double[] { 217.0/255.0f, 217.0/255.0f, 217.0/255.0f }, 1.0f));
-		addConvertor(new MaterialConvertor("IfcWall", new double[] { 217.0/255.0f, 217.0/255.0f, 217.0/255.0f }, 1.0f));
+		addConvertor(new MaterialConvertor("IfcFurnishingElement", new double[] { 205.0/255, 104.0/255, 57.0/255f }, 1.0f));
+		addConvertor(new MaterialConvertor("IfcPlate", new double[] { 0.0f, 0.0f, 0.0f }, 0.4f));
+		addConvertor(new MaterialConvertor("IfcMember", new double[] { 0.137255, 0.203922, 0.270588 }, 1.0f));
+		addConvertor(new MaterialConvertor("IfcWallStandardCase", new double[] { 150/255.0, 150/255.0, 104.0/255.0f }, 1.0f));
+		addConvertor(new MaterialConvertor("IfcWall", new double[] { 146.0/255.0, 72.0/255.0, 38.0/255.0f }, 1.0f));
 		addConvertor(new MaterialConvertor("IfcCurtainWall", new double[] { 0.5f, 0.5f, 0.5f }, 0.5f));
-		addConvertor(new MaterialConvertor("IfcRailing", new double[] { 0.137255f, 0.203922f, 0.270588f }, 1.0f));
-		addConvertor(new MaterialConvertor("IfcColumn", new double[] { 0.437255f, 0.603922f, 0.370588f, }, 1.0f));
-		addConvertor(new MaterialConvertor("IfcBuildingElementProxy", new double[] { 0.0f, 0.5f, 0.0f }, 1.0f));
+		addConvertor(new MaterialConvertor("IfcRailing", new double[] { 0.137255, 0.203922, 0.270588f }, 1.0f));
+		addConvertor(new MaterialConvertor("IfcColumn", new double[] { 0.0f, 0.0f, 0.0f }, 1.0f));
+		addConvertor(new MaterialConvertor("IfcBuildingElementProxy", new double[] { 0.0f, 0.8f, 0.5f }, 1.0f));
 		
-		addConvertor(new MaterialConvertor("IfcBeam", new double[] { 0.137255f, 0.403922f, 0.870588f }, 1.0f));
+		addConvertor(new MaterialConvertor("IfcBeam", new double[] { 0.137255, 0.403922, 0.870588f }, 1.0f));
 //		addConvertor(new Convertor<IfcBeamStandardCase>(IfcBeamStandardCase.class, new double[] { 0.137255f, 0.403922f, 0.870588f }, 1.0f));
-		addConvertor(new MaterialConvertor("IfcFlowTerminal", new double[] { 0.137255f, 0.403922f, 0.870588f }, 1.0f));
-		addConvertor(new MaterialConvertor("IfcProxy", new double[] { 0.137255f, 0.403922f, 0.870588f }, 1.0f));
-		addConvertor(new MaterialConvertor("IfcSite", new double[] { 0.0, 102.0f/255.0f, 102.0f/255.0f }, 1.0f));
+		addConvertor(new MaterialConvertor("IfcFlowTerminal", new double[] { 0.137255, 0.403922, 0.870588f }, 1.0f));
+		addConvertor(new MaterialConvertor("IfcProxy", new double[] { 0.0, 0.8, 0.5f }, 0.9f));
+		addConvertor(new MaterialConvertor("IfcSite", new double[] { 0.0, 102.0f/255.0f, 180.0f/255.0f }, 1.0f));
 //		addConvertor(new Convertor<IfcLightFixture>(IfcLightFixture.class, new double[] { 0.137255f, 0.403922f, 0.870588f }, 1.0f));
 //		addConvertor(new Convertor<IfcDuctSegment>(IfcDuctSegment.class, new double[] { 0.137255f, 0.403922f, 0.870588f }, 1.0f));
 		addConvertor(new MaterialConvertor("IfcDistributionFlowElement", new double[] { 0.8470588235f, 0.427450980392f, 0.0f }, 1.0f));
@@ -91,7 +91,7 @@ public class ColladaSerializer extends AbstractGeometrySerializer {
 		addConvertor(new MaterialConvertor("IfcBuildingElementPart", new double[] { 1.0f, 0.5f, 0.5f }, 1.0f));
 		addConvertor(new MaterialConvertor("IfcDistributionElement", new double[] { 1.0f, 0.5f, 0.5f }, 1.0f));
 		
-		addConvertor(new MaterialConvertor("IfcProduct", new double[] { 0.0, 102.0f/255.0f, 102.0f/255.0f }, 1.0f));
+		addConvertor(new MaterialConvertor("IfcProduct", new double[] { 0.8470588235, 0.427450980392, 0.0f }, 1.0f));
 	}
 
 	// Prepare a transformer for floating-point numbers into a strings, clipping extraneous zeros.
@@ -171,8 +171,6 @@ public class ColladaSerializer extends AbstractGeometrySerializer {
 		out.println(" <library_geometries>");
 		// For each IfcProduct, get the geometry for each object in the product.
 		
-		EClass productClass = (EClass) model.getPackageMetaData().getEClass("IfcProduct");
-
 		Set<IdEObject> convertedObjects = new HashSet<IdEObject>();
 
 		for (MaterialConvertor materialConvertor : convertors.values()) {
@@ -195,6 +193,11 @@ public class ColladaSerializer extends AbstractGeometrySerializer {
 			return;
 		}
 		//
+		
+//		if (!(isInstanceOf(ifcProductObject, "IfcWall") || isInstanceOf(ifcProductObject, "IfcWallStandardCase")
+//				|| isInstanceOf(ifcProductObject, "IfcCurtainWall"))) {
+//			return; //DEMO 输出窗
+//		}
 		
 		GeometryInfo geometryInfo = (GeometryInfo) ifcProductObject.eGet(ifcProductObject.eClass().getEStructuralFeature("geometry"));
 		if (geometryInfo != null && geometryInfo.getTransformation() != null) {

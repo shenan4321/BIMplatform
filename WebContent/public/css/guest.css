@@ -174,3 +174,8 @@
 	 font-family:microsoft yahei, Arial, Gotham;
 	 font-weight: 800;
 }
+.svg {
+           position: absolute;
+           top: 20px;
+           left: 162px;
+       }

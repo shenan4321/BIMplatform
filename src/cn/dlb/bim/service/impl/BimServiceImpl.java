@@ -9,20 +9,26 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+
 import com.mongodb.DBObject;
 import com.mongodb.gridfs.GridFSDBFile;
-import cn.dlb.bim.cache.CacheDescriptor;
+
 import cn.dlb.bim.component.MongoGridFs;
 import cn.dlb.bim.component.PlatformInitDatas;
 import cn.dlb.bim.component.PlatformServer;
 import cn.dlb.bim.dao.IfcModelDao;
+import cn.dlb.bim.dao.OutputTemplateDao;
 import cn.dlb.bim.dao.entity.IfcModelEntity;
+import cn.dlb.bim.dao.entity.ObjectTypeSelector;
+import cn.dlb.bim.dao.entity.ModelAndOutputTemplateMap;
 import cn.dlb.bim.dao.entity.ModelLabel;
+import cn.dlb.bim.dao.entity.OutputTemplate;
 import cn.dlb.bim.ifc.GeometryGenerator;
 import cn.dlb.bim.ifc.collada.GlbSerializer;
 import cn.dlb.bim.ifc.database.IfcModelDbException;
@@ -58,7 +64,6 @@ import cn.dlb.bim.ifc.tree.PropertySet;
 import cn.dlb.bim.models.geometry.GeometryInfo;
 import cn.dlb.bim.service.BimService;
 import cn.dlb.bim.utils.BinUtils;
-import cn.dlb.bim.utils.CacheUtils;
 import cn.dlb.bim.utils.IdentifyManager;
 import cn.dlb.bim.vo.GeometryInfoVo;
 import cn.dlb.bim.vo.GlbVo;
@@ -78,6 +83,10 @@ public class BimServiceImpl implements BimService {
 	@Autowired
 	@Qualifier("IfcModelDaoImpl")
 	private IfcModelDao ifcModelDao;
+	
+	@Autowired
+	@Qualifier("OutputTemplateDaoImpl")
+	private OutputTemplateDao outputTemplateDao;
 
 	@Override
 	public List<GeometryInfoVo> queryGeometryInfo(Integer rid, ProgressReporter progressReporter) {
@@ -549,4 +558,78 @@ public class BimServiceImpl implements BimService {
 		}
 		return glbVo;
 	}
+
+	@Override
+	public void insertOutputTemplate(OutputTemplate template) {
+		outputTemplateDao.insertOutputTemplate(template);
+	}
+
+	@Override
+	public void deleteOutputTemplate(Long otid) {
+		outputTemplateDao.deleteOutputTemplate(otid);
+	}
+
+	@Override
+	public void modifyOutputTemplate(OutputTemplate template) {
+		outputTemplateDao.modifyOutputTemplate(template);
+	}
+
+	@Override
+	public OutputTemplate queryOutputTemplateByOtid(Long otid) {
+		return outputTemplateDao.queryOutputTemplateByOtid(otid);
+	}
+
+	@Override
+	public OutputTemplate genModelDefaultOutputTemplate(Integer rid) {
+		IfcModelInterface model = queryModelByRid(rid, null);
+		PackageMetaData packageMetaData = model.getPackageMetaData();
+		EClass productClass = (EClass) packageMetaData.getEClassifierCaseInsensitive("IfcProduct");
+		List<IdEObject> projectList = model.getAllWithSubTypes(productClass);
+		OutputTemplate outputTemplate = new OutputTemplate();
+		for (IdEObject ifcProduct : projectList) {
+			GeometryInfo geometryInfo = (GeometryInfo) ifcProduct.eGet(ifcProduct.eClass().getEStructuralFeature("geometry"));
+			if (geometryInfo != null && geometryInfo.getTransformation() != null && !packageMetaData.getEClass("IfcSpace").isSuperTypeOf(ifcProduct.eClass())) {
+				String ifcType = ifcProduct.eClass().getName();
+				Object name = ifcProduct.eGet(ifcProduct.eClass().getEStructuralFeature("Name"));
+				Object objectType = ifcProduct.eGet(ifcProduct.eClass().getEStructuralFeature("ObjectType"));
+				if (objectType != null && name != null) {
+					String nameStr = name.toString();
+					String namespace = nameStr.split(":")[0];
+					outputTemplate.putIntoMap(ifcType, namespace, objectType.toString(), true);
+				}
+			}
+		}
+		Long otid = IdentifyManager.getIdentifyManager().nextId(IdentifyManager.OTID_KEY);
+		outputTemplate.setOtid(otid);
+		outputTemplate.setName("DEFAULT");
+		
+//		//test TODO remove
+		insertOutputTemplate(outputTemplate);
+		
+		return outputTemplate;
+	}
+
+	@Override
+	public void insertModelAndOutputTemplateMap(ModelAndOutputTemplateMap map) {
+		outputTemplateDao.insertModelAndOutputTemplateMap(map);
+	}
+
+	@Override
+	public void deleteModelAndOutputTemplateMap(ModelAndOutputTemplateMap map) {
+		outputTemplateDao.deleteModelAndOutputTemplateMap(map);
+	}
+
+	@Override
+	public List<ModelAndOutputTemplateMap> queryModelAndOutputTemplateMapByRid(Integer rid) {
+		return outputTemplateDao.queryModelAndOutputTemplateMapByRid(rid);
+	}
+	
+	@Override
+	public void test() {
+		genModelDefaultOutputTemplate(3);
+//		OutputTemplate outputTemplate = outputTemplateDao.queryOutputTemplateByOtid(78153895524000l);
+//		outputTemplate.getIfcTypeSelectorMap().get("IfcOpeningElement").getObjectTypeMap().put("Opening", false);
+//		outputTemplateDao.modifyOutputTemplate(outputTemplate);
+	}
+	
 }

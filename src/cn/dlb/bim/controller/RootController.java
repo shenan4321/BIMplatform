@@ -1,6 +1,5 @@
 package cn.dlb.bim.controller;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -12,10 +11,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import cn.dlb.bim.component.PlatformServer;
+import cn.dlb.bim.dao.entity.OutputTemplate;
 import cn.dlb.bim.ifc.database.queries.om.JsonQueryObjectModelConverter;
 import cn.dlb.bim.ifc.database.queries.om.Query;
 import cn.dlb.bim.ifc.database.queries.om.QueryException;
@@ -71,5 +69,14 @@ public class RootController {
 		result.setSuccess(true);
 		return result.getResult();
 	}
+	
+	@RequestMapping(value = "test", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> test() {//test
+		ResultUtil result = new ResultUtil();
+		bimService.test();
+		result.setSuccess(true);
+		return result.getResult();
+	} 
 	
 }

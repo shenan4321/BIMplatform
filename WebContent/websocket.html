@@ -21,7 +21,7 @@
 		if ('WebSocket' in window) {
 			//alert("WebSocket");
 			websocket = new WebSocket(
-					"ws://localhost:8080/BIMplatform/ws/geometry?rid=4");
+					"ws://localhost:8080/BIMplatform/ws/binarygeometry?rid=8");
 		} else if ('MozWebSocket' in window) {
 			//alert("MozWebSocket");
 			websocket = new MozWebSocket("ws://echo");
@@ -33,7 +33,7 @@
 			$("#tou").html("链接服务器成功!")
 		};
 		websocket.onmessage = function(evnt) {
-			$("#msg").html($("#msg").html() + "<br/>" + evnt.data);
+			//$("#msg").html($("#msg").html() + "<br/>" + evnt.data);
 		};
 		websocket.onerror = function(evnt) {
 		};

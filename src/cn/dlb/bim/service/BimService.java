@@ -1,12 +1,10 @@
 package cn.dlb.bim.service;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.List;
-import java.util.Map;
 
-import org.springframework.web.bind.annotation.RequestParam;
-
+import cn.dlb.bim.dao.entity.ModelAndOutputTemplateMap;
+import cn.dlb.bim.dao.entity.OutputTemplate;
 import cn.dlb.bim.ifc.emf.IfcModelInterface;
 import cn.dlb.bim.ifc.engine.cells.Vector3d;
 import cn.dlb.bim.ifc.shared.ProgressReporter;
@@ -55,4 +53,19 @@ public interface BimService {
 	 * @return
 	 */
 	public GlbVo queryGlbByGlbId(Long glbId);
+	
+	/**
+	 * 
+	 * @param template
+	 */
+	public void insertOutputTemplate(OutputTemplate template);
+	public void deleteOutputTemplate(Long otid);
+	public void modifyOutputTemplate(OutputTemplate template);
+	public OutputTemplate queryOutputTemplateByOtid(Long otid);
+	public OutputTemplate genModelDefaultOutputTemplate(Integer rid);
+	public void insertModelAndOutputTemplateMap(ModelAndOutputTemplateMap map);
+	public void deleteModelAndOutputTemplateMap(ModelAndOutputTemplateMap map);
+	public List<ModelAndOutputTemplateMap> queryModelAndOutputTemplateMapByRid(Integer rid);
+	
+	public void test();
 }

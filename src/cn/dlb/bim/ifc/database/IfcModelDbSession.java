@@ -23,16 +23,15 @@ import cn.dlb.bim.ifc.database.binary.TodoList;
 import cn.dlb.bim.ifc.emf.IdEObject;
 import cn.dlb.bim.ifc.emf.IdEObjectImpl;
 import cn.dlb.bim.ifc.emf.IdEObjectImpl.State;
-import cn.dlb.bim.ifc.model.BasicIfcModel;
 import cn.dlb.bim.ifc.emf.IfcModelInterface;
 import cn.dlb.bim.ifc.emf.IfcModelInterfaceException;
 import cn.dlb.bim.ifc.emf.MetaDataManager;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
 import cn.dlb.bim.ifc.emf.QueryInterface;
+import cn.dlb.bim.ifc.model.BasicIfcModel;
 import cn.dlb.bim.ifc.shared.ProgressReporter;
 import cn.dlb.bim.models.geometry.GeometryData;
 import cn.dlb.bim.models.geometry.GeometryInfo;
-import cn.dlb.bim.models.ifc2x3tc1.IfcProduct;
 import cn.dlb.bim.vo.ModelInfoVo;
 
 public class IfcModelDbSession extends IfcModelBinary {
@@ -68,9 +67,10 @@ public class IfcModelDbSession extends IfcModelBinary {
 		ifcModelEntity.setUploadDate(modelInfo.getUploadDate());
 
 		Map<Long, IdEObject> geometries = new HashMap<>();
-
-		for (IfcProduct ifcProduct : model.getAllWithSubTypes(IfcProduct.class)) {
-			GeometryInfo geometryInfo = ifcProduct.getGeometry();
+		EClass productClass = (EClass) model.getPackageMetaData().getEClassifierCaseInsensitive("IfcProduct");
+		List<IdEObject> projectList = model.getAllWithSubTypes(productClass);
+		for (IdEObject ifcProduct : projectList) {
+			GeometryInfo geometryInfo = (GeometryInfo) ifcProduct.eGet(ifcProduct.eClass().getEStructuralFeature("geometry"));
 			if (geometryInfo != null && !geometries.containsKey(geometryInfo.getOid())) {
 				geometries.put(geometryInfo.getOid(), geometryInfo);
 				GeometryData geometryData = geometryInfo.getData();

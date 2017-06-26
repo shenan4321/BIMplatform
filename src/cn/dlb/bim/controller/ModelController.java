@@ -36,7 +36,6 @@ import cn.dlb.bim.ifc.tree.MaterialGenerator;
 import cn.dlb.bim.ifc.tree.ProjectTree;
 import cn.dlb.bim.ifc.tree.PropertySet;
 import cn.dlb.bim.lucene.IfcProductRecordText;
-import cn.dlb.bim.models.ifc2x3tc1.IfcProduct;
 import cn.dlb.bim.service.BimService;
 import cn.dlb.bim.service.ProjectService;
 import cn.dlb.bim.vo.GlbVo;
@@ -245,7 +244,7 @@ public class ModelController {
 		
 		MaterialGenerator materialGetter = new MaterialGenerator(model);
 		for (IdEObject ifcProject : projectList) {
-			Material material = materialGetter.getMaterial(((IfcProduct) ifcProject));
+			Material material = materialGetter.getMaterial(ifcProject);
 			if (material != null) {
 				System.out.println("type : " + ifcProject.eClass().getName() 
 						+ " color : r " + material.getAmbient().r

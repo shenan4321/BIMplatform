@@ -12,6 +12,7 @@ public class IdentifyManager {
 	public static final String PID_KEY = "pid_key";
 	public static final String PICTURE_KEY = "piture_key";
 	public static final String OFFLINE_GLB_KEY = "offline_glb_key";
+	public static final String OTID_KEY = "otid_key";
 	
 	private static IdentifyManager identifyManager = null;
 	

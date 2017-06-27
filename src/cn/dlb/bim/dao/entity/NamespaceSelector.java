@@ -5,16 +5,9 @@ import java.util.Map;
 
 public class NamespaceSelector {
 	public static String UNDEFINED = "undefined";
-	private String ifcType;
 	private Map<String, ObjectTypeSelector> namespaceMap;
 	public NamespaceSelector() {
 		namespaceMap = new LinkedHashMap<>();
-	}
-	public String getIfcType() {
-		return ifcType;
-	}
-	public void setIfcType(String ifcType) {
-		this.ifcType = ifcType;
 	}
 	public Map<String, ObjectTypeSelector> getNamespaceMap() {
 		return namespaceMap;
@@ -32,7 +25,6 @@ public class NamespaceSelector {
 			selector.getObjectTypeMap().put(objectTypefiltered, selected);
 		} else {
 			ObjectTypeSelector selector = new ObjectTypeSelector();
-			selector.setNamespace(namespace);
 			selector.getObjectTypeMap().put(objectTypefiltered, selected);
 			namespaceMap.put(namespace, selector);
 		}

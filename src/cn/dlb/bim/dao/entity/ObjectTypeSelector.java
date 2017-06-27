@@ -10,13 +10,6 @@ public class ObjectTypeSelector {
 	public ObjectTypeSelector() {
 		objectTypeMap = new LinkedHashMap<String, Boolean>();
 	}
-	public String getNamespace() {
-		return namespace;
-	}
-
-	public void setNamespace(String namespace) {
-		this.namespace = namespace;
-	}
 	public Map<String, Boolean> getObjectTypeMap() {
 		return objectTypeMap;
 	}

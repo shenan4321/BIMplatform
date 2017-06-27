@@ -25,7 +25,6 @@ import cn.dlb.bim.component.PlatformServer;
 import cn.dlb.bim.dao.IfcModelDao;
 import cn.dlb.bim.dao.OutputTemplateDao;
 import cn.dlb.bim.dao.entity.IfcModelEntity;
-import cn.dlb.bim.dao.entity.ObjectTypeSelector;
 import cn.dlb.bim.dao.entity.ModelAndOutputTemplateMap;
 import cn.dlb.bim.dao.entity.ModelLabel;
 import cn.dlb.bim.dao.entity.OutputTemplate;
@@ -69,6 +68,7 @@ import cn.dlb.bim.vo.GeometryInfoVo;
 import cn.dlb.bim.vo.GlbVo;
 import cn.dlb.bim.vo.ModelInfoVo;
 import cn.dlb.bim.vo.ModelLabelVo;
+import cn.dlb.bim.vo.OutputTemplateVo;
 
 @Service("BimServiceImpl")
 public class BimServiceImpl implements BimService {
@@ -560,8 +560,9 @@ public class BimServiceImpl implements BimService {
 	}
 
 	@Override
-	public void insertOutputTemplate(OutputTemplate template) {
-		outputTemplateDao.insertOutputTemplate(template);
+	public void insertOutputTemplate(OutputTemplateVo template) {
+		OutputTemplate templateEntity = template.transformTo();
+		outputTemplateDao.insertOutputTemplate(templateEntity);
 	}
 
 	@Override
@@ -570,43 +571,67 @@ public class BimServiceImpl implements BimService {
 	}
 
 	@Override
-	public void modifyOutputTemplate(OutputTemplate template) {
-		outputTemplateDao.modifyOutputTemplate(template);
+	public void modifyOutputTemplate(OutputTemplateVo template) {
+		OutputTemplate templateEntity = template.transformTo();
+		outputTemplateDao.modifyOutputTemplate(templateEntity);
 	}
 
 	@Override
-	public OutputTemplate queryOutputTemplateByOtid(Long otid) {
-		return outputTemplateDao.queryOutputTemplateByOtid(otid);
-	}
-
-	@Override
-	public OutputTemplate genModelDefaultOutputTemplate(Integer rid) {
+	public OutputTemplateVo queryOutputTemplate(Integer rid, Long otid) {
+		OutputTemplate outputTemplate = outputTemplateDao.queryOutputTemplateByOtid(otid);
+		OutputTemplateVo outputTemplateVo = new OutputTemplateVo();
+		
 		IfcModelInterface model = queryModelByRid(rid, null);
 		PackageMetaData packageMetaData = model.getPackageMetaData();
 		EClass productClass = (EClass) packageMetaData.getEClassifierCaseInsensitive("IfcProduct");
 		List<IdEObject> projectList = model.getAllWithSubTypes(productClass);
-		OutputTemplate outputTemplate = new OutputTemplate();
 		for (IdEObject ifcProduct : projectList) {
 			GeometryInfo geometryInfo = (GeometryInfo) ifcProduct.eGet(ifcProduct.eClass().getEStructuralFeature("geometry"));
-			if (geometryInfo != null && geometryInfo.getTransformation() != null && !packageMetaData.getEClass("IfcSpace").isSuperTypeOf(ifcProduct.eClass())) {
+			if (geometryInfo != null && geometryInfo.getTransformation() != null && !packageMetaData.getEClass("IfcSpace").isSuperTypeOf(ifcProduct.eClass())
+					&& !packageMetaData.getEClass("IfcFeatureElementSubtraction").isSuperTypeOf(ifcProduct.eClass())) {
 				String ifcType = ifcProduct.eClass().getName();
 				Object name = ifcProduct.eGet(ifcProduct.eClass().getEStructuralFeature("Name"));
 				Object objectType = ifcProduct.eGet(ifcProduct.eClass().getEStructuralFeature("ObjectType"));
 				if (objectType != null && name != null) {
 					String nameStr = name.toString();
 					String namespace = nameStr.split(":")[0];
-					outputTemplate.putIntoMap(ifcType, namespace, objectType.toString(), true);
+					Boolean selected = outputTemplate.isSelected(ifcType, namespace, objectType.toString());
+					outputTemplateVo.putIntoMap(ifcType, namespace, objectType.toString(), selected, ifcProduct.getOid());
+				}
+			}
+		}
+		return outputTemplateVo;
+	}
+
+	@Override
+	public OutputTemplateVo genModelDefaultOutputTemplate(Integer rid) {
+		IfcModelInterface model = queryModelByRid(rid, null);
+		PackageMetaData packageMetaData = model.getPackageMetaData();
+		EClass productClass = (EClass) packageMetaData.getEClassifierCaseInsensitive("IfcProduct");
+		List<IdEObject> projectList = model.getAllWithSubTypes(productClass);
+		OutputTemplateVo outputTemplateVo = new OutputTemplateVo();
+		for (IdEObject ifcProduct : projectList) {
+			GeometryInfo geometryInfo = (GeometryInfo) ifcProduct.eGet(ifcProduct.eClass().getEStructuralFeature("geometry"));
+			if (geometryInfo != null && geometryInfo.getTransformation() != null && !packageMetaData.getEClass("IfcSpace").isSuperTypeOf(ifcProduct.eClass())
+					&& !packageMetaData.getEClass("IfcFeatureElementSubtraction").isSuperTypeOf(ifcProduct.eClass())) {
+				String ifcType = ifcProduct.eClass().getName();
+				Object name = ifcProduct.eGet(ifcProduct.eClass().getEStructuralFeature("Name"));
+				Object objectType = ifcProduct.eGet(ifcProduct.eClass().getEStructuralFeature("ObjectType"));
+				if (objectType != null && name != null) {
+					String nameStr = name.toString();
+					String namespace = nameStr.split(":")[0];
+					outputTemplateVo.putIntoMap(ifcType, namespace, objectType.toString(), true, ifcProduct.getOid());
 				}
 			}
 		}
 		Long otid = IdentifyManager.getIdentifyManager().nextId(IdentifyManager.OTID_KEY);
-		outputTemplate.setOtid(otid);
-		outputTemplate.setName("DEFAULT");
+		outputTemplateVo.setOtid(otid);
+		outputTemplateVo.setName("DEFAULT");
 		
 //		//test TODO remove
-		insertOutputTemplate(outputTemplate);
+//		insertOutputTemplate(outputTemplateVo);
 		
-		return outputTemplate;
+		return outputTemplateVo;
 	}
 
 	@Override

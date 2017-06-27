@@ -16,6 +16,7 @@ import cn.dlb.bim.vo.GeometryInfoVo;
 import cn.dlb.bim.vo.GlbVo;
 import cn.dlb.bim.vo.ModelInfoVo;
 import cn.dlb.bim.vo.ModelLabelVo;
+import cn.dlb.bim.vo.OutputTemplateVo;
 
 public interface BimService {
 	public List<GeometryInfoVo> queryGeometryInfo(Integer rid, ProgressReporter progressReporter);
@@ -58,11 +59,11 @@ public interface BimService {
 	 * 
 	 * @param template
 	 */
-	public void insertOutputTemplate(OutputTemplate template);
+	public void insertOutputTemplate(OutputTemplateVo template);
 	public void deleteOutputTemplate(Long otid);
-	public void modifyOutputTemplate(OutputTemplate template);
-	public OutputTemplate queryOutputTemplateByOtid(Long otid);
-	public OutputTemplate genModelDefaultOutputTemplate(Integer rid);
+	public void modifyOutputTemplate(OutputTemplateVo template);
+	public OutputTemplateVo queryOutputTemplate(Integer rid, Long otid);
+	public OutputTemplateVo genModelDefaultOutputTemplate(Integer rid);
 	public void insertModelAndOutputTemplateMap(ModelAndOutputTemplateMap map);
 	public void deleteModelAndOutputTemplateMap(ModelAndOutputTemplateMap map);
 	public List<ModelAndOutputTemplateMap> queryModelAndOutputTemplateMapByRid(Integer rid);

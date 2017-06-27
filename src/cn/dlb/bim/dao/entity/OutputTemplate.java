@@ -43,7 +43,6 @@ public class OutputTemplate {
 			selector.putIntoMap(namespace, objectTypefiltered, selected);
 		} else {
 			NamespaceSelector selector = new NamespaceSelector();
-			selector.setIfcType(ifcType);
 			selector.putIntoMap(namespace, objectTypefiltered, selected);
 			namespaceSelectorMap.put(ifcType, selector);
 		}

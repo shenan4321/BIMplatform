@@ -7,20 +7,16 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import org.eclipse.emf.ecore.EClass;
+import java.util.Set;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.LittleEndianDataOutputStream;
 
-import cn.dlb.bim.dao.entity.ObjectTypeSelector;
-import cn.dlb.bim.dao.entity.NamespaceSelector;
-import cn.dlb.bim.dao.entity.OutputTemplate;
 import cn.dlb.bim.ifc.emf.IdEObject;
 import cn.dlb.bim.ifc.emf.IfcModelInterface;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
@@ -28,6 +24,7 @@ import cn.dlb.bim.ifc.serializers.SerializerException;
 import cn.dlb.bim.ifc.shared.ProgressReporter;
 import cn.dlb.bim.models.geometry.GeometryData;
 import cn.dlb.bim.models.geometry.GeometryInfo;
+import cn.dlb.bim.vo.OutputTemplateVo;
 
 public class BinaryGeometryOutputTemplateSerializer implements MessagingSerializer {
 	private static final byte FORMAT_VERSION = 6;
@@ -61,11 +58,10 @@ public class BinaryGeometryOutputTemplateSerializer implements MessagingSerializ
 	private Mode mode = Mode.START;
 	private Map<Long, Object> concreteGeometrySent;
 	private Iterator<IdEObject> iterator;
-	private PackageMetaData packageMetaData;
-	private OutputTemplate outputTemplate;
+	private OutputTemplateVo outputTemplate;
 	private long splitCounter = 1;
 	
-	public BinaryGeometryOutputTemplateSerializer(IfcModelInterface model, OutputTemplate outputTemplate, PackageMetaData packageMetaData) throws SerializerException {
+	public BinaryGeometryOutputTemplateSerializer(IfcModelInterface model, OutputTemplateVo outputTemplate, PackageMetaData packageMetaData) throws SerializerException {
 		init(model , packageMetaData);
 		this.outputTemplate = outputTemplate;
 	}
@@ -73,7 +69,6 @@ public class BinaryGeometryOutputTemplateSerializer implements MessagingSerializ
 	@Override
 	public void init(IfcModelInterface model, PackageMetaData packageMetaData) throws SerializerException {
 		this.model = model;
-		this.packageMetaData = packageMetaData;
 	}
 
 	@Override
@@ -112,30 +107,17 @@ public class BinaryGeometryOutputTemplateSerializer implements MessagingSerializ
 		Bounds modelBounds = new Bounds();
 		int nrObjects = 0;
 		
-		// All access to EClass is being done generically to support multiple IFC schema's with 1 serializer
-		EClass productClass = model.getPackageMetaData().getEClass("IfcProduct");
+		Set<IdEObject> output = new HashSet<>();
 		
-		Map<Long, IdEObject> output = new HashMap<>();
-		List<IdEObject> products = model.getAllWithSubTypes(productClass);
-		for (IdEObject product : products) {
-			GeometryInfo geometryInfo = (GeometryInfo) product.eGet(product.eClass().getEStructuralFeature("geometry"));
-			if (geometryInfo != null && geometryInfo.getTransformation() != null && !packageMetaData.getEClass("IfcSpace").isSuperTypeOf(product.eClass()) 
-					&& !packageMetaData.getEClass("IfcFeatureElementSubtraction").isSuperTypeOf(product.eClass())) {
-				String ifcType = product.eClass().getName();
-				Object name = product.eGet(product.eClass().getEStructuralFeature("Name"));
-				Object objectType = product.eGet(product.eClass().getEStructuralFeature("ObjectType"));
-				if (objectType != null && name != null) {
-					String nameStr = name.toString();
-					String namespace = nameStr.split(":")[0];
-					if (outputTemplate.isSelected(ifcType, namespace, objectType.toString())) {
-						output.put(product.getOid(), product);
-					}
-				}
-			}
+		Set<Long> oids = outputTemplate.getAllSelectedOids();
+		
+		for (Long oid : oids) {
+			IdEObject idEObject = model.get(oid);
+			output.add(idEObject);
 		}
 		
 		// First iteration, to determine number of objects with geometry and calculate model bounds
-		for (IdEObject ifcProduct : output.values()) {
+		for (IdEObject ifcProduct : output) {
 			GeometryInfo geometryInfo = (GeometryInfo) ifcProduct.eGet(ifcProduct.eClass().getEStructuralFeature("geometry"));
 			Bounds objectBounds = new Bounds(
 					new Double3(
@@ -159,7 +141,7 @@ public class BinaryGeometryOutputTemplateSerializer implements MessagingSerializ
 		dataOutputStream.writeInt(nrObjects);
 		
 		concreteGeometrySent = new HashMap<Long, Object>();
-		iterator = output.values().iterator();
+		iterator = output.iterator();
 		
 		return nrObjects > 0;
 	}
@@ -192,9 +174,6 @@ public class BinaryGeometryOutputTemplateSerializer implements MessagingSerializ
 			
 			dataOutputStream.writeByte(messageType.getId());
 			dataOutputStream.writeUTF(ifcProduct.eClass().getName());
-			
-//			int rid = model.getModelMetaData().getRevisionId();
-//			dataOutputStream.writeInt(rid);
 			dataOutputStream.writeLong(ifcProduct.getOid());
 			
 			// BEWARE, ByteOrder is always LITTLE_ENDIAN, because that's what GPU's seem to prefer, Java's ByteBuffer default is BIG_ENDIAN though!
@@ -228,9 +207,6 @@ public class BinaryGeometryOutputTemplateSerializer implements MessagingSerializ
 					if(skipIndices != 0 && skipIndices != 8) {
 						dataOutputStream.write(new byte[skipIndices]);
 					}
-	
-//					Bounds objectBounds = new Bounds(geometryInfo.getMinBounds(), geometryInfo.getMaxBounds());
-//					objectBounds.writeTo(dataOutputStream);
 	
 					ByteBuffer indicesBuffer = ByteBuffer.wrap(geometryData.getIndices());
 					indicesBuffer.order(ByteOrder.LITTLE_ENDIAN);
@@ -302,8 +278,6 @@ public class BinaryGeometryOutputTemplateSerializer implements MessagingSerializ
 					}
 					concreteGeometrySent.put(geometryData.getOid(), arrayList);
 				} else {
-//					Bounds objectBounds = new Bounds(geometryInfo.getMinBounds(), geometryInfo.getMaxBounds());
-//					objectBounds.writeTo(dataOutputStream);
 					
 					dataOutputStream.writeLong(geometryData.getOid());
 					

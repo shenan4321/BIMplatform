@@ -1,6 +1,5 @@
 package cn.dlb.bim.controller;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -23,6 +22,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import cn.dlb.bim.component.RecordSearchManager;
+import cn.dlb.bim.dao.entity.OutputTemplate;
 import cn.dlb.bim.ifc.collada.KmzSerializer;
 import cn.dlb.bim.ifc.emf.IdEObject;
 import cn.dlb.bim.ifc.emf.IfcModelInterface;
@@ -41,6 +41,7 @@ import cn.dlb.bim.service.ProjectService;
 import cn.dlb.bim.vo.GlbVo;
 import cn.dlb.bim.vo.ModelInfoVo;
 import cn.dlb.bim.vo.ModelLabelVo;
+import cn.dlb.bim.vo.OutputTemplateVo;
 import cn.dlb.bim.web.ResultUtil;
 
 @Controller
@@ -343,6 +344,16 @@ public class ModelController {
 		List<ModelLabelVo> data = bimService.queryAllModelLabelByRid(rid);
 		result.setSuccess(true);
 		result.setData(data);
+		return result.getResult();
+	}
+	
+	@RequestMapping(value = "queryOutputTemplate", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> queryOutputTemplate(Integer rid, Long otid) {
+		ResultUtil result = new ResultUtil();
+		OutputTemplateVo outputTemplateVo = bimService.queryOutputTemplate(rid, otid);
+		result.setSuccess(true);
+		result.setData(outputTemplateVo);
 		return result.getResult();
 	}
 	

@@ -17,6 +17,7 @@ import cn.dlb.bim.ifc.serializers.SerializerException;
 import cn.dlb.bim.ifc.serializers.binarygeometry.BinaryGeometryOutputTemplateSerializer;
 import cn.dlb.bim.ifc.shared.ProgressReporter;
 import cn.dlb.bim.service.BimService;
+import cn.dlb.bim.vo.OutputTemplateVo;
 import cn.dlb.bim.vo.ProgressVo;
 
 public class BinaryGeometryOutputTemplateAction extends LongAction {
@@ -66,7 +67,7 @@ public class BinaryGeometryOutputTemplateAction extends LongAction {
 		};
 		
 		IfcModelInterface model = bimService.queryModelByRid(rid, progressReporter);
-		OutputTemplate outputTemplate = bimService.queryOutputTemplateByOtid(otid);
+		OutputTemplateVo outputTemplate = bimService.queryOutputTemplate(rid, otid);
 		try {
 			BinaryGeometryOutputTemplateSerializer serializer = new BinaryGeometryOutputTemplateSerializer(model, outputTemplate, model.getPackageMetaData());
 			ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();

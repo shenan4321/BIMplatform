@@ -19,8 +19,8 @@ import org.springframework.stereotype.Service;
 import com.mongodb.DBObject;
 import com.mongodb.gridfs.GridFSDBFile;
 
+import cn.dlb.bim.PlatformContext;
 import cn.dlb.bim.component.MongoGridFs;
-import cn.dlb.bim.component.PlatformInitDatas;
 import cn.dlb.bim.component.PlatformServer;
 import cn.dlb.bim.dao.IfcModelDao;
 import cn.dlb.bim.dao.OutputTemplateDao;
@@ -30,12 +30,13 @@ import cn.dlb.bim.dao.entity.ModelLabel;
 import cn.dlb.bim.dao.entity.OutputTemplate;
 import cn.dlb.bim.ifc.GeometryGenerator;
 import cn.dlb.bim.ifc.collada.GlbSerializer;
-import cn.dlb.bim.ifc.database.IfcModelDbException;
+import cn.dlb.bim.ifc.database.DatabaseException;
 import cn.dlb.bim.ifc.database.IfcModelDbSession;
 import cn.dlb.bim.ifc.database.OldQuery;
 import cn.dlb.bim.ifc.deserializers.DeserializeException;
 import cn.dlb.bim.ifc.deserializers.IfcStepDeserializer;
 import cn.dlb.bim.ifc.deserializers.StepParser;
+import cn.dlb.bim.ifc.deserializers.stream.IfcStepStreamingDeserializer;
 import cn.dlb.bim.ifc.emf.IdEObject;
 import cn.dlb.bim.ifc.emf.IfcModelInterface;
 import cn.dlb.bim.ifc.emf.IfcModelInterfaceException;
@@ -62,6 +63,7 @@ import cn.dlb.bim.ifc.tree.PropertyGenerator;
 import cn.dlb.bim.ifc.tree.PropertySet;
 import cn.dlb.bim.models.geometry.GeometryInfo;
 import cn.dlb.bim.service.BimService;
+import cn.dlb.bim.service.PlatformService;
 import cn.dlb.bim.utils.BinUtils;
 import cn.dlb.bim.utils.IdentifyManager;
 import cn.dlb.bim.vo.GeometryInfoVo;
@@ -87,6 +89,10 @@ public class BimServiceImpl implements BimService {
 	@Autowired
 	@Qualifier("OutputTemplateDaoImpl")
 	private OutputTemplateDao outputTemplateDao;
+	
+	@Autowired
+	@Qualifier("PlatformServiceImpl")
+	private PlatformService platformService;
 
 	@Override
 	public List<GeometryInfoVo> queryGeometryInfo(Integer rid, ProgressReporter progressReporter) {
@@ -154,16 +160,15 @@ public class BimServiceImpl implements BimService {
 			GeometryGenerator generator = new GeometryGenerator(model, serializer, renderEnginePool);
 			generator.generateForAllElements();
 
-			PlatformInitDatas platformInitDatas = server.getPlatformInitDatas();
 			IfcModelDbSession session = new IfcModelDbSession(server.getIfcModelDao(), server.getMetaDataManager(),
-					platformInitDatas, null, server.getModelCacheManager());
+					platformService, null, server.getModelCacheManager());
 			session.saveIfcModel(model, modelInfo);
 			rid = model.getModelMetaData().getRevisionId();
 		} catch (DeserializeException e) {
 			e.printStackTrace();
 		} catch (RenderEngineException e) {
 			e.printStackTrace();
-		} catch (IfcModelDbException e) {
+		} catch (DatabaseException e) {
 			e.printStackTrace();
 		}
 
@@ -311,14 +316,13 @@ public class BimServiceImpl implements BimService {
 		} else {
 			packageMetaData = server.getMetaDataManager().getPackageMetaData(Schema.IFC4.getEPackageName());
 		}
-		PlatformInitDatas platformInitDatas = server.getPlatformInitDatas();
 		IfcModelDbSession session = new IfcModelDbSession(server.getIfcModelDao(), server.getMetaDataManager(),
-				platformInitDatas, progressReporter, server.getModelCacheManager());
+				platformService, progressReporter, server.getModelCacheManager());
 		IfcModelInterface model = null;
 
 		try {
 			model = session.get(packageMetaData, rid, new OldQuery(packageMetaData, true));
-		} catch (IfcModelDbException e) {
+		} catch (DatabaseException e) {
 			e.printStackTrace();
 		} catch (IfcModelInterfaceException e) {
 			e.printStackTrace();
@@ -651,7 +655,19 @@ public class BimServiceImpl implements BimService {
 	
 	@Override
 	public void test() {
-		genModelDefaultOutputTemplate(3);
+		
+		IfcStepStreamingDeserializer deserializer = new IfcStepStreamingDeserializer() {
+		};
+		PackageMetaData packageMetaData = server.getMetaDataManager().getPackageMetaData(Schema.IFC2X3TC1.getEPackageName());
+		deserializer.init(packageMetaData, platformService);
+		try {
+			deserializer.read(new File(PlatformContext.getResourceBase()+"/upload/ifc/女生宿舍_设备-1497321043523.ifc"));
+		} catch (DeserializeException e) {
+			e.printStackTrace();
+		}
+		
+		
+//		genModelDefaultOutputTemplate(3);
 //		OutputTemplate outputTemplate = outputTemplateDao.queryOutputTemplateByOtid(78153895524000l);
 //		outputTemplate.getIfcTypeSelectorMap().get("IfcOpeningElement").getObjectTypeMap().put("Opening", false);
 //		outputTemplateDao.modifyOutputTemplate(outputTemplate);

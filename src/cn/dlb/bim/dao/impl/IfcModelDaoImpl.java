@@ -14,6 +14,7 @@ import cn.dlb.bim.dao.entity.IdEObjectEntity;
 import cn.dlb.bim.dao.entity.IfcModelEntity;
 import cn.dlb.bim.dao.entity.ModelLabel;
 import cn.dlb.bim.dao.entity.Project;
+import cn.dlb.bim.ifc.deserializers.stream.VirtualObject;
 
 @Repository("IfcModelDaoImpl")
 public class IfcModelDaoImpl implements IfcModelDao {
@@ -121,6 +122,11 @@ public class IfcModelDaoImpl implements IfcModelDao {
 		Query query = new Query();
 		query.addCriteria(Criteria.where("rid").is(rid));
 		return mongoTemplate.find(query, ModelLabel.class);
+	}
+
+	@Override
+	public void insertVirtualObject(VirtualObject virtualObject) {
+		mongoTemplate.save(virtualObject);
 	}
 
 }

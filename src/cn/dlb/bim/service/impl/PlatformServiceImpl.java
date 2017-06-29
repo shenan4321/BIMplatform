@@ -1,11 +1,9 @@
-package cn.dlb.bim.component;
+package cn.dlb.bim.service.impl;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.eclipse.emf.ecore.EClass;
@@ -19,21 +17,24 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import cn.dlb.bim.PlatformContext;
+import cn.dlb.bim.component.PlatformServer;
+import cn.dlb.bim.dao.IfcModelDao;
 import cn.dlb.bim.dao.PlatformInitDatasDao;
 import cn.dlb.bim.dao.entity.IfcClassLookupEntity;
 import cn.dlb.bim.dao.entity.PlatformInitDatasEntity;
-import cn.dlb.bim.ifc.database.IfcModelDbException;
-import cn.dlb.bim.ifc.database.binary.IfcDataBase;
+import cn.dlb.bim.ifc.database.DatabaseException;
+import cn.dlb.bim.ifc.deserializers.stream.VirtualObject;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
+import cn.dlb.bim.service.PlatformService;
 
 /**
  * @author shenan4321
  *
  */
-@Component("PlatformInitDatas")
-public class PlatformInitDatas implements InitializingBean, IfcDataBase {
+@Component("PlatformServiceImpl")
+public class PlatformServiceImpl implements InitializingBean, PlatformService {
 	
-	private static final Logger LOGGER = LoggerFactory.getLogger(PlatformInitDatas.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(PlatformServiceImpl.class);
 	
 	private final EClass[] cidToEclass;
 	private final Map<EClass, Short> eClassToCid;
@@ -48,12 +49,16 @@ public class PlatformInitDatas implements InitializingBean, IfcDataBase {
 	@Qualifier("PlatformServer")
 	private PlatformServer server;
 	
+	@Autowired
+	@Qualifier("IfcModelDaoImpl")
+	private IfcModelDao ifcModelDao;
+	
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		initialize();
 	}
 	
-	public PlatformInitDatas() {
+	public PlatformServiceImpl() {
 		this.cidToEclass = new EClass[Short.MAX_VALUE]; 
 		this.eClassToCid = new HashMap<>();
 		this.oidCounters = new HashMap<>();
@@ -122,11 +127,11 @@ public class PlatformInitDatas implements InitializingBean, IfcDataBase {
 		return cidToEclass[cid];
 	}
 	
-	public EClass getEClassForOid(long oid) throws IfcModelDbException {
+	public EClass getEClassForOid(long oid) throws DatabaseException {
 		short cid = (short)oid;
 		EClass eClass = getEClassForCid(cid);
 		if (eClass == null) {
-			throw new IfcModelDbException("No class for cid " + cid + " (cid came from oid: " + oid  + ")");
+			throw new DatabaseException("No class for cid " + cid + " (cid came from oid: " + oid  + ")");
 		}
 		return eClass;
 	}
@@ -170,7 +175,7 @@ public class PlatformInitDatas implements InitializingBean, IfcDataBase {
 		return platformInitDatasEntity.getRevisionId();
 	}
 
-	public void updateDataBase() {
+	public void syncOid() {
 		for (EClass eClass : oidChanged.keySet()) {
 			IfcClassLookupEntity ifcClassLookup = new IfcClassLookupEntity();
 			Short cid = eClassToCid.get(eClass);
@@ -180,5 +185,15 @@ public class PlatformInitDatas implements InitializingBean, IfcDataBase {
 			platformInitDatasDao.updateOidInIfcClassLookup(ifcClassLookup);
 		}
 		oidChanged.clear();
+	}
+
+	@Override
+	public void save(VirtualObject virtualObject) throws DatabaseException {
+		ifcModelDao.insertVirtualObject(virtualObject);
+	}
+
+	@Override
+	public void saveOverwrite(VirtualObject virtualObject) throws DatabaseException {
+		ifcModelDao.insertVirtualObject(virtualObject);
 	}
 }

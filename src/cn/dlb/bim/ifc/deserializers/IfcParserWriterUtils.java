@@ -335,4 +335,62 @@ public class IfcParserWriterUtils {
 			printWriter.write((val == null ? "$" : val.toString()));
 		}
 	}
+	
+	public static Object streamConvertSimpleValue(PackageMetaData packageMetaData, Class<?> instanceClass, String value, int lineNumber) throws DeserializeException {
+		if (!value.equals("")) {
+			if (instanceClass == Integer.class || instanceClass == int.class) {
+				try {
+					return Integer.parseInt(value);
+				} catch (NumberFormatException e) {
+					try {
+			            new BigInteger(value);
+			        } catch (Exception e1) {
+			            throw e; // re-throw, this was a formatting problem
+			        }
+					throw new NumberFormatException("Input is outside of Integer range (" + value + ")");
+				}
+			} else if (instanceClass == Long.class || instanceClass == long.class) {
+				return Long.parseLong(value);
+			} else if (instanceClass == Boolean.class || instanceClass == boolean.class) {
+				return Boolean.parseBoolean(value);
+			} else if (instanceClass.getSimpleName().equals("Tristate")) {
+				if (value.toString().equals("TRUE")) {
+					return true;
+				} else if (value.toString().equals("FALSE")) {
+					return false;
+				} else if (value.toString().equals("UNDEFINED")) {
+					return null;
+				}
+				throw new DeserializeException("Unknown value: " + value);
+			} else if (instanceClass == Double.class || instanceClass == double.class) {
+				try {
+					return Double.parseDouble(value);
+				} catch (NumberFormatException e) {
+					throw new DeserializeException(lineNumber, "Incorrect double floating point value: " + value, e);
+				}
+			} else if (instanceClass == String.class) {
+				if (value.startsWith("'") && value.endsWith("'")) {
+					return readString(value, lineNumber);
+				} else {
+					return value;
+				}
+			} else if (instanceClass == byte[].class) {
+				if (value.startsWith("\"") && value.endsWith("\"")) {
+					try {
+						// TODO Skipping the first one here to make even...
+						String substring = value.substring(2, value.length() - 1);
+						byte[] decoded = Hex.decodeHex(substring.toCharArray());
+						return decoded;
+					} catch (DecoderException e) {
+						throw new DeserializeException(e);
+					}
+				} else {
+					throw new DeserializeException("Byte[] not starting/ending with \"");
+				}
+			} else {
+				throw new DeserializeException("Unimplemented " + instanceClass);
+			}
+		}
+		return null;
+	}
 }

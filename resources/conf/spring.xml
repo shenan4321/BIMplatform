@@ -36,17 +36,33 @@
 	<!-- mongo模板操作对象 -->
 	<bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
 		<constructor-arg name="mongoDbFactory" ref="mongoDbFactory" />
+		<constructor-arg name="mongoConverter" ref="mappingMongoConverter" />
 		<property name="writeResultChecking" value="EXCEPTION" />
 	</bean>
+	
+	<!-- 配置mongodb映射类型 -->  
+    <bean id="mappingMongoConverter" class="org.springframework.data.mongodb.core.convert.MappingMongoConverter">  
+        <constructor-arg name="mongoDbFactory" ref="mongoDbFactory" />  
+        <constructor-arg name="mappingContext" ref="mappingContext" />  
+        <property name="typeMapper" ref="defaultMongoTypeMapper" />  
+    </bean>  
+	
+	<!-- 默认Mongodb类型映射 -->  
+    <bean id="defaultMongoTypeMapper" class="org.springframework.data.mongodb.core.convert.DefaultMongoTypeMapper">  
+        <constructor-arg name="typeKey">  
+            <null /><!-- 这里设置为空,可以把 spring data mongodb 多余保存的_class字段去掉 -->  
+        </constructor-arg>  
+    </bean>  
 
 	<bean id="gridFsTemplate" class="org.springframework.data.mongodb.gridfs.GridFsTemplate">
 		<constructor-arg ref="mongoDbFactory" />
-		<constructor-arg ref="mongoConverter" />
+		<constructor-arg ref="mappingMongoConverter" />
 	</bean>
+	
+	<bean id="mappingContext" class="org.springframework.data.mongodb.core.mapping.MongoMappingContext" /> 
 
 	<!-- 映射转换器，扫描back-package目录下的文件，根据注释，把它们作为mongodb的一个collection的映射 -->
-	<mongo:mapping-converter id="mongoConverter"
-		base-package="cn.dlb.bim.dao.entity" />
+	<mongo:mapping-converter base-package="cn.dlb.bim.dao.entity" />
 
 	<!-- mongodb bean的仓库目录，会自动扫描扩展了MongoRepository接口的接口进行注入 -->
 	<mongo:repositories base-package="cn.dlb.bim.dao.impl" />

@@ -15,6 +15,7 @@ import cn.dlb.bim.ifc.engine.jvm.JvmRenderEngineFactory;
 import cn.dlb.bim.ifc.engine.pool.CommonsPoolingRenderEnginePoolFactory;
 import cn.dlb.bim.ifc.engine.pool.RenderEnginePoolFactory;
 import cn.dlb.bim.ifc.engine.pool.RenderEnginePools;
+import cn.dlb.bim.service.impl.PlatformServiceImpl;
 
 /**
  * @author shenan4321
@@ -33,8 +34,6 @@ public class PlatformServer {
 	
 	@Autowired
 	private MongoGridFs mongoGridFs;
-	@Autowired
-	private PlatformInitDatas platformInitDatas;
 	@Autowired
 	private LongActionManager longActionManager;
 	@Autowired
@@ -67,10 +66,6 @@ public class PlatformServer {
 
 	public MongoGridFs getMongoGridFs() {
 		return mongoGridFs;
-	}
-
-	public PlatformInitDatas getPlatformInitDatas() {
-		return platformInitDatas;
 	}
 
 	public LongActionManager getLongActionManager() {

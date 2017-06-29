@@ -5,6 +5,7 @@ import java.util.List;
 import cn.dlb.bim.dao.entity.IdEObjectEntity;
 import cn.dlb.bim.dao.entity.IfcModelEntity;
 import cn.dlb.bim.dao.entity.ModelLabel;
+import cn.dlb.bim.ifc.deserializers.stream.VirtualObject;
 
 public interface IfcModelDao {
 	public void insertAllIdEObjectEntity(List<IdEObjectEntity> idEObjectEntitys);
@@ -24,4 +25,6 @@ public interface IfcModelDao {
 	public void deleteModelLabel(Integer labelId);
 	public void modifyModelLabel(ModelLabel modelLabel);
 	public List<ModelLabel> queryAllModelLabelByRid(Integer rid);
+	
+	public void insertVirtualObject(VirtualObject virtualObject);
 }

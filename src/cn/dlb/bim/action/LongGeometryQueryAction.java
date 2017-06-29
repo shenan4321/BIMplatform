@@ -6,7 +6,7 @@ import java.util.List;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import com.google.gson.Gson;
-import cn.dlb.bim.ifc.database.IfcModelDbException;
+import cn.dlb.bim.ifc.database.DatabaseException;
 import cn.dlb.bim.ifc.emf.IfcModelInterfaceException;
 import cn.dlb.bim.ifc.shared.ProgressReporter;
 import cn.dlb.bim.service.BimService;
@@ -31,7 +31,7 @@ public class LongGeometryQueryAction extends LongAction {
 	}
 
 	@Override
-	public void execute() throws IfcModelDbException, IfcModelInterfaceException {
+	public void execute() throws DatabaseException, IfcModelInterfaceException {
 
 		@SuppressWarnings("all")
 		ProgressReporter progressReporter = new ProgressReporter() {

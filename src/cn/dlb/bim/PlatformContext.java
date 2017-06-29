@@ -49,7 +49,7 @@ public class PlatformContext {
 		return classRootPath;
 	}
 
-	public static Path getUserpPath() {
+	public static Path getUserPath() {
 		return userPath;
 	}
 

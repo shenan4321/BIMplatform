@@ -6,8 +6,8 @@ import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import cn.dlb.bim.component.PlatformInitDatas;
 import cn.dlb.bim.models.ifc2x3tc1.Ifc2x3tc1Package;
+import cn.dlb.bim.service.impl.PlatformServiceImpl;
 
 //@Transactional  
 //@TransactionConfiguration(transactionManager = "txManager", defaultRollback = true)  
@@ -16,14 +16,14 @@ import cn.dlb.bim.models.ifc2x3tc1.Ifc2x3tc1Package;
 public class TestPlatformInitDatas {
 	
 //	@Resource(name="PlatformInitDatas")  
-	private PlatformInitDatas platformInitDatas;
+	private PlatformServiceImpl platformInitDatas;
 	 
 	@Before
 	public void before(){                                                                   
 		ApplicationContext context = new ClassPathXmlApplicationContext(new String[]{"classpath:conf/spring.xml"
 	    		,//"classpath:conf/spring-mvc.xml"
 	    		});
-		platformInitDatas = (PlatformInitDatas) context.getBean("PlatformInitDatas");
+		platformInitDatas = (PlatformServiceImpl) context.getBean("PlatformInitDatas");
 	}
 	 
 	@Test

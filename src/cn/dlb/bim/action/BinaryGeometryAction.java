@@ -6,7 +6,7 @@ import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import com.google.gson.Gson;
-import cn.dlb.bim.ifc.database.IfcModelDbException;
+import cn.dlb.bim.ifc.database.DatabaseException;
 import cn.dlb.bim.ifc.emf.IfcModelInterface;
 import cn.dlb.bim.ifc.emf.IfcModelInterfaceException;
 import cn.dlb.bim.ifc.serializers.SerializerException;
@@ -28,7 +28,7 @@ public class BinaryGeometryAction extends LongAction {
 	}
 
 	@Override
-	public void execute() throws IfcModelDbException, IfcModelInterfaceException {
+	public void execute() throws DatabaseException, IfcModelInterfaceException {
 
 		@SuppressWarnings("all")
 		ProgressReporter progressReporter = new ProgressReporter() {

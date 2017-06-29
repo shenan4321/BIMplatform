@@ -17,7 +17,6 @@ import cn.dlb.bim.cache.ModelCacheManager;
 import cn.dlb.bim.dao.IfcModelDao;
 import cn.dlb.bim.dao.entity.IdEObjectEntity;
 import cn.dlb.bim.dao.entity.IfcModelEntity;
-import cn.dlb.bim.ifc.database.binary.IfcDataBase;
 import cn.dlb.bim.ifc.database.binary.IfcModelBinary;
 import cn.dlb.bim.ifc.database.binary.TodoList;
 import cn.dlb.bim.ifc.emf.IdEObject;
@@ -32,6 +31,7 @@ import cn.dlb.bim.ifc.model.BasicIfcModel;
 import cn.dlb.bim.ifc.shared.ProgressReporter;
 import cn.dlb.bim.models.geometry.GeometryData;
 import cn.dlb.bim.models.geometry.GeometryInfo;
+import cn.dlb.bim.service.PlatformService;
 import cn.dlb.bim.vo.ModelInfoVo;
 
 public class IfcModelDbSession extends IfcModelBinary {
@@ -43,7 +43,7 @@ public class IfcModelDbSession extends IfcModelBinary {
 	private ProgressReporter progressReporter;
 	private ModelCacheManager modelCacheManager;
 
-	public IfcModelDbSession(IfcModelDao ifcModelDao, MetaDataManager metaDataManager, IfcDataBase ifcDataBase,
+	public IfcModelDbSession(IfcModelDao ifcModelDao, MetaDataManager metaDataManager, PlatformService ifcDataBase,
 			ProgressReporter progressReporter, ModelCacheManager modelCacheManager) {
 		super(ifcDataBase);
 		this.ifcModelDao = ifcModelDao;
@@ -52,7 +52,7 @@ public class IfcModelDbSession extends IfcModelBinary {
 		this.modelCacheManager = modelCacheManager;
 	}
 
-	public void saveIfcModel(IfcModelInterface model, ModelInfoVo modelInfo) throws IfcModelDbException {
+	public void saveIfcModel(IfcModelInterface model, ModelInfoVo modelInfo) throws DatabaseException {
 		IfcModelEntity ifcModelEntity = new IfcModelEntity();
 		final Integer revisionId = ifcDataBase.newRevisionId();
 		model.getModelMetaData().setRevisionId(revisionId);
@@ -99,13 +99,13 @@ public class IfcModelDbSession extends IfcModelBinary {
 
 		ifcModelDao.insertIfcModelEntity(ifcModelEntity);
 		ifcModelDao.insertAllIdEObjectEntity(idEObjectEntityList);
-		ifcDataBase.updateDataBase();
+		ifcDataBase.syncOid();
 		
 		modelCacheManager.cacheModel(revisionId, model);
 	}
 	
 	public IfcModelInterface get(PackageMetaData packageMetaData, int rid, QueryInterface query)
-			throws IfcModelDbException, IfcModelInterfaceException {
+			throws DatabaseException, IfcModelInterfaceException {
 		if (modelCacheManager.contains(rid)) {
 			return modelCacheManager.getIfcModel(rid);
 		}
@@ -138,7 +138,7 @@ public class IfcModelDbSession extends IfcModelBinary {
 
 	@SuppressWarnings("unchecked")
 	public <T extends IdEObject> T get(IdEObjectEntity objectEntity, IfcModelInterface model, QueryInterface query,
-			TodoList todoList) throws IfcModelDbException {
+			TodoList todoList) throws DatabaseException {
 		IdEObjectImpl cachedObject = (IdEObjectImpl) objectCache.get(objectEntity.getOid());
 		if (cachedObject != null) {
 			if (cachedObject.getLoadingState() == State.LOADED && cachedObject.getRid() != Integer.MAX_VALUE) {

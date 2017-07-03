@@ -72,7 +72,7 @@ public class WaitingListVirtualObject<T> {
 		AtomicInteger openConnectionCounter = getOpenConnectionCounter(virtualObject.getOid());
 		int decrementAndGet = openConnectionCounter.decrementAndGet();
 		if (decrementAndGet == 0) {
-			platformService.save(virtualObject);
+			platformService.saveBatch(virtualObject);
 		} else if (decrementAndGet < 0) {
 			throw new DatabaseException("Inconsistent state");
 		}

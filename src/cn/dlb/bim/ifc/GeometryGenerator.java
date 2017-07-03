@@ -49,9 +49,6 @@ public class GeometryGenerator {
 	private IRenderEngineModel renderEngineModel;
 	private final Map<Integer, GeometryData> hashes = new ConcurrentHashMap<Integer, GeometryData>();
 	private RenderEnginePool renderEnginePool;
-	
-	private final RenderEngineFilter renderEngineFilter = new RenderEngineFilter();
-	private final RenderEngineFilter renderEngineFilterTransformed = new RenderEngineFilter(true);
 
 	public GeometryGenerator(IfcModelInterface model, Serializer serializer, RenderEnginePool renderEnginePool) {
 		this.model = model;

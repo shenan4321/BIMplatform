@@ -239,14 +239,8 @@ public class IfcParserWriterUtils {
 	}
 
 	public static void writePrimitive(Object val, PrintWriter printWriter) throws SerializerException, IOException {
-		if (val.getClass().getSimpleName().equals("Tristate")) {
-			if (val.toString().equals("TRUE")) {
-				printWriter.write(".T.");
-			} else if (val.toString().equals("FALSE")) {
-				printWriter.write(".F.");
-			} else if (val.toString().equals("UNDEFINED")) {
-				printWriter.write(".U.");
-			}
+		if (val == null) {
+			printWriter.write(".U.");
 		} else if (val instanceof Double) {
 			if (((Double)val).isInfinite() || (((Double)val).isNaN())) {
 				LOGGER.info("Serializing infinite or NaN double as 0.0");

@@ -1,6 +1,7 @@
 package cn.dlb.bim.service.impl;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.util.CloseableIterator;
 import org.springframework.stereotype.Component;
 
 import cn.dlb.bim.PlatformContext;
@@ -22,9 +24,11 @@ import cn.dlb.bim.dao.IfcModelDao;
 import cn.dlb.bim.dao.PlatformInitDatasDao;
 import cn.dlb.bim.dao.entity.IfcClassLookupEntity;
 import cn.dlb.bim.dao.entity.PlatformInitDatasEntity;
+import cn.dlb.bim.ifc.database.BatchThreadLocal;
 import cn.dlb.bim.ifc.database.DatabaseException;
 import cn.dlb.bim.ifc.deserializers.stream.VirtualObject;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
+import cn.dlb.bim.ifc.model.IfcHeader;
 import cn.dlb.bim.service.PlatformService;
 
 /**
@@ -36,10 +40,14 @@ public class PlatformServiceImpl implements InitializingBean, PlatformService {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(PlatformServiceImpl.class);
 	
+	private static final int AUTO_COMMIT_SIZE = 1000;
+	
 	private final EClass[] cidToEclass;
 	private final Map<EClass, Short> eClassToCid;
 	private final Map<EClass, AtomicLong> oidCounters;
 	private final Map<EClass, Boolean> oidChanged;
+	
+	private final BatchThreadLocal<ArrayList<VirtualObject>> localBatch;
 	
 	@Autowired
 	@Qualifier("PlatformInitDatasDaoImpl")
@@ -58,11 +66,12 @@ public class PlatformServiceImpl implements InitializingBean, PlatformService {
 		initialize();
 	}
 	
-	public PlatformServiceImpl() {
+	public PlatformServiceImpl() throws NoSuchMethodException, SecurityException {
 		this.cidToEclass = new EClass[Short.MAX_VALUE]; 
 		this.eClassToCid = new HashMap<>();
 		this.oidCounters = new HashMap<>();
 		this.oidChanged = new HashMap<>();
+		this.localBatch = new BatchThreadLocal<>(ArrayList.class);
 	}
 	
 	private Long getInitCounter(EClass eClass) {
@@ -195,5 +204,47 @@ public class PlatformServiceImpl implements InitializingBean, PlatformService {
 	@Override
 	public void saveOverwrite(VirtualObject virtualObject) throws DatabaseException {
 		ifcModelDao.insertVirtualObject(virtualObject);
+	}
+	
+	@Override
+	public void saveBatch(VirtualObject virtualObject) {
+		ArrayList<VirtualObject> localBatchList = localBatch.newGet();
+		localBatchList.add(virtualObject);
+		if (localBatchList.size() >= AUTO_COMMIT_SIZE) {
+			autoCommitSaveBatch();
+		}
+	}
+	
+	private void autoCommitSaveBatch() {
+		ArrayList<VirtualObject> localBatchList = localBatch.newGet();
+		ifcModelDao.insertAllVirtualObject(localBatchList);
+		localBatch.get().clear();
+	}
+	
+	@Override
+	public void commitSaveBatch() {
+		ArrayList<VirtualObject> localBatchList = localBatch.newGet();
+		ifcModelDao.insertAllVirtualObject(localBatchList);
+		localBatch.get().clear();
+	}
+
+	@Override
+	public List<VirtualObject> queryVirtualObject(Integer rid, List<Short> cids) {
+		return ifcModelDao.queryVirtualObject(rid, cids);
+	}
+	
+	@Override
+	public CloseableIterator<VirtualObject> streamVirtualObjectByRid(Integer rid) {
+		return ifcModelDao.streamVirtualObjectByRid(rid);
+	}
+
+	@Override
+	public void saveIfcHeader(IfcHeader ifcHeader) {
+		ifcModelDao.saveIfcHeader(ifcHeader);
+	}
+
+	@Override
+	public IfcHeader queryIfcHeader(Integer rid) {
+		return ifcModelDao.queryIfcHeader(rid);
 	}
 }

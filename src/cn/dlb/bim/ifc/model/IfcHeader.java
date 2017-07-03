@@ -1,17 +1,15 @@
 package cn.dlb.bim.ifc.model;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-public class IfcHeader implements Serializable {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 2048900581931937675L;
-	
+@Document(collection = "IfcHeader")
+public class IfcHeader {
+	@Indexed
+	private Integer rid;
 	private List<String> description;
 	private String implementationLevel;
 	private String filename;
@@ -28,7 +26,12 @@ public class IfcHeader implements Serializable {
 		author = new ArrayList<>();
 		organization = new ArrayList<>();
 	}
-	
+	public Integer getRid() {
+		return rid;
+	}
+	public void setRid(Integer rid) {
+		this.rid = rid;
+	}
 	public List<String> getDescription() {
 		return description;
 	}

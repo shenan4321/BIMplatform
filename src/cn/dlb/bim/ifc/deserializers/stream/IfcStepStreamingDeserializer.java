@@ -19,6 +19,7 @@ import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EClassifier;
 import org.eclipse.emf.ecore.EDataType;
@@ -28,7 +29,9 @@ import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.EcorePackage;
 import org.eclipse.emf.ecore.impl.EClassImpl;
 import org.eclipse.emf.ecore.impl.EEnumImpl;
+
 import com.google.common.base.Charsets;
+
 import cn.dlb.bim.ifc.database.DatabaseException;
 import cn.dlb.bim.ifc.deserializers.DeserializeException;
 import cn.dlb.bim.ifc.deserializers.IfcHeaderParser;
@@ -60,6 +63,7 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 //	private QueryContext reusable;
 	private IfcHeader ifcHeader;
 	private PlatformService platformService;
+	private Integer rid;
 	
 //	private static MetricCollector metricCollector = new MetricCollector();
 	
@@ -72,6 +76,7 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 		this.platformService = platformService;
 		waitingList = new WaitingListVirtualObject<Integer>(platformService);
 		this.schema = packageMetaData.getSchema();
+		this.rid = platformService.newRevisionId();
 	}
 	
 	@Override
@@ -213,11 +218,13 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 			}
 			if (line.equals("DATA;")) {
 				mode = Mode.DATA;
+				platformService.saveIfcHeader(ifcHeader);
 			}
 			break;
 		case DATA:
 			if (line.equals("ENDSEC;")) {
 				mode = Mode.FOOTER;
+				platformService.commitSaveBatch();
 				try {
 					waitingList.dumpIfNotEmpty();
 				} catch (WaitingListException e) {
@@ -254,6 +261,7 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 		try {
 			if (ifcHeader == null) {
 				ifcHeader = new IfcHeader();
+				ifcHeader.setRid(rid);
 			}
 			if (line.startsWith("FILE_DESCRIPTION")) {
 				String filedescription = line.substring("FILE_DESCRIPTION".length()).trim();
@@ -279,12 +287,12 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 	}
 
 	private VirtualObject newVirtualObject(EClass eClass) {
-		return new VirtualObject(platformService.getCidOfEClass(eClass), platformService.newOid(eClass));
+		return new VirtualObject(rid, platformService.getCidOfEClass(eClass), platformService.newOid(eClass));
 	}
 
-//	private VirtualObject newWrappedVirtualObject(EClass eClass) {
-//		return new VirtualObject(eClass, -1l);
-//	}
+	private WrappedVirtualObject newWrappedVirtualObject(EClass eClass) {
+		return new WrappedVirtualObject(platformService.getCidOfEClass(eClass));
+	}
 	
 	public void processRecord(String line) throws DeserializeException, MetaDataException, DatabaseException {
 		int equalSignLocation = line.indexOf("=");
@@ -398,7 +406,7 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 			}
 
 			if (!openReferences) {
-				getPlatformService().save(object);
+				getPlatformService().saveBatch(object);
 //				metricCollector.collect(line.length(), nrBytes);
 			}
 		}
@@ -494,7 +502,7 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 			if (classifier instanceof EClassImpl) {
 				if (null != ((EClassImpl) classifier).getEStructuralFeature(WRAPPED_VALUE)) {
 					EClass newObjectEClass = (EClass) classifier;
-					VirtualObject newObject = newVirtualObject(newObjectEClass);
+					WrappedVirtualObject newObject = newWrappedVirtualObject(newObjectEClass);
 					Class<?> instanceClass = newObjectEClass.getEStructuralFeature(WRAPPED_VALUE).getEType().getInstanceClass();
 					if (value.equals("")) {
 
@@ -521,9 +529,9 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 						} else if (instanceClass.getSimpleName().equals("Tristate")) {
 							Object tristate = null;
 							if (value.equals(".T.")) {
-								tristate = true;
+								tristate = Boolean.TRUE;
 							} else if (value.equals(".F.")) {
-								tristate = false;
+								tristate = Boolean.FALSE;
 							} else if (value.equals(".U.")) {
 								tristate = null;
 							}
@@ -560,9 +568,9 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 
 	private void readEnum(String val, VirtualObject object, EStructuralFeature structuralFeature) throws DeserializeException, MetaDataException, DatabaseException {
 		if (val.equals(".T.")) {
-			object.setAttribute(structuralFeature, true);
+			object.setAttribute(structuralFeature, Boolean.TRUE);
 		} else if (val.equals(".F.")) {
-			object.setAttribute(structuralFeature, false);
+			object.setAttribute(structuralFeature, Boolean.FALSE);
 		} else if (val.equals(".U.")) {
 			object.eUnset(structuralFeature);
 		} else {

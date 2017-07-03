@@ -2,10 +2,13 @@ package cn.dlb.bim.dao;
 
 import java.util.List;
 
+import org.springframework.data.util.CloseableIterator;
+
 import cn.dlb.bim.dao.entity.IdEObjectEntity;
 import cn.dlb.bim.dao.entity.IfcModelEntity;
 import cn.dlb.bim.dao.entity.ModelLabel;
 import cn.dlb.bim.ifc.deserializers.stream.VirtualObject;
+import cn.dlb.bim.ifc.model.IfcHeader;
 
 public interface IfcModelDao {
 	public void insertAllIdEObjectEntity(List<IdEObjectEntity> idEObjectEntitys);
@@ -27,4 +30,10 @@ public interface IfcModelDao {
 	public List<ModelLabel> queryAllModelLabelByRid(Integer rid);
 	
 	public void insertVirtualObject(VirtualObject virtualObject);
+	public void insertAllVirtualObject(List<VirtualObject> virtualObjects);
+	public List<VirtualObject> queryVirtualObject(Integer rid, List<Short> cids);
+	public CloseableIterator<VirtualObject> streamVirtualObjectByRid(Integer rid);
+	
+	public void saveIfcHeader(IfcHeader ifcHeader);
+	public IfcHeader queryIfcHeader(Integer rid);
 }

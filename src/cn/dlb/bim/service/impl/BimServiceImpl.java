@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,12 +16,12 @@ import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.util.CloseableIterator;
 import org.springframework.stereotype.Service;
 
 import com.mongodb.DBObject;
 import com.mongodb.gridfs.GridFSDBFile;
 
-import cn.dlb.bim.PlatformContext;
 import cn.dlb.bim.component.MongoGridFs;
 import cn.dlb.bim.component.PlatformServer;
 import cn.dlb.bim.dao.IfcModelDao;
@@ -36,7 +38,9 @@ import cn.dlb.bim.ifc.database.OldQuery;
 import cn.dlb.bim.ifc.deserializers.DeserializeException;
 import cn.dlb.bim.ifc.deserializers.IfcStepDeserializer;
 import cn.dlb.bim.ifc.deserializers.StepParser;
-import cn.dlb.bim.ifc.deserializers.stream.IfcStepStreamingDeserializer;
+import cn.dlb.bim.ifc.deserializers.stream.IfcStepStreamingSerializer;
+import cn.dlb.bim.ifc.deserializers.stream.SimpleObjectProvider;
+import cn.dlb.bim.ifc.deserializers.stream.VirtualObject;
 import cn.dlb.bim.ifc.emf.IdEObject;
 import cn.dlb.bim.ifc.emf.IfcModelInterface;
 import cn.dlb.bim.ifc.emf.IfcModelInterfaceException;
@@ -48,6 +52,7 @@ import cn.dlb.bim.ifc.engine.RenderEngineException;
 import cn.dlb.bim.ifc.engine.cells.Vector3d;
 import cn.dlb.bim.ifc.engine.pool.RenderEnginePool;
 import cn.dlb.bim.ifc.engine.pool.RenderEnginePools;
+import cn.dlb.bim.ifc.model.IfcHeader;
 import cn.dlb.bim.ifc.serializers.IfcStepSerializer;
 import cn.dlb.bim.ifc.serializers.SerializerException;
 import cn.dlb.bim.ifc.shared.ProgressReporter;
@@ -656,21 +661,58 @@ public class BimServiceImpl implements BimService {
 	@Override
 	public void test() {
 		
-		IfcStepStreamingDeserializer deserializer = new IfcStepStreamingDeserializer() {
-		};
-		PackageMetaData packageMetaData = server.getMetaDataManager().getPackageMetaData(Schema.IFC2X3TC1.getEPackageName());
-		deserializer.init(packageMetaData, platformService);
-		try {
-			deserializer.read(new File(PlatformContext.getResourceBase()+"/upload/ifc/女生宿舍_设备-1497321043523.ifc"));
-		} catch (DeserializeException e) {
-			e.printStackTrace();
-		}
-		
+//		IfcStepStreamingDeserializer deserializer = new IfcStepStreamingDeserializer() {
+//		};
+//		PackageMetaData packageMetaData = server.getMetaDataManager().getPackageMetaData(Schema.IFC2X3TC1.getEPackageName());
+//		deserializer.init(packageMetaData, platformService);
+//		try {
+//			deserializer.read(new File(PlatformContext.getResourceBase()+"/upload/ifc/53#地块-地上-建筑-1496742557201.ifc"));
+//		} catch (DeserializeException e) {
+//			e.printStackTrace();
+//		}
 		
 //		genModelDefaultOutputTemplate(3);
 //		OutputTemplate outputTemplate = outputTemplateDao.queryOutputTemplateByOtid(78153895524000l);
 //		outputTemplate.getIfcTypeSelectorMap().get("IfcOpeningElement").getObjectTypeMap().put("Opening", false);
 //		outputTemplateDao.modifyOutputTemplate(outputTemplate);
+		
+		PackageMetaData packageMetaData = server.getMetaDataManager().getPackageMetaData(Schema.IFC2X3TC1.getEPackageName());
+		IfcStepStreamingSerializer serialzer = new IfcStepStreamingSerializer() {
+		};
+		Integer rid = 50;
+		CloseableIterator<VirtualObject> iterator = platformService.streamVirtualObjectByRid(rid);
+		IfcHeader ifcHeader = platformService.queryIfcHeader(rid);
+		SimpleObjectProvider objectProvider = new SimpleObjectProvider(iterator);
+		try {
+			serialzer.init(platformService, objectProvider, ifcHeader, packageMetaData);
+			FileOutputStream fos = new FileOutputStream(new File("E://text.ifc"));
+			serialzer.writeToOutputStream(fos);
+			fos.flush();
+			fos.close();
+		} catch (SerializerException e) {
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (DatabaseException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+//		PackageMetaData packageMetaData = server.getMetaDataManager().getPackageMetaData(Schema.IFC2X3TC1.getEPackageName());
+//		EClass ifcProduct = packageMetaData.getEClass("IfcProduct");
+//		Set<EClass> subClasses = packageMetaData.getAllSubClasses(ifcProduct);
+//		List<Short> cids = new ArrayList<Short>();
+//		for (EClass subClass : subClasses) {
+//			Short cid = platformService.getCidOfEClass(subClass);
+//			cids.add(cid);
+//		}
+//		List<VirtualObject> virtualObjects = platformService.queryVirtualObject(39, cids);
+//		System.out.println(virtualObjects);
+	}
+	
+	public List<VirtualObject> queryVirtualObject(Integer rid, List<Short> cids) {
+		return platformService.queryVirtualObject(rid, cids);
 	}
 	
 }

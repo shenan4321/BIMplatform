@@ -4,23 +4,26 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.eclipse.emf.ecore.EStructuralFeature;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "VirtualObject")
-public class VirtualObject {
-	@Id
+public class VirtualObject implements MinimalVirtualObject {
+	@Indexed
 	private Long oid;
 	@Indexed
 	private Integer rid;
 	@Indexed
 	private final Short eClassId;
-	private final Map<String, Object> features = new LinkedHashMap<>();
-	public VirtualObject(Short eClassId, Long oid) {
+	private final Map<String, Object> features;
+	
+	public VirtualObject(Integer rid, Short eClassId, Long oid) {
+		this.rid = rid;
 		this.eClassId = eClassId;
 		this.oid = oid;
+		features = new LinkedHashMap<>();
 	}
 	public Long getOid() {
 		return oid;
@@ -45,7 +48,7 @@ public class VirtualObject {
 		features.remove(eStructuralFeature.getName());
 	}
 	public boolean eIsSet(EStructuralFeature feature) {
-		return features.containsKey(feature);
+		return features.containsKey(feature.getName());
 	}
 	public void setReference(EStructuralFeature eStructuralFeature, Long oid) {
 		features.put(eStructuralFeature.getName(), oid);

@@ -7,14 +7,15 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.data.util.CloseableIterator;
 import org.springframework.stereotype.Repository;
 
 import cn.dlb.bim.dao.IfcModelDao;
 import cn.dlb.bim.dao.entity.IdEObjectEntity;
 import cn.dlb.bim.dao.entity.IfcModelEntity;
 import cn.dlb.bim.dao.entity.ModelLabel;
-import cn.dlb.bim.dao.entity.Project;
 import cn.dlb.bim.ifc.deserializers.stream.VirtualObject;
+import cn.dlb.bim.ifc.model.IfcHeader;
 
 @Repository("IfcModelDaoImpl")
 public class IfcModelDaoImpl implements IfcModelDao {
@@ -127,6 +128,36 @@ public class IfcModelDaoImpl implements IfcModelDao {
 	@Override
 	public void insertVirtualObject(VirtualObject virtualObject) {
 		mongoTemplate.save(virtualObject);
+	}
+
+	@Override
+	public void insertAllVirtualObject(List<VirtualObject> virtualObjects) {
+		mongoTemplate.insertAll(virtualObjects);
+	}
+
+	@Override
+	public List<VirtualObject> queryVirtualObject(Integer rid, List<Short> cids) {
+		Query query = new Query();
+		query.addCriteria(Criteria.where("rid").is(rid).andOperator(Criteria.where("eClassId").in(cids)));
+		return mongoTemplate.find(query, VirtualObject.class);
+	}
+	
+	public CloseableIterator<VirtualObject> streamVirtualObjectByRid(Integer rid) {
+		Query query = new Query();
+		query.addCriteria(Criteria.where("rid").is(rid));
+		return mongoTemplate.stream(query, VirtualObject.class);
+	}
+
+	@Override
+	public void saveIfcHeader(IfcHeader ifcHeader) {
+		mongoTemplate.save(ifcHeader);
+	}
+
+	@Override
+	public IfcHeader queryIfcHeader(Integer rid) {
+		Query query = new Query();
+		query.addCriteria(Criteria.where("rid").is(rid));
+		return mongoTemplate.findOne(query, IfcHeader.class);
 	}
 
 }

@@ -14,8 +14,8 @@ import cn.dlb.bim.dao.IfcModelDao;
 import cn.dlb.bim.dao.entity.IdEObjectEntity;
 import cn.dlb.bim.dao.entity.IfcModelEntity;
 import cn.dlb.bim.dao.entity.ModelLabel;
-import cn.dlb.bim.ifc.deserializers.stream.VirtualObject;
 import cn.dlb.bim.ifc.model.IfcHeader;
+import cn.dlb.bim.ifc.stream.VirtualObject;
 
 @Repository("IfcModelDaoImpl")
 public class IfcModelDaoImpl implements IfcModelDao {

@@ -1,4 +1,4 @@
-package cn.dlb.bim.ifc.deserializers.stream;
+package cn.dlb.bim.ifc.stream;
 
 import org.eclipse.emf.ecore.EStructuralFeature;
 import cn.dlb.bim.ifc.database.DatabaseException;

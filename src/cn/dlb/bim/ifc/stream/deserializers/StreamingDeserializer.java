@@ -1,4 +1,6 @@
-package cn.dlb.bim.ifc.deserializers.stream;
+package cn.dlb.bim.ifc.stream.deserializers;
+
+import java.io.File;
 
 /******************************************************************************
  * Copyright (C) 2009-2016  BIMserver.org
@@ -17,24 +19,23 @@ package cn.dlb.bim.ifc.deserializers.stream;
  * along with this program.  If not, see {@literal<http://www.gnu.org/licenses/>}.
  *****************************************************************************/
 
-import org.eclipse.emf.ecore.EStructuralFeature;
+import java.io.InputStream;
+import java.util.Map;
 
-/*
- * WaitingObject's are used when while reading, a reference is encountered that has not yet been
- * parsed. In that case a WaitingObject is created and stored in a map. As soon as the referenced
- * object get's parsed, all that object's waiting objects are connected to the original object.
- */
-public class ListWaitingVirtualObject extends WaitingVirtualObject {
+import org.eclipse.emf.ecore.EClass;
 
-	// To keep an eventual order intact, for EList's you can store the index at which it should be placed
-	private final int index;
+import cn.dlb.bim.ifc.deserializers.DeserializeException;
+import cn.dlb.bim.ifc.emf.IfcModelInterface;
+import cn.dlb.bim.ifc.emf.PackageMetaData;
+import cn.dlb.bim.ifc.model.IfcHeader;
+import cn.dlb.bim.ifc.shared.ByteProgressReporter;
+import cn.dlb.bim.service.PlatformService;
 
-	public ListWaitingVirtualObject(int lineNumber, VirtualObject object, EStructuralFeature structuralFeature, int index) {
-		super(lineNumber, object, structuralFeature);
-		this.index = index;
-	}
-	
-	public int getIndex() {
-		return index;
-	}
+public interface StreamingDeserializer {
+	void init(PackageMetaData packageMetaData, PlatformService platformService);
+	void setProgressReporter(ByteProgressReporter byteProgressReporter);
+	long read(InputStream inputStream, String fileName, long fileSize) throws DeserializeException;
+	public long read(File sourceFile) throws DeserializeException;
+	IfcHeader getIfcHeader();
+	Map<EClass, Integer> getSummaryMap();
 }

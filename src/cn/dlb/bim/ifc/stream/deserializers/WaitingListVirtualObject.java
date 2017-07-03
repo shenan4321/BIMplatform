@@ -1,4 +1,4 @@
-package cn.dlb.bim.ifc.deserializers.stream;
+package cn.dlb.bim.ifc.stream.deserializers;
 
 /******************************************************************************
  * Copyright (C) 2009-2016  BIMserver.org
@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import cn.dlb.bim.ifc.database.DatabaseException;
 import cn.dlb.bim.ifc.deserializers.DeserializeException;
+import cn.dlb.bim.ifc.stream.VirtualObject;
 import cn.dlb.bim.service.PlatformService;
 
 public class WaitingListVirtualObject<T> {

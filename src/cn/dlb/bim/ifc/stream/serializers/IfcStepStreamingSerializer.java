@@ -1,4 +1,4 @@
-package cn.dlb.bim.ifc.deserializers.stream;
+package cn.dlb.bim.ifc.stream.serializers;
 
 /******************************************************************************
  * Copyright (C) 2009-2016  BIMserver.org
@@ -42,6 +42,10 @@ import cn.dlb.bim.ifc.model.IfcHeader;
 import cn.dlb.bim.ifc.serializers.SerializerException;
 import cn.dlb.bim.ifc.serializers.SerializerInputstream;
 import cn.dlb.bim.ifc.serializers.StreamingReader;
+import cn.dlb.bim.ifc.stream.MinimalVirtualObject;
+import cn.dlb.bim.ifc.stream.ObjectProvider;
+import cn.dlb.bim.ifc.stream.VirtualObject;
+import cn.dlb.bim.ifc.stream.WrappedVirtualObject;
 import cn.dlb.bim.service.PlatformService;
 import cn.dlb.bim.utils.StringUtils;
 import cn.dlb.bim.utils.UTF8PrintWriter;

@@ -1,4 +1,4 @@
-package cn.dlb.bim.ifc.deserializers.stream;
+package cn.dlb.bim.ifc.stream.deserializers;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -41,6 +41,8 @@ import cn.dlb.bim.ifc.emf.PackageMetaData;
 import cn.dlb.bim.ifc.emf.Schema;
 import cn.dlb.bim.ifc.model.IfcHeader;
 import cn.dlb.bim.ifc.shared.ByteProgressReporter;
+import cn.dlb.bim.ifc.stream.VirtualObject;
+import cn.dlb.bim.ifc.stream.WrappedVirtualObject;
 import cn.dlb.bim.service.PlatformService;
 import cn.dlb.bim.utils.FakeClosingInputStream;
 import cn.dlb.bim.utils.StringUtils;

@@ -1,4 +1,4 @@
-package cn.dlb.bim.ifc.deserializers.stream;
+package cn.dlb.bim.ifc.stream.deserializers;
 
 /******************************************************************************
  * Copyright (C) 2009-2016  BIMserver.org
@@ -17,17 +17,26 @@ package cn.dlb.bim.ifc.deserializers.stream;
  * along with this program.  If not, see {@literal<http://www.gnu.org/licenses/>}.
  *****************************************************************************/
 
-import java.io.InputStream;
-import java.io.OutputStream;
+import org.eclipse.emf.ecore.EStructuralFeature;
 
-import cn.dlb.bim.ifc.database.DatabaseException;
-import cn.dlb.bim.ifc.emf.PackageMetaData;
-import cn.dlb.bim.ifc.model.IfcHeader;
-import cn.dlb.bim.ifc.serializers.SerializerException;
-import cn.dlb.bim.service.PlatformService;
+import cn.dlb.bim.ifc.stream.VirtualObject;
 
-public interface StreamingSerializer {
-	void init(PlatformService platformService, ObjectProvider objectProvider, IfcHeader ifcHeader, PackageMetaData packageMetaData) throws SerializerException;
-	void writeToOutputStream(OutputStream outputStream) throws SerializerException, DatabaseException;
-	InputStream getInputStream();
+/*
+ * WaitingObject's are used when while reading, a reference is encountered that has not yet been
+ * parsed. In that case a WaitingObject is created and stored in a map. As soon as the referenced
+ * object get's parsed, all that object's waiting objects are connected to the original object.
+ */
+public class ListWaitingVirtualObject extends WaitingVirtualObject {
+
+	// To keep an eventual order intact, for EList's you can store the index at which it should be placed
+	private final int index;
+
+	public ListWaitingVirtualObject(int lineNumber, VirtualObject object, EStructuralFeature structuralFeature, int index) {
+		super(lineNumber, object, structuralFeature);
+		this.index = index;
+	}
+	
+	public int getIndex() {
+		return index;
+	}
 }

@@ -9,8 +9,8 @@ import org.springframework.core.convert.converter.Converter;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
-import cn.dlb.bim.ifc.deserializers.stream.VirtualObject;
-import cn.dlb.bim.ifc.deserializers.stream.WrappedVirtualObject;
+import cn.dlb.bim.ifc.stream.VirtualObject;
+import cn.dlb.bim.ifc.stream.WrappedVirtualObject;
 
 public class VirtualObjectReadConverter implements Converter<DBObject, VirtualObject>  {
 

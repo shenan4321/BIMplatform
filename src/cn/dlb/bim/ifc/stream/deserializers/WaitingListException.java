@@ -1,4 +1,4 @@
-package cn.dlb.bim.ifc.deserializers.stream;
+package cn.dlb.bim.ifc.stream.deserializers;
 
 /******************************************************************************
  * Copyright (C) 2009-2016  BIMserver.org

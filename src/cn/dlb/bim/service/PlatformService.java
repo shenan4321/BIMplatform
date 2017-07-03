@@ -7,9 +7,9 @@ import org.eclipse.emf.ecore.EClassifier;
 import org.springframework.data.util.CloseableIterator;
 
 import cn.dlb.bim.ifc.database.DatabaseException;
-import cn.dlb.bim.ifc.deserializers.stream.VirtualObject;
 import cn.dlb.bim.ifc.emf.OidProvider;
 import cn.dlb.bim.ifc.model.IfcHeader;
+import cn.dlb.bim.ifc.stream.VirtualObject;
 
 public interface PlatformService extends OidProvider {
 	public EClassifier getEClassifier(String packageName, String classifierName);

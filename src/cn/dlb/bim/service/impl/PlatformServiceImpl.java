@@ -26,9 +26,9 @@ import cn.dlb.bim.dao.entity.IfcClassLookupEntity;
 import cn.dlb.bim.dao.entity.PlatformInitDatasEntity;
 import cn.dlb.bim.ifc.database.BatchThreadLocal;
 import cn.dlb.bim.ifc.database.DatabaseException;
-import cn.dlb.bim.ifc.deserializers.stream.VirtualObject;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
 import cn.dlb.bim.ifc.model.IfcHeader;
+import cn.dlb.bim.ifc.stream.VirtualObject;
 import cn.dlb.bim.service.PlatformService;
 
 /**

@@ -1,4 +1,4 @@
-package cn.dlb.bim.ifc.deserializers.stream;
+package cn.dlb.bim.ifc.stream.deserializers;
 
 /******************************************************************************
  * Copyright (C) 2009-2016  BIMserver.org
@@ -18,6 +18,8 @@ package cn.dlb.bim.ifc.deserializers.stream;
  *****************************************************************************/
 
 import org.eclipse.emf.ecore.EStructuralFeature;
+
+import cn.dlb.bim.ifc.stream.VirtualObject;
 
 public class WaitingVirtualObject {
 	// The object that has a missing reference

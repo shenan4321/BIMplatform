@@ -1,6 +1,4 @@
-package cn.dlb.bim.ifc.deserializers.stream;
-
-import java.io.File;
+package cn.dlb.bim.ifc.stream.serializers;
 
 /******************************************************************************
  * Copyright (C) 2009-2016  BIMserver.org
@@ -20,22 +18,17 @@ import java.io.File;
  *****************************************************************************/
 
 import java.io.InputStream;
-import java.util.Map;
+import java.io.OutputStream;
 
-import org.eclipse.emf.ecore.EClass;
-
-import cn.dlb.bim.ifc.deserializers.DeserializeException;
-import cn.dlb.bim.ifc.emf.IfcModelInterface;
+import cn.dlb.bim.ifc.database.DatabaseException;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
 import cn.dlb.bim.ifc.model.IfcHeader;
-import cn.dlb.bim.ifc.shared.ByteProgressReporter;
+import cn.dlb.bim.ifc.serializers.SerializerException;
+import cn.dlb.bim.ifc.stream.ObjectProvider;
 import cn.dlb.bim.service.PlatformService;
 
-public interface StreamingDeserializer {
-	void init(PackageMetaData packageMetaData, PlatformService platformService);
-	void setProgressReporter(ByteProgressReporter byteProgressReporter);
-	long read(InputStream inputStream, String fileName, long fileSize) throws DeserializeException;
-	public long read(File sourceFile) throws DeserializeException;
-	IfcHeader getIfcHeader();
-	Map<EClass, Integer> getSummaryMap();
+public interface StreamingSerializer {
+	void init(PlatformService platformService, ObjectProvider objectProvider, IfcHeader ifcHeader, PackageMetaData packageMetaData) throws SerializerException;
+	void writeToOutputStream(OutputStream outputStream) throws SerializerException, DatabaseException;
+	InputStream getInputStream();
 }

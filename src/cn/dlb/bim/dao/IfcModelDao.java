@@ -7,8 +7,8 @@ import org.springframework.data.util.CloseableIterator;
 import cn.dlb.bim.dao.entity.IdEObjectEntity;
 import cn.dlb.bim.dao.entity.IfcModelEntity;
 import cn.dlb.bim.dao.entity.ModelLabel;
-import cn.dlb.bim.ifc.deserializers.stream.VirtualObject;
 import cn.dlb.bim.ifc.model.IfcHeader;
+import cn.dlb.bim.ifc.stream.VirtualObject;
 
 public interface IfcModelDao {
 	public void insertAllIdEObjectEntity(List<IdEObjectEntity> idEObjectEntitys);

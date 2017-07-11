@@ -2,32 +2,30 @@ SceneJS.setConfigs({
     pluginPath:"public/js/scenejs/plugins"
 });
 
-
-
 function showView(geom) {
-        var boundMinX = 0, boundMinY = 0, boundMinZ = 0,
-            boundMaxX = 0, boundMaxY = 0, boundMaxZ = 0;
-        	if(geom.bound){
-	            boundMinX = Math.min(0, geom.bound.min.x);
-	            boundMinY = Math.min(0, geom.bound.min.y);
-	            boundMinZ = Math.min(0, geom.bound.min.z);
-	            boundMaxX = Math.max(0, geom.bound.max.x);
-	            boundMaxY = Math.max(0, geom.bound.max.y);
-	            boundMaxZ = Math.max(0, geom.bound.max.z);
-	            var node = {
-	                    geometry_info: geom,
-	                    boundMinX : boundMinX,
-	                    boundMinY : boundMinY,
-	                    boundMinZ : boundMinZ,
-	                    boundMaxX : boundMaxX,
-	                    boundMaxY : boundMaxY,
-	                    boundMaxZ : boundMaxZ,
-	                    type:"geometry/ifcmodel"
-	            };
-	            window.scene.getNode("my-lights",function(xxx){
-	    	   		xxx.addNode({type:"material",nodes:[node]});
-	    	   	});
-        	}
+    var boundMinX = 0, boundMinY = 0, boundMinZ = 0,
+        boundMaxX = 0, boundMaxY = 0, boundMaxZ = 0;
+    	if(geom.bound){
+            boundMinX = Math.min(0, geom.bound.min.x);
+            boundMinY = Math.min(0, geom.bound.min.y);
+            boundMinZ = Math.min(0, geom.bound.min.z);
+            boundMaxX = Math.max(0, geom.bound.max.x);
+            boundMaxY = Math.max(0, geom.bound.max.y);
+            boundMaxZ = Math.max(0, geom.bound.max.z);
+            var node = {
+                    geometry_info: geom,
+                    boundMinX : boundMinX,
+                    boundMinY : boundMinY,
+                    boundMinZ : boundMinZ,
+                    boundMaxX : boundMaxX,
+                    boundMaxY : boundMaxY,
+                    boundMaxZ : boundMaxZ,
+                    type:"geometry/ifcmodel"
+            };
+            window.scene.getNode("my-lights",function(xxx){
+    	   		xxx.addNode({type:"material",nodes:[node]});
+    	   	});
+    	}
 }
 
 
@@ -111,10 +109,11 @@ function createScene(middle,zoom){
 		        }]
 		    };
 	    window.scene =  SceneJS.createScene(sceneViewObj);
+	    //todo 创建完之后不能立刻找到my-lights节点，要等待一定时间，求回调方法后执行。
 	    setTimeout(function(){
 	    	window.geomotryLoad = new GeometryLoader();
 	    	window.geomotryLoad.setModels(window.scene.findNode("my-lights"));
-	    },600)
+	    },800)
 	     
 }
 

@@ -4,8 +4,6 @@ var myApp = angular.module("myApp", []);
 
 myApp.controller('myAppCtrl', function ($scope, $http) {
 	
-	
-	
 	$scope.menuClick = function(param){
 		$scope[param]($scope, $http);
 	}
@@ -17,9 +15,7 @@ myApp.controller('myAppCtrl', function ($scope, $http) {
 	    }); 
 		$scope.enableTag = function(item){
 			$('#muiSwitch').toggleClass('checked');
-			SceneJS.getScene().getNode("myEnable",function(myEnable){
-				myEnable.setEnabled(!myEnable.getEnabled());
-		   	});
+			$('#myCanvas').toggle();
 		}
 	}
 	
@@ -36,30 +32,33 @@ myApp.controller('myAppCtrl', function ($scope, $http) {
 		
 		
 	    $scope.setOidShow = function(item){
+	    	console.log(item);
 	    	if($scope.treeClick){
 	    		$scope.treeClick.checked = !$scope.treeClick.checked
 	    	}
 	    	$scope.treeClick = item;
 	    	item.checked = !item.checked;
-	    	SceneJS.getScene().getNode(item.oid + "geometry",function (material) {
-	            if(hisPick.name){
-	                scene.getNode(hisPick.name + "geometry", function (material) {
-	                    material.setColor(hisPick.color);//之前点过的东西还原
-	                });
-	            }
-	            hisPick = {name:item.oid,color:material.getColor()}
-	            material.setColor({r: 0, g: 1, b: 0});
-	            var pTableScope= $('#pTable').scope();
-	            pTableScope.oid = item.oid ;
-	            $.ajax({
-	          	  url:'./model/queryProperty.do',
-	          	  type:'GET',
-	          	  data:{oid:item.oid,rid:string}
-	            }).done(function(data){
-	          	  pTableScope.list = data.data  
-	          	  $('#pTable').scope().$apply();
-	            })
-	    	});
+	    	var itemBox = xeogl.scene.components['ifc'+item.oid];
+			cameraFlightAnimation.flyTo({
+                aabb: itemBox.worldBoundary.aabb
+            });
+            if(hisPick.name){
+				xeogl.scene.components[hisPick.name].material.emissive =  xeogl.scene.components[hisPick.name].material.baseColor;
+            }
+            itemBox.material.emissive = new Float32Array([0, 1, 0]);
+            hisPick = {name:'ifc'+item.oid};
+            if(window.tt){
+            	var pTableScope= $('#pTable').scope();
+                pTableScope.oid = item.oid ;
+                $.ajax({
+              	  url:'./model/queryProperty.do',
+              	  type:'GET',
+              	  data:{oid:'ifc'+item.oid,rid:string}
+                }).done(function(data){
+              	  pTableScope.list = data.data; 
+              	  $('#pTable').scope().$apply();
+                })
+            }
 	    }
 	}
 	
@@ -72,15 +71,15 @@ myApp.controller('myAppCtrl', function ($scope, $http) {
 		$scope.typeShowTag = function(item){
 			item.checked = !item.checked;
 			angular.forEach(item.oids, function(data,index,array){
-				scene.getNode("flags"+data,function (myEnable) {
-					myEnable.setEnabled(!myEnable.getEnabled());  
-				});
+				if(!xeogl.scene.components['ifc'+data].visibility.showFloor){
+					xeogl.scene.components['ifc'+data].visibility.visible = item.checked;
+					xeogl.scene.components['ifc'+data].visibility.showType = !item.checked;//默认此参数是空，所以某类显示出来的时候
+				}
 			});
 		}
-		$scope.selectedPlaneBoxList = [];
+		/*$scope.selectedPlaneBoxList = [];
 		$scope.selectedPlaneBoxEventList = [];
 		$scope.typeShowOpearate = function(item){
-			
 			if($scope.selectedPlaneBoxList.indexOf(item.name)==-1){
 					var MenuType = function () {
 			            this.message = "Directional light";
@@ -92,8 +91,6 @@ myApp.controller('myAppCtrl', function ($scope, $http) {
 			            var update = function () {
 			            	angular.forEach(item.oids, function(data,index,array){
 			         			scene.getNode(data+'geometry',function(mt){
-			         				
-			         				
 			         				mt.setColor({r:self["color.r"],g:self["color.g"],b:self["color.b"]});
 			         				mt.setAlpha(self["alpha.a"]);
 			         			})
@@ -102,10 +99,10 @@ myApp.controller('myAppCtrl', function ($scope, $http) {
 			            };
 			            update();
 			        };
-			        /*var $closeButton = $('.dg .close-button');
+			        var $closeButton = $('.dg .close-button');
 			        if($closeButton.length==1){
 			        	$closeButton.css('position','relative').after($closeButton.clone().css('position','relative').addClass('cover-button').html('还原'));
-			        }*/
+			        }
 					var menuType = new MenuType();
 					$scope.selectedPlaneBoxList.push(item.name);	
 					var menubox = gui.addFolder(item.name+'类');
@@ -116,7 +113,7 @@ myApp.controller('myAppCtrl', function ($scope, $http) {
 			        menubox.open();
 			}
 			
-		}
+		}*/
 	}
 	
 	$scope.pTableCtrl = function($scope, $http){
@@ -126,18 +123,22 @@ myApp.controller('myAppCtrl', function ($scope, $http) {
 	$scope.floorCtrl = function($scope, $http){
 		$http.get('./model/queryModelBuildingStorey.do?rid='+string).success(function (data,status) {
 			$scope.floorData = data.data;
-			$scope.enableTag = function(item){
+			
+			/*$scope.enableTag = function(item){
 				$('#muiFloorSwitch').toggleClass('checked');
 				SceneJS.getScene().getNode("myEnable",function(myEnable){
 					myEnable.setEnabled(!myEnable.getEnabled());
 			   	});
-			}
+			}*/
 			$scope.floorClick = function(item,obj){
+				console.log('全部的oid',item.oidContains);
 				item.isActive = !item.isActive;
 				angular.forEach(item.oidContains, function(data,index,array){
-					scene.getNode("flags"+data,function (myEnable) {
-						myEnable.setEnabled(!myEnable.getEnabled());  
-					});
+					//和类型不要互相冲突
+					if(!xeogl.scene.components['ifc'+data].visibility.showType){
+						xeogl.scene.components['ifc'+data].visibility.visible = item.isActive;
+						xeogl.scene.components['ifc'+data].visibility.showFloor = !item.isActive;
+					}
 				});
 			}
 	    }); 
@@ -146,34 +147,37 @@ myApp.controller('myAppCtrl', function ($scope, $http) {
 	
 	$scope.searchCtrl = function($scope, $http){
 		$scope.bimSearch = function(){
-			console.log($http);
 			if($.html5Validate.isAllpass($('#searchFrom'))){
-				
 				$http.get('./model/searchRecord.do?rid='+string+'&keyword='+$('#searchText').val()).success(function (data,status) {
 					$scope.searchList = data.data;
 			    }); 
 			}
 			$scope.searchShow = function(item){
 				item.checked = !item.checked;
-				SceneJS.getScene().getNode(item.oid + "geometry",function (material) {
-		            if(hisPick.name){
-		                scene.getNode(hisPick.name + "geometry", function (material) {
-		                    material.setColor(hisPick.color);//之前点过的东西还原
-		                });
-		            }
-		            hisPick = {name:item.oid,color:material.getColor()}
-		            material.setColor({r: 0, g: 1, b: 0});
-		            var pTableScope= $('#pTable').scope();
-		            pTableScope.oid = item.oid ;
-		            $.ajax({
-		          	  url:'./model/queryProperty.do',
-		          	  type:'GET',
-		          	  data:{oid:item.oid,rid:string}
-		            }).done(function(data){
-		          	  pTableScope.list = data.data; 
-		          	  $('#pTable').scope().$apply();
-		            })
-		    	});
+				var itemBox = xeogl.scene.components['ifc'+item.oid];
+				if(itemBox){
+					cameraFlightAnimation.flyTo({
+	                    aabb: itemBox.worldBoundary.aabb
+	                });
+	                if(hisPick.name){
+						xeogl.scene.components[hisPick.name].material.emissive =  xeogl.scene.components[hisPick.name].material.baseColor;
+	                }                
+	                itemBox.material.emissive = new Float32Array([0, 1, 0]);
+	                hisPick = {name:'ifc'+item.oid};
+				}
+                
+                if(window.tt){
+                	var pTableScope= $('#pTable').scope();
+                    pTableScope.oid = item.oid ;
+                    $.ajax({
+                  	  url:'./model/queryProperty.do',
+                  	  type:'GET',
+                  	  data:{oid:'ifc'+item.oid,rid:string}
+                    }).done(function(data){
+                  	  pTableScope.list = data.data; 
+                  	  $('#pTable').scope().$apply();
+                    })
+                }
 				
 			}
 		}

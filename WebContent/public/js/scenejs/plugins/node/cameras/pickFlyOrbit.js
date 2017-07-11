@@ -377,7 +377,7 @@ require([
 
                 scene.on("pick",
                     function (hit) {
-                	console.log(hit.name);
+                	console.log(hit);
                         if (!hit.worldPos || hit.name == "__SceneJS_dontPickMe") {
                             return;
                         }
@@ -396,7 +396,7 @@ require([
                         flying = true;
                         label.setText("[ " + Math.round(endPivot[0]) + ", " + Math.round(endPivot[1]) + ", " + Math.round(endPivot[2]) + " ]");
                         window.currentPiont = endPivot;
-                        scene.getNode(hit.name + "geometry",function (material) {
+                        /*scene.getNode(hit.name + "geometry",function (material) {
                             if(hisPick.name){
                                 scene.getNode(hisPick.name + "geometry", function (material) {
                                     material.setColor(hisPick.color);//之前点过的东西还原
@@ -416,7 +416,7 @@ require([
 	                          	  $('#pTable').scope().$apply();
 	                            })
                             }
-                        });
+                        });*/
                         
                     });
 
@@ -464,7 +464,7 @@ require([
                 			}
                 			
                 			
-                			lookat.setUp({x: 0, y:1, z: Math.abs(zoom)>Math.abs(maxZoom) ? Math.abs(maxZoom) : Math.abs(zoom) });
+                			//lookat.setUp({x: 0, y:1, z: Math.abs(zoom)>Math.abs(maxZoom) ? Math.abs(maxZoom) : Math.abs(zoom) });
                 			//原点的眼睛
                 			var eye = glmat.vec3.fromValues(0, 0, zoom);
                             //lookat的那个轴

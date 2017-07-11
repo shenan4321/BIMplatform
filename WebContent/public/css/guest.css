@@ -132,6 +132,7 @@
 	-webkit-appearance: none;
 	-webkit-border-radius: 0;
 	vertical-align: top;
+	cursor: pointer;
 }
 #btnPick{
 	display:inline-block;

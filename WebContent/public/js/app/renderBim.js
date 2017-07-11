@@ -37,12 +37,14 @@ function createScene(){
 	maxPitch=-10,
 	zoom= - (~~(maxZoom/1.5)),
 	zoomSensitivity= -(~~(maxZoom/15)),
-	//eye={x:middle.x,y: - middle.y* 10,z: maxZoom/5*4},
 	eye = {x: 4120.287109375, y: -112420.634765625, z: 9389.171752929688},
 	look= middle;
 	$window = $(window);
 	
-	
+	  background: -webkit-linear-gradient(left top, red , blue); /* Safari 5.1 - 6.0 */
+	  background: -o-linear-gradient(bottom right, red, blue); /* Opera 11.1 - 12.0 */
+	  background: -moz-linear-gradient(bottom right, red, blue); /* Firefox 3.6 - 15 */
+	  background: linear-gradient(to bottom right, red , blue); /* 标准的语法 */
 	 var sceneViewObj = {
 		        canvasId:"mySceneCanvas",
 		        type: "scene",
@@ -50,12 +52,13 @@ function createScene(){
 					{
 		                type: "models/backgrounds/gradient",
 		                color: [ // Default color
-		                    0.755, 0.725, 0.745, 1.0, // top left (R,G,B,A)
-		                    0.755, 0.725, 0.745, 1.0, // top left (R,G,B,A)
-		                    0.85, 0.9, 0.98, 1.0, // bottom right
+		                    145.38, 184.875, 190, 1.0, // top left (R,G,B,A)
+		                    145.38, 184.875, 190, 1.0, // top left (R,G,B,A)
+		                    216.75,229.5,250, 1.0, // bottom right
 		                    0.85, 0.9, 0.98, 1.0   // bottom left
 		                ]
 		            },
+		            
 					{
 		        	type: "cameras/pickFlyOrbit",
 		        	showCursor: true,

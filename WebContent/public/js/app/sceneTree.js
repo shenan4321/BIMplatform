@@ -189,5 +189,13 @@ myApp.controller('myAppCtrl', function ($scope, $http) {
 		}
 	}
 	
-	
+	$scope.colorCtrl = function($scope, $http){
+	    $scope.colorData = [{id:1,name:'方案一'},{id:2,name:'方案二'},{id:3,name:'方案三'}];
+	     
+		$scope.colorClick = function(item){
+			Ifc.Constants.materials=Ifc.Constants['materials'+item.id];
+			localStorage.setItem("IfcMType",item.id);
+			window.location.reload();
+		}
+	}
 });

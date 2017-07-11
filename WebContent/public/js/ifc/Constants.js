@@ -30,31 +30,8 @@ Ifc.Constants.defaultTypes = [
 	"IfcRoof"
 ];
 
-//writeMaterial(jsonWriter, "IfcSpace", new double[] { 0.137255f, 0.403922f, 0.870588f }, 1.0f);
-//writeMaterial(jsonWriter, "IfcRoof", new double[] { 0.837255f, 0.203922f, 0.270588f }, 1.0f);
-//writeMaterial(jsonWriter, "IfcSlab", new double[] { 0.637255f, 0.603922f, 0.670588f }, 1.0f);
-//writeMaterial(jsonWriter, "IfcWall", new double[] { 0.537255f, 0.337255f, 0.237255f }, 1.0f);
-//writeMaterial(jsonWriter, "IfcWallStandardCase", new double[] { 1.0f, 1.0f, 1.0f }, 1.0f);
-//writeMaterial(jsonWriter, "IfcDoor", new double[] { 0.637255f, 0.603922f, 0.670588f }, 1.0f);
-//writeMaterial(jsonWriter, "IfcWindow", new double[] { 0.2f, 0.2f, 0.8f }, 0.2f);
-//writeMaterial(jsonWriter, "IfcRailing", new double[] { 0.137255f, 0.203922f, 0.270588f }, 1.0f);
-//writeMaterial(jsonWriter, "IfcColumn", new double[] { 0.437255f, 0.603922f, 0.370588f, }, 1.0f);
-//writeMaterial(jsonWriter, "IfcBeam", new double[] { 0.437255f, 0.603922f, 0.370588f, }, 1.0f);
-//writeMaterial(jsonWriter, "IfcFurnishingElement", new double[] { 0.437255f, 0.603922f, 0.370588f }, 1.0f);
-//writeMaterial(jsonWriter, "IfcCurtainWall", new double[] { 0.5f, 0.5f, 0.5f }, 0.5f);
-//writeMaterial(jsonWriter, "IfcStair", new double[] { 0.637255f, 0.603922f, 0.670588f }, 1.0f);
-//writeMaterial(jsonWriter, "IfcBuildingElementProxy", new double[] { 0.5f, 0.5f, 0.5f }, 1.0f);
-//writeMaterial(jsonWriter, "IfcFlowSegment", new double[] { 0.8470588235f, 0.427450980392f, 0f }, 1.0f);
-//writeMaterial(jsonWriter, "IfcFlowFitting", new double[] { 0.8470588235f, 0.427450980392f, 0f }, 1.0f);
-//writeMaterial(jsonWriter, "IfcFlowTerminal", new double[] { 0.8470588235f, 0.427450980392f, 0f }, 1.0f);
-//writeMaterial(jsonWriter, "IfcProxy", new double[] { 0.637255f, 0.603922f, 0.670588f }, 1.0f);
-//writeMaterial(jsonWriter, "IfcSite", new double[] { 0.637255f, 0.603922f, 0.670588f }, 1.0f);
-//writeMaterial(jsonWriter, "IfcLightFixture", new double[] {0.8470588235f, 0.8470588235f, 0f }, 1.0f);
-//writeMaterial(jsonWriter, "IfcDuctSegment", new double[] {0.8470588235f, 0.427450980392f, 0f }, 1.0f);
-//writeMaterial(jsonWriter, "IfcDuctFitting", new double[] {0.8470588235f, 0.427450980392f, 0f }, 1.0f);
-//writeMaterial(jsonWriter, "IfcAirTerminal", new double[] {0.8470588235f, 0.427450980392f, 0f }, 1.0f);
 
-Ifc.Constants.materials = {
+Ifc.Constants.materials1 = {
 	IfcSpace: {r: 0.5, g: 0.4, b: 0.1, a: 0.6},
 	IfcRoof: {r: 70/255, g: 30/255, b: 30/255, a: 0.7},
 	IfcSlab: {r: 160.0/255, g: 150/255, b:104.0/255, a: 0.7},
@@ -99,6 +76,114 @@ Ifc.Constants.materials = {
 	IfcProduct: {r:0.0, g: 102/255, b:102/255, a: 0.6},
 	DEFAULT: {r: 0.8470588235, g: 0.427450980392, b: 0, a: 0.6}
 }
+
+
+Ifc.Constants.materials2 = {
+		IfcSpace: {r: 0.5, g: 0.4, b: 0.1, a: 0.6},
+		IfcRoof: {r: 142/255, g: 142/255, b: 130/255, a: 1},
+		IfcSlab: {r: 204/255, g: 204/255, b:204/255, a: 1},
+		IfcWall: {r: 205/255, g: 205/255, b: 205/255, a:1},
+		IfcWallStandardCase: {r: 205/255, g: 205/255, b: 205/255, a:1},
+		IfcDoor: {r: 0.55, g:0.55, b:0.5, a: 1},
+		IfcWindow: {r: 0, g: 0.5, b: 1, a: 0.2},
+		IfcOpeningElement: {r:0, g: 0, b: 0, a: 1},
+		IfcRailing: {r: 153/255, g: 153/255, b:153/255, a: 1},
+		IfcColumn: {r:102/255, g:102/255, b: 102/255, a: 1},
+		IfcBeam:{r: 0, g: 0, b:0, a:0.6},
+		IfcBeamStandardCase: {r: 0, g: 0, b: 0, a: 0.6},
+		IfcFurnishingElement: {r: 142/255, g: 130/255, b: 102/255, a: 1},
+		IfcCurtainWall: {r:0, g: 0, b: 0, a: 0.6},
+		IfcStair: {r: 0, g: 0, b: 0, a: 0.6},
+		IfcStairFlight: {r:  204/255, g:204/255, b:204/255, a:1},
+		IfcBuildingElementProxy: {r: 51/255, g: 102/255, b: 0/255, a: 1},
+		IfcFlowSegment: {r: 0, g: 0, b:0, a: 0.6},
+		IfcFlowitting: {r: 0, g: 0, b: 0, a: 0.6},
+		IfcFlowTerminal: {r: 0, g:  0, b: 0, a: 0.6},
+		IfcProxy: {r: 0, g: 0, b: 0, a:0},
+		IfcSite: {r:51/255, g: 102/255, b: 0/255, a: 1},
+		IfcLightFixture: {r:  0, g: 0, b:  0, a: 0.6},
+		IfcDuctSegment: {r: 0, g: 0, b:0, a: 0.6},
+		IfcDistributionFlowElement: {r: 0, g: 0, b: 0, a: 0},
+		IfcDuctFitting: {r: 0, g: 0, b:0, a: 0.6},
+		IfcPlate: {r: 0.4, g: 0.6, b:0.8, a: 0.4},
+		IfcPile: {r:0, g:  0, b: 0, a: 0.6},
+		IfcAirTerminal: {r: 0, g: 0, b: 0, a: 0.6},
+		IfcMember: {r: 0, g: 0, b:0, a: 0.6},
+		IfcCovering: {r: 0.8, g: 0.8, b: 0.8, a: 1},
+		IfcTransportElement: {r: 0, g: 0, b: 0, a: 0.6},
+		IfcFlowController: {r: 0, g: 0, b: 0, a: 0.6},
+		IfcFlowFitting: {r: 0, g: 0, b: 0, a: 0.6},
+		IfcRamp: {r: 0, g: 0, b: 0, a: 0.6},
+		IfcFurniture: {r: 0, g:0,b: 0, a: 0.6},
+		IfcFooting: {r: 0.4,g: 0.4, b: 0.4, a: 1},
+		IfcSystemFurnitureElement: {r: 0, g: 0, b: 0, a: 0.6},
+		IfcSpace: {r: 0, g: 0, b: 0, a: 0.6},
+		IfcBuildingElementPart: {r: 0, g: 0, b: 0, a: 0.6},
+		IfcDistributionElement: {r: 0, g: 0, b: 0, a: 0.6},
+		IfcProduct: {r:0, g: 0, b:0, a: 0.6},
+		DEFAULT: {r: 0.8470588235, g: 0.427450980392, b: 0, a: 0.6}
+}
+
+Ifc.Constants.materials3 = {
+		IfcSpace: {r: 0.5, g: 0.4, b: 0.1, a: 0.6},
+		IfcRoof: {r: 70/255, g: 30/255, b: 30/255, a: 0.7},
+		IfcSlab: {r: 153/255, g: 153/255, b:153/255, a: 1},
+		IfcWall: {r: 153/255, g: 166/255, b: 153/255, a:0.6},
+		IfcWallStandardCase: {r: 146.0/255, g: 145/255, b: 130/255, a:1},
+		IfcDoor: {r: 0.8, g:  0.8, b:0.8, a: 1},
+		IfcWindow: {r: 0, g: 0, b: 0, a: 0.5},
+		IfcOpeningElement: {r:0.5, g: 0.5, b: 0.5, a: 1},
+		IfcRailing: {r: 0.6, g: 0.6, b:0.6, a: 1},
+		IfcColumn: {r:0.6, g:0.65, b: 0.6, a: 1},
+		IfcBeam:{r: 0, g: 0, b:0, a:0.6},
+		IfcBeamStandardCase: {r: 0, g: 0, b: 0, a: 0},
+		IfcFurnishingElement: {r: 146/255, g: 145/255, b: 146/255, a: 1},
+		IfcCurtainWall: {r:0, g: 0, b: 0, a: 0},
+		IfcStair: {r: 0, g: 0, b: 0, a: 0.6},
+		IfcStairFlight: {r:  0.4, g:0.4, b:0.4, a:1},
+		IfcBuildingElementProxy: {r: 0.4, g: 0.6, b: 0.2, a: 1},
+		IfcFlowSegment: {r: 0, g: 0, b:0, a: 0},
+		IfcFlowitting: {r: 0, g: 0, b: 0, a: 0},
+		IfcFlowTerminal: {r: 0, g:  0, b: 0, a: 0.6},
+		IfcProxy: {r: 0, g: 0, b: 0, a:0},
+		IfcSite: {r:153/255, g: 205/255, b: 153/255, a: 1},
+		IfcLightFixture: {r:  0, g: 0, b:  0, a: 0},
+		IfcDuctSegment: {r: 0, g: 0, b:0, a: 0},
+		IfcDistributionFlowElement: {r: 0, g: 0, b: 0, a: 0},
+		IfcDuctFitting: {r: 0, g: 0, b:0, a: 0},
+		IfcPlate: {r: 0, g: 0, b:0, a: 0.5},
+		IfcPile: {r:0, g:  0, b: 0, a: 0},
+		IfcAirTerminal: {r: 0, g: 0, b: 0, a: 0},
+		IfcMember: {r: 0, g: 0, b:0, a: 0.6},
+		IfcCovering: {r: 0.6, g: 0.6, b: 0.6, a: 0.6},
+		IfcTransportElement: {r: 0, g: 0, b: 0, a: 0},
+		IfcFlowController: {r: 0, g: 0, b: 0, a: 0},
+		IfcFlowFitting: {r: 0, g: 0, b: 0, a: 0},
+		IfcRamp: {r: 0, g: 0, b: 0, a: 0},
+		IfcFurniture: {r: 0, g:0,b: 0, a: 0},
+		IfcFooting: {r: 0.6,g: 0.6, b: 0.6, a: 1},
+		IfcSystemFurnitureElement: {r: 0, g: 0, b: 0, a: 0},
+		IfcSpace: {r: 0, g: 0, b: 0, a: 0},
+		IfcBuildingElementPart: {r: 0, g: 0, b: 0, a: 0},
+		IfcDistributionElement: {r: 0, g: 0, b: 0, a: 0},
+		IfcProduct: {r:0, g: 0, b:0, a: 0},
+		DEFAULT: {r: 0.8470588235, g: 0.427450980392, b: 0, a: 0.6}
+	}
+
+var IfcMType = localStorage.IfcMType;
+if(IfcMType){
+	Ifc.Constants.materials = Ifc.Constants['materials'+ IfcMType];
+}else{
+	localStorage.setItem("IfcMType", 1);
+	Ifc.Constants.materials = Ifc.Constants.materials1;
+}
+ 
+
+
+
+
+
+
 
 /*
  * Default camera settings

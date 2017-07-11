@@ -1,0 +1,9 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<div class="floor">
+	<ul>
+   		<li><span class="floor-tittle">配色方案</span></li>
+   		<li ng-repeat="item in colorData" ng-click="colorClick(item)" ng-init="item.isActive=true" ng-class="{true: 'hover', false: ''}[item.isActive]">
+   			<span>{{item.name}}</span>
+   		</li>
+    </ul>
+</div>

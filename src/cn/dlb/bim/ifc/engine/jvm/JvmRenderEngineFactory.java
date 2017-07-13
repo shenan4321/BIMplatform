@@ -11,14 +11,9 @@ import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Component;
 
-import cn.dlb.bim.PlatformContext;
 import cn.dlb.bim.component.PlatformServer;
-import cn.dlb.bim.controller.RootController;
+import cn.dlb.bim.component.PlatformServerConfig;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
 import cn.dlb.bim.ifc.engine.IRenderEngine;
 import cn.dlb.bim.ifc.engine.IRenderEngineFactory;
@@ -50,10 +45,10 @@ public class JvmRenderEngineFactory implements IRenderEngineFactory {
 			} else if (os.contains("linux")) {
 				libraryName = "libifcengine.so";
 			}
-			InputStream inputStream = Files.newInputStream(PlatformContext.getClassRootPath().resolve("lib/" + System.getProperty("sun.arch.data.model") + "/" + libraryName));
+			InputStream inputStream = Files.newInputStream(server.getPlatformServerConfig().getCompileClassRoute().resolve("lib/" + System.getProperty("sun.arch.data.model") + "/" + libraryName));
 			if (inputStream != null) {
 				try {
-					Path tmpFolder = PlatformContext.getTempPath();
+					Path tmpFolder = server.getPlatformServerConfig().getTempDir();
 					nativeFolder = tmpFolder.resolve("ifcenginedll");
 					Path file = nativeFolder.resolve(libraryName);
 					if (Files.exists(nativeFolder)) {
@@ -94,7 +89,8 @@ public class JvmRenderEngineFactory implements IRenderEngineFactory {
 //				classPathEntries.add(path.toAbsolutePath().toString());
 //			}
 			
-			return new JvmIfcEngine(schemaFile, nativeFolder, PlatformContext.getTempPath(), PlatformContext.getClasslocation(), classPathEntries);
+			return new JvmIfcEngine(schemaFile, nativeFolder, server.getPlatformServerConfig().getTempDir(), server.getPlatformServerConfig().getClassPath()
+					, classPathEntries);
 		} catch (RenderEngineException e) {
 			throw e;
 		}

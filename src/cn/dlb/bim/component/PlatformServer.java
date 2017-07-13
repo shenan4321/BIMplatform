@@ -1,9 +1,9 @@
 package cn.dlb.bim.component;
 
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import cn.dlb.bim.PlatformContext;
 import cn.dlb.bim.cache.ModelCacheManager;
 import cn.dlb.bim.cache.NewDiskCacheManager;
 import cn.dlb.bim.dao.IfcModelDao;
@@ -15,6 +15,7 @@ import cn.dlb.bim.ifc.engine.jvm.JvmRenderEngineFactory;
 import cn.dlb.bim.ifc.engine.pool.CommonsPoolingRenderEnginePoolFactory;
 import cn.dlb.bim.ifc.engine.pool.RenderEnginePoolFactory;
 import cn.dlb.bim.ifc.engine.pool.RenderEnginePools;
+import cn.dlb.bim.service.PlatformService;
 import cn.dlb.bim.service.impl.PlatformServiceImpl;
 
 /**
@@ -22,14 +23,14 @@ import cn.dlb.bim.service.impl.PlatformServiceImpl;
  *
  */
 @Component("PlatformServer")
-public class PlatformServer {
+public class PlatformServer implements InitializingBean {
 
-	private final MetaDataManager metaDataManager;
-	private final SerializationManager serializationManager;
-	private final ColladaCacheManager colladaCacheManager;
-	private final ColladaProcessFactory colladaProcessFactory;
-	private final ModelCacheManager modelCacheManager;
-	private final NewDiskCacheManager diskCacheManager;
+	private MetaDataManager metaDataManager;
+	private SerializationManager serializationManager;
+	private ColladaCacheManager colladaCacheManager;
+	private ColladaProcessFactory colladaProcessFactory;
+	private ModelCacheManager modelCacheManager;
+	private NewDiskCacheManager diskCacheManager;
 	private RenderEnginePools renderEnginePools;
 	
 	@Autowired
@@ -38,14 +39,17 @@ public class PlatformServer {
 	private LongActionManager longActionManager;
 	@Autowired
 	private IfcModelDao ifcModelDao;
+	@Autowired
+	private PlatformServerConfig platformServerConfig;
 	
-	public PlatformServer() {
-		metaDataManager = new MetaDataManager(PlatformContext.getTempPath());
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		metaDataManager = new MetaDataManager(platformServerConfig.getTempDir());
 		serializationManager = new SerializationManager(this);
 		colladaCacheManager = new ColladaCacheManager(this);
-		colladaProcessFactory = new ColladaProcessFactory();
+		colladaProcessFactory = new ColladaProcessFactory(this);
 		modelCacheManager = new ModelCacheManager();
-		diskCacheManager = new NewDiskCacheManager(PlatformContext.getDiskCachepath());
+		diskCacheManager = new NewDiskCacheManager(platformServerConfig.getDiskCachePath());
 		renderEnginePools = new RenderEnginePools(this, new CommonsPoolingRenderEnginePoolFactory(10), new JvmRenderEngineFactory(this));//先写10
 		
 		initialize();
@@ -94,6 +98,10 @@ public class PlatformServer {
 
 	public RenderEnginePools getRenderEnginePools() {
 		return renderEnginePools;
+	}
+
+	public PlatformServerConfig getPlatformServerConfig() {
+		return platformServerConfig;
 	}
 	
 }

@@ -26,6 +26,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EClassifier;
@@ -34,16 +35,15 @@ import org.eclipse.emf.ecore.EEnum;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.EcorePackage;
+
 import cn.dlb.bim.ifc.database.DatabaseException;
 import cn.dlb.bim.ifc.deserializers.IfcParserWriterUtils;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
-import cn.dlb.bim.ifc.emf.ProjectInfo;
 import cn.dlb.bim.ifc.model.IfcHeader;
 import cn.dlb.bim.ifc.serializers.SerializerException;
 import cn.dlb.bim.ifc.serializers.SerializerInputstream;
 import cn.dlb.bim.ifc.serializers.StreamingReader;
 import cn.dlb.bim.ifc.stream.MinimalVirtualObject;
-import cn.dlb.bim.ifc.stream.ObjectProvider;
 import cn.dlb.bim.ifc.stream.VirtualObject;
 import cn.dlb.bim.ifc.stream.WrappedVirtualObject;
 import cn.dlb.bim.service.PlatformService;
@@ -52,7 +52,7 @@ import cn.dlb.bim.utils.UTF8PrintWriter;
 import nl.tue.buildingsmart.schema.EntityDefinition;
 import nl.tue.buildingsmart.schema.SchemaDefinition;
 
-public abstract class IfcStepStreamingSerializer implements StreamingSerializer, StreamingReader {
+public abstract class IfcStepStreamingSerializer implements StreamingSerializer, StreamingReader, OidConvertingSerializer {
 	private static final EcorePackage ECORE_PACKAGE_INSTANCE = EcorePackage.eINSTANCE;
 	private static final String NULL = "NULL";
 	private static final String OPEN_CLOSE_PAREN = "()";

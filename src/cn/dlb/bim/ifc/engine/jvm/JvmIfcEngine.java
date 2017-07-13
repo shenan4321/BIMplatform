@@ -107,6 +107,8 @@ public class JvmIfcEngine implements IRenderEngine {
 			command.append(" -classpath ");
 			command.append("\"");
 			command.append(classLocation + File.pathSeparator);
+			
+			System.out.println("classLocation" + classLocation);
 			if (classPathEntries != null) {
 				for (String classPathEntry : classPathEntries) {
 					command.append(classPathEntry + File.pathSeparator);

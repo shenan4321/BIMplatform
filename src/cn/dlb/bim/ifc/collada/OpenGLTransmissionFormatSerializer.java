@@ -24,8 +24,8 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import cn.dlb.bim.PlatformContext;
 import cn.dlb.bim.component.PlatformServer;
+import cn.dlb.bim.component.PlatformServerConfig;
 import cn.dlb.bim.ifc.collada.ColladaProcess.Collada2GLTFConfiguration;
 import cn.dlb.bim.ifc.emf.IfcModelInterface;
 import cn.dlb.bim.ifc.emf.ProjectInfo;
@@ -106,7 +106,7 @@ public class OpenGLTransmissionFormatSerializer extends EmfSerializer {
 		if (getMode() == Mode.BODY) {
 			Path writeDirectory = null;
 			try {
-				Path tempDirectory = PlatformContext.getTempPath();
+				Path tempDirectory = server.getPlatformServerConfig().getTempDir();
 				if (!Files.exists(tempDirectory))
 					Files.createDirectory(tempDirectory);
 				//

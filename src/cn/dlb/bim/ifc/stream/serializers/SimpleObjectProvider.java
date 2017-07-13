@@ -1,4 +1,4 @@
-package cn.dlb.bim.ifc.stream;
+package cn.dlb.bim.ifc.stream.serializers;
 
 import java.io.IOException;
 
@@ -6,6 +6,7 @@ import org.springframework.data.util.CloseableIterator;
 
 import cn.dlb.bim.ifc.database.DatabaseException;
 import cn.dlb.bim.ifc.query.QueryException;
+import cn.dlb.bim.ifc.stream.VirtualObject;
 
 public class SimpleObjectProvider implements ObjectProvider {
 	

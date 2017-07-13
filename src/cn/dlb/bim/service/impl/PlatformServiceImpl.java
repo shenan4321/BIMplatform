@@ -18,8 +18,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.util.CloseableIterator;
 import org.springframework.stereotype.Component;
 
-import cn.dlb.bim.PlatformContext;
 import cn.dlb.bim.component.PlatformServer;
+import cn.dlb.bim.component.PlatformServerConfig;
 import cn.dlb.bim.dao.IfcModelDao;
 import cn.dlb.bim.dao.PlatformInitDatasDao;
 import cn.dlb.bim.dao.entity.IfcClassLookupEntity;
@@ -87,7 +87,7 @@ public class PlatformServiceImpl implements InitializingBean, PlatformService {
 	}
 	
 	private void initPlatformInitDatas() {
-		PlatformInitDatasEntity platformInitDatasEntity = platformInitDatasDao.queryPlatformInitDatasEntityByPlatformVersionId(PlatformContext.getPlatformVersion());
+		PlatformInitDatasEntity platformInitDatasEntity = platformInitDatasDao.queryPlatformInitDatasEntityByPlatformVersionId(PlatformServerConfig.PLATFORM_VERSION);
 		if (platformInitDatasEntity == null) {
 			createPlatformInitDatas();
 		} 
@@ -174,13 +174,13 @@ public class PlatformServiceImpl implements InitializingBean, PlatformService {
 	
 	private void createPlatformInitDatas() {
 		PlatformInitDatasEntity platformInitDatasEntity = new PlatformInitDatasEntity();
-		platformInitDatasEntity.setPlatformVersionId(PlatformContext.getPlatformVersion());
+		platformInitDatasEntity.setPlatformVersionId(PlatformServerConfig.PLATFORM_VERSION);
 		platformInitDatasEntity.setRevisionId(1);
 		platformInitDatasDao.insertPlatformInitDatasEntity(platformInitDatasEntity);
 	}
 
 	public Integer newRevisionId() {
-		PlatformInitDatasEntity platformInitDatasEntity = platformInitDatasDao.findAndIncreateRevisionId(PlatformContext.getPlatformVersion(), 1);
+		PlatformInitDatasEntity platformInitDatasEntity = platformInitDatasDao.findAndIncreateRevisionId(PlatformServerConfig.PLATFORM_VERSION, 1);
 		return platformInitDatasEntity.getRevisionId();
 	}
 

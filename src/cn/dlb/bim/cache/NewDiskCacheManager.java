@@ -29,7 +29,7 @@ public class NewDiskCacheManager {
 		this.cacheDir = cacheDir;
 		try {
 			if (!Files.exists(cacheDir)) {
-				Files.createDirectory(cacheDir);
+				Files.createDirectories(cacheDir);
 			}
 			for (Path file : PathUtils.list(this.cacheDir)) {
 				if (file.getFileName().toString().endsWith(".__tmp")) {

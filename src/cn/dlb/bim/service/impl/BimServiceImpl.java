@@ -4,19 +4,18 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.util.CloseableIterator;
 import org.springframework.stereotype.Service;
 
 import com.mongodb.DBObject;
@@ -49,13 +48,10 @@ import cn.dlb.bim.ifc.engine.RenderEngineException;
 import cn.dlb.bim.ifc.engine.cells.Vector3d;
 import cn.dlb.bim.ifc.engine.pool.RenderEnginePool;
 import cn.dlb.bim.ifc.engine.pool.RenderEnginePools;
-import cn.dlb.bim.ifc.model.IfcHeader;
 import cn.dlb.bim.ifc.serializers.IfcStepSerializer;
 import cn.dlb.bim.ifc.serializers.SerializerException;
 import cn.dlb.bim.ifc.shared.ProgressReporter;
-import cn.dlb.bim.ifc.stream.SimpleObjectProvider;
 import cn.dlb.bim.ifc.stream.VirtualObject;
-import cn.dlb.bim.ifc.stream.serializers.IfcStepStreamingSerializer;
 import cn.dlb.bim.ifc.tree.BuildingCellContainer;
 import cn.dlb.bim.ifc.tree.BuildingCellGenerator;
 import cn.dlb.bim.ifc.tree.BuildingStorey;
@@ -288,6 +284,7 @@ public class BimServiceImpl implements BimService {
 		server.getColladaCacheManager().saveGlb(glbInput, rid.toString(), rid, longitude, latitude);
 	}
 
+	@SuppressWarnings("resource")
 	private Schema preReadSchema(File file) throws IOException, DeserializeException {
 		BufferedReader br = new BufferedReader(new FileReader(file));
 		String line = null;
@@ -486,6 +483,7 @@ public class BimServiceImpl implements BimService {
 		return result;
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public Long convertIfcToGlbOffline(File modelFile) {
 		Long glbId = -1l;
@@ -676,39 +674,47 @@ public class BimServiceImpl implements BimService {
 //		outputTemplate.getIfcTypeSelectorMap().get("IfcOpeningElement").getObjectTypeMap().put("Opening", false);
 //		outputTemplateDao.modifyOutputTemplate(outputTemplate);
 		
+//		PackageMetaData packageMetaData = server.getMetaDataManager().getPackageMetaData(Schema.IFC2X3TC1.getEPackageName());
+//		IfcStepStreamingSerializer serialzer = new IfcStepStreamingSerializer() {
+//		};
+//		Integer rid = 50;
+//		CloseableIterator<VirtualObject> iterator = platformService.streamVirtualObjectByRid(rid);
+//		IfcHeader ifcHeader = platformService.queryIfcHeader(rid);
+//		SimpleObjectProvider objectProvider = new SimpleObjectProvider(iterator);
+//		try {
+//			serialzer.init(platformService, objectProvider, ifcHeader, packageMetaData);
+//			FileOutputStream fos = new FileOutputStream(new File("E://text.ifc"));
+//			serialzer.writeToOutputStream(fos);
+//			fos.flush();
+//			fos.close();
+//		} catch (SerializerException e) {
+//			e.printStackTrace();
+//		} catch (FileNotFoundException e) {
+//			e.printStackTrace();
+//		} catch (DatabaseException e) {
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+		
 		PackageMetaData packageMetaData = server.getMetaDataManager().getPackageMetaData(Schema.IFC2X3TC1.getEPackageName());
-		IfcStepStreamingSerializer serialzer = new IfcStepStreamingSerializer() {
-		};
-		Integer rid = 50;
-		CloseableIterator<VirtualObject> iterator = platformService.streamVirtualObjectByRid(rid);
-		IfcHeader ifcHeader = platformService.queryIfcHeader(rid);
-		SimpleObjectProvider objectProvider = new SimpleObjectProvider(iterator);
-		try {
-			serialzer.init(platformService, objectProvider, ifcHeader, packageMetaData);
-			FileOutputStream fos = new FileOutputStream(new File("E://text.ifc"));
-			serialzer.writeToOutputStream(fos);
-			fos.flush();
-			fos.close();
-		} catch (SerializerException e) {
-			e.printStackTrace();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (DatabaseException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+		EClass ifcProduct = packageMetaData.getEClass("IfcBuilding");
+		Set<EClass> subClasses = packageMetaData.getAllSubClasses(ifcProduct);
+		List<Short> cids = new ArrayList<Short>();
+		cids.add(platformService.getCidOfEClass(ifcProduct));
+		for (EClass subClass : subClasses) {
+			Short cid = platformService.getCidOfEClass(subClass);
+			cids.add(cid);
+		}
+		List<VirtualObject> virtualObjects = platformService.queryVirtualObject(50, cids);
+		
+		for (VirtualObject virtualObject : virtualObjects) {
+			EClass eclass = platformService.getEClassForCid(virtualObject.getEClassId());
+			EReference isDecomposedByReference = packageMetaData.getEReference(eclass.getName(), "IsDecomposedBy");
+			Object isDecomposedBy = virtualObject.eGet(isDecomposedByReference);
+			System.out.println(isDecomposedBy);
 		}
 		
-//		PackageMetaData packageMetaData = server.getMetaDataManager().getPackageMetaData(Schema.IFC2X3TC1.getEPackageName());
-//		EClass ifcProduct = packageMetaData.getEClass("IfcProduct");
-//		Set<EClass> subClasses = packageMetaData.getAllSubClasses(ifcProduct);
-//		List<Short> cids = new ArrayList<Short>();
-//		for (EClass subClass : subClasses) {
-//			Short cid = platformService.getCidOfEClass(subClass);
-//			cids.add(cid);
-//		}
-//		List<VirtualObject> virtualObjects = platformService.queryVirtualObject(39, cids);
-//		System.out.println(virtualObjects);
 	}
 	
 	public List<VirtualObject> queryVirtualObject(Integer rid, List<Short> cids) {

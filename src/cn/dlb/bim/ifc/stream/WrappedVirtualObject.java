@@ -35,4 +35,12 @@ public class WrappedVirtualObject implements MinimalVirtualObject {
 			features.put(eStructuralFeature.getName(), value);
 		}
 	}
+	public void set(String key, Object value) {
+		if (value != null) {
+			features.put(key, value);
+		}
+	}
+	public Object eGet(String key) {
+		return features.get(key);
+	}
 }

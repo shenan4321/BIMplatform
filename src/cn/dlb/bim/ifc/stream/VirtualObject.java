@@ -83,4 +83,10 @@ public class VirtualObject implements MinimalVirtualObject {
 	public Map<String, Object> getFeatures() {
 		return features;
 	}
+	public Boolean has(String key) {
+		return features.containsKey(key);
+	}
+	public Object get(String key) {
+		return features.get(key);
+	}
 }

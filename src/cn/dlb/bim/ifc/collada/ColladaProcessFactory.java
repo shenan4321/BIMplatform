@@ -10,16 +10,18 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cn.dlb.bim.PlatformContext;
+import cn.dlb.bim.component.PlatformServer;
+import cn.dlb.bim.component.PlatformServerConfig;
 import cn.dlb.bim.utils.PathUtils;
 
 public class ColladaProcessFactory {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ColladaProcessFactory.class);
 	
 	private Path nativeExcuteFile;
+	private PlatformServer server;
 	
-	public ColladaProcessFactory() {
-		
+	public ColladaProcessFactory(PlatformServer server) {
+		this.server = server;
 	}
 	
 	public void initialize() {
@@ -33,10 +35,10 @@ public class ColladaProcessFactory {
 			} else if (os.contains("linux")) {
 				libraryName = "collada2gltf";
 			}
-			InputStream inputStream = Files.newInputStream(PlatformContext.getClassRootPath().resolve("lib/" + System.getProperty("sun.arch.data.model") + "/" + libraryName));
+			InputStream inputStream = Files.newInputStream(server.getPlatformServerConfig().getCompileClassRoute().resolve("lib/" + System.getProperty("sun.arch.data.model") + "/" + libraryName));
 			if (inputStream != null) {
 				try {
-					Path tmpFolder = PlatformContext.getTempPath();
+					Path tmpFolder = server.getPlatformServerConfig().getTempDir();
 					Path nativeFolder = tmpFolder.resolve("collada2gltf");
 					nativeExcuteFile = nativeFolder.resolve(libraryName);
 					if (Files.exists(nativeFolder)) {

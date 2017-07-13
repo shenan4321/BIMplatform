@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
-import cn.dlb.bim.PlatformContext;
 import cn.dlb.bim.ifc.emf.IdEObject;
 import cn.dlb.bim.ifc.emf.IfcModelInterface;
 import cn.dlb.bim.ifc.tree.BuildingStorey;
@@ -29,6 +28,8 @@ public class RecordSearchManager {
 	@Autowired
 	@Qualifier("BimServiceImpl")
 	private BimService bimService;
+	@Autowired
+	private PlatformServerConfig platformServerConfig;
 	
 	public static Integer Record_Limit = Integer.MAX_VALUE;
 	
@@ -112,7 +113,7 @@ public class RecordSearchManager {
 	}
 	
 	public Path getIndexPath(Integer rid) {
-		Path tempPath = PlatformContext.getTempPath();
+		Path tempPath = platformServerConfig.getTempDir();
 		Path indexPath = tempPath.resolve("index/" + rid + "/");
 		return indexPath;
 	}

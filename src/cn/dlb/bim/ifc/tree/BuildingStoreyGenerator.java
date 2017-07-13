@@ -35,6 +35,7 @@ public class BuildingStoreyGenerator {
 		return result;
 	}
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void collectBuildingStorey(IdEObject object, BuildingStorey buildingStorey) {
 		if (!isInstanceOf(object, "IfcObjectDefinition")) {
 			return;

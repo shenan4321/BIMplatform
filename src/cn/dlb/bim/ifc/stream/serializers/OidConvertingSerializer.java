@@ -17,17 +17,9 @@ package cn.dlb.bim.ifc.stream.serializers;
  * along with this program.  If not, see {@literal<http://www.gnu.org/licenses/>}.
  *****************************************************************************/
 
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.util.Map;
 
-import cn.dlb.bim.ifc.database.DatabaseException;
-import cn.dlb.bim.ifc.emf.PackageMetaData;
-import cn.dlb.bim.ifc.model.IfcHeader;
-import cn.dlb.bim.ifc.serializers.SerializerException;
-import cn.dlb.bim.service.PlatformService;
+public interface OidConvertingSerializer {
 
-public interface StreamingSerializer {
-	void init(PlatformService platformService, ObjectProvider objectProvider, IfcHeader ifcHeader, PackageMetaData packageMetaData) throws SerializerException;
-	void writeToOutputStream(OutputStream outputStream) throws SerializerException, DatabaseException;
-	InputStream getInputStream();
+	Map<Long, Integer> getOidToEid();
 }

@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import cn.dlb.bim.component.RecordSearchManager;
+import cn.dlb.bim.dao.entity.ModelAndOutputTemplateMap;
 import cn.dlb.bim.dao.entity.OutputTemplate;
 import cn.dlb.bim.ifc.collada.KmzSerializer;
 import cn.dlb.bim.ifc.emf.IdEObject;
@@ -354,6 +355,16 @@ public class ModelController {
 		OutputTemplateVo outputTemplateVo = bimService.queryOutputTemplate(rid, otid);
 		result.setSuccess(true);
 		result.setData(outputTemplateVo);
+		return result.getResult();
+	}
+	
+	@RequestMapping(value = "queryAllModelAndOutputTemplateMap", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> queryAllModelAndOutputTemplateMap(Integer rid) {
+		ResultUtil result = new ResultUtil();
+		List<ModelAndOutputTemplateMap> modelAndOutputTemplateMaps = bimService.queryModelAndOutputTemplateMapByRid(rid);
+		result.setSuccess(true);
+		result.setData(modelAndOutputTemplateMaps);
 		return result.getResult();
 	}
 	

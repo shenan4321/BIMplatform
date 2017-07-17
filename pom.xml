@@ -31,12 +31,12 @@
 				<directory>resources</directory>
 			</resource>
 			<resource>
-                <directory>generated/</directory>
-                <includes>
-                    <include>**/*.ecore</include>
-                </includes>
-                <filtering>true</filtering>
-            </resource>
+				<directory>generated/</directory>
+				<includes>
+					<include>**/*.ecore</include>
+				</includes>
+				<filtering>true</filtering>
+			</resource>
 		</resources>
 		<plugins>
 			<plugin>
@@ -72,6 +72,7 @@
 				<artifactId>maven-war-plugin</artifactId>
 				<version>2.4</version>
 				<configuration>
+					<failOnMissingWebXml>false</failOnMissingWebXml>
 					<!--指定web.xml文件的位置 -->
 					<webXml>WebContent\WEB-INF\web.xml</webXml>
 					<!--指定jsp等文件所在位置 -->

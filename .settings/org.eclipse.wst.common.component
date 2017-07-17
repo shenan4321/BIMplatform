@@ -1,15 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
     <wb-module deploy-name="BIMplatform">
-<<<<<<< HEAD
         <wb-resource deploy-path="/WEB-INF/web.xml" source-path="/WebContent/WEB-INF/web.xml"/>
         <wb-resource deploy-path="/" source-path="/target/m2e-wtp/web-resources"/>
         <wb-resource deploy-path="/" source-path="/WebContent" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/generated"/>
-=======
-        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
-        <wb-resource deploy-path="/WEB-INF/classes" source-path="/resources"/>
-        <wb-resource deploy-path="/" source-path="/generated"/>
->>>>>>> f531c63a6a98230e94841a0400550a963fab3e68
         <property name="context-root" value="BIMplatform"/>
         <property name="java-output-path" value="/BIMplatform/target/classes"/>
     </wb-module>

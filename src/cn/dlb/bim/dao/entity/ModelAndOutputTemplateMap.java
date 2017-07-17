@@ -10,6 +10,8 @@ public class ModelAndOutputTemplateMap {
 	private Integer rid;
 	@Indexed
 	private Long otid;
+	private String outputTemplateName;
+	
 	public Integer getRid() {
 		return rid;
 	}
@@ -21,5 +23,11 @@ public class ModelAndOutputTemplateMap {
 	}
 	public void setOtid(Long otid) {
 		this.otid = otid;
+	}
+	public String getOutputTemplateName() {
+		return outputTemplateName;
+	}
+	public void setOutputTemplateName(String outputTemplateName) {
+		this.outputTemplateName = outputTemplateName;
 	}
 }

@@ -66,7 +66,7 @@ public class OutputTemplateVo implements ITransformer<OutputTemplate> {
 		}
 	}
 	
-	public Set<Long> getAllSelectedOids() {
+	public Set<Long> allSelectedOids() {
 		Set<Long> resultSet = new HashSet<>();
 		for (IfcTypeSelectorVo ifcTypeSelectorVo : ifcTypeSelectorMap.values()) {
 			ifcTypeSelectorVo.getAllSelectedOids(resultSet);

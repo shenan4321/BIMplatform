@@ -109,7 +109,7 @@ public class BinaryGeometryOutputTemplateSerializer implements MessagingSerializ
 		
 		Set<IdEObject> output = new HashSet<>();
 		
-		Set<Long> oids = outputTemplate.getAllSelectedOids();
+		Set<Long> oids = outputTemplate.allSelectedOids();
 		
 		for (Long oid : oids) {
 			IdEObject idEObject = model.get(oid);

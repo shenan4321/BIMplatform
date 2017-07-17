@@ -368,6 +368,16 @@ public class ModelController {
 		return result.getResult();
 	}
 	
+	@RequestMapping(value = "newOutputTemplate", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> newOutputTemplate(Integer rid) {
+		ResultUtil result = new ResultUtil();
+		OutputTemplateVo outputTemplateVo = bimService.genModelDefaultOutputTemplate(rid);
+		result.setSuccess(true);
+		result.setData(outputTemplateVo);
+		return result.getResult();
+	}
+	
 	@RequestMapping(value = "kml", method = RequestMethod.GET)
 	public void kml(@RequestParam("rid")Integer rid) {
 		IfcModelInterface model = bimService.queryModelByRid(rid, null);

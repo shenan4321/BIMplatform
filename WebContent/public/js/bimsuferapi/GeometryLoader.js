@@ -40,7 +40,6 @@ function GeometryLoader(bimServerApi, models, viewer) {
 			geometry.indices = indices;
 			geometry.positions = vertices;
 			geometry.normals = normals;
-			
 			if (colors != null && colors.length > 0) {
 				geometry.colors = colors;
 			}

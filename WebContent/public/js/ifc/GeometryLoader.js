@@ -26,6 +26,15 @@ function GeometryLoader() {
         });
 	}
 	
+	this.createGeometryLine = function(geometryId,vertices,indices){
+		var geometry = new xeogl.Geometry(xeogl.scene, { // http://xeoengine.org/docs/classes/Geometry.html
+            id: "geometry.line" + geometryId,
+            primitive: "lines",
+            positions: vertices,
+            indices: indices
+        });
+	}
+	
 	this.createBimObject = function(geometryType , ifcProductOid , geometryDataOid , material, transformationMatrix){
 		o.ifcIds.push(ifcProductOid);
 		new xeogl.BIMObject(xeogl.scene, {
@@ -53,7 +62,8 @@ function GeometryLoader() {
 			var normals = data.readFloatArray((data.readInt()));
 			var colors = data.readFloatArray((data.readInt()));
 			o.createGeometry(geometryDataOid, vertices, normals, colors, indices);
-			o.createBimObject(geometryType , ifcProductOid ,[geometryDataOid], material, transformationMatrix)
+			o.createGeometryLine(geometryDataOid, vertices, IndicesForLinesWireFrame);
+			o.createBimObject(geometryType , ifcProductOid ,[geometryDataOid], material, transformationMatrix,true)
 		} else if(geometryType == 2){
 			var nrParts = data.readInt();
 			data.align8();
@@ -71,7 +81,7 @@ function GeometryLoader() {
 			o.createBimObject(geometryType , ifcProductOid ,geometryIds, material, transformationMatrix);
 		}else if(geometryType == 3){
             var geometryDataOid = data.readLong();
-            o.createBimObject(geometryType , ifcProductOid ,[geometryDataOid], material, transformationMatrix);
+            o.createBimObject(geometryType , ifcProductOid ,[geometryDataOid], material, transformationMatrix,true);
 		}else{
 			var arraySize = data.readInt();
             var coreIds = [];

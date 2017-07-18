@@ -68,11 +68,12 @@ xeogl.BIMObject = xeogl.Component.extend({
 
         //this.entities = [];
         var entity;
+        var entity1;
 
         
         if(cfg.geometryIds.length==1){
         	
-            entity = this.create({ // http://xeoengine.org/docs/classes/Entity.html
+            /*entity =*/ this.create({ // http://xeoengine.org/docs/classes/Entity.html
                 type: "xeogl.Entity",
                 id:'ifc'+this.id,
                 meta: {
@@ -84,11 +85,32 @@ xeogl.BIMObject = xeogl.Component.extend({
                 geometry: "geometry." + cfg.geometryIds[0],
                 transform: this.transform,
                 visibility: this.visibility,
-                material: this.material,
+                material:this.material,
                 stage: this.stage,
                 depthBuf: this.depthBuf
             });
 
+        	this.create({ // http://xeoengine.org/docs/classes/Entity.html
+                type: "xeogl.Entity",
+                meta: {
+                    objectId: cfg.geometryIds[0]+'line'
+                },
+                modes:this.modes,
+                lights:lights,
+                camera: camera,
+                geometry: "geometry.line" + cfg.geometryIds[0],
+                transform: this.transform,
+                visibility: this.visibility,
+                material: new xeogl.PhongMaterial({
+                    diffuse: [.1, .1, .1],
+                    emissive: [.1, .1, .1],
+                    lineWidth: 4
+                }),
+                stage: this.stage,
+                depthBuf: this.depthBuf
+            })
+
+            
         }else{
         	var geometryBuilder = new xeogl.GeometryBuilder();
         	
@@ -120,7 +142,6 @@ xeogl.BIMObject = xeogl.Component.extend({
     },
 
     add: function(geometryId){
-    	console.log(111);
         var entity = this.create({ // http://xeoengine.org/docs/classes/Entity.html
             type: "xeogl.Entity",
             meta: {

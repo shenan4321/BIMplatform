@@ -68,6 +68,7 @@
         <li class="li" data-name="searchCtrl"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 搜索 </p> </a> </li>
         <li class="li" data-name="floorCtrl"> <a class="font" data-section=""> <i class="iconfont">&#xe660;</i> <i class="iconfont1"></i> <p> 楼层 </p> </a> </li>
         <li class="li" data-name="colorCtrl"> <a class="font" data-section=""> <i class="icon iconfont">&#xe60a;</i> <i class="iconfont1"></i> <p> 配色 </p> </a> </li>
+        <li class="li" data-name="majorCtrl"> <a class="font" data-section=""> <i class="icon iconfont">&#xe636;</i> <i class="iconfont1"></i> <p> 专业 </p> </a> </li>
     </ul>
 </div>
 <div class="nav-slide">
@@ -108,12 +109,16 @@
             <div ng-include="'./treeTemp/floor.html'"></div>
         </div>
     </div>
-     <div class="nav-slide-o">
+    <div class="nav-slide-o">
         <div>
             <div ng-include="'./treeTemp/color.html'"></div>
         </div>
     </div>
-    <!--<div class="nav-slide-o"></div> -->
+    <div class="nav-slide-o">
+        <div>
+            <div ng-include="'./treeTemp/major.html'"></div>
+        </div>
+    </div>
 </div>
 <script type="text/javascript" src="public/js/jquery/2.1.4/jquery-2.1.4.min.js"></script>
 <!-- build:js1 -->
@@ -127,6 +132,7 @@
 <script src="public/js/ifc/StringView.js" type="text/javascript"></script>
 <script src="public/js/ifc/GeometryLoader.js" type="text/javascript"></script>
 <script src="public/js/xeogl/xeogl.min.js" type="text/javascript"></script>
+<script src="public/js/xeogl/xeogl.outline.js" type="text/javascript"></script>
 <script src="public/js/xeogl/xeoglGeometryBuilder.js" type="text/javascript"></script>
 <script src="public/js/xeogl/EventHandler.js" type="text/javascript"></script>
 <script src="public/js/xeogl/bimCameraControl.js" type="text/javascript"></script>
@@ -142,6 +148,7 @@
 <!-- build:js4 -->
 <script src="public/js/dlbSvg.js" type="text/javascript"></script>
 <script src="public/js/app/menu.js"></script>
+<script src="public/js/app/qaq.js"></script>
 <script src="public/js/html5validate.js" type="text/javascript"></script>
 <script src="public/js/color/jquery.minicolors.js" type="text/javascript"></script>
 <!-- endbuild -->
@@ -250,7 +257,7 @@
 						xeogl.scene.components[hisPick.name].material.emissive =  xeogl.scene.components[hisPick.name].material.baseColor;
                     }
                     hit.entity.material.emissive = new Float32Array([0, 1, 0]);
-                    hisPick = {name:hit.entity.id}
+                    hisPick = {name:hit.entity.id};
                     if(window.tt){
                         var pTableScope= $('#pTable').scope();
                         pTableScope.oid = hit.entity.id ;

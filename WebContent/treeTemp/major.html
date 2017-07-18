@@ -1,0 +1,50 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<div class="major-box">
+    <div class="major-box1 cl">
+        <span  class="fl" ng-show="majorTypedata.length>=1">提示：最多12个专业</span>
+        <button type="button" class="fr major-save-btn" ng-show="majorTypedata.length>=1">保存</button>
+        <button type="button" class="fl major-save-btn" ng-show="majorTypedata.length==0" ng-click="initMajor()">新建</button>
+    </div>
+	
+	
+    <div class="major-box2" ng-show="majorTypedata.length>=1">
+        <p>当前专业:</p>
+        <div class="select-down-wrapper">
+            <div class="select-down-showitem" ng-click="selectDown()">
+                <span class="select-down-left" ng-bind="{true:'默认',false:majorTypedata[0].name}[majorTypedata[0].name=='DEFAULT']"></span>
+                <div class="icon-black-down"></div>
+            </div>
+            <ul class="select-down-box" ng-repeat="item in majorTypedata" ng-show="majorTypedata.length>1 && majorTypedata.showTag">
+                <li ng-if="$index!=majorTypedata.indexNow">
+                    <span class="select-down-leftw">所有专业</span>
+                    <a class="icon-red-cross" title="删除">X</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+	
+	
+    <div  class="tile-choose-box"  ng-show="majorTypedata.length>=1">
+        <ul ng-repeat = "(key,value) in majorTypedata[majorTypedata.indexNow].ifcTypeSelectorMap">
+            <li ng-if="key != 'selected'">
+                <span ng-class="{true:'icon-tile-choose',false:'icon-tile-nochoose'}[value.selected]" ng-click="allMajorValue(value)" ng-init="value.selected = true"></span>
+                <span class="tile-font">{{key}}</span>
+                <b class="icon-white-down tile-fr" onclick="collosePand(this)"></b>
+            </li>
+            <ul ng-repeat = "(key1,val1) in value.namespaceSelectorMap">
+                <li ng-if="key1 != 'selected' ">
+                    <span class="icon-tile-choose" ng-class="{true:'icon-tile-choose',false:'icon-tile-nochoose'}[val1.selected]" ng-click="allMajorValue(val1)"></span>
+                    <a class="tile-font">{{key1}}</a>
+                </li>
+                <ul ng-repeat = "(key2,val2) in val1.objectTypeContainerMap">
+                    <li>
+                        <span class="icon-tile-choose" ng-class="{true:'icon-tile-choose',false:'icon-tile-nochoose'}[val2.selected]" ng-click="allMajorValue(val2)"></span>
+                        <span class="tile-font">{{key2}}</span>
+                    </li>
+                </ul>
+            </ul>
+            
+        </ul>
+    </div>
+    
+</div>	

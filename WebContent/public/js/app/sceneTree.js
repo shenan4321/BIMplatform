@@ -2,11 +2,12 @@ var myApp = angular.module("myApp", []);
 
 
 
-myApp.controller('myAppCtrl', function ($scope, $http) {
+myApp.controller('myAppCtrl', function ($scope, $http,$compile) {
 	
 	$scope.menuClick = function(param){
-		$scope[param]($scope, $http);
+		$scope[param]($scope, $http,$compile);
 	}
+	
 	
 	
 	$scope.fileCtrl = function($scope, $http){
@@ -32,7 +33,7 @@ myApp.controller('myAppCtrl', function ($scope, $http) {
 		
 		
 	    $scope.setOidShow = function(item){
-	    	console.log(item);
+	    	
 	    	if($scope.treeClick){
 	    		$scope.treeClick.checked = !$scope.treeClick.checked
 	    	}
@@ -64,10 +65,13 @@ myApp.controller('myAppCtrl', function ($scope, $http) {
 	
 	
 	$scope.typeCtrl = function($scope, $http){
-		$http.get('./model/queryBuildingCells.do?rid='+string).success(function (data,status) {  
-	    	$scope.typeList = data.data;
-	    }).error(function (data,status) {  
-	    }); 
+		if(!$scope.typeList){
+			$http.get('./model/queryBuildingCells.do?rid='+string).success(function (data,status) {  
+		    	$scope.typeList = data.data;
+		    }).error(function (data,status) {
+		    	
+		    }); 
+		}
 		$scope.typeShowTag = function(item){
 			item.checked = !item.checked;
 			angular.forEach(item.oids, function(data,index,array){
@@ -183,19 +187,184 @@ myApp.controller('myAppCtrl', function ($scope, $http) {
 		}
 	}
 	
-	$scope.markCtrl = function($scope, $http){
+	$scope.markCtrl = function($scope, $http,$compile){
 		$scope.changColor=function(){
 			$('.demo').minicolors();
 		}
 	}
 	
 	$scope.colorCtrl = function($scope, $http){
+		
+		$scope.IfcMType = localStorage.getItem("IfcMType") || 1;
+		
 	    $scope.colorData = [{id:1,name:'方案一'},{id:2,name:'方案二'},{id:3,name:'方案三'}];
-	     
+	    
 		$scope.colorClick = function(item){
 			Ifc.Constants.materials=Ifc.Constants['materials'+item.id];
 			localStorage.setItem("IfcMType",item.id);
-			window.location.reload();
+			$scope.IfcMType = item.id;
+			if(!$scope.typeList){
+				$http.get('./model/queryBuildingCells.do?rid='+string).success(function (data,status) {  
+			    	$scope.typeList = data.data;
+			    	allChangeColor($scope.typeList);
+			    }); 
+			}else{
+				allChangeColor($scope.typeList);
+			}
 		}
 	}
+	
+	$scope.majorCtrl = function($scope, $http){
+		
+		$http.get('./model/queryAllModelAndOutputTemplateMap.do?rid='+string).success(function (data,status) {
+	    	$scope.majorTypedata = data.data;
+	    });
+		
+		$scope.initMajor = function(){
+			$http.get('./model/newOutputTemplate.do?rid='+string).success(function (data,status) {
+		    	$scope.majorFirstdata = data.data;
+		    	$scope.majorTypedata.push(data.data);
+		    	$scope.majorTypedata.indexNow = 0;
+		    	dealMajorData();
+		    });
+		}
+		
+		$scope.selectDown = function(){
+			$scope.majorTypedata.showTag = true;
+		}
+		
+		$scope.allMajorValue = function(value){
+			value.selected = !value.selected;
+			
+			//第一层选择选中都选中
+			if(value.namespaceSelectorMap){
+				if(value.selected){
+					var tt = $scope.majorTypedata[$scope.majorTypedata.indexNow].ifcTypeSelectorMap;
+					//angular.forEach(tt, function(ttdata,idx){
+						//ttdata.selected = true;
+						angular.forEach(value.namespaceSelectorMap, function(ttd,i){
+							ttd.selected = true;
+							angular.forEach(ttd.objectTypeContainerMap, function(td){
+								td.selected = true;
+							});
+						});
+					//});
+				}else{
+					/*var tt = $scope.majorTypedata[$scope.majorTypedata.indexNow].ifcTypeSelectorMap;
+					angular.forEach(tt, function(ttdata,idx){
+						ttdata.selected = false;*/
+						angular.forEach(value.namespaceSelectorMap, function(ttd,i){
+							ttd.selected = false;
+							angular.forEach(ttd.objectTypeContainerMap, function(td){
+								td.selected = false;
+							});
+						});
+					//});
+				}
+			}
+
+			
+			//第二层选择选中都选中
+			if(value.objectTypeContainerMap){
+				if(value.selected){
+					angular.forEach(value.objectTypeContainerMap, function(ttdata){
+						ttdata.selected = true;
+					});
+				}else{
+					angular.forEach(value.objectTypeContainerMap, function(ttdata){
+						ttdata.selected = false;
+					});
+				}
+			}
+			
+			checkTree();
+			
+		}
+		
+		$scope.saveBtn = function(){
+			var dialog = new QAQ.AADialog({
+			    compile:$compile,
+			    scope:$scope,
+		        backdrop: false,//默认点击dialog背景时 不关闭dialog
+		        keyboard: true,//默认 按键盘escape 关闭dialog
+		        title: "对话框标题11",
+		        content: '<p>我是dialog的内容</p>',//dialog的模板 3种模式  1. content:'<p>我是dialog的内容</p>' 2.contentUrl:'/views/dialog模板.html' 3.contentSelector:'#模板id'
+		        width: 420,//选填
+		        zIndex: 999,//
+		        cache: true,//是否对模板进行缓存
+		        modal: true, //是否显示遮罩
+		        renderTo: 'body',//暂时无用
+		        drag: true,//是否可拖拽
+		        winResize: false,//浏览器缩放时是否重新定位
+			});
+		}
+		
+		function dealMajorData(){
+			var tt = $scope.majorTypedata[$scope.majorTypedata.indexNow].ifcTypeSelectorMap;
+			angular.forEach(tt, function(ttdata,idx){
+				ttdata.selected = true;
+				angular.forEach(ttdata.namespaceSelectorMap, function(ttd,i){
+					ttd.selected = true;
+				});
+			});
+		}
+		
+		function checkTree(){
+			var tt = $scope.majorTypedata[$scope.majorTypedata.indexNow].ifcTypeSelectorMap;
+			angular.forEach(tt, function(ttdata){
+				tt.selected = tt.selected;
+				var s1 = 0;
+				var count1 = 0;
+				angular.forEach(ttdata.namespaceSelectorMap, function(tdata,key){
+					if(key!='selected'){
+						count1++;
+					}
+					var s2 = 0;
+					var count2 = 0;
+					angular.forEach(tdata.objectTypeContainerMap, function(t){
+						if(t.objectType){
+							count2++;
+						}
+						if(t.selected){
+							s2++;
+						}
+					});	
+					if(s2 == count2){
+						tdata.selected  = true;
+					}else{
+						tdata.selected  = false;
+					}
+					if(tdata.selected){
+						s1++;
+					}					
+				});
+				if(s1 == count1){
+					ttdata.selected  = true;
+				}else{
+					ttdata.selected  = false;
+				}
+			});
+		}
+		
+		//不影响数据单纯数据操作		
+		window.collosePand = function(){
+			console.log(this)
+			
+		}
+	}
+
+	function allChangeColor(list){
+		angular.forEach(list, function(item,index,array){
+    		angular.forEach(item.oids, function(data,index,array){
+    			var mt = Ifc.Constants.materials['Ifc'+item.name] || Ifc.Constants.materials['DEFAULT'];
+    			if(xeogl.scene.components['ifc'+data]){
+	    			xeogl.scene.components['ifc'+data].material.emissive = [mt.r,mt.g,mt.b];
+	    			xeogl.scene.components['ifc'+data].material.baseColor = [mt.r,mt.g,mt.b]; 
+	    			xeogl.scene.components['ifc'+data].material.opacity = mt.a;
+    			}
+			});
+		});
+	}
+	
+
 });

@@ -3,9 +3,7 @@
     "use strict";
 
     /**
-
      Controls camera with mouse and keyboard, handles selection of entities and rotation point.
-
      */
     xeogl.BIMCameraControl = xeogl.Component.extend({
 
@@ -19,9 +17,9 @@
 
             // Configs
 
-            var sensitivityKeyboardRotate = cfg.sensitivityKeyboardRotate || 0.05;
+            var sensitivityKeyboardRotate = cfg.sensitivityKeyboardRotate || 0.5;
 
-            var orthoScaleRate = 0.02; // Rate at which orthographic scale changes with zoom
+            var orthoScaleRate = 0.8; // Rate at which orthographic scale changes with zoom
 
             var canvasPickTolerance = 4;
             var worldPickTolerance = 3;
@@ -449,8 +447,8 @@
                         var xDelta = - tempVecHover[0] * Math.PI;
                         var yDelta = tempVecHover[1] * Math.PI;
 
-                        rotationDeltas[0] += xDelta *0.01;
-                        rotationDeltas[1] += yDelta *0.01;
+                        rotationDeltas[0] += xDelta * 0.0009;
+                        rotationDeltas[1] += yDelta * 0.0009;
 
                         math.rotationMat4v(rotationDeltas[1] * math.DEGTORAD, orbitPitchAxis, pitchMat);
 
@@ -734,12 +732,11 @@
                         var zoomTimeInSeconds = 0.2;
                         var viewDistance = getSceneDiagSize();
                         if (lastHoverDistance) {
-                            viewDistance = viewDistance * 0.1 + lastHoverDistance;
+                            viewDistance = viewDistance * 0.02 + lastHoverDistance;
                         }
 
                         var tickDeltaSecs = e.deltaTime / 1000.0;
-                        
-                        var f = viewDistance * ((delta < 0) ? -1 : 1) / zoomTimeInSeconds / 50;
+                        var f = viewDistance * ((delta < 0) ? -1 : 1) / zoomTimeInSeconds / 100.;
 
                         if (newTarget) {
 

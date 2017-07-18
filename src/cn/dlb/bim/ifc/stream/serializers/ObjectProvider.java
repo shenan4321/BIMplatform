@@ -3,7 +3,7 @@ package cn.dlb.bim.ifc.stream.serializers;
 import java.io.IOException;
 
 import cn.dlb.bim.ifc.database.DatabaseException;
-import cn.dlb.bim.ifc.query.QueryException;
+import cn.dlb.bim.ifc.database.queries.om.QueryException;
 import cn.dlb.bim.ifc.stream.VirtualObject;
 
 public interface ObjectProvider {

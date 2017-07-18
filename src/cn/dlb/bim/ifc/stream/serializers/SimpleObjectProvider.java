@@ -5,7 +5,7 @@ import java.io.IOException;
 import org.springframework.data.util.CloseableIterator;
 
 import cn.dlb.bim.ifc.database.DatabaseException;
-import cn.dlb.bim.ifc.query.QueryException;
+import cn.dlb.bim.ifc.database.queries.om.QueryException;
 import cn.dlb.bim.ifc.stream.VirtualObject;
 
 public class SimpleObjectProvider implements ObjectProvider {

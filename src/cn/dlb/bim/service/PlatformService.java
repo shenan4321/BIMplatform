@@ -18,11 +18,13 @@ public interface PlatformService extends OidProvider {
 	public EClass getEClassForOid(long oid) throws DatabaseException;
 	public Integer newRevisionId();
 	public void syncOid();
-	void save(VirtualObject virtualObject) throws DatabaseException;
-	void saveOverwrite(VirtualObject virtualObject) throws DatabaseException;
+	void save(VirtualObject virtualObject);
+	void update(VirtualObject virtualObject);
 	public void saveBatch(VirtualObject virtualObject);
 	public void commitSaveBatch();
 	public List<VirtualObject> queryVirtualObject(Integer rid, List<Short> cids);
+	public CloseableIterator<VirtualObject> streamVirtualObject(Integer rid, Short cid);
+	public VirtualObject queryVirtualObject(Integer rid, Long oid);
 	public CloseableIterator<VirtualObject> streamVirtualObjectByRid(Integer rid);
 	public void saveIfcHeader(IfcHeader ifcHeader);
 	public IfcHeader queryIfcHeader(Integer rid);

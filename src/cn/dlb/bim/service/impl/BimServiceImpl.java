@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import com.mongodb.DBObject;
 import com.mongodb.gridfs.GridFSDBFile;
 
+import cn.dlb.bim.action.StreamingCheckinAction;
 import cn.dlb.bim.component.MongoGridFs;
 import cn.dlb.bim.component.PlatformServer;
 import cn.dlb.bim.dao.IfcModelDao;
@@ -697,24 +698,30 @@ public class BimServiceImpl implements BimService {
 //			e.printStackTrace();
 //		}
 		
-		PackageMetaData packageMetaData = server.getMetaDataManager().getPackageMetaData(Schema.IFC2X3TC1.getEPackageName());
-		EClass ifcProduct = packageMetaData.getEClass("IfcBuilding");
-		Set<EClass> subClasses = packageMetaData.getAllSubClasses(ifcProduct);
-		List<Short> cids = new ArrayList<Short>();
-		cids.add(platformService.getCidOfEClass(ifcProduct));
-		for (EClass subClass : subClasses) {
-			Short cid = platformService.getCidOfEClass(subClass);
-			cids.add(cid);
-		}
-		List<VirtualObject> virtualObjects = platformService.queryVirtualObject(50, cids);
+//		PackageMetaData packageMetaData = server.getMetaDataManager().getPackageMetaData(Schema.IFC2X3TC1.getEPackageName());
+//		EClass ifcProduct = packageMetaData.getEClass("IfcBuilding");
+//		Set<EClass> subClasses = packageMetaData.getAllSubClasses(ifcProduct);
+//		List<Short> cids = new ArrayList<Short>();
+//		cids.add(platformService.getCidOfEClass(ifcProduct));
+//		for (EClass subClass : subClasses) {
+//			Short cid = platformService.getCidOfEClass(subClass);
+//			cids.add(cid);
+//		}
+//		List<VirtualObject> virtualObjects = platformService.queryVirtualObject(50, cids);
+//		
+//		for (VirtualObject virtualObject : virtualObjects) {
+//			EClass eclass = platformService.getEClassForCid(virtualObject.getEClassId());
+//			EReference isDecomposedByReference = packageMetaData.getEReference(eclass.getName(), "IsDecomposedBy");
+//			Object isDecomposedBy = virtualObject.eGet(isDecomposedByReference);
+//			System.out.println(isDecomposedBy);
+//		}
 		
-		for (VirtualObject virtualObject : virtualObjects) {
-			EClass eclass = platformService.getEClassForCid(virtualObject.getEClassId());
-			EReference isDecomposedByReference = packageMetaData.getEReference(eclass.getName(), "IsDecomposedBy");
-			Object isDecomposedBy = virtualObject.eGet(isDecomposedByReference);
-			System.out.println(isDecomposedBy);
+		StreamingCheckinAction action = new StreamingCheckinAction(null, new File("E:\\IFC模型\\别墅.ifc"), server, platformService);
+		try {
+			action.execute();
+		} catch (DatabaseException | IfcModelInterfaceException e) {
+			e.printStackTrace();
 		}
-		
 	}
 	
 	public List<VirtualObject> queryVirtualObject(Integer rid, List<Short> cids) {

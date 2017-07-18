@@ -3,6 +3,7 @@ package cn.dlb.bim.dao.impl;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -158,6 +159,30 @@ public class IfcModelDaoImpl implements IfcModelDao {
 		Query query = new Query();
 		query.addCriteria(Criteria.where("rid").is(rid));
 		return mongoTemplate.findOne(query, IfcHeader.class);
+	}
+
+	@Override
+	public VirtualObject queryVirtualObject(Integer rid, Long oid) {
+		Query query = new Query();
+		query.addCriteria(Criteria.where("rid").is(rid).andOperator(Criteria.where("oid").is(oid)));
+		return mongoTemplate.findOne(query, VirtualObject.class);
+	}
+
+	@Override
+	public void updateVirtualObject(VirtualObject virtualObject) {
+		Query query = new Query();
+		query.addCriteria(Criteria.where("rid").is(virtualObject.getRid()).andOperator(Criteria.where("oid").is(virtualObject.getOid())));
+		Update update = new Update();
+		update.set("eClassId", virtualObject.getEClassId())
+			.set("features", virtualObject.getFeatures());
+		mongoTemplate.findAndModify(query, update, VirtualObject.class);
+	}
+
+	@Override
+	public CloseableIterator<VirtualObject> streamVirtualObject(Integer rid, Short cid) {
+		Query query = new Query();
+		query.addCriteria(Criteria.where("rid").is(rid).andOperator(Criteria.where("eClassId").is(cid)));
+		return mongoTemplate.stream(query, VirtualObject.class);
 	}
 
 }

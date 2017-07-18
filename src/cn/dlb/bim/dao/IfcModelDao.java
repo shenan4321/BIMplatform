@@ -33,7 +33,10 @@ public interface IfcModelDao {
 	public void insertAllVirtualObject(List<VirtualObject> virtualObjects);
 	public List<VirtualObject> queryVirtualObject(Integer rid, List<Short> cids);
 	public CloseableIterator<VirtualObject> streamVirtualObjectByRid(Integer rid);
+	public CloseableIterator<VirtualObject> streamVirtualObject(Integer rid, Short cid);
 	
 	public void saveIfcHeader(IfcHeader ifcHeader);
 	public IfcHeader queryIfcHeader(Integer rid);
+	public VirtualObject queryVirtualObject(Integer rid, Long oid);
+	public void updateVirtualObject(VirtualObject virtualObject);
 }

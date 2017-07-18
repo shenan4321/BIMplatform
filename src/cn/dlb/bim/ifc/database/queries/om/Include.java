@@ -51,28 +51,28 @@ public class Include extends PartOfQuery implements CanInclude {
 		fields.add(feature);
 	}
 	
-	public void addFieldDirect(String fieldName) throws QueryException {
-		EReference feature = null;
-		for (EClass eClass : types) {
-			if (eClass.getEStructuralFeature(fieldName) == null) {
-				throw new QueryException("Class \"" + eClass.getName() + "\" does not have the field \"" + fieldName + "\"");
-			}
-			if (feature == null) {
-				if (!(eClass.getEStructuralFeature(fieldName) instanceof EReference)) {
-					throw new QueryException(fieldName + " is not a reference");
-				}
-				feature = (EReference) eClass.getEStructuralFeature(fieldName);
-			} else {
-				if (feature != eClass.getEStructuralFeature(fieldName)) {
-					throw new QueryException("Classes \"" + eClass.getName() + "\" and \"" + feature.getEContainingClass().getName() + "\" have fields with the same name, but they are not logically the same");
-				}
-			}
-		}
-		if (fieldsDirect == null) {
-			fieldsDirect = new ArrayList<>();
-		}
-		fieldsDirect.add(feature);
-	}
+//	public void addFieldDirect(String fieldName) throws QueryException {
+//		EReference feature = null;
+//		for (EClass eClass : types) {
+//			if (eClass.getEStructuralFeature(fieldName) == null) {
+//				throw new QueryException("Class \"" + eClass.getName() + "\" does not have the field \"" + fieldName + "\"");
+//			}
+//			if (feature == null) {
+//				if (!(eClass.getEStructuralFeature(fieldName) instanceof EReference)) {
+//					throw new QueryException(fieldName + " is not a reference");
+//				}
+//				feature = (EReference) eClass.getEStructuralFeature(fieldName);
+//			} else {
+//				if (feature != eClass.getEStructuralFeature(fieldName)) {
+//					throw new QueryException("Classes \"" + eClass.getName() + "\" and \"" + feature.getEContainingClass().getName() + "\" have fields with the same name, but they are not logically the same");
+//				}
+//			}
+//		}
+//		if (fieldsDirect == null) {
+//			fieldsDirect = new ArrayList<>();
+//		}
+//		fieldsDirect.add(feature);
+//	}
 
 	public void addInclude(Include newInclude) {
 		if (includes == null) {

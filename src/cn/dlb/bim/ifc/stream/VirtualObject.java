@@ -5,9 +5,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EStructuralFeature;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import cn.dlb.bim.ifc.stream.query.QueryContext;
 
 @Document(collection = "VirtualObject")
 public class VirtualObject implements MinimalVirtualObject {

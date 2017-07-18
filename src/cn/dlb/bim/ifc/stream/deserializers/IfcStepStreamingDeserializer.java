@@ -604,5 +604,9 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 			throw new DeserializeException(lineNumber, "'" + val + "' is not a valid reference");
 		}
 	}
-	
+
+	public Integer getRid() {
+		return rid;
+	}
+
 }

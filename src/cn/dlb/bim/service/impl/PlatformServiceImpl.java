@@ -197,13 +197,13 @@ public class PlatformServiceImpl implements InitializingBean, PlatformService {
 	}
 
 	@Override
-	public void save(VirtualObject virtualObject) throws DatabaseException {
+	public void save(VirtualObject virtualObject) {
 		ifcModelDao.insertVirtualObject(virtualObject);
 	}
 
 	@Override
-	public void saveOverwrite(VirtualObject virtualObject) throws DatabaseException {
-		ifcModelDao.insertVirtualObject(virtualObject);
+	public void update(VirtualObject virtualObject) {
+		ifcModelDao.updateVirtualObject(virtualObject);
 	}
 	
 	@Override
@@ -246,5 +246,15 @@ public class PlatformServiceImpl implements InitializingBean, PlatformService {
 	@Override
 	public IfcHeader queryIfcHeader(Integer rid) {
 		return ifcModelDao.queryIfcHeader(rid);
+	}
+
+	@Override
+	public VirtualObject queryVirtualObject(Integer rid, Long oid) {
+		return ifcModelDao.queryVirtualObject(rid, oid);
+	}
+
+	@Override
+	public CloseableIterator<VirtualObject> streamVirtualObject(Integer rid, Short cid) {
+		return ifcModelDao.streamVirtualObject(rid, cid);
 	}
 }

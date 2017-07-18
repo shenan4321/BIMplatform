@@ -378,6 +378,20 @@ public class ModelController {
 		return result.getResult();
 	}
 	
+	@RequestMapping(value = "saveOutputTemplate", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> saveOutputTemplate(Integer rid, OutputTemplateVo outputTemplate) {
+		ResultUtil result = new ResultUtil();
+		bimService.insertOutputTemplate(outputTemplate);
+		ModelAndOutputTemplateMap map = new ModelAndOutputTemplateMap();
+		map.setOutputTemplateName(outputTemplate.getName());
+		map.setRid(rid);
+		map.setOtid(outputTemplate.getOtid());
+		bimService.insertModelAndOutputTemplateMap(map);
+		result.setSuccess(true);
+		return result.getResult();
+	}
+	
 	@RequestMapping(value = "kml", method = RequestMethod.GET)
 	public void kml(@RequestParam("rid")Integer rid) {
 		IfcModelInterface model = bimService.queryModelByRid(rid, null);

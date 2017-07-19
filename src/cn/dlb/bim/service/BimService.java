@@ -3,8 +3,6 @@ package cn.dlb.bim.service;
 import java.io.File;
 import java.util.List;
 
-import cn.dlb.bim.dao.entity.ModelAndOutputTemplateMap;
-import cn.dlb.bim.dao.entity.OutputTemplate;
 import cn.dlb.bim.ifc.emf.IfcModelInterface;
 import cn.dlb.bim.ifc.engine.cells.Vector3d;
 import cn.dlb.bim.ifc.shared.ProgressReporter;
@@ -14,6 +12,7 @@ import cn.dlb.bim.ifc.tree.ProjectTree;
 import cn.dlb.bim.ifc.tree.PropertySet;
 import cn.dlb.bim.vo.GeometryInfoVo;
 import cn.dlb.bim.vo.GlbVo;
+import cn.dlb.bim.vo.ModelAndOutputTemplateVo;
 import cn.dlb.bim.vo.ModelInfoVo;
 import cn.dlb.bim.vo.ModelLabelVo;
 import cn.dlb.bim.vo.OutputTemplateVo;
@@ -65,7 +64,7 @@ public interface BimService {
 	public OutputTemplateVo queryOutputTemplate(Integer rid, Long otid);
 	public OutputTemplateVo genModelDefaultOutputTemplate(Integer rid);
 	public void deleteModelAndOutputTemplateMap(Integer rid, Long otid);
-	public ModelAndOutputTemplateMap queryModelAndOutputTemplateMapByRid(Integer rid);
+	public List<ModelAndOutputTemplateVo> queryModelAndOutputTemplateByRid(Integer rid);
 	
 	public void test();
 	

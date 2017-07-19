@@ -42,6 +42,7 @@ import cn.dlb.bim.lucene.IfcProductRecordText;
 import cn.dlb.bim.service.BimService;
 import cn.dlb.bim.service.ProjectService;
 import cn.dlb.bim.vo.GlbVo;
+import cn.dlb.bim.vo.ModelAndOutputTemplateVo;
 import cn.dlb.bim.vo.ModelInfoVo;
 import cn.dlb.bim.vo.ModelLabelVo;
 import cn.dlb.bim.vo.OutputTemplateVo;
@@ -364,9 +365,9 @@ public class ModelController {
 	@ResponseBody
 	public Map<String, Object> queryModelAndOutputTemplateMap(Integer rid) {
 		ResultUtil result = new ResultUtil();
-		ModelAndOutputTemplateMap modelAndOutputTemplateMap = bimService.queryModelAndOutputTemplateMapByRid(rid);
+		List<ModelAndOutputTemplateVo> modelAndOutputTemplates = bimService.queryModelAndOutputTemplateByRid(rid);
 		result.setSuccess(true);
-		result.setData(modelAndOutputTemplateMap);
+		result.setData(modelAndOutputTemplates);
 		return result.getResult();
 	}
 	

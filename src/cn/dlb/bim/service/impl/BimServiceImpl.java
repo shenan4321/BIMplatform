@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
@@ -68,6 +69,7 @@ import cn.dlb.bim.utils.BinUtils;
 import cn.dlb.bim.utils.IdentifyManager;
 import cn.dlb.bim.vo.GeometryInfoVo;
 import cn.dlb.bim.vo.GlbVo;
+import cn.dlb.bim.vo.ModelAndOutputTemplateVo;
 import cn.dlb.bim.vo.ModelInfoVo;
 import cn.dlb.bim.vo.ModelLabelVo;
 import cn.dlb.bim.vo.OutputTemplateVo;
@@ -652,8 +654,16 @@ public class BimServiceImpl implements BimService {
 	}
 
 	@Override
-	public ModelAndOutputTemplateMap queryModelAndOutputTemplateMapByRid(Integer rid) {
-		return outputTemplateDao.queryModelAndOutputTemplateMapByRid(rid);
+	public List<ModelAndOutputTemplateVo> queryModelAndOutputTemplateByRid(Integer rid) {
+		ModelAndOutputTemplateMap map = outputTemplateDao.queryModelAndOutputTemplateMapByRid(rid);
+		List<ModelAndOutputTemplateVo> result = new ArrayList<>();
+		for (Entry<Long, String> entry : map.getOtid2Name().entrySet()) {
+			ModelAndOutputTemplateVo modelAndTemplate = new ModelAndOutputTemplateVo();
+			modelAndTemplate.setOtid(entry.getKey());
+			modelAndTemplate.setName(entry.getValue());
+			result.add(modelAndTemplate);
+		}
+		return result;
 	}
 	
 	@Override

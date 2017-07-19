@@ -364,9 +364,9 @@ public class ModelController {
 	@ResponseBody
 	public Map<String, Object> queryAllModelAndOutputTemplateMap(Integer rid) {
 		ResultUtil result = new ResultUtil();
-		List<ModelAndOutputTemplateMap> modelAndOutputTemplateMaps = bimService.queryModelAndOutputTemplateMapByRid(rid);
+		ModelAndOutputTemplateMap modelAndOutputTemplateMap = bimService.queryModelAndOutputTemplateMapByRid(rid);
 		result.setSuccess(true);
-		result.setData(modelAndOutputTemplateMaps);
+		result.setData(modelAndOutputTemplateMap);
 		return result.getResult();
 	}
 	
@@ -384,12 +384,16 @@ public class ModelController {
 	@ResponseBody
 	public Map<String, Object> saveOutputTemplate(@PathVariable Integer rid, @RequestBody OutputTemplateVo outputTemplate) {
 		ResultUtil result = new ResultUtil();
-		bimService.insertOutputTemplate(outputTemplate);
-		ModelAndOutputTemplateMap map = new ModelAndOutputTemplateMap();
-		map.setName(outputTemplate.getName());
-		map.setRid(rid);
-		map.setOtid(outputTemplate.getOtid());
-		bimService.insertModelAndOutputTemplateMap(map);
+		bimService.insertOutputTemplate(rid, outputTemplate);
+		result.setSuccess(true);
+		return result.getResult();
+	}
+	
+	@RequestMapping(value = "modifyOutputTemplate", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> modifyOutputTemplate(@RequestBody OutputTemplateVo outputTemplate) {
+		ResultUtil result = new ResultUtil();
+		bimService.modifyOutputTemplate(outputTemplate);
 		result.setSuccess(true);
 		return result.getResult();
 	}

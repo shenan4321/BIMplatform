@@ -1,16 +1,20 @@
 package cn.dlb.bim.dao.entity;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "ModelAndOutputTemplateMap")
 public class ModelAndOutputTemplateMap {
 	@Id
 	private Integer rid;
-	@Indexed
-	private Long otid;
-	private String name;
+	private Map<Long, String> otid2Name;
+	
+	public ModelAndOutputTemplateMap() {
+		otid2Name = new HashMap<>();
+	}
 	
 	public Integer getRid() {
 		return rid;
@@ -18,16 +22,11 @@ public class ModelAndOutputTemplateMap {
 	public void setRid(Integer rid) {
 		this.rid = rid;
 	}
-	public Long getOtid() {
-		return otid;
+	public Map<Long, String> getOtid2Name() {
+		return otid2Name;
 	}
-	public void setOtid(Long otid) {
-		this.otid = otid;
+	public void setOtid2Name(Map<Long, String> otid2Name) {
+		this.otid2Name = otid2Name;
 	}
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
+
 }

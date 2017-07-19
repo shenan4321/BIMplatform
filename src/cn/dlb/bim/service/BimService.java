@@ -59,14 +59,14 @@ public interface BimService {
 	 * 
 	 * @param template
 	 */
-	public void insertOutputTemplate(OutputTemplateVo template);
+	public void insertOutputTemplate(Integer rid, OutputTemplateVo template);
 	public void deleteOutputTemplate(Long otid);
 	public void modifyOutputTemplate(OutputTemplateVo template);
 	public OutputTemplateVo queryOutputTemplate(Integer rid, Long otid);
 	public OutputTemplateVo genModelDefaultOutputTemplate(Integer rid);
-	public void insertModelAndOutputTemplateMap(ModelAndOutputTemplateMap map);
-	public void deleteModelAndOutputTemplateMap(ModelAndOutputTemplateMap map);
-	public List<ModelAndOutputTemplateMap> queryModelAndOutputTemplateMapByRid(Integer rid);
+	public void deleteModelAndOutputTemplateMap(Integer rid, Long otid);
+	public ModelAndOutputTemplateMap queryModelAndOutputTemplateMapByRid(Integer rid);
 	
 	public void test();
+	
 }

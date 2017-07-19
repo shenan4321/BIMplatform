@@ -1,13 +1,12 @@
 package cn.dlb.bim.dao.impl;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
+
 import cn.dlb.bim.dao.OutputTemplateDao;
 import cn.dlb.bim.dao.entity.ModelAndOutputTemplateMap;
 import cn.dlb.bim.dao.entity.OutputTemplate;
@@ -47,23 +46,25 @@ public class OutputTemplateDaoImpl implements OutputTemplateDao {
 	}
 
 	@Override
-	public void insertModelAndOutputTemplateMap(ModelAndOutputTemplateMap map) {
+	public void saveModelAndOutputTemplateMap(ModelAndOutputTemplateMap map) {
 		mongoTemplate.save(map);
 	}
 
 	@Override
-	public void deleteModelAndOutputTemplateMap(ModelAndOutputTemplateMap map) {
+	public void deleteModelAndOutputTemplateMap(Integer rid, Long otid) {
 		Query query = new Query();
-		query.addCriteria(Criteria.where("rid").is(map.getRid()));
-		query.addCriteria(Criteria.where("otid").is(map.getOtid()));
+		ModelAndOutputTemplateMap map = queryModelAndOutputTemplateMapByRid(rid);
+		if (map != null) {
+			map.getOtid2Name().remove(otid);
+		}
 		mongoTemplate.remove(query, OutputTemplate.class);
 	}
 
 	@Override
-	public List<ModelAndOutputTemplateMap> queryModelAndOutputTemplateMapByRid(Integer rid) {
+	public ModelAndOutputTemplateMap queryModelAndOutputTemplateMapByRid(Integer rid) {
 		Query query = new Query();
 		query.addCriteria(Criteria.where("rid").is(rid));
-		return mongoTemplate.find(query, ModelAndOutputTemplateMap.class);
+		return mongoTemplate.findOne(query, ModelAndOutputTemplateMap.class);
 	}
 	
 }

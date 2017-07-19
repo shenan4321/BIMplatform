@@ -8,7 +8,7 @@ import java.util.Set;
 import cn.dlb.bim.dao.entity.OutputTemplate;
 
 public class OutputTemplateVo implements ITransformer<OutputTemplate> {
-	private Long otid;
+	private Long otid = -1;
 	private String name;
 	private Map<String, IfcTypeSelectorVo> ifcTypeSelectorMap;
 	public OutputTemplateVo() {

@@ -9,11 +9,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.EReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -568,9 +566,17 @@ public class BimServiceImpl implements BimService {
 	}
 
 	@Override
-	public void insertOutputTemplate(OutputTemplateVo template) {
+	public void insertOutputTemplate(Integer rid, OutputTemplateVo template) {
 		OutputTemplate templateEntity = template.transformTo();
+		Long otid = IdentifyManager.getIdentifyManager().nextId(IdentifyManager.OTID_KEY);
+		template.setOtid(otid);
 		outputTemplateDao.insertOutputTemplate(templateEntity);
+		ModelAndOutputTemplateMap map = outputTemplateDao.queryModelAndOutputTemplateMapByRid(rid);
+		if (map == null) {
+			map = new ModelAndOutputTemplateMap();
+		}
+		map.getOtid2Name().put(template.getOtid(), template.getName());
+		outputTemplateDao.saveModelAndOutputTemplateMap(map);
 	}
 
 	@Override
@@ -632,8 +638,6 @@ public class BimServiceImpl implements BimService {
 				}
 			}
 		}
-		Long otid = IdentifyManager.getIdentifyManager().nextId(IdentifyManager.OTID_KEY);
-		outputTemplateVo.setOtid(otid);
 		outputTemplateVo.setName("DEFAULT");
 		
 //		//test TODO remove
@@ -643,17 +647,12 @@ public class BimServiceImpl implements BimService {
 	}
 
 	@Override
-	public void insertModelAndOutputTemplateMap(ModelAndOutputTemplateMap map) {
-		outputTemplateDao.insertModelAndOutputTemplateMap(map);
+	public void deleteModelAndOutputTemplateMap(Integer rid, Long otid) {
+		outputTemplateDao.deleteModelAndOutputTemplateMap(rid, otid);
 	}
 
 	@Override
-	public void deleteModelAndOutputTemplateMap(ModelAndOutputTemplateMap map) {
-		outputTemplateDao.deleteModelAndOutputTemplateMap(map);
-	}
-
-	@Override
-	public List<ModelAndOutputTemplateMap> queryModelAndOutputTemplateMapByRid(Integer rid) {
+	public ModelAndOutputTemplateMap queryModelAndOutputTemplateMapByRid(Integer rid) {
 		return outputTemplateDao.queryModelAndOutputTemplateMapByRid(rid);
 	}
 	
@@ -716,7 +715,7 @@ public class BimServiceImpl implements BimService {
 //			System.out.println(isDecomposedBy);
 //		}
 		
-		StreamingCheckinAction action = new StreamingCheckinAction(null, new File("E:\\IFC模型\\别墅.ifc"), server, platformService);
+		StreamingCheckinAction action = new StreamingCheckinAction(null, new File("E:\\IFC模型\\huahuatest.ifc"), server, platformService);
 		try {
 			action.execute();
 		} catch (DatabaseException | IfcModelInterfaceException e) {
@@ -727,5 +726,5 @@ public class BimServiceImpl implements BimService {
 	public List<VirtualObject> queryVirtualObject(Integer rid, List<Short> cids) {
 		return platformService.queryVirtualObject(rid, cids);
 	}
-	
+
 }

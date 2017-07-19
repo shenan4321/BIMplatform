@@ -77,7 +77,7 @@ myApp.controller('myAppCtrl', function ($scope, $http,$compile) {
 		$scope.typeShowTag = function(item){
 			item.checked = !item.checked;
 			angular.forEach(item.oids, function(data,index,array){
-				if(!xeogl.scene.components['ifc'+data].visibility.showFloor){
+				if(!xeogl.scene.components['ifc'+data].visibility.showFloor &&  !xeogl.scene.components['ifc'+data].visibility.showTypeType ){
 					xeogl.scene.components['ifc'+data].visibility.visible = item.checked;
 					xeogl.scene.components['ifc'+data].visibility.showType = !item.checked;//默认此参数是空，所以某类显示出来的时候
 				}
@@ -141,7 +141,7 @@ myApp.controller('myAppCtrl', function ($scope, $http,$compile) {
 				item.isActive = !item.isActive;
 				angular.forEach(item.oidContains, function(data,index,array){
 					//和类型不要互相冲突
-					if(!xeogl.scene.components['ifc'+data].visibility.showType){
+					if(!xeogl.scene.components['ifc'+data].visibility.showType && !xeogl.scene.components['ifc'+data].visibility.showTypeType){
 						xeogl.scene.components['ifc'+data].visibility.visible = item.isActive;
 						xeogl.scene.components['ifc'+data].visibility.showFloor = !item.isActive;
 					}
@@ -202,7 +202,6 @@ myApp.controller('myAppCtrl', function ($scope, $http,$compile) {
 			localStorage.setItem("IfcMType",item.id);
 			$scope.IfcMType = item.id;
 			if(!$scope.typeList){
-				
 				$http.get('./model/queryBuildingCells.do?rid='+string).success(function (data,status) {  
 			    	$scope.typeList = data.data;
 			    	allChangeColor($scope.typeList);
@@ -298,6 +297,8 @@ myApp.controller('myAppCtrl', function ($scope, $http,$compile) {
 					});
 				}
 			}
+			
+			
 			
 			checkTree();
 			
@@ -444,6 +445,19 @@ myApp.controller('myAppCtrl', function ($scope, $http,$compile) {
 							}
 							if(t.selected){
 								s2++;
+								angular.forEach(t.oids, function(data,index,array){
+									if(!xeogl.scene.components['ifc'+data].visibility.showFloor &&  !xeogl.scene.components['ifc'+data].visibility.showType ){
+										xeogl.scene.components['ifc'+data].visibility.visible = true;
+										xeogl.scene.components['ifc'+data].visibility.showTypeType = false;//默认此参数是空，所以某类显示出来的时候
+									}
+								});
+							}else{
+								angular.forEach(t.oids, function(data,index,array){
+									if(!xeogl.scene.components['ifc'+data].visibility.showFloor &&  !xeogl.scene.components['ifc'+data].visibility.showType ){
+										xeogl.scene.components['ifc'+data].visibility.visible = false;
+										xeogl.scene.components['ifc'+data].visibility.showTypeType = true;//默认此参数是空，所以某类显示出来的时候
+									}
+								});
 							}
 						});	
 						if(s2 == count2){
@@ -465,12 +479,15 @@ myApp.controller('myAppCtrl', function ($scope, $http,$compile) {
 		}
 		
 		//不影响数据单纯数据操作		
-		window.collosePand = function(){
-
+		window.collosePand = function(obj){
 			var $jq_obj = $(obj);
-			var $jq_baba = $jq_obj.parent(".selected");
+			if($jq_obj.attr('class').indexOf('icon-white-down')>-1){
+				$jq_obj.attr('class','icon-white-up tile-fr');
+			}else{
+				$jq_obj.attr('class','icon-white-down tile-fr');
+			}
+			var $jq_baba = $jq_obj.parent();
 			$jq_baba.next().toggle();
-			
 		}
 	}
 

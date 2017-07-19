@@ -4,6 +4,8 @@ var myApp = angular.module("myApp", []);
 
 myApp.controller('myAppCtrl', function ($scope, $http,$compile) {
 	
+	$scope.colorData = [{id:1,name:'方案一',isActive:true},{id:2,name:'方案二',isActive:true},{id:3,name:'方案三',isActive:true}];
+	
 	$scope.menuClick = function(param){
 		$scope[param]($scope, $http,$compile);
 	}
@@ -194,16 +196,13 @@ myApp.controller('myAppCtrl', function ($scope, $http,$compile) {
 	}
 	
 	$scope.colorCtrl = function($scope, $http){
-		
 		$scope.IfcMType = localStorage.getItem("IfcMType") || 1;
-		
-	    $scope.colorData = [{id:1,name:'方案一'},{id:2,name:'方案二'},{id:3,name:'方案三'}];
-	    
 		$scope.colorClick = function(item){
 			Ifc.Constants.materials=Ifc.Constants['materials'+item.id];
 			localStorage.setItem("IfcMType",item.id);
 			$scope.IfcMType = item.id;
 			if(!$scope.typeList){
+				
 				$http.get('./model/queryBuildingCells.do?rid='+string).success(function (data,status) {  
 			    	$scope.typeList = data.data;
 			    	allChangeColor($scope.typeList);
@@ -216,17 +215,37 @@ myApp.controller('myAppCtrl', function ($scope, $http,$compile) {
 	
 	$scope.majorCtrl = function($scope, $http){
 		
+		var temp = [];
+		
 		$http.get('./model/queryAllModelAndOutputTemplateMap.do?rid='+string).success(function (data,status) {
 	    	$scope.majorTypedata = data.data;
 	    });
 		
 		$scope.initMajor = function(){
-			$http.get('./model/newOutputTemplate.do?rid='+string).success(function (data,status) {
-		    	$scope.majorFirstdata = data.data;
+			$.ajax({
+				url:'./model/newOutputTemplate.do?rid='+string,
+				type :'get'
+			}).done(function(data){
+				
+				temp.push(data.data);
+				console.log('temp',temp);
+				
+				$.ajax({
+					type:"POST",
+					url:'./model/saveOutputTemplate.do?rid='+string,
+					datatype:"json",
+			        contentType: "application/json",
+					data:JSON.stringify(temp[0])
+				}).done(function(data1){
+					console.log('111',data1);
+				});
+				 
+				/*$scope.majorFirstdata = angular.copy(data.data);
 		    	$scope.majorTypedata.push(data.data);
 		    	$scope.majorTypedata.indexNow = 0;
 		    	dealMajorData();
-		    });
+		    	$scope.$apply();*/
+			})
 		}
 		
 		$scope.selectDown = function(){
@@ -281,14 +300,14 @@ myApp.controller('myAppCtrl', function ($scope, $http,$compile) {
 			
 		}
 		
-		$scope.saveBtn = function(){
+		$scope.saveMajor = function(){
 			var dialog = new QAQ.AADialog({
 			    compile:$compile,
 			    scope:$scope,
 		        backdrop: false,//默认点击dialog背景时 不关闭dialog
 		        keyboard: true,//默认 按键盘escape 关闭dialog
-		        title: "对话框标题11",
-		        content: '<p>我是dialog的内容</p>',//dialog的模板 3种模式  1. content:'<p>我是dialog的内容</p>' 2.contentUrl:'/views/dialog模板.html' 3.contentSelector:'#模板id'
+		        title: "保存/修改专业",
+		        contentSelector: '#msgBox',//dialog的模板 3种模式  1. content:'<p>我是dialog的内容</p>' 2.contentUrl:'/views/dialog模板.html' 3.contentSelector:'#模板id'
 		        width: 420,//选填
 		        zIndex: 999,//
 		        cache: true,//是否对模板进行缓存
@@ -296,7 +315,27 @@ myApp.controller('myAppCtrl', function ($scope, $http,$compile) {
 		        renderTo: 'body',//暂时无用
 		        drag: true,//是否可拖拽
 		        winResize: false,//浏览器缩放时是否重新定位
+		        success:function(){
+		        	var t = $('#txt').html();
+		        	$('#newMajorName').val(t);
+		        }
 			});
+			
+		}
+		
+		
+		$scope.saveMajorAs = function(){
+			temp[$scope.majorTypedata.indexNow].name = $('#newMajorName').val();
+			/*var tt = {};
+			var tt1 = angular.copy($scope.majorTypedata[$scope.majorTypedata.indexNow]);*/
+			
+			
+			$http.post('./model/saveOutputTemplate.do',{
+				rid:string,
+				outputTemplate:JSON.stringify(temp[$scope.majorTypedata.indexNow])
+			}).success(function (data){
+				console.log('111',data);
+		    }); 
 		}
 		
 		function dealMajorData(){
@@ -315,33 +354,35 @@ myApp.controller('myAppCtrl', function ($scope, $http,$compile) {
 				tt.selected = tt.selected;
 				var s1 = 0;
 				var count1 = 0;
-				angular.forEach(ttdata.namespaceSelectorMap, function(tdata,key){
-					if(key!='selected'){
-						count1++;
-					}
-					var s2 = 0;
-					var count2 = 0;
-					angular.forEach(tdata.objectTypeContainerMap, function(t){
-						if(t.objectType){
-							count2++;
+				if(typeof(ttdata.namespaceSelectorMap)== true){
+					angular.forEach(ttdata.namespaceSelectorMap, function(tdata,key){
+						if(key!='selected'){
+							count1++;
 						}
-						if(t.selected){
-							s2++;
+						var s2 = 0;
+						var count2 = 0;
+						angular.forEach(tdata.objectTypeContainerMap, function(t){
+							if(t.objectType){
+								count2++;
+							}
+							if(t.selected){
+								s2++;
+							}
+						});	
+						if(s2 == count2){
+							tdata.selected  = true;
+						}else{
+							tdata.selected  = false;
 						}
-					});	
-					if(s2 == count2){
-						tdata.selected  = true;
+						if(tdata.selected){
+							s1++;
+						}					
+					});
+					if(s1 == count1){
+						ttdata.selected  = true;
 					}else{
-						tdata.selected  = false;
+						ttdata.selected  = false;
 					}
-					if(tdata.selected){
-						s1++;
-					}					
-				});
-				if(s1 == count1){
-					ttdata.selected  = true;
-				}else{
-					ttdata.selected  = false;
 				}
 			});
 		}

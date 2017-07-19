@@ -192,7 +192,6 @@
     top:-99999px;
 }
 .sb_dialog_layer_main{
-    border: 1px solid #717171;
     font-size: 14px;
     border-radius: 4px;
     overflow: hidden;
@@ -206,7 +205,7 @@
     overflow: hidden;
     margin: 0;
     padding-left: 10px;
-    font-weight: bold;
+    font-weight: 400;
 }
 .sb_dialog_btn_close {
     color: #fff;
@@ -217,7 +216,7 @@
     line-height: 31px;
     width: 30px;
     font-size: 23px;
-    font-weight: bold;
+    font-weight: 400;
     font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 }
 .sb_dialog_btn_close:hover{
@@ -228,12 +227,12 @@
 .sb_dialog_layer_title {
     padding: 4px;
     border-bottom: 1px solid #103956;
-    background: #103956
+    background: #103956;
 }
 .sb_dialog_layer_cont{
     min-height: 20px;
     overflow: auto;
-    background-color: #FFF;
+    background-color: rgba(57,65,74,0.8);
 }
 .sb_tip_button{
 	padding: 7px;
@@ -795,4 +794,38 @@
         .tile-fr{float: right;margin-top:10px;margin-right:10px;}
 .tile-choose-box{margin-top: 10px;padding-left: 2px;}
         
+        
+.msg {
+    margin: 20px 20px 0;
+    max-height: 300px;
+    overflow: auto;
+    line-height: 1.3em;
+}
+.msg h1 {position:relative;display: block;overflow: hidden;height: 36px;line-height: 36px;border-bottom: 1px solid #aaa;font-weight: normal;font-size:16px;background: #2a9dd9;color: #fff;margin: 0;text-indent: 14px;}
+.msg .x{position: absolute;z-index: 2003;top: 0;right: 0;width: 40px;height: 36px;font-size: 18px;line-height: 36px;}
+.msg table th{text-align: center;font-weight:normal;font-size:14px;color: #fff;}
+.msg table th span{color:#fc0000;margin-right:5px;}
+.msg table tr{height:40px;}
+.msg-toolBar{ display:block;overflow:hidden;height:30px;margin-top:5px;text-align:center;padding-bottom: 20px;}
+.msg-toolBar button{
+	margin-left:10px;
+	margin-right:10px;
+	display: inline-block;
+    padding-left:15px;
+    padding-right:15px;
+    height: 30px;
+    line-height: 30px;
+    border: 0;
+    color: #fff;
+    margin-top: 8px;
+    letter-spacing: 1px;
+    background: #103956;
+    outline: none;
+    -webkit-appearance: none;
+    -webkit-border-radius: 0;
+    vertical-align: top;
+    cursor: pointer;
+    font-size: 12px;
+}
+.gray{width: 290px;background:#fff;font-family: Microsoft YaHei;padding: 0 8px;height: 32px;line-height: 32px;font-size: 14px;color: #666;border: 1px solid #e3e3e3;}
         

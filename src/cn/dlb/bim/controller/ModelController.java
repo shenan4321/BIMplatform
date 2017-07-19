@@ -15,6 +15,8 @@ import org.eclipse.emf.ecore.EClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -378,14 +380,14 @@ public class ModelController {
 		return result.getResult();
 	}
 	
-	@RequestMapping(value = "saveOutputTemplate", method = RequestMethod.GET)
+	@RequestMapping(value = "saveOutputTemplate", method = RequestMethod.POST)
 	@ResponseBody
-	public Map<String, Object> saveOutputTemplate(Integer rid, OutputTemplateVo outputTemplate) {
+	public Map<String, Object> saveOutputTemplate(@RequestBody OutputTemplateVo outputTemplate) {
 		ResultUtil result = new ResultUtil();
 		bimService.insertOutputTemplate(outputTemplate);
 		ModelAndOutputTemplateMap map = new ModelAndOutputTemplateMap();
 		map.setOutputTemplateName(outputTemplate.getName());
-		map.setRid(rid);
+//		map.setRid(rid);
 		map.setOtid(outputTemplate.getOtid());
 		bimService.insertModelAndOutputTemplateMap(map);
 		result.setSuccess(true);

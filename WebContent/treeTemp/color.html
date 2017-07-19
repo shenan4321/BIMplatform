@@ -2,8 +2,7 @@
 <div class="floor">
 	<ul>
    		<li><span class="floor-tittle">配色方案</span></li>
-   		<li ng-repeat="item in colorData" ng-click="colorClick(item)" ng-init="item.isActive=true" 
-   		ng-class="{true: 'hover', false: ''}[IfcMType==item.id]">
+   		<li ng-repeat="item in colorData" ng-click="colorClick(item)" ng-class="{true: 'hover', false: ''}[IfcMType==item.id]">
    			<span>{{item.name}}</span>
    		</li>
     </ul>

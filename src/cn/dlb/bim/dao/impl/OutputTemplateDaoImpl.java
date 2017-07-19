@@ -52,12 +52,11 @@ public class OutputTemplateDaoImpl implements OutputTemplateDao {
 
 	@Override
 	public void deleteModelAndOutputTemplateMap(Integer rid, Long otid) {
-		Query query = new Query();
 		ModelAndOutputTemplateMap map = queryModelAndOutputTemplateMapByRid(rid);
 		if (map != null) {
 			map.getOtid2Name().remove(otid);
+			mongoTemplate.save(map);
 		}
-		mongoTemplate.remove(query, OutputTemplate.class);
 	}
 
 	@Override

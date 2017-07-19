@@ -385,16 +385,26 @@ public class ModelController {
 	@ResponseBody
 	public Map<String, Object> saveOutputTemplate(@PathVariable Integer rid, @RequestBody OutputTemplateVo outputTemplate) {
 		ResultUtil result = new ResultUtil();
-		bimService.insertOutputTemplate(rid, outputTemplate);
+		Long otid = bimService.insertOutputTemplate(rid, outputTemplate);
+		result.setSuccess(true);
+		result.setKeyValue("otid", otid);
+		return result.getResult();
+	}
+	
+	@RequestMapping(value = "modifyOutputTemplate/{rid}", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> modifyOutputTemplate(@PathVariable Integer rid, @RequestBody OutputTemplateVo outputTemplate) {
+		ResultUtil result = new ResultUtil();
+		bimService.modifyOutputTemplate(rid, outputTemplate);
 		result.setSuccess(true);
 		return result.getResult();
 	}
 	
-	@RequestMapping(value = "modifyOutputTemplate", method = RequestMethod.POST)
+	@RequestMapping(value = "deleteOutputTemplate", method = RequestMethod.POST)
 	@ResponseBody
-	public Map<String, Object> modifyOutputTemplate(@RequestBody OutputTemplateVo outputTemplate) {
+	public Map<String, Object> deleteOutputTemplate(Integer rid, Long otid) {
 		ResultUtil result = new ResultUtil();
-		bimService.modifyOutputTemplate(outputTemplate);
+		bimService.deleteModelAndOutputTemplateMap(rid, otid);
 		result.setSuccess(true);
 		return result.getResult();
 	}

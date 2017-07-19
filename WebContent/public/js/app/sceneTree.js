@@ -219,42 +219,40 @@ myApp.controller('myAppCtrl', function ($scope, $http,$compile) {
 		
 		var dialog;
 		
-		$http.get('./model/queryAllModelAndOutputTemplateMap.do?rid='+string).success(function (data,status) {
+		$http.get('./model/queryModelAndOutputTemplateMap.do?rid='+string).success(function (data,status) {
 	    	$scope.majorTypedata = data.data;
 	    	$scope.majorTypedata.indexNow = 0; //当前是第几个专业
 	    	if($scope.majorTypedata.length>0){
 	    		$http.get('./model/queryOutputTemplate.do?rid='+string+'&otid='+$scope.majorTypedata[$scope.majorTypedata.indexNow].otid).success(function (res) {
-	    				$scope.majorTypedata[$scope.majorTypedata.indexNow].ifcTypeSelectorMap = res.data.ifcTypeSelectorMap;
-	    				checkTree();
+    				$scope.majorTypedata[$scope.majorTypedata.indexNow].ifcTypeSelectorMap = res.data.ifcTypeSelectorMap;
+    				checkTree();
 	    		});
 	    	}
 	    });
 		
-		  
-		
 		$scope.initMajor = function(){
 			$.ajax({
-				url:'./model/newOutputTemplate.do?rid='+string,
+				url:'./model/newOutputTemplate.do?rid='+string, //拿默认模板
 				type :'get'
 			}).done(function(data){
 		    	$scope.majorTypedata.push(data.data);
 				$.ajax({
 					type:"POST",
 					url:'./model/saveOutputTemplate/'+string+'.do',
-					//datatype:"json",
 			        contentType: "application/json",
 					data:JSON.stringify(data.data)
-				}).done(function(data1){
-					
+				}).done(function(res){
+					console.log(res);
+					$scope.majorTypedata.indexNow = $scope.majorTypedata.length-1;
+					$scope.majorTypedata[$scope.majorTypedata.indexNow].otid = res.otid;
+			    	dealMajorData();
+			    	$scope.$apply();
 				});
-		    	$scope.majorTypedata.indexNow = 0;
-		    	$scope.$apply();
-		    	checkTree();
 			})
 		}
 		
 		$scope.selectDown = function(){
-			$scope.majorTypedata.showTag = true;
+			$('.select-down-box').toggle();
 		}
 		
 		$scope.allMajorValue = function(value){
@@ -306,53 +304,99 @@ myApp.controller('myAppCtrl', function ($scope, $http,$compile) {
 		}
 		
 		$scope.saveMajor = function(){
-			dialog = new QAQ.AADialog({
-			    compile:$compile,
-			    scope:$scope,
-		        backdrop: false,//默认点击dialog背景时 不关闭dialog
-		        keyboard: true,//默认 按键盘escape 关闭dialog
-		        title: "保存/修改专业",
-		        contentSelector: '#msgBox',//dialog的模板 3种模式  1. content:'<p>我是dialog的内容</p>' 2.contentUrl:'/views/dialog模板.html' 3.contentSelector:'#模板id'
-		        width: 420,//选填
-		        zIndex: 999,//
-		        cache: true,//是否对模板进行缓存
-		        modal: true, //是否显示遮罩
-		        renderTo: 'body',//暂时无用
-		        drag: true,//是否可拖拽
-		        winResize: false,//浏览器缩放时是否重新定位
-		        success:function(){
-		        	var t = $('#txt').html();
-		        	$('#newMajorName').val(t);
-		        }
+			$scope.majorTypedata[$scope.majorTypedata.indexNow].name = $('#txt').html();
+			var tempMd = delSelectedMap($scope.majorTypedata[$scope.majorTypedata.indexNow]);
+			$.ajax({
+				type:"POST",
+				url:'./model/modifyOutputTemplate/'+string+'.do',
+				datatype:"json",
+		        contentType: "application/json",
+		        data:JSON.stringify(tempMd)
+			}).done(function(res){
+				if(res.success){
+					QAQ.Dialog.info('修改成功','info');
+					dialog.close();
+					setTimeout(function(){
+						$('.sb_dialog_modal').remove();
+						$('.qaq').remove();
+					},1500);
+				}else{
+					QAQ.Dialog.info('增加失败');
+				}
 			});
-			
 		}
 		
+		$scope.removeMajorType =  function(item,num){
+			QAQ.Dialog.confirm('确认不要我了?',function(){
+				$http.post('./model/deleteOutputTemplate.do?rid='+string+'&otid='+item.otid).success(function (res) {
+					if(res.success){
+						QAQ.Dialog.info('删除成功','info');
+						setTimeout(function(){
+							$('.sb_dialog_modal').remove();
+							$('.qaq').remove();
+							$scope.majorTypedata.splice(num,1);
+						},1500);
+					}else{
+						QAQ.Dialog.info('删除成功');
+					}
+	    		});
+		    });
+		}   
 		
 		$scope.saveMajorAs = function(){
 			$scope.majorTypedata[$scope.majorTypedata.indexNow].name = $('#newMajorName').val();
+			var tempMd = delSelectedMap($scope.majorTypedata[$scope.majorTypedata.indexNow]);
+			delete tempMd.otid;
 			$.ajax({
 				type:"POST",
 				url:'./model/saveOutputTemplate/'+string+'.do',
 				datatype:"json",
 		        contentType: "application/json",
-				data:JSON.stringify(delSelectedMap($scope.majorTypedata[$scope.majorTypedata.indexNow]))
-			}).done(function(data1){
-				
+				data:JSON.stringify(tempMd)
+			}).done(function(res){
+				if(res.success){
+					QAQ.Dialog.info('增加成功','info');
+					dialog.close();
+					setTimeout(function(){
+						$('.sb_dialog_modal').remove();
+						$('.qaq').remove();
+					},2000);
+				}else{
+					QAQ.Dialog.info('增加失败');
+				}
 			});
 		}
 		
 		$scope.updateMajor = function(){
 			$scope.majorTypedata[$scope.majorTypedata.indexNow].name = $('#newMajorName').val();
+			var tempMd = delSelectedMap($scope.majorTypedata[$scope.majorTypedata.indexNow]);
 			$.ajax({
 				type:"POST",
-				url:'./model/saveOutputTemplate/'+string+'.do',
+				url:'./model/modifyOutputTemplate/'+string+'.do',
 				datatype:"json",
 		        contentType: "application/json",
-				data:JSON.stringify(delSelectedMap($scope.majorTypedata[$scope.majorTypedata.indexNow]))
-			}).done(function(data1){
-				
+		        data:JSON.stringify(tempMd)
+			}).done(function(res){
+				if(res.success){
+					QAQ.Dialog.info('修改成功','info');
+					dialog.close();
+					setTimeout(function(){
+						$('.sb_dialog_modal').remove();
+						$('.qaq').remove();
+					},2000);
+				}else{
+					QAQ.Dialog.info('增加失败');
+				}
 			});
+		}
+		
+		$scope.chooseMajorType = function(item,num){
+			$('.select-down-box').hide();
+			$scope.majorTypedata.indexNow = num;
+			$http.get('./model/queryOutputTemplate.do?rid='+string+'&otid='+item.otid).success(function (res) {
+				$scope.majorTypedata[$scope.majorTypedata.indexNow].ifcTypeSelectorMap = res.data.ifcTypeSelectorMap;
+				checkTree();
+    		});
 		}
 		
 		function dealMajorData(){

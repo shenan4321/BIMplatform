@@ -234,15 +234,15 @@
     overflow: auto;
     background-color: rgba(57,65,74,0.8);
 }
-.sb_tip_button{
+/* .sb_tip_button{
 	padding: 7px;
 	text-align: right;
 	color:#fff;
-	background: #103956;
+	background: rgba(57,65,74,0.8);
 }
 .sb_tip_button .btn{
     margin-right: 7px;
-}
+} */
 .sb_dialog_modal{
     position: fixed;
     left:0;
@@ -273,6 +273,7 @@
     line-height: 1.5;
     padding: 20px;
     font-size: 14px;
+    color: #fff;
 }
 .sb-confirm-icon{
     width:24px;
@@ -305,6 +306,7 @@
     vertical-align: top;
     display: inline-block;
     text-indent: 10px;
+    color: #fff;
 }
 .sb-icon-warning{
     background-position: -24px center ;
@@ -480,30 +482,32 @@
 *html .qaq-clearfix{height: 1%;}/*ie6*/
 *+html .qaq-clearfix{min-height: 1px;}/*ie7*/
 /* button */
+
+.sb_tip_button{
+	display:block;overflow:hidden;height:30px;text-align:center;padding-bottom: 20px;
+	background: rgba(57,65,74,0.8);
+}
 .qaq .btn{
-    display: inline-block;
-    margin-bottom: 0;
-    font-weight: normal;
-    text-align: center;
-    vertical-align: middle;
+	margin-left:10px;
+	margin-right:10px;
+	display: inline-block;
+    padding-left:15px;
+    padding-right:15px;
+    height: 30px;
+    line-height: 30px;
+    border: 0;
+    color: #fff;
+    margin-top: 8px;
+    letter-spacing: 1px;
+    background: #103956;
+    outline: none;
+    -webkit-appearance: none;
+    -webkit-border-radius: 0;
+    vertical-align: top;
     cursor: pointer;
-    background-image: none;
-    border: 1px solid transparent;
-    white-space: nowrap;
-    padding: 6px 12px;
-    font-size: 14px;
-    border-radius: 4px;
+    font-size: 12px;
 }
-.qaq .btn-default {
-    color: #333;
-    background-color: #fff;
-    border-color: #ccc;
-}
-.qaq .btn-default:hover, .qaq .btn-default:focus, .qaq .btn-default:active{
-    color: #444444;
-    background-color: #ebebeb;
-    border-color: #adadad;
-}
+/* 
 .qaq .btn-primary {
     color: #fff;
     background-color: #428bca;
@@ -553,7 +557,7 @@
     color:#fff;
     background-color:#d2322d;
     border-color:#ac2925
-}
+} */
 .qaq a.link{
     color: #428bca;
 }
@@ -566,7 +570,6 @@
 .major-box1 .fr{color:#fff;font-size:12px;float: right}
 .major-box1 .major-save-btn{
 	display: inline-block;
-	width: 54px;
 	height: 30px;
 	line-height:30px;
 	border: 0;
@@ -648,7 +651,6 @@
             top: 37px;
             z-index: 3;
             left: 0;
-            display:none;
         }
         .select-down-box li{
             padding-left:12px;
@@ -707,6 +709,7 @@
             white-space: nowrap;
             font-size:12px;
             cursor: pointer;
+            outline:0;
         }
         .select-down-leftw{
             color:#fff;

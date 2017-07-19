@@ -568,17 +568,19 @@ public class BimServiceImpl implements BimService {
 	}
 
 	@Override
-	public void insertOutputTemplate(Integer rid, OutputTemplateVo template) {
+	public Long insertOutputTemplate(Integer rid, OutputTemplateVo template) {
 		OutputTemplate templateEntity = template.transformTo();
 		Long otid = IdentifyManager.getIdentifyManager().nextId(IdentifyManager.OTID_KEY);
-		template.setOtid(otid);
+		templateEntity.setOtid(otid);
 		outputTemplateDao.insertOutputTemplate(templateEntity);
 		ModelAndOutputTemplateMap map = outputTemplateDao.queryModelAndOutputTemplateMapByRid(rid);
 		if (map == null) {
 			map = new ModelAndOutputTemplateMap();
 		}
-		map.getOtid2Name().put(template.getOtid(), template.getName());
+		map.setRid(rid);
+		map.getOtid2Name().put(templateEntity.getOtid(), template.getName());
 		outputTemplateDao.saveModelAndOutputTemplateMap(map);
+		return otid;
 	}
 
 	@Override
@@ -587,8 +589,15 @@ public class BimServiceImpl implements BimService {
 	}
 
 	@Override
-	public void modifyOutputTemplate(OutputTemplateVo template) {
+	public void modifyOutputTemplate(Integer rid, OutputTemplateVo template) {
 		OutputTemplate templateEntity = template.transformTo();
+		ModelAndOutputTemplateMap map = outputTemplateDao.queryModelAndOutputTemplateMapByRid(rid);
+		if (map == null) {
+			map = new ModelAndOutputTemplateMap();
+		}
+		map.setRid(rid);
+		map.getOtid2Name().put(templateEntity.getOtid(), template.getName());
+		outputTemplateDao.saveModelAndOutputTemplateMap(map);
 		outputTemplateDao.modifyOutputTemplate(templateEntity);
 	}
 
@@ -657,6 +666,9 @@ public class BimServiceImpl implements BimService {
 	public List<ModelAndOutputTemplateVo> queryModelAndOutputTemplateByRid(Integer rid) {
 		ModelAndOutputTemplateMap map = outputTemplateDao.queryModelAndOutputTemplateMapByRid(rid);
 		List<ModelAndOutputTemplateVo> result = new ArrayList<>();
+		if (map == null) {
+			return result;
+		}
 		for (Entry<Long, String> entry : map.getOtid2Name().entrySet()) {
 			ModelAndOutputTemplateVo modelAndTemplate = new ModelAndOutputTemplateVo();
 			modelAndTemplate.setOtid(entry.getKey());

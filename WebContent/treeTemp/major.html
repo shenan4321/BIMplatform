@@ -1,10 +1,9 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 <div class="major-box">
     <div class="major-box1 cl">
-        <span  class="fl" ng-show="majorTypedata.length>=1">提示：最多12个专业</span>
         <span  class="fl" ng-show="majorTypedata.length==0">暂无专业</span>
-        <button type="button" class="fr major-save-btn" ng-show="majorTypedata.length>=1" ng-click="saveMajor()">保存</button>
-        <button type="button" class="fr major-save-btn" ng-show="majorTypedata.length==0" ng-click="initMajor()">新建</button>
+        <button type="button" class="fr major-save-btn" ng-show="majorTypedata.length>=1" ng-click="saveMajor()" style="margin-left:6px;">保存修改</button>
+        <button type="button" class="fr major-save-btn" ng-click="initMajor()">新建</button>
     </div>
 	
 	
@@ -13,13 +12,13 @@
         <div class="select-down-wrapper">
             <div class="select-down-showitem" ng-click="selectDown()">
             	<!--{true:'默认',false:majorTypedata[0].name}[majorTypedata[0].name=='DEFAULT']-->
-                <span class="select-down-left" id="txt" ng-bind="majorTypedata[0].name"></span>
+                <span class="select-down-left" id="txt" ng-bind="majorTypedata[majorTypedata.indexNow].name" contenteditable="true"></span>
                 <div class="icon-black-down"></div>
             </div>
-            <ul class="select-down-box" ng-repeat="item in majorTypedata" ng-show="majorTypedata.length>1 && majorTypedata.showTag">
-                <li ng-if="$index!=majorTypedata.indexNow">
-                    <span class="select-down-leftw">所有专业</span>
-                    <a class="icon-red-cross" title="删除">X</a>
+            <ul class="select-down-box" style="display:none">
+                <li ng-if="$index!=majorTypedata.indexNow"  ng-repeat="item in majorTypedata">
+                    <span class="select-down-leftw" ng-click="chooseMajorType(item,$index)">{{item.name}}</span>
+                    <a class="icon-red-cross" title="删除" ng-click="removeMajorType(item,$index)">X</a>
                 </li>
             </ul>
         </div>
@@ -50,18 +49,6 @@
     </div>
     
 </div>	
-
-<script id="msgBox" type="ng/template">
-	<div class="msg">
-	<table>
-	    <tbody><tr>
-	        <th width="100"><span>*</span>名称：</th>
-	        <td><input type="text" name="userName" class="gray" placeholder="请输入专业名称"  id="newMajorName"></td>
-	    </tr></tbody>
-	</table>
-	</div>
-	<div class="msg-toolBar">
-        <button type="button" class="major-save-btn" ng-click="saveMajorAs()">另存为</button>
-		<button type="button" class="major-save-btn" ng-click="updateMajor()">修改</button>
-    </div>
-</script>
+<!-- 
+<button type="button" class="major-save-btn" ng-click="saveMajorAs()">另存为</button>
+ -->

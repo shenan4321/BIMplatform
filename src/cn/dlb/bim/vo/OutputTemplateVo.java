@@ -40,6 +40,7 @@ public class OutputTemplateVo implements ITransformer<OutputTemplate> {
 	public OutputTemplate transformTo() {
 		OutputTemplate templateEntity = new OutputTemplate();
 		templateEntity.setName(this.name);
+		templateEntity.setOtid(this.otid);
 		for (IfcTypeSelectorVo ifcTypeSelectorVo : ifcTypeSelectorMap.values()) {
 			String ifcType = ifcTypeSelectorVo.getIfcType();
 			for (NamespaceSelectorVo namespaceSelectorVo : ifcTypeSelectorVo.getNamespaceSelectorMap().values()) {

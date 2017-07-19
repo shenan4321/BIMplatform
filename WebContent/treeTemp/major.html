@@ -29,7 +29,7 @@
     <div  class="tile-choose-box"  ng-show="majorTypedata.length>=1">
         <ul ng-repeat = "(key,value) in majorTypedata[majorTypedata.indexNow].ifcTypeSelectorMap track by $index">
             <li ng-if="key != 'selected'">
-                <span ng-class="{true:'icon-tile-choose',false:'icon-tile-nochoose'}[value.selected]" ng-click="allMajorValue(value)" ng-init="value.selected = true"></span>
+                <span ng-class="{true:'icon-tile-choose',false:'icon-tile-nochoose'}[value.selected]" ng-click="allMajorValue(value)"></span>
                 <span class="tile-font">{{key}}</span>
                 <b class="icon-white-down tile-fr" onclick="collosePand(this)"></b>
             </li>

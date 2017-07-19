@@ -217,34 +217,39 @@ myApp.controller('myAppCtrl', function ($scope, $http,$compile) {
 		
 		var temp = [];
 		
+		var dialog;
+		
 		$http.get('./model/queryAllModelAndOutputTemplateMap.do?rid='+string).success(function (data,status) {
 	    	$scope.majorTypedata = data.data;
+	    	$scope.majorTypedata.indexNow = 0; //当前是第几个专业
+	    	if($scope.majorTypedata.length>0){
+	    		$http.get('./model/queryOutputTemplate.do?rid='+string+'&otid='+$scope.majorTypedata[$scope.majorTypedata.indexNow].otid).success(function (res) {
+	    				$scope.majorTypedata[$scope.majorTypedata.indexNow].ifcTypeSelectorMap = res.data.ifcTypeSelectorMap;
+	    				checkTree();
+	    		});
+	    	}
 	    });
+		
+		  
 		
 		$scope.initMajor = function(){
 			$.ajax({
 				url:'./model/newOutputTemplate.do?rid='+string,
 				type :'get'
 			}).done(function(data){
-				
-				temp.push(data.data);
-				console.log('temp',temp);
-				
+		    	$scope.majorTypedata.push(data.data);
 				$.ajax({
 					type:"POST",
-					url:'./model/saveOutputTemplate.do?rid='+string,
-					datatype:"json",
+					url:'./model/saveOutputTemplate/'+string+'.do',
+					//datatype:"json",
 			        contentType: "application/json",
-					data:JSON.stringify(temp[0])
+					data:JSON.stringify(data.data)
 				}).done(function(data1){
-					console.log('111',data1);
+					
 				});
-				 
-				/*$scope.majorFirstdata = angular.copy(data.data);
-		    	$scope.majorTypedata.push(data.data);
 		    	$scope.majorTypedata.indexNow = 0;
-		    	dealMajorData();
-		    	$scope.$apply();*/
+		    	$scope.$apply();
+		    	checkTree();
 			})
 		}
 		
@@ -256,7 +261,7 @@ myApp.controller('myAppCtrl', function ($scope, $http,$compile) {
 			value.selected = !value.selected;
 			
 			//第一层选择选中都选中
-			if(value.namespaceSelectorMap){
+			if(typeof(value.namespaceSelectorMap) !== 'undefined' && value.namespaceSelectorMap){
 				if(value.selected){
 					var tt = $scope.majorTypedata[$scope.majorTypedata.indexNow].ifcTypeSelectorMap;
 					//angular.forEach(tt, function(ttdata,idx){
@@ -284,7 +289,7 @@ myApp.controller('myAppCtrl', function ($scope, $http,$compile) {
 
 			
 			//第二层选择选中都选中
-			if(value.objectTypeContainerMap){
+			if(typeof(value.namespaceSelectorMap) !== 'undefined' && value.objectTypeContainerMap){
 				if(value.selected){
 					angular.forEach(value.objectTypeContainerMap, function(ttdata){
 						ttdata.selected = true;
@@ -301,7 +306,7 @@ myApp.controller('myAppCtrl', function ($scope, $http,$compile) {
 		}
 		
 		$scope.saveMajor = function(){
-			var dialog = new QAQ.AADialog({
+			dialog = new QAQ.AADialog({
 			    compile:$compile,
 			    scope:$scope,
 		        backdrop: false,//默认点击dialog背景时 不关闭dialog
@@ -325,17 +330,29 @@ myApp.controller('myAppCtrl', function ($scope, $http,$compile) {
 		
 		
 		$scope.saveMajorAs = function(){
-			temp[$scope.majorTypedata.indexNow].name = $('#newMajorName').val();
-			/*var tt = {};
-			var tt1 = angular.copy($scope.majorTypedata[$scope.majorTypedata.indexNow]);*/
-			
-			
-			$http.post('./model/saveOutputTemplate.do',{
-				rid:string,
-				outputTemplate:JSON.stringify(temp[$scope.majorTypedata.indexNow])
-			}).success(function (data){
-				console.log('111',data);
-		    }); 
+			$scope.majorTypedata[$scope.majorTypedata.indexNow].name = $('#newMajorName').val();
+			$.ajax({
+				type:"POST",
+				url:'./model/saveOutputTemplate/'+string+'.do',
+				datatype:"json",
+		        contentType: "application/json",
+				data:JSON.stringify(delSelectedMap($scope.majorTypedata[$scope.majorTypedata.indexNow]))
+			}).done(function(data1){
+				
+			});
+		}
+		
+		$scope.updateMajor = function(){
+			$scope.majorTypedata[$scope.majorTypedata.indexNow].name = $('#newMajorName').val();
+			$.ajax({
+				type:"POST",
+				url:'./model/saveOutputTemplate/'+string+'.do',
+				datatype:"json",
+		        contentType: "application/json",
+				data:JSON.stringify(delSelectedMap($scope.majorTypedata[$scope.majorTypedata.indexNow]))
+			}).done(function(data1){
+				
+			});
 		}
 		
 		function dealMajorData(){
@@ -348,13 +365,29 @@ myApp.controller('myAppCtrl', function ($scope, $http,$compile) {
 			});
 		}
 		
+		
+		function delSelectedMap(tt){
+			tt = angular.copy(tt);
+			delete tt.$$hashKey;
+			delete tt.rid;
+			angular.forEach(tt, function(ttdata){
+				delete ttdata.selected;
+				if( ttdata instanceof Object && typeof(ttdata.namespaceSelectorMap) !== 'undefined'){
+					angular.forEach(ttdata.namespaceSelectorMap, function(tdata,key){
+						delete tdata.selected;
+					});
+				}
+			});
+			return tt;
+		}
+		
 		function checkTree(){
 			var tt = $scope.majorTypedata[$scope.majorTypedata.indexNow].ifcTypeSelectorMap;
 			angular.forEach(tt, function(ttdata){
-				tt.selected = tt.selected;
+				tt.selected = !!tt.selected;
 				var s1 = 0;
 				var count1 = 0;
-				if(typeof(ttdata.namespaceSelectorMap)== true){
+				if( ttdata instanceof Object && typeof(ttdata.namespaceSelectorMap) !== 'undefined'){
 					angular.forEach(ttdata.namespaceSelectorMap, function(tdata,key){
 						if(key!='selected'){
 							count1++;

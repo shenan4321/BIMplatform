@@ -380,14 +380,14 @@ public class ModelController {
 		return result.getResult();
 	}
 	
-	@RequestMapping(value = "saveOutputTemplate", method = RequestMethod.POST)
+	@RequestMapping(value = "saveOutputTemplate/{rid}", method = RequestMethod.POST)
 	@ResponseBody
-	public Map<String, Object> saveOutputTemplate(@RequestBody OutputTemplateVo outputTemplate) {
+	public Map<String, Object> saveOutputTemplate(@PathVariable Integer rid, @RequestBody OutputTemplateVo outputTemplate) {
 		ResultUtil result = new ResultUtil();
 		bimService.insertOutputTemplate(outputTemplate);
 		ModelAndOutputTemplateMap map = new ModelAndOutputTemplateMap();
-		map.setOutputTemplateName(outputTemplate.getName());
-//		map.setRid(rid);
+		map.setName(outputTemplate.getName());
+		map.setRid(rid);
 		map.setOtid(outputTemplate.getOtid());
 		bimService.insertModelAndOutputTemplateMap(map);
 		result.setSuccess(true);

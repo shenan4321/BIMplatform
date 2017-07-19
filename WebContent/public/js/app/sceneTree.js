@@ -466,7 +466,10 @@ myApp.controller('myAppCtrl', function ($scope, $http,$compile) {
 		
 		//不影响数据单纯数据操作		
 		window.collosePand = function(){
-			console.log(this)
+
+			var $jq_obj = $(obj);
+			var $jq_baba = $jq_obj.parent(".selected");
+			$jq_baba.next().toggle();
 			
 		}
 	}

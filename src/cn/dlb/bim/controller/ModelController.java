@@ -360,9 +360,9 @@ public class ModelController {
 		return result.getResult();
 	}
 	
-	@RequestMapping(value = "queryAllModelAndOutputTemplateMap", method = RequestMethod.GET)
+	@RequestMapping(value = "queryModelAndOutputTemplateMap", method = RequestMethod.GET)
 	@ResponseBody
-	public Map<String, Object> queryAllModelAndOutputTemplateMap(Integer rid) {
+	public Map<String, Object> queryModelAndOutputTemplateMap(Integer rid) {
 		ResultUtil result = new ResultUtil();
 		ModelAndOutputTemplateMap modelAndOutputTemplateMap = bimService.queryModelAndOutputTemplateMapByRid(rid);
 		result.setSuccess(true);

@@ -77,9 +77,16 @@ myApp.controller('myAppCtrl', function ($scope, $http,$compile) {
 		$scope.typeShowTag = function(item){
 			item.checked = !item.checked;
 			angular.forEach(item.oids, function(data,index,array){
-				if(!xeogl.scene.components['ifc'+data].visibility.showFloor &&  !xeogl.scene.components['ifc'+data].visibility.showTypeType ){
-					xeogl.scene.components['ifc'+data].visibility.visible = item.checked;
+				if(xeogl.scene.components['ifc'+data]){
 					xeogl.scene.components['ifc'+data].visibility.showType = !item.checked;//默认此参数是空，所以某类显示出来的时候
+					
+					if(item.checked){
+						if(!xeogl.scene.components['ifc'+data].visibility.showType && !xeogl.scene.components['ifc'+data].visibility.showTypeType && !xeogl.scene.components['ifc'+data].visibility.showFloor){
+							xeogl.scene.components['ifc'+data].visibility.visible = true;
+						}
+					}else{
+						xeogl.scene.components['ifc'+data].visibility.visible = false;
+					}
 				}
 			});
 		}
@@ -137,13 +144,19 @@ myApp.controller('myAppCtrl', function ($scope, $http,$compile) {
 			   	});
 			}*/
 			$scope.floorClick = function(item,obj){
-				console.log('全部的oid',item.oidContains);
 				item.isActive = !item.isActive;
 				angular.forEach(item.oidContains, function(data,index,array){
 					//和类型不要互相冲突
-					if(!xeogl.scene.components['ifc'+data].visibility.showType && !xeogl.scene.components['ifc'+data].visibility.showTypeType){
-						xeogl.scene.components['ifc'+data].visibility.visible = item.isActive;
+					//如果他是true
+					if(xeogl.scene.components['ifc'+data]){
 						xeogl.scene.components['ifc'+data].visibility.showFloor = !item.isActive;
+						if(item.isActive){
+							if(!xeogl.scene.components['ifc'+data].visibility.showType && !xeogl.scene.components['ifc'+data].visibility.showTypeType && !xeogl.scene.components['ifc'+data].visibility.showFloor){
+								xeogl.scene.components['ifc'+data].visibility.visible = true;
+							}
+						}else{
+							xeogl.scene.components['ifc'+data].visibility.visible = false;
+						}
 					}
 				});
 			}
@@ -241,7 +254,6 @@ myApp.controller('myAppCtrl', function ($scope, $http,$compile) {
 			        contentType: "application/json",
 					data:JSON.stringify(data.data)
 				}).done(function(res){
-					console.log(res);
 					$scope.majorTypedata.indexNow = $scope.majorTypedata.length-1;
 					$scope.majorTypedata[$scope.majorTypedata.indexNow].otid = res.otid;
 			    	dealMajorData();
@@ -445,20 +457,22 @@ myApp.controller('myAppCtrl', function ($scope, $http,$compile) {
 							}
 							if(t.selected){
 								s2++;
-								angular.forEach(t.oids, function(data,index,array){
-									if(!xeogl.scene.components['ifc'+data].visibility.showFloor &&  !xeogl.scene.components['ifc'+data].visibility.showType ){
-										xeogl.scene.components['ifc'+data].visibility.visible = true;
-										xeogl.scene.components['ifc'+data].visibility.showTypeType = false;//默认此参数是空，所以某类显示出来的时候
-									}
-								});
-							}else{
-								angular.forEach(t.oids, function(data,index,array){
-									if(!xeogl.scene.components['ifc'+data].visibility.showFloor &&  !xeogl.scene.components['ifc'+data].visibility.showType ){
-										xeogl.scene.components['ifc'+data].visibility.visible = false;
-										xeogl.scene.components['ifc'+data].visibility.showTypeType = true;//默认此参数是空，所以某类显示出来的时候
-									}
-								});
 							}
+							angular.forEach(t.oids, function(data,index,array){
+								
+								if(xeogl.scene.components['ifc'+data]){
+									xeogl.scene.components['ifc'+data].visibility.showTypeType = !t.selected;//默认此参数是空，所以某类显示出来的时候
+									
+									if(t.selected){
+										if(!xeogl.scene.components['ifc'+data].visibility.showType && !xeogl.scene.components['ifc'+data].visibility.showTypeType && !xeogl.scene.components['ifc'+data].visibility.showFloor){
+											xeogl.scene.components['ifc'+data].visibility.visible = true;
+										}
+									}else{
+										xeogl.scene.components['ifc'+data].visibility.visible = false;
+									}
+								}
+								
+							});
 						});	
 						if(s2 == count2){
 							tdata.selected  = true;

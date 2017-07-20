@@ -2,11 +2,12 @@ function initStart(){
 	var thisTime;
 	window.tt = false;
 	window.asideBoxList = new Array($('.aside-box li').length-1);
-	$('.aside-box li').on('click',function(){
-		if(!tt){
-			angular.bootstrap(document,['myApp']);
-			tt = true;
-		}
+	if(!tt){
+		angular.bootstrap(document,['myApp']);
+		tt = true;
+	}
+	
+	$('.aside-box li').on('click',function(){	
 		var $this = $(this);
 		var num = $this.index();
 		$('.aside-box li').removeClass('hover').eq(num).addClass('hover');
@@ -36,7 +37,7 @@ function initStart(){
 	});
 	
 	//'./project/queryProjectByRid.do?rid='+string
-	$.ajax({
+/*	$.ajax({
 	   url:"./project/queryProjectByRid.do?rid="+string,
 	   type:"POST",
 	   dataType:"json",
@@ -60,6 +61,6 @@ function initStart(){
 			}
 	})
 		   }
-		})
+		})*/
 	
 }

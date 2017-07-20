@@ -11,7 +11,7 @@ dlb.compassMenu = [
    {id:8,name:'弱电'},                   
 ];
 
-var luopanEvent = {};
+window.luopanEvent = {};
 (function ($) {
     var defaluts = {
         data:[{name:'建议中文', link:'www.baidu.com', onClick:function(){}}],//有onClick就不写link
@@ -66,7 +66,8 @@ var luopanEvent = {};
                 var svgG = document.createElementNS("http://www.w3.org/2000/svg","g");
                 svgG.setAttribute('id',"itemsContainer");
 
-
+                
+                
 
                 for(var i=0;i<len;i++){
 

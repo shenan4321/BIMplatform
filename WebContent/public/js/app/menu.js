@@ -2,10 +2,9 @@ function initStart(){
 	var thisTime;
 	window.tt = false;
 	window.asideBoxList = new Array($('.aside-box li').length-1);
-	if(!tt){
-		angular.bootstrap(document,['myApp']);
-		tt = true;
-	}
+	
+	angular.bootstrap(document,['myApp']);
+	
 	
 	$('.aside-box li').on('click',function(){	
 		var $this = $(this);
@@ -22,7 +21,7 @@ function initStart(){
 		$('#luopanBox1').hide();
 		$('#luopanBox').show();
 	});
-	$('#luopanBox').on('click',function(){
+	$('#luopanSvgImg1').on('click',function(){
 		$('#luopanBox').hide();
 		$('#luopanBox1').show();
 	});
@@ -55,7 +54,7 @@ function initStart(){
 						luopanData.push({name:this.name,link:'http://'+location.host+location.pathname+'?rid='+item.rid})
 					}			
 				});
-				$('#luopanSvg').luopan({
+				$.luopan({
 					data:luopanData,
 				});	
 			}

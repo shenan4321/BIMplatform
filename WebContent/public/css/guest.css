@@ -578,6 +578,8 @@
     vertical-align: top;
     cursor: pointer;
     font-size:12px;
+    padding-left: 10px;
+    padding-right: 10px;
 }
 .major-box2{margin-top: 10px;margin-bottom:10px;}
 .major-box2 p{font-size:12px;}
@@ -825,4 +827,3 @@
     cursor: pointer;
     font-size: 12px;
 }
-.gray{width: 290px;background:#fff;font-family: Microsoft YaHei;padding: 0 8px;height: 32px;line-height: 32px;font-size: 14px;color: #666;border: 1px solid #e3e3e3;}

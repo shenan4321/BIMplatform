@@ -4,7 +4,52 @@ var myApp = angular.module("myApp", []);
 
 myApp.controller('myAppCtrl', function ($scope, $http,$compile) {
 	
+	
+	$scope.IfcMType = localStorage.getItem("IfcMType") || 1;
+
 	$scope.colorData = [{id:1,name:'方案一',isActive:true},{id:2,name:'方案二',isActive:true},{id:3,name:'方案三',isActive:true}];
+	
+	
+	//marjord 数据整理成罗盘数据
+	function formatterMajorToLuoPan(md){
+		var luopanData = [];
+		$.each(md,function(index,item){
+    		
+			luopanData.push({name:this.name,onClick:function(){
+				$http.get('./model/queryOutputTemplate.do?rid='+string+'&otid='+item.otid).success(function (res) {
+					$('.svg-item-selected')[0].setAttribute('class','svg-item');
+					$('.svg-item').eq(index)[0].setAttribute('class','svg-item-selected');
+					$scope.majorTypedata.indexNow = index;
+					$scope.majorTypedata[index].ifcTypeSelectorMap = res.data.ifcTypeSelectorMap;
+					checkTree();
+	    		});
+			},selected: ($scope.majorTypedata.indexNow==index )? true:false});
+    				
+    	});
+		
+		
+		return luopanData;
+	}
+	
+	
+	$http.get('./model/queryModelAndOutputTemplateMap.do?rid='+string).success(function (data,status) {
+    	$scope.majorTypedata = data.data;
+    	$scope.majorTypedata.indexNow = 0; //当前是第几个专业
+    	
+    	/*$http.get('./model/queryOutputTemplate.do?rid='+string+'&otid='+item.otid).success(function (res) {
+			$scope.majorTypedata[index].ifcTypeSelectorMap = res.data.ifcTypeSelectorMap;
+			checkTree();
+		});*/
+    	var luopanData = [];
+    	$http.get('./model/queryOutputTemplate.do?rid='+string+'&otid='+$scope.majorTypedata[$scope.majorTypedata.indexNow].otid).success(function (res) {
+			$scope.majorTypedata[$scope.majorTypedata.indexNow].ifcTypeSelectorMap = res.data.ifcTypeSelectorMap;
+			checkTree();
+		});
+    	
+    	
+    	luopanBox = $.luopan({data:formatterMajorToLuoPan($scope.majorTypedata)});
+    	
+    });
 	
 	$scope.menuClick = function(param){
 		$scope[param]($scope, $http,$compile);
@@ -209,7 +254,6 @@ myApp.controller('myAppCtrl', function ($scope, $http,$compile) {
 	}
 	
 	$scope.colorCtrl = function($scope, $http){
-		$scope.IfcMType = localStorage.getItem("IfcMType") || 1;
 		$scope.colorClick = function(item){
 			Ifc.Constants.materials=Ifc.Constants['materials'+item.id];
 			localStorage.setItem("IfcMType",item.id);
@@ -229,18 +273,6 @@ myApp.controller('myAppCtrl', function ($scope, $http,$compile) {
 		
 		var temp = [];
 		
-		var dialog;
-		
-		$http.get('./model/queryModelAndOutputTemplateMap.do?rid='+string).success(function (data,status) {
-	    	$scope.majorTypedata = data.data;
-	    	$scope.majorTypedata.indexNow = 0; //当前是第几个专业
-	    	if($scope.majorTypedata.length>0){
-	    		$http.get('./model/queryOutputTemplate.do?rid='+string+'&otid='+$scope.majorTypedata[$scope.majorTypedata.indexNow].otid).success(function (res) {
-    				$scope.majorTypedata[$scope.majorTypedata.indexNow].ifcTypeSelectorMap = res.data.ifcTypeSelectorMap;
-    				checkTree();
-	    		});
-	    	}
-	    });
 		
 		$scope.initMajor = function(){
 			$.ajax({
@@ -248,13 +280,14 @@ myApp.controller('myAppCtrl', function ($scope, $http,$compile) {
 				type :'get'
 			}).done(function(data){
 		    	$scope.majorTypedata.push(data.data);
+		    	$scope.majorTypedata.indexNow = $scope.majorTypedata.length-1;
+		    	luopanBox.updateDom(formatterMajorToLuoPan($scope.majorTypedata));
 				$.ajax({
 					type:"POST",
 					url:'./model/saveOutputTemplate/'+string+'.do',
 			        contentType: "application/json",
 					data:JSON.stringify(data.data)
 				}).done(function(res){
-					$scope.majorTypedata.indexNow = $scope.majorTypedata.length-1;
 					$scope.majorTypedata[$scope.majorTypedata.indexNow].otid = res.otid;
 			    	dealMajorData();
 			    	$scope.$apply();
@@ -328,7 +361,7 @@ myApp.controller('myAppCtrl', function ($scope, $http,$compile) {
 			}).done(function(res){
 				if(res.success){
 					QAQ.Dialog.info('修改成功','info');
-					dialog.close();
+					luopanBox.updateDom(formatterMajorToLuoPan($scope.majorTypedata));
 					setTimeout(function(){
 						$('.sb_dialog_modal').remove();
 						$('.qaq').remove();
@@ -344,6 +377,7 @@ myApp.controller('myAppCtrl', function ($scope, $http,$compile) {
 				$http.post('./model/deleteOutputTemplate.do?rid='+string+'&otid='+item.otid).success(function (res) {
 					if(res.success){
 						QAQ.Dialog.info('删除成功','info');
+						luopanBox.updateDom(formatterMajorToLuoPan($scope.majorTypedata));
 						setTimeout(function(){
 							$('.sb_dialog_modal').remove();
 							$('.qaq').remove();
@@ -356,62 +390,21 @@ myApp.controller('myAppCtrl', function ($scope, $http,$compile) {
 		    });
 		}   
 		
-		$scope.saveMajorAs = function(){
-			$scope.majorTypedata[$scope.majorTypedata.indexNow].name = $('#newMajorName').val();
-			var tempMd = delSelectedMap($scope.majorTypedata[$scope.majorTypedata.indexNow]);
-			delete tempMd.otid;
-			$.ajax({
-				type:"POST",
-				url:'./model/saveOutputTemplate/'+string+'.do',
-				datatype:"json",
-		        contentType: "application/json",
-				data:JSON.stringify(tempMd)
-			}).done(function(res){
-				if(res.success){
-					QAQ.Dialog.info('增加成功','info');
-					dialog.close();
-					setTimeout(function(){
-						$('.sb_dialog_modal').remove();
-						$('.qaq').remove();
-					},2000);
-				}else{
-					QAQ.Dialog.info('增加失败');
-				}
-			});
-		}
-		
-		$scope.updateMajor = function(){
-			$scope.majorTypedata[$scope.majorTypedata.indexNow].name = $('#newMajorName').val();
-			var tempMd = delSelectedMap($scope.majorTypedata[$scope.majorTypedata.indexNow]);
-			$.ajax({
-				type:"POST",
-				url:'./model/modifyOutputTemplate/'+string+'.do',
-				datatype:"json",
-		        contentType: "application/json",
-		        data:JSON.stringify(tempMd)
-			}).done(function(res){
-				if(res.success){
-					QAQ.Dialog.info('修改成功','info');
-					dialog.close();
-					setTimeout(function(){
-						$('.sb_dialog_modal').remove();
-						$('.qaq').remove();
-					},2000);
-				}else{
-					QAQ.Dialog.info('增加失败');
-				}
-			});
-		}
 		
 		$scope.chooseMajorType = function(item,num){
 			$('.select-down-box').hide();
 			$scope.majorTypedata.indexNow = num;
+			if(num<=12){
+				$('.svg-item-selected')[0].setAttribute('class','svg-item');
+				$('.svg-item').eq(num)[0].setAttribute('class','svg-item-selected');
+			}
 			$http.get('./model/queryOutputTemplate.do?rid='+string+'&otid='+item.otid).success(function (res) {
 				$scope.majorTypedata[$scope.majorTypedata.indexNow].ifcTypeSelectorMap = res.data.ifcTypeSelectorMap;
 				checkTree();
     		});
 		}
 		
+		//后台默认没带，树形前面两个大类标签的selected
 		function dealMajorData(){
 			var tt = $scope.majorTypedata[$scope.majorTypedata.indexNow].ifcTypeSelectorMap;
 			angular.forEach(tt, function(ttdata,idx){
@@ -422,7 +415,7 @@ myApp.controller('myAppCtrl', function ($scope, $http,$compile) {
 			});
 		}
 		
-		
+		//后台默认没带，树形前面两个大类标签的selected，删除selected树形，回传
 		function delSelectedMap(tt){
 			tt = angular.copy(tt);
 			delete tt.$$hashKey;
@@ -438,59 +431,7 @@ myApp.controller('myAppCtrl', function ($scope, $http,$compile) {
 			return tt;
 		}
 		
-		function checkTree(){
-			var tt = $scope.majorTypedata[$scope.majorTypedata.indexNow].ifcTypeSelectorMap;
-			angular.forEach(tt, function(ttdata){
-				tt.selected = !!tt.selected;
-				var s1 = 0;
-				var count1 = 0;
-				if( ttdata instanceof Object && typeof(ttdata.namespaceSelectorMap) !== 'undefined'){
-					angular.forEach(ttdata.namespaceSelectorMap, function(tdata,key){
-						if(key!='selected'){
-							count1++;
-						}
-						var s2 = 0;
-						var count2 = 0;
-						angular.forEach(tdata.objectTypeContainerMap, function(t){
-							if(t.objectType){
-								count2++;
-							}
-							if(t.selected){
-								s2++;
-							}
-							angular.forEach(t.oids, function(data,index,array){
-								
-								if(xeogl.scene.components['ifc'+data]){
-									xeogl.scene.components['ifc'+data].visibility.showTypeType = !t.selected;//默认此参数是空，所以某类显示出来的时候
-									
-									if(t.selected){
-										if(!xeogl.scene.components['ifc'+data].visibility.showType && !xeogl.scene.components['ifc'+data].visibility.showTypeType && !xeogl.scene.components['ifc'+data].visibility.showFloor){
-											xeogl.scene.components['ifc'+data].visibility.visible = true;
-										}
-									}else{
-										xeogl.scene.components['ifc'+data].visibility.visible = false;
-									}
-								}
-								
-							});
-						});	
-						if(s2 == count2){
-							tdata.selected  = true;
-						}else{
-							tdata.selected  = false;
-						}
-						if(tdata.selected){
-							s1++;
-						}					
-					});
-					if(s1 == count1){
-						ttdata.selected  = true;
-					}else{
-						ttdata.selected  = false;
-					}
-				}
-			});
-		}
+		
 		
 		//不影响数据单纯数据操作		
 		window.collosePand = function(obj){
@@ -518,5 +459,58 @@ myApp.controller('myAppCtrl', function ($scope, $http,$compile) {
 		});
 	}
 	
+	function checkTree(){
+		var tt = $scope.majorTypedata[$scope.majorTypedata.indexNow].ifcTypeSelectorMap;
+		angular.forEach(tt, function(ttdata){
+			tt.selected = !!tt.selected;
+			var s1 = 0;
+			var count1 = 0;
+			if( ttdata instanceof Object && typeof(ttdata.namespaceSelectorMap) !== 'undefined'){
+				angular.forEach(ttdata.namespaceSelectorMap, function(tdata,key){
+					if(key!='selected'){
+						count1++;
+					}
+					var s2 = 0;
+					var count2 = 0;
+					angular.forEach(tdata.objectTypeContainerMap, function(t){
+						if(t.objectType){
+							count2++;
+						}
+						if(t.selected){
+							s2++;
+						}
+						angular.forEach(t.oids, function(data,index,array){
+							
+							if(xeogl.scene.components['ifc'+data]){
+								xeogl.scene.components['ifc'+data].visibility.showTypeType = !t.selected;//默认此参数是空，所以某类显示出来的时候
+								
+								if(t.selected){
+									if(!xeogl.scene.components['ifc'+data].visibility.showType && !xeogl.scene.components['ifc'+data].visibility.showTypeType && !xeogl.scene.components['ifc'+data].visibility.showFloor){
+										xeogl.scene.components['ifc'+data].visibility.visible = true;
+									}
+								}else{
+									xeogl.scene.components['ifc'+data].visibility.visible = false;
+								}
+							}
+							
+						});
+					});	
+					if(s2 == count2){
+						tdata.selected  = true;
+					}else{
+						tdata.selected  = false;
+					}
+					if(tdata.selected){
+						s1++;
+					}					
+				});
+				if(s1 == count1){
+					ttdata.selected  = true;
+				}else{
+					ttdata.selected  = false;
+				}
+			}
+		});
+	}
 
 });

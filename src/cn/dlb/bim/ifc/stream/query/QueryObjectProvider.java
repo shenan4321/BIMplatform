@@ -18,7 +18,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import cn.dlb.bim.component.PlatformServer;
 import cn.dlb.bim.ifc.database.DatabaseException;
-import cn.dlb.bim.ifc.database.queries.om.JsonQueryObjectModelConverter;
+import cn.dlb.bim.ifc.database.queries.JsonQueryObjectModelConverter;
 import cn.dlb.bim.ifc.database.queries.om.Query;
 import cn.dlb.bim.ifc.database.queries.om.QueryException;
 import cn.dlb.bim.ifc.database.queries.om.QueryPart;
@@ -60,9 +60,9 @@ public class QueryObjectProvider implements ObjectProvider {
 		this.query = query;
 		this.rid = rid;
 		this.packageMetaData = packageMetaData;
-		
+		QueryContext queryContext = new QueryContext(platformService, packageMetaData, rid);
 		stack = new ArrayDeque<StackFrame>();
-		stack.push(new QueryStackFrame(this, rid));
+		stack.push(new QueryStackFrame(this, rid, queryContext));
 		
 		for (QueryPart queryPart : query.getQueryParts()) {
 			if (queryPart.hasOids()) {

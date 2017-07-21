@@ -289,11 +289,11 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 	}
 
 	private VirtualObject newVirtualObject(EClass eClass) {
-		return new VirtualObject(rid, platformService.getCidOfEClass(eClass), platformService.newOid(eClass));
+		return new VirtualObject(rid, platformService.getCidOfEClass(eClass), platformService.newOid(eClass), eClass);
 	}
 
 	private WrappedVirtualObject newWrappedVirtualObject(EClass eClass) {
-		return new WrappedVirtualObject(platformService.getCidOfEClass(eClass));
+		return new WrappedVirtualObject(platformService.getCidOfEClass(eClass), eClass);
 	}
 	
 	public void processRecord(String line) throws DeserializeException, MetaDataException, DatabaseException {

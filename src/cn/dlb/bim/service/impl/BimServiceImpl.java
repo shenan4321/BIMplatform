@@ -162,7 +162,7 @@ public class BimServiceImpl implements BimService {
 			GeometryGenerator generator = new GeometryGenerator(model, serializer, renderEnginePool);
 			generator.generateForAllElements();
 
-			IfcModelDbSession session = new IfcModelDbSession(server.getIfcModelDao(), server.getMetaDataManager(),
+			IfcModelDbSession session = new IfcModelDbSession(ifcModelDao, server.getMetaDataManager(),
 					platformService, null, server.getModelCacheManager());
 			session.saveIfcModel(model, modelInfo);
 			rid = model.getModelMetaData().getRevisionId();
@@ -319,7 +319,7 @@ public class BimServiceImpl implements BimService {
 		} else {
 			packageMetaData = server.getMetaDataManager().getPackageMetaData(Schema.IFC4.getEPackageName());
 		}
-		IfcModelDbSession session = new IfcModelDbSession(server.getIfcModelDao(), server.getMetaDataManager(),
+		IfcModelDbSession session = new IfcModelDbSession(ifcModelDao, server.getMetaDataManager(),
 				platformService, progressReporter, server.getModelCacheManager());
 		IfcModelInterface model = null;
 
@@ -737,7 +737,7 @@ public class BimServiceImpl implements BimService {
 //			System.out.println(isDecomposedBy);
 //		}
 		
-		StreamingCheckinAction action = new StreamingCheckinAction(null, new File("E:\\IFC模型\\huahuatest.ifc"), server, platformService);
+		StreamingCheckinAction action = new StreamingCheckinAction(null, new File("E:\\IFC模型\\世博地下空间+结构+消防.ifc"), server, platformService);
 		try {
 			action.execute();
 		} catch (DatabaseException | IfcModelInterfaceException e) {

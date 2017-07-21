@@ -52,7 +52,8 @@ import cn.dlb.bim.utils.UTF8PrintWriter;
 import nl.tue.buildingsmart.schema.EntityDefinition;
 import nl.tue.buildingsmart.schema.SchemaDefinition;
 
-public abstract class IfcStepStreamingSerializer implements StreamingSerializer, StreamingReader, OidConvertingSerializer {
+public abstract class IfcStepStreamingSerializer
+		implements StreamingSerializer, StreamingReader, OidConvertingSerializer {
 	private static final EcorePackage ECORE_PACKAGE_INSTANCE = EcorePackage.eINSTANCE;
 	private static final String NULL = "NULL";
 	private static final String OPEN_CLOSE_PAREN = "()";
@@ -68,10 +69,10 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 	private static final String BOOLEAN_UNDEFINED = ".U.";
 	private static final String DOLLAR = "$";
 	private static final String WRAPPED_VALUE = "wrappedValue";
-	
+
 	private String headerSchema;
 	private ObjectProvider objectProvider;
-	
+
 	private Map<Long, Integer> oidToEid = new HashMap<>();
 	private int oidCounter = 1;
 
@@ -84,7 +85,7 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 	private PackageMetaData packageMetaData;
 	private PrintWriter printWriter;
 	private PlatformService platformService;
-	
+
 	@Override
 	public boolean write(OutputStream outputStream) throws SerializerException, DatabaseException {
 		if (this.printWriter == null) {
@@ -98,24 +99,24 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 		}
 		return result;
 	}
-	
+
 	public Map<Long, Integer> getOidToEid() {
 		return oidToEid;
 	}
-	
+
 	public Mode getMode() {
 		return mode;
 	}
-	
+
 	public void setMode(Mode mode) {
 		this.mode = mode;
 	}
-	
+
 	@Override
 	public InputStream getInputStream() {
 		return new SerializerInputstream(this);
 	}
-	
+
 	public IfcStepStreamingSerializer() {
 	}
 
@@ -124,19 +125,20 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 	}
 
 	@Override
-	public void init(PlatformService platformService, ObjectProvider objectProvider, IfcHeader ifcHeader, PackageMetaData packageMetaData) throws SerializerException {
+	public void init(PlatformService platformService, ObjectProvider objectProvider, IfcHeader ifcHeader,
+			PackageMetaData packageMetaData) throws SerializerException {
 		this.platformService = platformService;
 		this.objectProvider = objectProvider;
 		this.ifcHeader = ifcHeader;
 		this.packageMetaData = packageMetaData;
 		headerSchema = ifcHeader.getIfcSchemaVersion();
 	}
-	
+
 	public void writeToOutputStream(OutputStream outputStream) throws SerializerException, DatabaseException {
 		this.printWriter = new UTF8PrintWriter(outputStream);
 		try {
 			while (mode != Mode.FINISHED) {
-				processMode();			
+				processMode();
 			}
 		} catch (IOException e) {
 			throw new SerializerException(e);
@@ -178,21 +180,26 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 		if (ifcHeader == null) {
 			Date date = new Date();
 			println("FILE_DESCRIPTION ((''), '2;1');");
-			println("FILE_NAME ('', '" + dateFormatter.format(date) + "', (''), (''), '', 'BIMserver', '');");
+			println("FILE_NAME ('', '" + dateFormatter.format(date) + "', (''), (''), '', 'BIMplatform', '');");
 			println("FILE_SCHEMA (('" + headerSchema + "'));");
 		} else {
 			print("FILE_DESCRIPTION ((");
 			print(StringUtils.concat(ifcHeader.getDescription(), "'", ", "));
 			println("), '" + ifcHeader.getImplementationLevel() + "');");
-			println("FILE_NAME ('" + ifcHeader.getFilename() + "', '" + dateFormatter.format(ifcHeader.getTimeStamp()) + "', (" + StringUtils.concat(ifcHeader.getAuthor(), "'", ", ") + "), (" + StringUtils.concat(ifcHeader.getOrganization(), "'", ", ") + "), '" + ifcHeader.getPreProcessorVersion() + "', '" + ifcHeader.getOriginatingSystem() + "', '"	+ ifcHeader.getAuthorization() + "');");
+			println("FILE_NAME ('" + ifcHeader.getFilename() + "', '" + dateFormatter.format(ifcHeader.getTimeStamp())
+					+ "', (" + StringUtils.concat(ifcHeader.getAuthor(), "'", ", ") + "), ("
+					+ StringUtils.concat(ifcHeader.getOrganization(), "'", ", ") + "), '"
+					+ ifcHeader.getPreProcessorVersion() + "', '" + ifcHeader.getOriginatingSystem() + "', '"
+					+ ifcHeader.getAuthorization() + "');");
 
-			//	println("FILE_SCHEMA (('" + ifcHeader.getIfcSchemaVersion() + "'));");
+			// println("FILE_SCHEMA (('" + ifcHeader.getIfcSchemaVersion() + "'));");
 			println("FILE_SCHEMA (('" + headerSchema + "'));");
 		}
 		println("ENDSEC;");
 		println("DATA;");
 		// println("//This program comes with ABSOLUTELY NO WARRANTY.");
-		// println("//This is free software, and you are welcome to redistribute it under certain conditions. See www.bimserver.org <http://www.bimserver.org>");
+		// println("//This is free software, and you are welcome to redistribute it
+		// under certain conditions. See www.bimserver.org <http://www.bimserver.org>");
 	}
 
 	private void println(String line) throws IOException {
@@ -202,7 +209,7 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 	private void print(String text) throws IOException {
 		printWriter.write(text);
 	}
-	
+
 	private void write(VirtualObject object) throws SerializerException, IOException {
 		EClass eClass = platformService.getEClassForCid(object.getEClassId());
 		if (eClass.getEAnnotation("hidden") != null) {
@@ -222,10 +229,11 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 		print(upperCase);
 		print(OPEN_PAREN);
 		boolean isFirst = true;
-		
+
 		EntityDefinition entityBN = getSchemaDefinition().getEntityBN(eClass.getName());
 		for (EStructuralFeature feature : eClass.getEAllStructuralFeatures()) {
-			if (feature.getEAnnotation("hidden") == null && (entityBN != null && (!entityBN.isDerived(feature.getName()) || entityBN.isDerivedOverride(feature.getName())))) {
+			if (feature.getEAnnotation("hidden") == null && (entityBN != null
+					&& (!entityBN.isDerived(feature.getName()) || entityBN.isDerivedOverride(feature.getName())))) {
 				EClassifier type = feature.getEType();
 				if (type instanceof EEnum) {
 					if (!isFirst) {
@@ -234,7 +242,7 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 					writeEnum(object, feature);
 					isFirst = false;
 				} else if (type instanceof EClass) {
-					EReference eReference = (EReference)feature;
+					EReference eReference = (EReference) feature;
 					if (!packageMetaData.isInverse(eReference)) {
 						if (!isFirst) {
 							print(COMMA);
@@ -268,7 +276,8 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 		}
 	}
 
-	private void writeEDataType(VirtualObject object, EntityDefinition entityBN, EStructuralFeature feature) throws SerializerException, IOException {
+	private void writeEDataType(VirtualObject object, EntityDefinition entityBN, EStructuralFeature feature)
+			throws SerializerException, IOException {
 		if (entityBN != null && entityBN.isDerived(feature.getName())) {
 			print(ASTERISK);
 		} else if (feature.isMany()) {
@@ -281,14 +290,19 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 	private void writeEClass(VirtualObject object, EStructuralFeature feature) throws SerializerException, IOException {
 		Object referencedObject = object.eGet(feature);
 		if (referencedObject instanceof VirtualObject) {
-			EClass referencedObjectEClass = platformService.getEClassForCid(((VirtualObject)referencedObject).getEClassId());
+			EClass referencedObjectEClass = platformService
+					.getEClassForCid(((VirtualObject) referencedObject).getEClassId());
 			if (referencedObjectEClass.getEAnnotation("wrapped") != null) {
 				writeWrappedValue(object, feature, referencedObjectEClass);
 			}
 		} else {
 			if (referencedObject instanceof Long) {
-				print(DASH);
-				print(String.valueOf(getExpressId((Long) referencedObject)));
+				if (object.useFeatureForSerialization(feature)) {
+					print(DASH);
+					print(String.valueOf(getExpressId((Long) referencedObject)));
+				} else {
+					print(DOLLAR);
+				}
 			} else {
 				EClass objectEClass = platformService.getEClassForCid(object.getEClassId());
 				EntityDefinition entityBN = getSchemaDefinition().getEntityBN(objectEClass.getName());
@@ -311,7 +325,8 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 				EStructuralFeature structuralFeature = ((EClass) type).getEStructuralFeature(WRAPPED_VALUE);
 				if (structuralFeature != null) {
 					String name = structuralFeature.getEType().getName();
-					if (name.equals(IFC_BOOLEAN) || name.equals(IFC_LOGICAL) || structuralFeature.getEType() == EcorePackage.eINSTANCE.getEBoolean()) {
+					if (name.equals(IFC_BOOLEAN) || name.equals(IFC_LOGICAL)
+							|| structuralFeature.getEType() == EcorePackage.eINSTANCE.getEBoolean()) {
 						print(BOOLEAN_UNDEFINED);
 					} else {
 						print(DOLLAR);
@@ -335,16 +350,17 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 				EClass objectEClass = platformService.getEClassForCid(object.getEClassId());
 				EStructuralFeature asStringFeature = objectEClass.getEStructuralFeature(feature.getName() + "AsString");
 				String asString = (String) object.eGet(asStringFeature);
-				writeDoubleValue((Double)ref, asString, feature);
+				writeDoubleValue((Double) ref, asString, feature);
 			} else {
 				IfcParserWriterUtils.writePrimitive(ref, printWriter);
 			}
 		}
 	}
 
-	private void writeDoubleValue(double value, String asString, EStructuralFeature feature) throws SerializerException, IOException {
+	private void writeDoubleValue(double value, String asString, EStructuralFeature feature)
+			throws SerializerException, IOException {
 		if (asString != null) {
-			print((String)asString);
+			print((String) asString);
 			return;
 		}
 		IfcParserWriterUtils.writePrimitive(value, printWriter);
@@ -358,9 +374,10 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 		if (structuralFeature != null) {
 			Object realVal = eObject.eGet(structuralFeature);
 			if (structuralFeature.getEType() == ECORE_PACKAGE_INSTANCE.getEDouble()) {
-				EStructuralFeature asStringFeature = class1.getEStructuralFeature(structuralFeature.getName() + "AsString");
+				EStructuralFeature asStringFeature = class1
+						.getEStructuralFeature(structuralFeature.getName() + "AsString");
 				String asString = (String) eObject.eGet(asStringFeature);
-				writeDoubleValue((Double)realVal, asString, structuralFeature);
+				writeDoubleValue((Double) realVal, asString, structuralFeature);
 			} else {
 				IfcParserWriterUtils.writePrimitive(realVal, printWriter);
 			}
@@ -368,7 +385,8 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 		print(CLOSE_PAREN);
 	}
 
-	private void writeList(MinimalVirtualObject object, EStructuralFeature feature) throws SerializerException, IOException {
+	private void writeList(MinimalVirtualObject object, EStructuralFeature feature)
+			throws SerializerException, IOException {
 		List<?> list = (List<?>) object.eGet(feature);
 		if (list == null) {
 			if (feature.isUnsettable()) {
@@ -380,13 +398,14 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 		}
 		List<?> doubleStingList = null;
 		if (feature.getEType() == EcorePackage.eINSTANCE.getEDouble()) {
-			EStructuralFeature doubleStringFeature = feature.getEContainingClass().getEStructuralFeature(feature.getName() + "AsString");
+			EStructuralFeature doubleStringFeature = feature.getEContainingClass()
+					.getEStructuralFeature(feature.getName() + "AsString");
 			if (doubleStringFeature == null) {
 				throw new SerializerException("Field " + feature.getName() + "AsString" + " not found");
 			}
 			doubleStingList = (List<?>) object.eGet(doubleStringFeature);
 		}
-		if (list.isEmpty()) {
+		if (list.isEmpty() || !object.useFeatureForSerialization(feature)) {
 			if (!feature.isUnsettable()) {
 				print(OPEN_CLOSE_PAREN);
 			} else {
@@ -397,80 +416,88 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 			boolean first = true;
 			int index = 0;
 			for (Object listObject : list) {
-				if (!first) {
-					print(COMMA);
-				}
-				if (feature instanceof EReference && listObject instanceof Long) {
-					print(DASH);
-					print(String.valueOf(getExpressId((Long)listObject)));
-				} else {
-					if (listObject == null) {
-						print(DOLLAR);
+				if (object.useFeatureForSerialization(feature, index)) {
+					if (!first) {
+						print(COMMA);
+					}
+					if (feature instanceof EReference && listObject instanceof Long) {
+						print(DASH);
+						print(String.valueOf(getExpressId((Long) listObject)));
 					} else {
-						if (listObject instanceof WrappedVirtualObject && feature.getEType().getEAnnotation("wrapped") != null) {
-							WrappedVirtualObject eObject = (WrappedVirtualObject) listObject;
-							EClass eObjectEClass = platformService.getEClassForCid(eObject.getEClassId());
-							Object realVal = eObject.eGet(eObjectEClass.getEStructuralFeature("wrappedValue"));
-							if (realVal instanceof Double) {
-								Object stringVal = eObject.eGet(eObjectEClass.getEStructuralFeature("wrappedValueAsString"));
-								if (stringVal != null) {
-									print((String) stringVal);
-								} else {
-									IfcParserWriterUtils.writePrimitive(realVal, printWriter);
-								}
-							} else {
-								IfcParserWriterUtils.writePrimitive(realVal, printWriter);
-							}
-						} else if (listObject instanceof WrappedVirtualObject) {
-							WrappedVirtualObject eObject = (WrappedVirtualObject) listObject;
-							EClass class1 = platformService.getEClassForCid(eObject.getEClassId());
-							EStructuralFeature structuralFeature = class1.getEStructuralFeature(WRAPPED_VALUE);
-							if (structuralFeature != null) {
-								Object realVal = eObject.eGet(structuralFeature);
-								print(packageMetaData.getUpperCase(class1));
-								print(OPEN_PAREN);
-								if (realVal instanceof Double) {
-									EStructuralFeature asStringFeature = class1.getEStructuralFeature(structuralFeature.getName() + "AsString");
-									String asString = (String) eObject.eGet(asStringFeature);
-									writeDoubleValue((Double)realVal, asString, structuralFeature);
-								} else {
-									IfcParserWriterUtils.writePrimitive(realVal, printWriter);
-								}
-								print(CLOSE_PAREN);
-							} else {
-								if (feature.getEAnnotation("twodimensionalarray") != null) {
-									EClass eObjectEClass = platformService.getEClassForCid(eObject.getEClassId());
-									writeList(eObject, eObjectEClass.getEStructuralFeature("List"));
-								} else {
-//										LOGGER.info("Unfollowable reference found from " + object + "(" + object.getOid() + ")." + feature.getName() + " to " + eObject + "(" + eObject.getOid() + ")");
-								}
-							}
+						if (listObject == null) {
+							print(DOLLAR);
 						} else {
-							if (doubleStingList != null) {
-								if (index < doubleStingList.size()) {
-									String val = (String)doubleStingList.get(index);
-									if (val == null) {
-										IfcParserWriterUtils.writePrimitive(listObject, printWriter);
+							if (listObject instanceof WrappedVirtualObject
+									&& feature.getEType().getEAnnotation("wrapped") != null) {
+								WrappedVirtualObject eObject = (WrappedVirtualObject) listObject;
+								EClass eObjectEClass = platformService.getEClassForCid(eObject.getEClassId());
+								Object realVal = eObject.eGet(eObjectEClass.getEStructuralFeature("wrappedValue"));
+								if (realVal instanceof Double) {
+									Object stringVal = eObject
+											.eGet(eObjectEClass.getEStructuralFeature("wrappedValueAsString"));
+									if (stringVal != null) {
+										print((String) stringVal);
 									} else {
-										print(val);
+										IfcParserWriterUtils.writePrimitive(realVal, printWriter);
+									}
+								} else {
+									IfcParserWriterUtils.writePrimitive(realVal, printWriter);
+								}
+							} else if (listObject instanceof WrappedVirtualObject) {
+								WrappedVirtualObject eObject = (WrappedVirtualObject) listObject;
+								EClass class1 = platformService.getEClassForCid(eObject.getEClassId());
+								EStructuralFeature structuralFeature = class1.getEStructuralFeature(WRAPPED_VALUE);
+								if (structuralFeature != null) {
+									Object realVal = eObject.eGet(structuralFeature);
+									print(packageMetaData.getUpperCase(class1));
+									print(OPEN_PAREN);
+									if (realVal instanceof Double) {
+										EStructuralFeature asStringFeature = class1
+												.getEStructuralFeature(structuralFeature.getName() + "AsString");
+										String asString = (String) eObject.eGet(asStringFeature);
+										writeDoubleValue((Double) realVal, asString, structuralFeature);
+									} else {
+										IfcParserWriterUtils.writePrimitive(realVal, printWriter);
+									}
+									print(CLOSE_PAREN);
+								} else {
+									if (feature.getEAnnotation("twodimensionalarray") != null) {
+										EClass eObjectEClass = platformService.getEClassForCid(eObject.getEClassId());
+										writeList(eObject, eObjectEClass.getEStructuralFeature("List"));
+									} else {
+										// LOGGER.info("Unfollowable reference found from " + object + "(" +
+										// object.getOid() + ")." + feature.getName() + " to " + eObject + "(" +
+										// eObject.getOid() + ")");
+									}
+								}
+							} else {
+								if (doubleStingList != null) {
+									if (index < doubleStingList.size()) {
+										String val = (String) doubleStingList.get(index);
+										if (val == null) {
+											IfcParserWriterUtils.writePrimitive(listObject, printWriter);
+										} else {
+											print(val);
+										}
+									} else {
+										IfcParserWriterUtils.writePrimitive(listObject, printWriter);
 									}
 								} else {
 									IfcParserWriterUtils.writePrimitive(listObject, printWriter);
 								}
-							} else {
-								IfcParserWriterUtils.writePrimitive(listObject, printWriter);
 							}
 						}
 					}
+					first = false;
 				}
-				first = false;
-				index++;				
+				index++;
 			}
 			print(CLOSE_PAREN);
 		}
 	}
 
-	private void writeWrappedValue(VirtualObject object, EStructuralFeature feature, EClass ec) throws SerializerException, IOException {
+	private void writeWrappedValue(VirtualObject object, EStructuralFeature feature, EClass ec)
+			throws SerializerException, IOException {
 		Object get = object.eGet(feature);
 		boolean isWrapped = ec.getEAnnotation("wrapped") != null;
 		EStructuralFeature structuralFeature = ec.getEStructuralFeature(WRAPPED_VALUE);
@@ -485,9 +512,10 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 						print(BOOLEAN_UNDEFINED);
 					} else if (structuralFeature.getEType() == ECORE_PACKAGE_INSTANCE.getEDouble()) {
 						EClass objectEClass = platformService.getEClassForCid(object.getEClassId());
-						EStructuralFeature asStringFeature = objectEClass.getEStructuralFeature(feature.getName() + "AsString");
+						EStructuralFeature asStringFeature = objectEClass
+								.getEStructuralFeature(feature.getName() + "AsString");
 						String asString = (String) betweenObject.eGet(asStringFeature);
-						writeDoubleValue((Double)val, asString, feature);
+						writeDoubleValue((Double) val, asString, feature);
 					} else {
 						IfcParserWriterUtils.writePrimitive(val, printWriter);
 					}
@@ -514,9 +542,10 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 					Object val = object2.eGet(structuralFeature);
 					if (structuralFeature.getEType() == ECORE_PACKAGE_INSTANCE.getEDouble()) {
 						EClass object2EClass = platformService.getEClassForCid(object2.getEClassId());
-						EStructuralFeature asStringFeature = object2EClass.getEStructuralFeature(feature.getName() + "AsString");
+						EStructuralFeature asStringFeature = object2EClass
+								.getEStructuralFeature(feature.getName() + "AsString");
 						String asString = (String) object2.eGet(asStringFeature);
-						writeDoubleValue((Double)val, asString, structuralFeature);
+						writeDoubleValue((Double) val, asString, structuralFeature);
 					} else {
 						IfcParserWriterUtils.writePrimitive(val, printWriter);
 					}
@@ -526,7 +555,8 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 			}
 		} else if (get == null) {
 			EClassifier type = structuralFeature.getEType();
-			if (type.getName().equals("IfcBoolean") || type.getName().equals("IfcLogical") || type == ECORE_PACKAGE_INSTANCE.getEBoolean()) {
+			if (type.getName().equals("IfcBoolean") || type.getName().equals("IfcLogical")
+					|| type == ECORE_PACKAGE_INSTANCE.getEBoolean()) {
 				print(BOOLEAN_UNDEFINED);
 			} else {
 				EClass objectEClass = platformService.getEClassForCid(object.getEClassId());
@@ -562,11 +592,11 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 					print(DOLLAR);
 				} else {
 					print(DOT);
-//					if (val instanceof String) {
-						print((String)val);
-//					} else {
-//						print(val.toString().toUpperCase());
-//					}
+					// if (val instanceof String) {
+					print((String) val);
+					// } else {
+					// print(val.toString().toUpperCase());
+					// }
 					print(DOT);
 				}
 			}

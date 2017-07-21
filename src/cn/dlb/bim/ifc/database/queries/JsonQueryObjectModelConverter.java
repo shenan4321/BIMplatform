@@ -1,4 +1,4 @@
-package cn.dlb.bim.ifc.database.queries.om;
+package cn.dlb.bim.ifc.database.queries;
 
 import java.io.IOException;
 import java.net.URL;
@@ -19,6 +19,12 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import cn.dlb.bim.ifc.database.queries.om.CanInclude;
+import cn.dlb.bim.ifc.database.queries.om.InBoundingBox;
+import cn.dlb.bim.ifc.database.queries.om.Include;
+import cn.dlb.bim.ifc.database.queries.om.Query;
+import cn.dlb.bim.ifc.database.queries.om.QueryException;
+import cn.dlb.bim.ifc.database.queries.om.QueryPart;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
 
 public class JsonQueryObjectModelConverter {
@@ -293,13 +299,8 @@ public class JsonQueryObjectModelConverter {
 		}
 		String namespaceString = includeName.substring(0, includeName.indexOf(":"));
 		String singleIncludeName = includeName.substring(includeName.indexOf(":") + 1);
-		URL resource;
-		try {
-			resource = getClass().getClassLoader().loadClass("org.bimserver.database.queries.StartFrame").getResource("json/" + namespaceString + ".json");
-			if (resource == null) {
-				throw new QueryException("Could not find '" + namespaceString + "' namespace in predefined queries");
-			}
-		} catch (ClassNotFoundException e1) {
+		URL resource = getClass().getResource("json/" + namespaceString + ".json");
+		if (resource == null) {
 			throw new QueryException("Could not find '" + namespaceString + "' namespace in predefined queries");
 		}
 		OBJECT_MAPPER.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);

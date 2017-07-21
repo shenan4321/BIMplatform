@@ -22,7 +22,7 @@
 	<!-- 扫描文件（自动将component注入） -->
 	<context:component-scan base-package="cn.dlb.bim.component" />
 
-	<!-- 扫描文件（自动将service层注入） -->
+	<!-- 扫描文件（自动将dao层注入） -->
 	<context:component-scan base-package="cn.dlb.bim.dao.impl" />
 
 	<!-- spring连接mongodb数据库的配置 -->
@@ -43,11 +43,7 @@
 	<!-- by default look for a Mongo object named 'mongo' - default name used 
 		for the converter is 'mappingConverter' -->
 	<mongo:mapping-converter id="mappingConverter" base-package="cn.dlb.bim.dao.converters" type-mapper-ref="defaultMongoTypeMapper">
-		<mongo:custom-converters>
-			<mongo:converter>
-				<bean class="cn.dlb.bim.dao.converters.VirtualObjectReadConverter" />
-			</mongo:converter>
-		</mongo:custom-converters>
+		<mongo:custom-converters base-package="cn.dlb.bim.dao.converters"/>
 	</mongo:mapping-converter>
 	
 	<!-- 默认Mongodb类型映射 -->

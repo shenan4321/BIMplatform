@@ -29,8 +29,8 @@ import org.springframework.data.util.CloseableIterator;
 
 import cn.dlb.bim.component.PlatformServer;
 import cn.dlb.bim.ifc.database.DatabaseException;
+import cn.dlb.bim.ifc.database.queries.JsonQueryObjectModelConverter;
 import cn.dlb.bim.ifc.database.queries.om.Include;
-import cn.dlb.bim.ifc.database.queries.om.JsonQueryObjectModelConverter;
 import cn.dlb.bim.ifc.database.queries.om.Query;
 import cn.dlb.bim.ifc.database.queries.om.QueryException;
 import cn.dlb.bim.ifc.database.queries.om.QueryPart;
@@ -42,6 +42,7 @@ import cn.dlb.bim.ifc.engine.IRenderEngineInstance;
 import cn.dlb.bim.ifc.engine.IRenderEngineModel;
 import cn.dlb.bim.ifc.engine.IndexFormat;
 import cn.dlb.bim.ifc.engine.Precision;
+import cn.dlb.bim.ifc.engine.RenderEngineConceptualFaceProperties;
 import cn.dlb.bim.ifc.engine.RenderEngineException;
 import cn.dlb.bim.ifc.engine.RenderEngineFilter;
 import cn.dlb.bim.ifc.engine.RenderEngineGeometry;
@@ -52,6 +53,7 @@ import cn.dlb.bim.ifc.engine.pool.RenderEnginePool;
 import cn.dlb.bim.ifc.model.IfcHeader;
 import cn.dlb.bim.ifc.stream.query.ObjectListener;
 import cn.dlb.bim.ifc.stream.query.ObjectProviderProxy;
+import cn.dlb.bim.ifc.stream.query.QueryContext;
 import cn.dlb.bim.ifc.stream.query.QueryObjectProvider;
 import cn.dlb.bim.ifc.stream.serializers.IfcStepStreamingSerializer;
 import cn.dlb.bim.ifc.stream.serializers.ObjectProvider;
@@ -62,9 +64,6 @@ import cn.dlb.bim.service.PlatformService;
 import cn.dlb.bim.utils.Formatters;
 
 public class StreamingGeometryGenerator extends GenericGeometryGenerator {
-
-	private static String IFC2X3_SCHEMA_SHORT = "IFC2X3";
-	private static String IFC4_SCHEMA_SHORT = "IFC4";
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(StreamingGeometryGenerator.class);
 
@@ -130,8 +129,7 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 				
 				objectProvider = new QueryObjectProvider(platformService, server, query, rid, packageMetaData);
 
-				StreamingSerializer ifcSerializer = new IfcStepStreamingSerializer() {
-				};
+				StreamingSerializer ifcSerializer = new IfcStepStreamingSerializer() {};
 				IRenderEngine renderEngine = null;
 				byte[] bytes = null;
 				try {
@@ -157,6 +155,7 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 					IOUtils.copy(ifcSerializer.getInputStream(), baos);
 					bytes = baos.toByteArray();
 					InputStream in = new ByteArrayInputStream(bytes);
+					
 					try {
 						if (!objects.isEmpty()) {
 							renderEngine = renderEnginePool.borrowObject();
@@ -195,12 +194,12 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 											Long geometryInfoOid = platformService
 													.newOid(GeometryPackage.eINSTANCE.getGeometryInfo());
 											VirtualObject geometryInfo = new VirtualObject(rid, geometryInfoCid,
-													geometryInfoOid);
+													geometryInfoOid, GeometryPackage.eINSTANCE.getGeometryInfo());
 
 											Short vector3fCid = platformService
 													.getCidOfEClass(GeometryPackage.eINSTANCE.getVector3f());
-											WrappedVirtualObject minBounds = new WrappedVirtualObject(vector3fCid);
-											WrappedVirtualObject maxBounds = new WrappedVirtualObject(vector3fCid);
+											WrappedVirtualObject minBounds = new WrappedVirtualObject(vector3fCid, GeometryPackage.eINSTANCE.getVector3f());
+											WrappedVirtualObject maxBounds = new WrappedVirtualObject(vector3fCid, GeometryPackage.eINSTANCE.getVector3f());
 
 											minBounds.set("x", Double.POSITIVE_INFINITY);
 											minBounds.set("y", Double.POSITIVE_INFINITY);
@@ -228,12 +227,48 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 											Long geometryDataOid = platformService
 													.newOid(GeometryPackage.eINSTANCE.getGeometryData());
 											VirtualObject geometryData = new VirtualObject(rid, geometryDataCid,
-													geometryDataOid);
+													geometryDataOid, GeometryPackage.eINSTANCE.getGeometryData());
 
-											int[] indices = geometry.getIndices();
+											int faceCnt = renderEngineInstance.getConceptualFaceCnt();
+											int[] indicesForFaces = new int[geometry.getIndices().length];
+											int[] indicesForLinesWireFrame = new int[2*geometry.getIndices().length];
+											int[] primitivesForFaces = new int[faceCnt];
+											int noPrimitivesForFaces = 0;
+											int noPrimitivesForWireFrame = 0;
+											for (int i = 0; i < faceCnt; i++) {
+												RenderEngineConceptualFaceProperties conceptualFaceProperties = renderEngineInstance.getConceptualFaceEx(i);
+												int noIndicesTrangles = conceptualFaceProperties.getNoIndicesTriangles();
+												int startIndexTriangles = conceptualFaceProperties.getStartIndexTriangles();
+												int noIndicesFacesPolygons = conceptualFaceProperties.getNoIndicesFacesPolygons();
+												int startIndexFacesPolygons = conceptualFaceProperties.getStartIndexFacesPolygons();
+												int	j = 0;
+												while  (j < noIndicesTrangles) {
+													indicesForFaces[noPrimitivesForFaces * 3 + j] = geometry.getIndices()[startIndexTriangles + j];
+													j++;
+												}
+												noPrimitivesForFaces += noIndicesTrangles/3;
+												primitivesForFaces[i] = noIndicesTrangles / 3;
+												
+												j = 0;
+												int	lastItem = -1;
+												while  (j < noIndicesFacesPolygons) {
+													if	(lastItem >= 0 && geometry.getIndices()[startIndexFacesPolygons+j] >= 0) {
+														indicesForLinesWireFrame[2*noPrimitivesForWireFrame + 0] = lastItem;
+														indicesForLinesWireFrame[2*noPrimitivesForWireFrame + 1] = geometry.getIndices()[startIndexFacesPolygons+j];
+														noPrimitivesForWireFrame++;
+													}
+													lastItem = geometry.getIndices()[startIndexFacesPolygons+j];
+													j++;
+												}
+												
+											}
+											int[] trimIndicesForFaces = Arrays.copyOf(indicesForFaces, 3 * noPrimitivesForFaces);
+											int[] trimIndicesForLinesWireFrame = Arrays.copyOf(indicesForLinesWireFrame, 2 * noPrimitivesForWireFrame);
+											
+//											int[] indices = geometry.getIndices();
 											geometryData.setAttribute(
 													GeometryPackage.eINSTANCE.getGeometryData_Indices(),
-													intArrayToByteArray(indices));
+													intArrayToByteArray(trimIndicesForFaces));
 											float[] vertices = geometry.getVertices();
 											geometryData.setAttribute(
 													GeometryPackage.eINSTANCE.getGeometryData_Vertices(),
@@ -243,10 +278,12 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 											geometryData.setAttribute(
 													GeometryPackage.eINSTANCE.getGeometryData_Normals(),
 													floatArrayToByteArray(geometry.getNormals()));
+											
+											geometryData.setAttribute(GeometryPackage.eINSTANCE.getGeometryData_WireFrameIndices(), intArrayToByteArray(trimIndicesForLinesWireFrame));
 
 											geometryInfo.setAttribute(
 													GeometryPackage.eINSTANCE.getGeometryInfo_PrimitiveCount(),
-													indices.length / 3);
+													trimIndicesForFaces.length / 3);
 
 											Set<Color4f> usedColors = new HashSet<>();
 
@@ -259,7 +296,7 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 												for (int i = 0; i < geometry.getMaterialIndices().length; ++i) {
 													int c = geometry.getMaterialIndices()[i];
 													for (int j = 0; j < 3; ++j) {
-														int k = indices[i * 3 + j];
+														int k = trimIndicesForFaces[i * 3 + j];
 														if (c > -1) {
 															hasMaterial = true;
 															Color4f color = new Color4f();
@@ -291,9 +328,9 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 												Matrix.setIdentityM(tranformationMatrix, 0);
 											}
 
-											for (int i = 0; i < indices.length; i++) {
+											for (int i = 0; i < trimIndicesForFaces.length; i++) {
 												processExtends(geometryInfo, tranformationMatrix, vertices,
-														indices[i] * 3, generateGeometryResult);
+														trimIndicesForFaces[i] * 3, generateGeometryResult);
 											}
 
 											geometryInfo.setReference(GeometryPackage.eINSTANCE.getGeometryInfo_Data(),
@@ -356,6 +393,7 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 								}
 							}
 						}
+						platformService.commitSaveBatch();
 					} finally {
 						try {
 							// if (notFoundsObjects) {
@@ -392,20 +430,9 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 	}
 
 	@SuppressWarnings("unchecked")
-	public GenerateGeometryResult generateGeometry() throws DatabaseException, GeometryGeneratingException {
+	public GenerateGeometryResult generateGeometry(QueryContext queryContext) throws DatabaseException, GeometryGeneratingException {
 		GenerateGeometryResult generateGeometryResult = new GenerateGeometryResult();
-		IfcHeader ifcHeader = platformService.queryIfcHeader(rid);
-		String ifcSchemaVersion = ifcHeader.getIfcSchemaVersion();
-		Schema schema = null;
-		if (ifcSchemaVersion.startsWith(IFC2X3_SCHEMA_SHORT)) {
-			schema = Schema.IFC2X3TC1;
-		} else if (ifcSchemaVersion.startsWith(IFC4_SCHEMA_SHORT)) {
-			schema = Schema.IFC4;
-		}
-		if (schema == null) {
-			return null;
-		}
-		PackageMetaData packageMetaData = server.getMetaDataManager().getPackageMetaData(schema.getEPackageName());
+		packageMetaData = queryContext.getPackageMetaData();
 		productClass = packageMetaData.getEClass("IfcProduct");
 		geometryFeature = productClass.getEStructuralFeature("geometry");
 		representationFeature = productClass.getEStructuralFeature("Representation");
@@ -462,7 +489,7 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 								queryPart.addType(eClass, false);
 								int x = 0;
 								queryPart.addOid(next.getOid());
-								while (next != null && x < maxObjectsPerFile - 1) {
+								while (iterator.hasNext() && x < maxObjectsPerFile - 1) {
 									next = iterator.next();
 									if (next != null && platformService.getEClassForCid(next.getEClassId()) == eClass) {
 										Object representationRefObject = next.eGet(representationFeature);
@@ -534,7 +561,6 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 							}
 						}
 					}
-					next = iterator.next();
 				}
 			}
 
@@ -618,6 +644,9 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 		if (geometryData.has("materials")) {
 			size += ((byte[]) geometryData.get("materials")).length;
 		}
+		if (geometryData.has("indicesForLinesWireFrame")) {
+			size += ((byte[]) geometryData.get("indicesForLinesWireFrame")).length;
+		}
 		return size;
 	}
 
@@ -637,6 +666,9 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 		}
 		if (geometryData.has("materials")) {
 			hashCode += Arrays.hashCode((byte[]) geometryData.get("materials"));
+		}
+		if (geometryData.has("indicesForLinesWireFrame")) {
+			hashCode += Arrays.hashCode((byte[]) geometryData.get("indicesForLinesWireFrame"));
 		}
 		return hashCode;
 	}

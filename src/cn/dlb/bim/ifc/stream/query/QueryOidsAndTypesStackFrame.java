@@ -14,12 +14,13 @@ public class QueryOidsAndTypesStackFrame extends DatabaseReadingStackFrame imple
 	private EClass eClass;
 	private Iterator<Long> oidIterator;
 
-	public QueryOidsAndTypesStackFrame(QueryObjectProvider queryObjectProvider, EClass eClass, QueryPart queryPart, QueryContext reusable, List<Long> oids) throws DatabaseException, QueryException {
+	public QueryOidsAndTypesStackFrame(QueryObjectProvider queryObjectProvider, EClass eClass, QueryPart queryPart,
+			QueryContext reusable, List<Long> oids) throws DatabaseException, QueryException {
 		super(reusable, queryObjectProvider, queryPart);
 		this.eClass = eClass;
-		
+
 		oidIterator = oids.iterator();
-		
+
 	}
 
 	@Override
@@ -28,11 +29,13 @@ public class QueryOidsAndTypesStackFrame extends DatabaseReadingStackFrame imple
 			return true;
 		}
 		long oid = oidIterator.next();
-		currentObject = getReusable().getPlatformService().queryVirtualObject(getReusable().getRid(), oid);
-		if (currentObject != null) {
-			processPossibleIncludes(eClass, getQueryPart());
-		} 
-		return true;
-	}
+		if (!getQueryObjectProvider().hasRead(oid)) {
+			currentObject = getReusable().getPlatformService().queryVirtualObject(getReusable().getRid(), oid);
+			decideUseForSerialization(currentObject);
 
+		}
+		processPossibleIncludes(eClass, getQueryPart());
+		return false;
+	}
+	
 }

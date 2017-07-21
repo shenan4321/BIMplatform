@@ -38,6 +38,7 @@ public class QueryTypeStackFrame extends DatabaseReadingStackFrame implements Ob
 	boolean process() throws DatabaseException, QueryException, JsonParseException, JsonMappingException, IOException {
 		
 		currentObject = iterator.next();
+		decideUseForSerialization(currentObject);
 		
 		processPossibleIncludes(eClass, getQueryPart());
 		

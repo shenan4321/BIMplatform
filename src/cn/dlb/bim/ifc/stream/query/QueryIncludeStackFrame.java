@@ -65,6 +65,7 @@ public class QueryIncludeStackFrame extends DatabaseReadingStackFrame {
 	public boolean process() throws DatabaseException, QueryException {
 		feature = featureIterator.next();
 		Object value = currentObject.eGet(feature);
+		
 		if (value != null) {
 			if (feature.isMany()) {
 				List<Long> list = (List<Long>)value;

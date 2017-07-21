@@ -38,6 +38,7 @@ public class FollowReferenceStackFrame extends DatabaseReadingStackFrame impleme
 		}
 		Integer rid = getReusable().getRid();
 		currentObject = getQueryObjectProvider().getPlatformService().queryVirtualObject(rid, oid);
+		decideUseForSerialization(currentObject);
 		processPossibleIncludes(null, include);
 		return true;
 	}

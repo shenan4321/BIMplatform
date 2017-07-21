@@ -9,12 +9,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EReference;
 import org.springframework.data.util.CloseableIterator;
 import org.springframework.web.socket.WebSocketSession;
-
 import cn.dlb.bim.component.PlatformServer;
 import cn.dlb.bim.ifc.database.DatabaseException;
 import cn.dlb.bim.ifc.deserializers.DeserializeException;
@@ -22,8 +20,11 @@ import cn.dlb.bim.ifc.deserializers.StepParser;
 import cn.dlb.bim.ifc.emf.IfcModelInterfaceException;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
 import cn.dlb.bim.ifc.emf.Schema;
+import cn.dlb.bim.ifc.stream.GeometryGeneratingException;
+import cn.dlb.bim.ifc.stream.StreamingGeometryGenerator;
 import cn.dlb.bim.ifc.stream.VirtualObject;
 import cn.dlb.bim.ifc.stream.deserializers.IfcStepStreamingDeserializer;
+import cn.dlb.bim.ifc.stream.query.QueryContext;
 import cn.dlb.bim.service.PlatformService;
 
 public class StreamingCheckinAction extends LongAction {
@@ -64,15 +65,15 @@ public class StreamingCheckinAction extends LongAction {
 			e.printStackTrace();
 		}
 		Integer rid = deserializer.getRid();
-		EClass ifcProductEClass = packageMetaData.getEClass("IfcProduct");
-		Set<EClass> subClasses = packageMetaData.getAllSubClasses(ifcProductEClass);
-		List<Short> cids = new ArrayList<Short>();
-		cids.add(platformService.getCidOfEClass(ifcProductEClass));
-		for (EClass subClass : subClasses) {
-			Short cid = platformService.getCidOfEClass(subClass);
-			cids.add(cid);
-		}
 		fixInverses(packageMetaData, rid);
+		
+		StreamingGeometryGenerator generator = new StreamingGeometryGenerator(server, platformService, rid);
+		QueryContext queryContext = new QueryContext(platformService, packageMetaData, rid);
+		try {
+			generator.generateGeometry(queryContext);
+		} catch (GeometryGeneratingException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@SuppressWarnings({ "unchecked", "unused" })
@@ -119,7 +120,7 @@ public class StreamingCheckinAction extends LongAction {
 			}
 			cache.put(refOid, referencedObject);
 		}
-		EClass referencedObjectEclass = platformService.getEClassForCid(next.getEClassId());
+		EClass referencedObjectEclass = platformService.getEClassForCid(referencedObject.getEClassId());
 		EReference oppositeReference = packageMetaData.getInverseOrOpposite(referencedObjectEclass, eReference);
 		if (oppositeReference == null) {
 			if (eReference.getName().equals("RelatedElements")

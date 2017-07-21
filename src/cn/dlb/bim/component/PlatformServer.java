@@ -38,8 +38,6 @@ public class PlatformServer implements InitializingBean {
 	@Autowired
 	private LongActionManager longActionManager;
 	@Autowired
-	private IfcModelDao ifcModelDao;
-	@Autowired
 	private PlatformServerConfig platformServerConfig;
 	
 	@Override
@@ -74,10 +72,6 @@ public class PlatformServer implements InitializingBean {
 
 	public LongActionManager getLongActionManager() {
 		return longActionManager;
-	}
-
-	public IfcModelDao getIfcModelDao() {
-		return ifcModelDao;
 	}
 
 	public ColladaCacheManager getColladaCacheManager() {

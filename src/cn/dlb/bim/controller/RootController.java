@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import cn.dlb.bim.component.PlatformServer;
 import cn.dlb.bim.dao.entity.OutputTemplate;
-import cn.dlb.bim.ifc.database.queries.om.JsonQueryObjectModelConverter;
+import cn.dlb.bim.ifc.database.queries.JsonQueryObjectModelConverter;
 import cn.dlb.bim.ifc.database.queries.om.Query;
 import cn.dlb.bim.ifc.database.queries.om.QueryException;
 import cn.dlb.bim.ifc.emf.PackageMetaData;

@@ -39,4 +39,5 @@ public interface IfcModelDao {
 	public IfcHeader queryIfcHeader(Integer rid);
 	public VirtualObject queryVirtualObject(Integer rid, Long oid);
 	public void updateVirtualObject(VirtualObject virtualObject);
+	public int updateAllVirtualObject(List<VirtualObject> virtualObjects);
 }

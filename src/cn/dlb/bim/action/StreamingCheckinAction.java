@@ -103,9 +103,9 @@ public class StreamingCheckinAction extends LongAction {
 			}
 		}
 		for (VirtualObject referencedObject : cache.values()) {
-			platformService.update(referencedObject);
+			platformService.updateBatch(referencedObject);
 		}
-		
+		platformService.commitUpdateBatch();
 	}
 
 	private void fixInverses(PackageMetaData packageMetaData, Integer rid, Map<Long, VirtualObject> cache,

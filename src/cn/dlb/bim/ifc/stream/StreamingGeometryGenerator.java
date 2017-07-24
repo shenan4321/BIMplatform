@@ -364,7 +364,7 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 											totalBytes.addAndGet(size);
 
 											ifcProduct.setReference(geometryFeature, geometryInfo.getOid());
-											platformService.saveBatch(ifcProduct);
+											platformService.updateBatch(ifcProduct);
 
 										}
 									} catch (EntityNotFoundException e) {
@@ -393,7 +393,7 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 								}
 							}
 						}
-						platformService.commitSaveBatch();
+						platformService.commitAllBatch();
 					} finally {
 						try {
 							// if (notFoundsObjects) {
@@ -453,7 +453,8 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 			RenderEnginePool renderEnginePool = server.getRenderEnginePools()
 					.getRenderEnginePool(packageMetaData.getSchema());
 
-			int maxSimultanousThreads = 100;
+			//int maxSimultanousThreads = 100;原来100
+			int maxSimultanousThreads = 5;
 			ThreadPoolExecutor executor = new ThreadPoolExecutor(maxSimultanousThreads, maxSimultanousThreads, 24,
 					TimeUnit.HOURS, new ArrayBlockingQueue<Runnable>(10000000));
 

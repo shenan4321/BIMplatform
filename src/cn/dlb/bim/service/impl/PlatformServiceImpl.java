@@ -41,13 +41,15 @@ public class PlatformServiceImpl implements InitializingBean, PlatformService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(PlatformServiceImpl.class);
 	
 	private static final int AUTO_COMMIT_SIZE = 1000;
+	private static final String SAVE_BATCH_KEY = "save";
+	private static final String UPDATE_BATCH_KEY = "update";
 	
 	private final EClass[] cidToEclass;
 	private final Map<EClass, Short> eClassToCid;
 	private final Map<EClass, AtomicLong> oidCounters;
 	private final Map<EClass, Boolean> oidChanged;
 	
-	private final BatchThreadLocal<ArrayList<VirtualObject>> localBatch;
+	private final BatchThreadLocal<Map<String, List<VirtualObject>>> localBatch;
 	
 	@Autowired
 	@Qualifier("PlatformInitDatasDaoImpl")
@@ -71,7 +73,7 @@ public class PlatformServiceImpl implements InitializingBean, PlatformService {
 		this.eClassToCid = new HashMap<>();
 		this.oidCounters = new HashMap<>();
 		this.oidChanged = new HashMap<>();
-		this.localBatch = new BatchThreadLocal<>(ArrayList.class);
+		this.localBatch = new BatchThreadLocal<>(HashMap.class, ArrayList.class);
 	}
 	
 	private Long getInitCounter(EClass eClass) {
@@ -208,22 +210,18 @@ public class PlatformServiceImpl implements InitializingBean, PlatformService {
 	
 	@Override
 	public void saveBatch(VirtualObject virtualObject) {
-		ArrayList<VirtualObject> localBatchList = localBatch.newGet();
+		List<VirtualObject> localBatchList = localBatch.newGet().get(SAVE_BATCH_KEY);
 		localBatchList.add(virtualObject);
 		if (localBatchList.size() >= AUTO_COMMIT_SIZE) {
-			autoCommitSaveBatch();
+			ifcModelDao.insertAllVirtualObject(localBatchList);
+			localBatch.get().clear();
 		}
 	}
 	
-	private void autoCommitSaveBatch() {
-		ArrayList<VirtualObject> localBatchList = localBatch.newGet();
-		ifcModelDao.insertAllVirtualObject(localBatchList);
-		localBatch.get().clear();
-	}
 	
 	@Override
 	public void commitSaveBatch() {
-		ArrayList<VirtualObject> localBatchList = localBatch.newGet();
+		List<VirtualObject> localBatchList = localBatch.newGet().get(SAVE_BATCH_KEY);
 		ifcModelDao.insertAllVirtualObject(localBatchList);
 		localBatch.get().clear();
 	}
@@ -256,5 +254,28 @@ public class PlatformServiceImpl implements InitializingBean, PlatformService {
 	@Override
 	public CloseableIterator<VirtualObject> streamVirtualObject(Integer rid, Short cid) {
 		return ifcModelDao.streamVirtualObject(rid, cid);
+	}
+
+	@Override
+	public void updateBatch(VirtualObject virtualObject) {
+		List<VirtualObject> localBatchList = localBatch.newGet().get(UPDATE_BATCH_KEY);
+		localBatchList.add(virtualObject);
+		if (localBatchList.size() >= AUTO_COMMIT_SIZE) {
+			ifcModelDao.updateAllVirtualObject(localBatchList);
+			localBatch.get().clear();
+		}
+	}
+
+	@Override
+	public void commitUpdateBatch() {
+		List<VirtualObject> localBatchList = localBatch.newGet().get(UPDATE_BATCH_KEY);
+		ifcModelDao.updateAllVirtualObject(localBatchList);
+		localBatch.get().clear();
+	}
+
+	@Override
+	public void commitAllBatch() {
+		commitUpdateBatch();
+		commitSaveBatch();
 	}
 }

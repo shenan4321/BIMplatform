@@ -19,9 +19,12 @@ public interface PlatformService extends OidProvider {
 	public Integer newRevisionId();
 	public void syncOid();
 	void save(VirtualObject virtualObject);
-	void update(VirtualObject virtualObject);
 	public void saveBatch(VirtualObject virtualObject);
 	public void commitSaveBatch();
+	void update(VirtualObject virtualObject);
+	void updateBatch(VirtualObject virtualObject);
+	void commitUpdateBatch();
+	void commitAllBatch();
 	public List<VirtualObject> queryVirtualObject(Integer rid, List<Short> cids);
 	public CloseableIterator<VirtualObject> streamVirtualObject(Integer rid, Short cid);
 	public VirtualObject queryVirtualObject(Integer rid, Long oid);

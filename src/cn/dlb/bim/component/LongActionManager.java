@@ -22,7 +22,6 @@ public class LongActionManager implements ActionStateListener {
 	private ThreadPoolTaskExecutor taskExecutor;
 	
 	private Map<LongAction, Future> actions = Collections.synchronizedMap(new HashMap<>());
-//	private Map<WebSocketSession, LongAction> websocketSessionHolder = Collections.synchronizedMap(new HashMap<>());
 	
 	public void startLongAction(LongAction longAction) {
 		
@@ -53,10 +52,6 @@ public class LongActionManager implements ActionStateListener {
 	
 	public void remove(LongAction longAction) {
 		actions.remove(longAction);
-//		WebSocketSession socketSession = longAction.relatedWebSocketSession();
-//		if (socketSession != null) {
-//			websocketSessionHolder.remove(socketSession);
-//		}
 	}
 	
 //	public void cancelLongActionByWebSocketSessionRelated(WebSocketSession webSocketSession) {
@@ -66,12 +61,9 @@ public class LongActionManager implements ActionStateListener {
 	
 	private void regist(LongAction longAction, Future future) {
 		longAction.addStateListener(this);
-//		WebSocketSession socketSession = longAction.relatedWebSocketSession();
-//		if (socketSession != null) {
-//			websocketSessionHolder.put(socketSession, longAction);
-//		}
 	}
 	
+	@SuppressWarnings("unused")
 	private void cancelLongAction(LongAction longAction) {
 		Future future = actions.get(longAction);
 		if (future != null) {

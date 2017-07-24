@@ -55,8 +55,8 @@
 	</svg>
     </a>
   <div class="c-div div_project">
-        <a class="btn action-save c-button button_wUyZlQ2" href="http://localhost:8080/BIMplatform/admin/index.html#!/">项目管理
-		</a>
+  		<a class="btn action-save c-button button_wUyZlQ2" href="./index.html#!/">模型列表</a>
+        <a class="btn action-save c-button button_wUyZlQ2" href="./admin/index.html#!/">项目管理</a>
     </div>    
 </header>
 <div class="aside-menu-box">
@@ -248,6 +248,7 @@
                 window.cameraFlightAnimation = new xeogl.CameraFlightAnimation({
                     camera: camera
                 });
+                $('#luopanBox1').show()
                 bimCameraControl.on("pick", function (hit) {
                     cameraFlightAnimation.flyTo({
                         aabb: hit.entity.worldBoundary.aabb
@@ -257,21 +258,20 @@
                     }
                     hit.entity.material.emissive = new Float32Array([0, 1, 0]);
                     hisPick = {name:hit.entity.id};
-                    if(window.tt){
-                        var pTableScope= $('#pTable').scope();
-                        pTableScope.oid = hit.entity.id ;
-                        $.ajax({
-                      	  url:'./model/queryProperty.do',
-                      	  type:'GET',
-                      	  data:{oid:hit.entity.id.replace('ifc',''),rid:string}
-                        }).done(function(data){
-                      	  pTableScope.list = data.data  
-                      	  $('#pTable').scope().$apply();
-                        })
-                    }
+                    var pTableScope= $('#pTable').scope();
+                    pTableScope.oid = hit.entity.id ;
+                    $.ajax({
+                  	  url:'./model/queryProperty.do',
+                  	  type:'GET',
+                  	  data:{oid:hit.entity.id.replace('ifc',''),rid:string}
+                    }).done(function(data){
+                  	  pTableScope.list = data.data  
+                  	  $('#pTable').scope().$apply();
+                    })
+                    
                 });
                 
-                /*  var Menus = function () {
+                 var Menus = function () {
 	                 this.message = "Directional light";
 	                 this["alpha.a"] = 0.6;
                  }; 
@@ -284,7 +284,7 @@
     	                 xeogl.scene.components['ifc'+geomotryLoad.ifcIds[i]].material.opacity = value;	                 
                      }	 
                  });
-                 color.open(); */
+                 color.open(); 
                 initStart();
             }
         });

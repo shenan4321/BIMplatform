@@ -14,7 +14,6 @@ myApp.controller('myAppCtrl', function ($scope, $http,$compile) {
 	function formatterMajorToLuoPan(md){
 		var luopanData = [];
 		$.each(md,function(index,item){
-    		
 			luopanData.push({name:this.name,onClick:function(){
 				$http.get('./model/queryOutputTemplate.do?rid='+string+'&otid='+item.otid).success(function (res) {
 					$('.svg-item-selected')[0].setAttribute('class','svg-item');
@@ -24,10 +23,7 @@ myApp.controller('myAppCtrl', function ($scope, $http,$compile) {
 					checkTree();
 	    		});
 			},selected: ($scope.majorTypedata.indexNow==index )? true:false});
-    				
     	});
-		
-		
 		return luopanData;
 	}
 	

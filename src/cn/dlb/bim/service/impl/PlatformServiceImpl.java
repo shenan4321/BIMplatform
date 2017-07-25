@@ -73,7 +73,7 @@ public class PlatformServiceImpl implements InitializingBean, PlatformService {
 		this.eClassToCid = new HashMap<>();
 		this.oidCounters = new HashMap<>();
 		this.oidChanged = new HashMap<>();
-		this.localBatch = new BatchThreadLocal<>(HashMap.class, ArrayList.class);
+		this.localBatch = new BatchThreadLocal<>(HashMap.class);
 	}
 	
 	private Long getInitCounter(EClass eClass) {

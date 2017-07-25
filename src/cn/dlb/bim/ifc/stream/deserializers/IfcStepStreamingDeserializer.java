@@ -50,7 +50,7 @@ import nl.tue.buildingsmart.schema.Attribute;
 import nl.tue.buildingsmart.schema.EntityDefinition;
 import nl.tue.buildingsmart.schema.ExplicitAttribute;
 
-public abstract class IfcStepStreamingDeserializer implements StreamingDeserializer {
+public class IfcStepStreamingDeserializer implements StreamingDeserializer {
 	private ByteProgressReporter byteProgressReporter;
 	private PackageMetaData packageMetaData;
 	private static final String WRAPPED_VALUE = "wrappedValue";

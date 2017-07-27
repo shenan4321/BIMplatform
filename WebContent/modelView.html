@@ -9,7 +9,7 @@
     <meta name="x5-fullscreen" content="true" />
     <meta name="browsermode" content="application" />
     <meta name="x5-page-mode" content="app" />
-    <title>东链博BIM应用Server</title>
+    <title>东链博BIM+应用Server</title>
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
     <!-- build:css -->
     <link rel="stylesheet" href="public/css/format.css" type="text/css" />
@@ -55,7 +55,7 @@
 	</svg>
     </a>
   <div class="c-div div_project">
-  		<a class="btn action-save c-button button_wUyZlQ2" href="./index.html#!/">模型列表</a>
+  		<!-- <a class="btn action-save c-button button_wUyZlQ2" href="./index.html#!/">模型列表</a> -->
         <a class="btn action-save c-button button_wUyZlQ2" href="./admin/index.html#!/">项目管理</a>
     </div>    
 </header>
@@ -145,7 +145,7 @@
 <!-- endbuild -->
 
 <!-- build:js4 -->
-<script src="public/js/dlbSvg.js" type="text/javascript"></script>
+<script src="public/js/app/dlbSvg.js" type="text/javascript"></script>
 <script src="public/js/app/menu.js"></script>
 <script src="public/js/app/qaq.js"></script>
 <script src="public/js/html5validate.js" type="text/javascript"></script>
@@ -187,9 +187,11 @@
     
     xeogl.scene = new xeogl.Scene({
         canvas: "myCanvas",
-        transparent: true
+        transparent: true,
+        ticksPerRender:30
     });
 
+    
     var camera = new xeogl.Camera({
         view: new xeogl.Lookat({
             gimbalLockY: false // Default is true
@@ -222,7 +224,7 @@
         ]
     });
     
-    setTimeout(start,800)
+    setTimeout(start,300)
     
     function start(){
         websocket.init({
@@ -231,24 +233,78 @@
                 window.progress = $.progress();
             },
             onmessage:function(res){
-                if(typeof(res)=='string'){
+                 if(typeof(res)=='string'){
                     progress.update(JSON.parse(res));
                 }else{
                     geomotryLoad.process(res);
                 }
             },
             onclose:function(){
-                progress.hide();
+            	
+            	progress.hide();
+                /* websocket = null;
+                geomotryLoad = null; */
+                
+                
+            	websocket.init({
+                    urlPath:"ws/binarygeometry?rid="+string,
+                    onopen:function(msg){
+                        window.progress = $.progress();
+                    },
+                    onmessage:function(res){
+                         if(typeof(res)=='string'){
+                            progress.update(JSON.parse(res));
+                        }else{
+                            geomotryLoad.process(res,1);
+                        }
+                    },
+                    onclose:function(){
+                    	progress.hide();
+                        websocket = null;
+                        geomotryLoad = null;
+                        $('.aside-menu-box').show();
+                        var bimCameraControl = new xeogl.BIMCameraControl({
+                            camera: camera
+                        });
+                        window.cameraFlightAnimation = new xeogl.CameraFlightAnimation({
+                            camera: camera
+                        });
+                        $('#luopanBox1').show();
+                        bimCameraControl.on("pick", function (hit) {
+                            cameraFlightAnimation.flyTo({
+                                aabb: hit.entity.worldBoundary.aabb
+                            });
+                            if(hisPick.name){
+        						xeogl.scene.components[hisPick.name].material.emissive =  xeogl.scene.components[hisPick.name].material.baseColor;
+                            }
+                            hit.entity.material.emissive = new Float32Array([0, 1, 0]);
+                            hisPick = {name:hit.entity.id};
+                            var pTableScope= $('#pTable').scope();
+                            pTableScope.oid = hit.entity.id;
+                            $.ajax({
+                          	  url:'./model/queryProperty.do',
+                          	  type:'GET',
+                          	  data:{oid:hit.entity.id.replace('ifc',''),rid:string}
+                            }).done(function(data){
+                          	  pTableScope.list = data.data  
+                          	  $('#pTable').scope().$apply();
+                            })
+                        });
+                        //initStart();
+                        xeogl.scene.ticksPerRender =  2;
+                    }
+            	});
+                /* progress.hide();
                 websocket = null;
-                //geomotryLoad = null;
+                geomotryLoad = null;
                 $('.aside-menu-box').show();
-                 var bimCameraControl = new xeogl.BIMCameraControl({
+                var bimCameraControl = new xeogl.BIMCameraControl({
                     camera: camera
                 });
                 window.cameraFlightAnimation = new xeogl.CameraFlightAnimation({
                     camera: camera
                 });
-                $('#luopanBox1').show()
+                $('#luopanBox1').show();
                 bimCameraControl.on("pick", function (hit) {
                     cameraFlightAnimation.flyTo({
                         aabb: hit.entity.worldBoundary.aabb
@@ -259,7 +315,7 @@
                     hit.entity.material.emissive = new Float32Array([0, 1, 0]);
                     hisPick = {name:hit.entity.id};
                     var pTableScope= $('#pTable').scope();
-                    pTableScope.oid = hit.entity.id ;
+                    pTableScope.oid = hit.entity.id;
                     $.ajax({
                   	  url:'./model/queryProperty.do',
                   	  type:'GET',
@@ -269,9 +325,9 @@
                   	  $('#pTable').scope().$apply();
                     })
                     
-                });
+                }); */
                 
-                 var Menus = function () {
+                 /* var Menus = function () {
 	                 this.message = "Directional light";
 	                 this["alpha.a"] = 0.6;
                  }; 
@@ -284,8 +340,9 @@
     	                 xeogl.scene.components['ifc'+geomotryLoad.ifcIds[i]].material.opacity = value;	                 
                      }	 
                  });
-                 color.open(); 
-                initStart();
+                 color.open();  */
+                 initStart();
+                 xeogl.scene.ticksPerRender =  2;
             }
         });
     }

@@ -36,15 +36,14 @@ myApp.controller('myAppCtrl', function ($scope, $http,$compile) {
 			$scope.majorTypedata[index].ifcTypeSelectorMap = res.data.ifcTypeSelectorMap;
 			checkTree();
 		});*/
-    	var luopanData = [];
-    	$http.get('./model/queryOutputTemplate.do?rid='+string+'&otid='+$scope.majorTypedata[$scope.majorTypedata.indexNow].otid).success(function (res) {
-			$scope.majorTypedata[$scope.majorTypedata.indexNow].ifcTypeSelectorMap = res.data.ifcTypeSelectorMap;
-			checkTree();
-		});
-    	
-    	
-    	luopanBox = $.luopan({data:formatterMajorToLuoPan($scope.majorTypedata)});
-    	
+    	if(data.data.length!=0){
+    		var luopanData = [];
+	    	$http.get('./model/queryOutputTemplate.do?rid='+string+'&otid='+$scope.majorTypedata[$scope.majorTypedata.indexNow].otid).success(function (res) {
+				$scope.majorTypedata[$scope.majorTypedata.indexNow].ifcTypeSelectorMap = res.data.ifcTypeSelectorMap;
+				checkTree();
+			});
+	    	luopanBox = $.luopan({data:formatterMajorToLuoPan($scope.majorTypedata)});
+    	}
     });
 	
 	$scope.menuClick = function(param){
@@ -438,7 +437,7 @@ myApp.controller('myAppCtrl', function ($scope, $http,$compile) {
 				$jq_obj.attr('class','icon-white-down tile-fr');
 			}
 			var $jq_baba = $jq_obj.parent();
-			$jq_baba.next().toggle();
+			$jq_baba.siblings().toggle();
 		}
 	}
 

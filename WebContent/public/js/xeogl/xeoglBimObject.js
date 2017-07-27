@@ -66,14 +66,11 @@ xeogl.BIMObject = xeogl.Component.extend({
 
         // TODO: If all geometries are of same primitive, then we can combine them
 
-        //this.entities = [];
-        var entity;
-        var entity1;
-
+        //this.entities = []
         
         if(cfg.geometryIds.length==1){
         	
-            /*entity =*/ this.create({ // http://xeoengine.org/docs/classes/Entity.html
+             this.create({ // http://xeoengine.org/docs/classes/Entity.html
                 type: "xeogl.Entity",
                 id:'ifc'+this.id,
                 meta: {
@@ -136,7 +133,6 @@ xeogl.BIMObject = xeogl.Component.extend({
                 depthBuf: this.depthBuf
             });
 
-        	
         }
 
     },

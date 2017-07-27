@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html >
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0" />
+<meta name="screen-orientation" content="portrait" />
+<meta name="x5-orientation" content="portrait" />
+<meta name="full-screen" content="yes" />
+<meta name="x5-fullscreen" content="true" />
+<meta name="browsermode" content="application" />
+<meta name="x5-page-mode" content="app" />
+<title>东链博BIM+应用Server</title>
+<link rel="stylesheet" href="public/css/format.css" type="text/css" />
+<link rel="stylesheet" href="public/css/index.css" type="text/css" />
+<link href="asset/css/bootstrap.css" rel="stylesheet">
+<style>
+	html,body {
+    	background: -webkit-linear-gradient(#61656a ,#ebf6ff);
+    	height:100%;
+	}
+	.content{
+	    padding: 75px 0 35px;
+    min-height: 90%;
+}
+.content .nav{
+	height: 38px;
+	line-height: 38px;
+}
+.content .nav li{
+	height: 22px;
+	margin-right: 9px;
+	line-height: 22px;
+	border-radius: 3px;
+}
+.content .nav li a{
+	display: block;
+	line-height: 22px;
+	color: #ffffff;
+	background: #b6c2c9;
+	padding:0 5px;
+	text-decoration: none;
+}
+.content .nav li a:hover{
+	text-decoration: none;
+	background: #8e969c;
+}
+.content .nav li .active{
+	background: #8e969c;
+}
+
+.content .gallery{
+    width: 93%;
+    margin: 0 auto;
+}
+.content .gallery > div{
+    background: rgba(0,0,0,0.3);
+	width: 291px;
+	margin:10px;
+	border-radius: 3px;
+	float:left;
+}
+.content > div .image-inners{
+	position: relative;
+}
+
+.content > div .image-inners img {
+	width: 289px;
+	height: 200px;
+	opacity:1;filter(alpha=100);
+	
+}
+.content > div .image-inners img:hover {
+	opacity:0.8;filter(alpha=80)
+}
+.content > div .image-inners .image-captions{
+	padding: 0 15px;
+	height: 32px;
+	color: #ffffff;
+	line-height: 32px;
+	text-align: center;
+	position: absolute;
+	top: 15px;
+	left: 0;
+	background:rgba(0,0,0,0.5);
+}
+
+.content > div .image-info{
+	padding:2px 15px 10px;
+}
+.content > div .image-info .title{
+	padding: 0;
+    margin-bottom: 8px;
+    color: #fff;
+    font-weight: 600;
+    font-size: 16px;
+}
+.content > div .image-info .stars{
+
+}
+.content > div .image-info .stars span{
+	color:#fff;
+}
+.content > div .image-info .stars .active{
+	color: #FF8500;
+}
+a.yellow{
+	color:#e6ef8b
+}
+</style>
+</head>
+<body  ng-app="myApp" ng-controller="siteCtrl">
+<header class="app-header navbar">
+    <a class="navbar-brand" href="#">
+	<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="-263 -263 526 526" fill="#00ccff" class="svg flash animated">
+	    <defs>
+	        <filter id="Gaussian_Blur">
+	            <feGaussianBlur in="SourceGraphic" stdDeviation="10"></feGaussianBlur>
+	        </filter>
+	        <radialGradient id="grey_blue" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+	            <stop offset="0%" style="stop-color:rgb(255, 255, 255);stop-opacity:1"></stop>
+	            <stop offset="80%" style="stop-color:rgb(144, 245, 255);stop-opacity:1"></stop>
+	        </radialGradient>
+	    </defs>
+	    <polygon id="star" cx="100" cy="100" rx="100" ry="100" style="fill:url(#grey_blue);stroke:#fff9b8;stroke-width:10; filter:url(#Gaussian_Blur);" points="250,0 64,64 0,250 -64,64 -250,0 -64,-64 0,-250 64,-64"></polygon>
+	</svg>
+    </a>    
+</header>
+	
+<div class="content">	
+	<div class="gallery clearfix" id="gallery">
+		<div class="building fl"  ng-repeat="it in prolist" data-href="{{it.pid}}" ng-hide="pid">
+			<div class="image-inners">
+				<a ng-href="/BIMplatform/index.html?pid={{it.pid}}" ><img ng-src="{{it.picUrl}}"></a>
+				<span class="image-captions fs-md">推荐</span>
+			</div>
+			<div class="image-info">
+				<h4 class="title fs-sm">{{it.title}}</h4>
+				<div class="stars">
+					<!-- begin five-pointed star -->
+					<div class="fl">
+					 <span class="glyphicon glyphicon-star active" ng-if="0< it.stars"></span>
+					 <span class="glyphicon glyphicon-star active" ng-if="1< it.stars"></span>
+					 <span class="glyphicon glyphicon-star active" ng-if="2< it.stars"></span>
+					 <span class="glyphicon glyphicon-star active" ng-if="3< it.stars"></span>
+					 <span class="glyphicon glyphicon-star active" ng-if="4< it.stars"></span>
+					</div>
+					<!-- end five-pointed star -->
+					<div class="fr fs-xs">
+						<span>by <a href="#" class="yellow">{{it.author}}</a></span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<table width="100%" class="">
+		<tr>
+			<td>编号</td>
+			<td>模型名称</td>
+			<td>模型结构</td>
+			<td>模型简介</td>
+			<td>评分</td>
+			<td>模型作者</td>
+			<td>操作</td>
+		</tr>		
+		<tr ng-repeat="item in modellist">
+			<td>{{item}}</td>
+			<td>{{item.name}}</td>
+			<td>{{item.name}}</td>
+			<td>{{item.name}}</td>
+			<td>{{item.name}}</td>
+			<td>{{item.name}}</td>
+			<td><a href="">查看</a></td>
+		</tr>
+	</table>
+</div>
+	<script type="text/javascript" src="public/js/jquery/2.1.4/jquery-2.1.4.min.js"></script>
+	<script type="text/javascript" src="public/js/angularjs/1.4.4/angular.min.js"></script>
+ 	<script>
+ 		$('#filter a').click(function(){
+ 			$('#filter a').removeClass("active");
+ 			$(this).addClass("active");
+
+ 			var selector = $(this).attr('data-option-value');
+ 			$('#gallery').isotope({ filter: selector });
+ 			return false;
+
+		});
+ 		
+ 		function GetQueryString(name){
+ 	        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)","i");
+ 	        var r = window.location.search.substr(1).match(reg);
+ 	        if (r!=null) return unescape(r[2]); return null;
+ 	    }
+ 		 
+ 		var app = angular.module('myApp',[]);
+ 		
+ 		app.controller('siteCtrl', function($scope, $http) {
+ 			
+ 			var pid = GetQueryString('pid');
+ 			$scope.pid = pid; 
+ 			$http({
+ 				method: 'POST',
+ 				url: 'project/queryAllProject.do'
+ 			}).then(function successCallback(response) {
+ 				$scope.prolist = response.data.data;
+ 			}, function errorCallback(response) {
+ 					// 请求失败执行代码
+ 			});
+ 			if(!pid){
+	 			
+ 			}else{
+ 				$http({
+	 				method: 'POST',
+	 				url: 'model/queryModelInfoByPid.do?pid='+pid
+	 			}).then(function successCallback(response) {
+	 				
+	 				$scope.modellist = response.data.data;
+	 			}, function errorCallback(response) {
+	 					// 请求失败执行代码
+	 			});
+ 			}
+ 		});
+ 	</script>	
+  	
+</body>
+</html>

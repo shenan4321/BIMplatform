@@ -16,8 +16,12 @@ myApp.controller('myAppCtrl', function ($scope, $http) {
 		$.each(md,function(index,item){
 			luopanData.push({name:this.name,onClick:function(){
 				$http.get('./model/queryOutputTemplate.do?rid='+string+'&otid='+item.otid).success(function (res) {
-					$('.svg-item-selected')[0].setAttribute('class','svg-item');
-					$('.svg-item').eq(index)[0].setAttribute('class','svg-item-selected');
+					if($('.svg-item-selected')[0]){
+						$('.svg-item-selected')[0].setAttribute('class','svg-item');
+					}
+					if($('.svg-item').eq(index)[0]){
+						$('.svg-item').eq(index)[0].setAttribute('class','svg-item-selected');
+					}
 					$scope.majorTypedata.indexNow = index;
 					$scope.majorTypedata[index].ifcTypeSelectorMap = res.data.ifcTypeSelectorMap;
 					checkTree();

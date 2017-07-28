@@ -285,6 +285,7 @@ myApp.controller('myAppCtrl', function ($scope, $http,$compile) {
 				}).done(function(res){
 					$scope.majorTypedata[$scope.majorTypedata.indexNow].otid = res.otid;
 			    	dealMajorData();
+			    	checkTree();
 			    	$scope.$apply();
 				});
 			})
@@ -326,7 +327,7 @@ myApp.controller('myAppCtrl', function ($scope, $http,$compile) {
 
 			
 			//第二层选择选中都选中
-			if(typeof(value.namespaceSelectorMap) !== 'undefined' && value.objectTypeContainerMap){
+			if(typeof(value.namespaceSelectorMap) == 'undefined' && value.objectTypeContainerMap){
 				if(value.selected){
 					angular.forEach(value.objectTypeContainerMap, function(ttdata){
 						ttdata.selected = true;

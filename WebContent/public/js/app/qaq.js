@@ -744,7 +744,8 @@
                     break;
             };
 
-            content = '<div class="sb-info-box"><span class="sb-dialog-icon '+ msgclass +'"></span><span class="sb-info-txt">'+msg+'</span></div>';
+            /*<span class="sb-dialog-icon '+ msgclass +'"></span>*/
+            content = '<div class="sb-info-box"><span class="sb-info-txt">'+msg+'</span></div>';
 
             var options = {
                 title:'提示框',

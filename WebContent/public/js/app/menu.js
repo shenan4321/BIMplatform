@@ -1,10 +1,8 @@
 function initStart(){
 	var thisTime;
-	window.tt = false;
+	
 	window.asideBoxList = new Array($('.aside-box li').length-1);
-	
 	angular.bootstrap(document,['myApp']);
-	
 	
 	$('.aside-box li').on('click',function(){	
 		var $this = $(this);

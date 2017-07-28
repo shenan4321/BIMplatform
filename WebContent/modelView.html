@@ -9,7 +9,7 @@
     <meta name="x5-fullscreen" content="true" />
     <meta name="browsermode" content="application" />
     <meta name="x5-page-mode" content="app" />
-    <title>东链博BIM+应用Server</title>
+    <title>东链博BIM应用Server</title>
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
     <!-- build:css -->
     <link rel="stylesheet" href="public/css/format.css" type="text/css" />
@@ -20,17 +20,10 @@
     <!-- endbuild -->
     <style>
         html,body,#mySceneCanvas{width:100%;height:100%;overflow:hidden}
-        body {background: -webkit-linear-gradient(#61656a ,#ebf6ff); /* Safari 5.1 - 6.0 */}
-        canvas {
-            position:absolute;
-            width:100%;
-            height:100%;
-        }
     </style>
 </head>
-<body ng-controller="myAppCtrl">
-<canvas id="myCanvas" ></canvas>
-<div id="luopanBox1"></div>
+<body  ng-controller="myAppCtrl">
+<div id="luopanBox1" ng-hide="majorTypedata.length==0"></div>
 <div id="luopanBox" class="ui-draggable">
     <div class="luopanBar">
         <svg xmlns="http://www.w3.org/2000/svg" version="1.1" id="luopanSvg" width="192" height="192">
@@ -38,9 +31,10 @@
         </svg>
     </div>
 </div>
+<canvas id="mySceneCanvas" width="100%" height="100%"></canvas>
 <header class="app-header navbar">
     <a class="navbar-brand" href="#">
-	<svg xmlns="http://www.w3.org/2000/svg"  width="10" height="10" viewbox='-263 -263 526 526' fill="#00ccff" class="svg flash animated">
+		<svg xmlns="http://www.w3.org/2000/svg"  width="10" height="10" viewbox='-263 -263 526 526' fill="#00ccff" class="svg flash animated">
 	    <defs>
 	        <filter id="Gaussian_Blur">
 	            <feGaussianBlur in="SourceGraphic" stdDeviation="10"/>
@@ -52,21 +46,22 @@
 	    </defs>
 	    <polygon id='star'  cx="100" cy="100" rx="100" ry="100" style="fill:url(#grey_blue);stroke:#fff9b8;stroke-width:10; filter:url(#Gaussian_Blur);"points='250,0 64,64 0,250 -64,64 -250,0 -64,-64 0,-250 64,-64' />
 	    </polygon>
-	</svg>
+		</svg>
     </a>
-  <div class="c-div div_project">
-  		<!-- <a class="btn action-save c-button button_wUyZlQ2" href="./index.html#!/">模型列表</a> -->
-        <a class="btn action-save c-button button_wUyZlQ2" href="./admin/index.html#!/">项目管理</a>
-    </div>    
+    <div class="c-div div_project">
+        <a class="btn action-save c-button button_wUyZlQ2" type="button" href="./admin/index.html#!/">
+            项目管理
+        </a>
+    </div>
 </header>
 <div class="aside-menu-box">
     <ul class="aside-box">
         <li class="li" data-name="fileCtrl"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 文件 </p> </a> </li>
         <li class="li" data-name="treeCtrl"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 场景树 </p> </a> </li>
         <li class="li" data-name="typeCtrl"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 类型 </p> </a> </li>
-        <li class="li" data-name="pTableCtrl"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 属性 </p> </a> </li>
+        <li class="li" data-name="pTableCtrl" > <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 属性 </p> </a> </li>
         <li class="li" data-name="searchCtrl"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 搜索 </p> </a> </li>
-        <li class="li" data-name="floorCtrl"> <a class="font" data-section=""> <i class="iconfont">&#xe660;</i> <i class="iconfont1"></i> <p> 楼层 </p> </a> </li>
+        <li class="li" data-name="floorCtrl"> <a class="font" data-section=""> <i class="iconfont"></i> <i class="iconfont1"></i> <p> 楼层 </p> </a> </li>
         <li class="li" data-name="colorCtrl"> <a class="font" data-section=""> <i class="icon iconfont">&#xe60a;</i> <i class="iconfont1"></i> <p> 配色 </p> </a> </li>
         <li class="li" data-name="majorCtrl"> <a class="font" data-section=""> <i class="icon iconfont">&#xe636;</i> <i class="iconfont1"></i> <p> 专业 </p> </a> </li>
     </ul>
@@ -119,29 +114,26 @@
             <div ng-include="'./treeTemp/major.html'"></div>
         </div>
     </div>
+    <!--<div class="nav-slide-o"></div> -->
 </div>
 <script type="text/javascript" src="public/js/jquery/2.1.4/jquery-2.1.4.min.js"></script>
 <!-- build:js1 -->
 <script type="text/javascript" src="public/js/progress.js"></script>
 <script type="text/javascript" src="public/js/websoketArrayBuffer.js"></script>
 <!-- endbuild -->
-
 <!-- build:js2 -->
 <script src="public/js/ifc/Constants.js"></script>
 <script src="public/js/ifc/DataInputStreamReader.js"></script>
 <script src="public/js/ifc/StringView.js" type="text/javascript"></script>
 <script src="public/js/ifc/GeometryLoader.js" type="text/javascript"></script>
-<script src="public/js/xeogl/xeogl.min.js" type="text/javascript"></script>
-<script src="public/js/xeogl/xeoglGeometryBuilder.js" type="text/javascript"></script>
-<script src="public/js/xeogl/EventHandler.js" type="text/javascript"></script>
-<script src="public/js/xeogl/bimCameraControl.js" type="text/javascript"></script>
-<script src="public/js/xeogl/xeoglBimObject.js" type="text/javascript"></script>
 <!-- endbuild -->
 
+<script src="public/js/scenejs/scenejs.js"></script>
 <script src="public/js/angularjs/1.4.4/angular.min.js"></script>
 
 <!-- build:js3 -->
 <script src="public/js/app/sceneTree.js"></script>
+<script src="public/js/app/renderBim2.js"></script>
 <!-- endbuild -->
 
 <!-- build:js4 -->
@@ -151,7 +143,6 @@
 <script src="public/js/html5validate.js" type="text/javascript"></script>
 <script src="public/js/color/jquery.minicolors.js" type="text/javascript"></script>
 <!-- endbuild -->
-
 <script src="public/js/datgui/dat.gui.min.js" type="text/javascript"></script>
 <script>
     function GetQueryString(name){
@@ -162,8 +153,7 @@
     var websocket = new WebsocketBim();
     var gui; //全局的控制面板
     window.hisPick = {}; //记录点过的东西
-    window.geomotryLoad = new GeometryLoader();
-    
+    window.allPoint = [];
     var string = GetQueryString("rid");
     if(!string){
         var pid= GetQueryString("pid");
@@ -175,57 +165,26 @@
                 aysnc:false,
                 success:function(res){
                     string =res.data.length?res.data[0].rid:4;
+                    var maxZoom = 1000;
+                    if(!window.scene){
+                        createScene();
+                    }
+                    setTimeout(start,800)
+
                 }
             });
         }else{
             rid = 1
         }
     }else{
+        var maxZoom = 1000;
+        if(!window.scene){
+            createScene();
+        }
+        setTimeout(start,800)
     }
-    
-    
-    
-    xeogl.scene = new xeogl.Scene({
-        canvas: "myCanvas",
-        transparent: true,
-        ticksPerRender:30
-    });
 
-    
-    var camera = new xeogl.Camera({
-        view: new xeogl.Lookat({
-            gimbalLockY: false // Default is true
-        })
-    });
-    
-    window.lights = new xeogl.Lights({
-        lights: [
-            new xeogl.AmbientLight({
-		    	color: [.9,.9,.9],
-		    	intensity: 1
-		    }),
-		    new xeogl.DirLight({
-		    	dir:[-10,-10,-10],
-		    	intensity: 1,
-		    	color:[1,1,1],
-		        diffuse:true,
-		        specular:true,
-		        space: "world"
-		    }),
-		    new xeogl.DirLight({
-		    	color: [.6,.6,.6],
-		    	dir:   		[10000,-100000,10000.0],
-		        pos:   		[10000,100000,10000.0],
-		        diffuse:	true,
-		        intensity: 1.0,
-		        specular:	true,
-		        space: "world"
-		    })
-        ]
-    });
-    
-    setTimeout(start,300)
-    
+
     function start(){
         websocket.init({
             urlPath:"ws/binarygeometry?rid="+string,
@@ -233,120 +192,41 @@
                 window.progress = $.progress();
             },
             onmessage:function(res){
-                 if(typeof(res)=='string'){
+                if(typeof(res)=='string'){
                     progress.update(JSON.parse(res));
                 }else{
                     geomotryLoad.process(res);
                 }
             },
             onclose:function(){
-            	
-            	progress.hide();
-                /* websocket = null;
-                geomotryLoad = null; */
-                
-                
-            	websocket.init({
-                    urlPath:"ws/binarygeometry?rid="+string,
-                    onopen:function(msg){
-                        window.progress = $.progress();
-                    },
-                    onmessage:function(res){
-                         if(typeof(res)=='string'){
-                            progress.update(JSON.parse(res));
-                        }else{
-                            geomotryLoad.process(res,1);
-                        }
-                    },
-                    onclose:function(){
-                    	progress.hide();
-                        websocket = null;
-                        geomotryLoad = null;
-                        $('.aside-menu-box').show();
-                        var bimCameraControl = new xeogl.BIMCameraControl({
-                            camera: camera
-                        });
-                        window.cameraFlightAnimation = new xeogl.CameraFlightAnimation({
-                            camera: camera
-                        });
-                        $('#luopanBox1').show();
-                        bimCameraControl.on("pick", function (hit) {
-                            cameraFlightAnimation.flyTo({
-                                aabb: hit.entity.worldBoundary.aabb
-                            });
-                            if(hisPick.name){
-        						xeogl.scene.components[hisPick.name].material.emissive =  xeogl.scene.components[hisPick.name].material.baseColor;
-                            }
-                            hit.entity.material.emissive = new Float32Array([0, 1, 0]);
-                            hisPick = {name:hit.entity.id};
-                            var pTableScope= $('#pTable').scope();
-                            pTableScope.oid = hit.entity.id;
-                            $.ajax({
-                          	  url:'./model/queryProperty.do',
-                          	  type:'GET',
-                          	  data:{oid:hit.entity.id.replace('ifc',''),rid:string}
-                            }).done(function(data){
-                          	  pTableScope.list = data.data  
-                          	  $('#pTable').scope().$apply();
-                            })
-                        });
-                        //initStart();
-                        xeogl.scene.ticksPerRender =  2;
-                    }
-            	});
-                /* progress.hide();
+                progress.hide();
                 websocket = null;
                 geomotryLoad = null;
                 $('.aside-menu-box').show();
-                var bimCameraControl = new xeogl.BIMCameraControl({
-                    camera: camera
-                });
-                window.cameraFlightAnimation = new xeogl.CameraFlightAnimation({
-                    camera: camera
-                });
-                $('#luopanBox1').show();
-                bimCameraControl.on("pick", function (hit) {
-                    cameraFlightAnimation.flyTo({
-                        aabb: hit.entity.worldBoundary.aabb
-                    });
-                    if(hisPick.name){
-						xeogl.scene.components[hisPick.name].material.emissive =  xeogl.scene.components[hisPick.name].material.baseColor;
-                    }
-                    hit.entity.material.emissive = new Float32Array([0, 1, 0]);
-                    hisPick = {name:hit.entity.id};
-                    var pTableScope= $('#pTable').scope();
-                    pTableScope.oid = hit.entity.id;
-                    $.ajax({
-                  	  url:'./model/queryProperty.do',
-                  	  type:'GET',
-                  	  data:{oid:hit.entity.id.replace('ifc',''),rid:string}
-                    }).done(function(data){
-                  	  pTableScope.list = data.data  
-                  	  $('#pTable').scope().$apply();
-                    })
-                    
-                }); */
-                
-                 /* var Menus = function () {
-	                 this.message = "Directional light";
-	                 this["alpha.a"] = 0.6;
-                 }; 
+                /*var Menus = function () {
+                 this.message = "Directional light";
+                 this["alpha.a"] = 0.6;
+                 var self = this;
+                 var update = function () {
+                 for(var i=0;i<allPoint.length;i++){
+                 scene.getNode(allPoint[i]+'geometry',function(mt){
+                 mt.setAlpha(self["alpha.a"]);
+                 })
+                 }
+                 requestAnimationFrame(update);
+                 };
+                 update();
+                 };
                  gui = new dat.GUI();
                  var menu = new Menus();
                  var color = gui.addFolder('设置总体透明度');
-                 var t = color.add(menu, 'alpha.a', 0.0, 1.0);
-                 t.onChange(function(value){
-                	 for(var i=0;i<geomotryLoad.ifcIds.length;i++){
-    	                 xeogl.scene.components['ifc'+geomotryLoad.ifcIds[i]].material.opacity = value;	                 
-                     }	 
-                 });
-                 color.open();  */
-                 initStart();
-                 xeogl.scene.ticksPerRender =  2;
+                 color.add(menu, 'alpha.a', 0.0, 1.0);
+                 color.open(); */
+                initStart();
             }
         });
+
     }
-    
     //监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常。
     window.onbeforeunload = function () {
         if(websocket){
@@ -358,5 +238,3 @@
 </script>
 </body>
 </html>
-
-

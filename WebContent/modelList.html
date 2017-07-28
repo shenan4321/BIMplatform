@@ -56,7 +56,7 @@
 		<div class="gallery clearfix" id="gallery">
 			<div class="building fl"  ng-repeat="it in prolist" data-href="{{it.pid}}">
 				<div class="image-inners">
-					<a ng-href="/BIMplatform/index.html?pid={{it.pid}}" ><img ng-src="{{it.picUrl}}"></a>
+					<a ng-href="/BIMplatform/modelView.html?pid={{it.pid}}" ><img ng-src="{{it.picUrl}}"></a>
 					<span class="image-captions fs-md">{{it.title}}</span>
 				</div>
 				<div class="image-info">
@@ -95,14 +95,15 @@
   		$('#filter a').click(function(){
   			$('#filter a').removeClass("active");
   			$(this).addClass("active");
+
   			var selector = $(this).attr('data-option-value');
   			$('#gallery').isotope({ filter: selector });
   			return false;
+
 		});
   		var app = angular.module('myApp', []);
   		
   		app.controller('siteCtrl', function($scope, $http) {
-  			
   			$http({
   				method: 'POST',
   				url: 'project/queryAllProject.do'

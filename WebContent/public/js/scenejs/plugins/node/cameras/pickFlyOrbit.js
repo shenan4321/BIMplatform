@@ -377,7 +377,7 @@ require([
 
                 scene.on("pick",
                     function (hit) {
-                	console.log(hit);
+                	console.log(hit.name);
                         if (!hit.worldPos || hit.name == "__SceneJS_dontPickMe") {
                             return;
                         }
@@ -396,7 +396,7 @@ require([
                         flying = true;
                         label.setText("[ " + Math.round(endPivot[0]) + ", " + Math.round(endPivot[1]) + ", " + Math.round(endPivot[2]) + " ]");
                         window.currentPiont = endPivot;
-                        /*scene.getNode(hit.name + "geometry",function (material) {
+                        scene.getNode(hit.name + "geometry",function (material) {
                             if(hisPick.name){
                                 scene.getNode(hisPick.name + "geometry", function (material) {
                                     material.setColor(hisPick.color);//之前点过的东西还原
@@ -404,7 +404,7 @@ require([
                             }
                             hisPick = {name:hit.name,color:material.getColor()}
                             material.setColor({r: 0.03137255, g: 0.30980392, b: 0.62745098});
-                            if(window.tt){
+                          
 	                            var pTableScope= $('#pTable').scope();
 	                            pTableScope.oid = hit.name ;
 	                            $.ajax({
@@ -415,8 +415,7 @@ require([
 	                          	  pTableScope.list = data.data  
 	                          	  $('#pTable').scope().$apply();
 	                            })
-                            }
-                        });*/
+                        });
                         
                     });
 
@@ -464,7 +463,7 @@ require([
                 			}
                 			
                 			
-                			//lookat.setUp({x: 0, y:1, z: Math.abs(zoom)>Math.abs(maxZoom) ? Math.abs(maxZoom) : Math.abs(zoom) });
+                			lookat.setUp({x: 0, y:1, z: Math.abs(zoom)>Math.abs(maxZoom) ? Math.abs(maxZoom) : Math.abs(zoom) });
                 			//原点的眼睛
                 			var eye = glmat.vec3.fromValues(0, 0, zoom);
                             //lookat的那个轴

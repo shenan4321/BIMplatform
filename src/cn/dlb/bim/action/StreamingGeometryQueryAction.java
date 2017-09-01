@@ -3,6 +3,7 @@ package cn.dlb.bim.action;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import org.eclipse.emf.ecore.EClass;
 import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -76,9 +77,11 @@ public class StreamingGeometryQueryAction extends LongAction {
 			PackageMetaData packageMetaData = queryContext.getPackageMetaData();
 			Query query = new Query(packageMetaData);
 			QueryPart queryPart = query.createQueryPart();
-			queryPart.addType(packageMetaData.getEClassIncludingDependencies("GeometryInfo"), false);
+			EClass geometryInfoElcass = packageMetaData.getEClassIncludingDependencies("GeometryInfo");
+			queryPart.addType(geometryInfoElcass, false);
 			Include include = queryPart.createInclude();
-			include.addType(packageMetaData.getEClassIncludingDependencies("GeometryData"), false);
+			include.addType(geometryInfoElcass, false);
+			include.addField("data");
 			QueryObjectProvider queryObjectProvider = new QueryObjectProvider(queryContext.getPlatformService(), server,
 					query, queryContext.getRid(), packageMetaData);
 			BinaryGeometryMessagingStreamingSerializer serializer = new BinaryGeometryMessagingStreamingSerializer();

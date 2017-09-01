@@ -3,7 +3,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cache="http://www.springframework.org/schema/cache"
 	xsi:schemaLocation="    
         http://www.springframework.org/schema/beans    
-        http://www.springframework.org/schema/beans/spring-beans-3.2.xsd    
+        http://www.springframework.org/schema/beans/spring-beans-3.2.xsd   
         http://www.springframework.org/schema/cache    
         http://www.springframework.org/schema/cache/spring-cache-3.2.xsd"
 	default-autowire="byName">
@@ -29,8 +29,7 @@
 	<bean id="memcachedClient" factory-bean="memcachedClientBuilder"
 		factory-method="build" destroy-method="shutdown" />
 
-	<bean id="cacheManager"
-		class="cn.dlb.bim.cache.MemcachedCacheManager">
+	<bean id="cacheManager" class="cn.dlb.bim.cache.MemcachedCacheManager">
 		<property name="memcachedClient" ref="memcachedClient" />
 		<property name="configMap">
 			<map>

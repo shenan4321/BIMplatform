@@ -14,7 +14,7 @@
 		class="org.springframework.web.multipart.commons.CommonsMultipartResolver" />
 
 	<!-- 引入jdbc配置文件 -->
-	<context:property-placeholder location="classpath:conf/jdbc.properties" />
+	<context:property-placeholder location="classpath:conf/mongodb.properties,classpath:conf/memcache.properties" />
 
 	<!-- 扫描文件（自动将service层注入） -->
 	<context:component-scan base-package="cn.dlb.bim.service" />

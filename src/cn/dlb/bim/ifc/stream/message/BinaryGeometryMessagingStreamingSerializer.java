@@ -235,11 +235,13 @@ public class BinaryGeometryMessagingStreamingSerializer implements MessagingStre
 			EStructuralFeature verticesFeature = data.eClass().getEStructuralFeature("vertices");
 			EStructuralFeature normalsFeature = data.eClass().getEStructuralFeature("normals");
 			EStructuralFeature materialsFeature = data.eClass().getEStructuralFeature("materials");
+			EStructuralFeature indicesForLinesWireFrameFeature = data.eClass().getEStructuralFeature("indicesForLinesWireFrame");
 
 			byte[] indices = (byte[]) data.eGet(indicesFeature);
 			byte[] vertices = (byte[]) data.eGet(verticesFeature);
 			byte[] normals = (byte[]) data.eGet(normalsFeature);
 			byte[] materials = (byte[]) data.eGet(materialsFeature);
+			byte[] indicesForLinesWire = (byte[]) data.eGet(indicesForLinesWireFrameFeature);
 
 			int totalNrIndices = indices.length / 4;
 			int maxIndexValues = 16389;
@@ -366,6 +368,18 @@ public class BinaryGeometryMessagingStreamingSerializer implements MessagingStre
 				// Aligning to 4-bytes
 				if (intBuffer.capacity() % 2 != 0) {
 					dataOutputStream.writeShort((short) 0);
+				}
+				
+				ByteBuffer indicesForLinesWireFrameBuffer = ByteBuffer.wrap(indicesForLinesWire);
+				indicesForLinesWireFrameBuffer.order(ByteOrder.LITTLE_ENDIAN);
+				dataOutputStream.writeInt(indicesForLinesWireFrameBuffer.capacity() / 4);
+				IntBuffer indicesForLinesWireFrameIntBuffer = indicesForLinesWireFrameBuffer.asIntBuffer();
+				for (int i=0; i<indicesForLinesWireFrameIntBuffer.capacity(); i++) {
+					dataOutputStream.writeShort((short)indicesForLinesWireFrameIntBuffer.get());
+				}
+				// Aligning to 4-bytes
+				if (indicesForLinesWireFrameIntBuffer.capacity() % 2 != 0) {
+					dataOutputStream.writeShort((short)0);
 				}
 
 				ByteBuffer vertexByteBuffer = ByteBuffer.wrap(vertices);

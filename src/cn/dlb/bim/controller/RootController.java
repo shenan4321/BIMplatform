@@ -30,7 +30,6 @@ public class RootController {
 	private static final Logger LOGGER = LoggerFactory.getLogger(RootController.class);
 
 	@Autowired
-	@Qualifier("BimServiceImpl")
 	private BimService bimService;
 	
 	@Autowired

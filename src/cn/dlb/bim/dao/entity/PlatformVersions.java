@@ -3,11 +3,11 @@ package cn.dlb.bim.dao.entity;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "PlatformInitDatasEntity")
-public class PlatformInitDatasEntity {
+@Document(collection = "PlatformVersions")
+public class PlatformVersions {
 	@Id
-	String platformVersionId;
-	int revisionId;
+	private String platformVersionId;
+	private int currentTopRevisionId;
 	
 	public String getPlatformVersionId() {
 		return platformVersionId;
@@ -15,11 +15,10 @@ public class PlatformInitDatasEntity {
 	public void setPlatformVersionId(String platformVersionId) {
 		this.platformVersionId = platformVersionId;
 	}
-	public int getRevisionId() {
-		return revisionId;
+	public int getCurrentTopRevisionId() {
+		return currentTopRevisionId;
 	}
-	public void setRevisionId(int revisionId) {
-		this.revisionId = revisionId;
+	public void setCurrentTopRevisionId(int currentTopRevisionId) {
+		this.currentTopRevisionId = currentTopRevisionId;
 	}
-	
 }

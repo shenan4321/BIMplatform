@@ -3,6 +3,8 @@ package cn.dlb.bim.dao.entity;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import cn.dlb.bim.ifc.engine.cells.Vector3f;
+
 @Document(collection = "Project")
 public class Project {
 	

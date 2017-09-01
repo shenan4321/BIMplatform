@@ -226,4 +226,12 @@ public class StringUtils {
 		}
 		return sb.toString();
 	}
+
+	public static String capitalize(String propertyName) {
+		if (propertyName.length() == 1) {
+			return propertyName.toUpperCase();
+		} else {
+			return propertyName.substring(0, 1).toUpperCase() + propertyName.substring(1);
+		}
+	}
 }

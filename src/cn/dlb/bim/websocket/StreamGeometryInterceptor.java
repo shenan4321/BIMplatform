@@ -10,7 +10,7 @@ import org.springframework.web.socket.server.HandshakeInterceptor;
 
 import com.google.common.base.Strings;
 
-public class GeometryInterceptor implements HandshakeInterceptor {
+public class StreamGeometryInterceptor implements HandshakeInterceptor {
 
 	@Override
 	public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler,

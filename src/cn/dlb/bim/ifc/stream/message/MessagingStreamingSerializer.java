@@ -20,6 +20,7 @@ package cn.dlb.bim.ifc.stream.message;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import cn.dlb.bim.dao.entity.ConcreteRevision;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
 import cn.dlb.bim.ifc.serializers.SerializerException;
 import cn.dlb.bim.ifc.serializers.binarygeometry.Writer;
@@ -27,7 +28,7 @@ import cn.dlb.bim.ifc.shared.ProgressReporter;
 import cn.dlb.bim.ifc.stream.serializers.ObjectProvider;
 
 public interface MessagingStreamingSerializer extends Writer {
-	void init(ObjectProvider objectProvider, PackageMetaData packageMetaData) throws SerializerException;
+	void init(ObjectProvider objectProvider, PackageMetaData packageMetaData, ConcreteRevision concreteRevision) throws SerializerException;
 	/**
 	 * @param streamingSocketInterface This is where you write your messages to
 	 * @param progressReporter Report any available progress to the progressReporter

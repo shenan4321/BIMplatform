@@ -15,13 +15,13 @@ import cn.dlb.bim.ifc.shared.ProgressReporter;
 import cn.dlb.bim.service.BimService;
 import cn.dlb.bim.vo.ProgressVo;
 
-public class BinaryGeometryAction extends LongAction {
+public class BinaryGeometryQueryAction extends LongAction {
 
 	private final BimService bimService;
 	private final Integer rid;
 	private int lastPercentProcess = 0;
 	
-	public BinaryGeometryAction(BimService bimService, Integer rid, WebSocketSession webSocketSession) {
+	public BinaryGeometryQueryAction(BimService bimService, Integer rid, WebSocketSession webSocketSession) {
 		super(webSocketSession);
 		this.bimService = bimService;
 		this.rid = rid;

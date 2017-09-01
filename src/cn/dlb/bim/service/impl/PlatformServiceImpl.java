@@ -15,19 +15,22 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.CriteriaDefinition;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.data.util.CloseableIterator;
 import org.springframework.stereotype.Component;
 
 import cn.dlb.bim.component.PlatformServer;
 import cn.dlb.bim.component.PlatformServerConfig;
+import cn.dlb.bim.dao.BaseMongoDao;
 import cn.dlb.bim.dao.IfcModelDao;
-import cn.dlb.bim.dao.PlatformInitDatasDao;
-import cn.dlb.bim.dao.entity.IfcClassLookupEntity;
-import cn.dlb.bim.dao.entity.PlatformInitDatasEntity;
+import cn.dlb.bim.dao.entity.CatalogIfc;
+import cn.dlb.bim.dao.entity.PlatformVersions;
 import cn.dlb.bim.ifc.database.BatchThreadLocal;
 import cn.dlb.bim.ifc.database.DatabaseException;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
-import cn.dlb.bim.ifc.model.IfcHeader;
 import cn.dlb.bim.ifc.stream.VirtualObject;
 import cn.dlb.bim.service.PlatformService;
 
@@ -52,8 +55,12 @@ public class PlatformServiceImpl implements InitializingBean, PlatformService {
 	private final BatchThreadLocal<Map<String, List<VirtualObject>>> localBatch;
 	
 	@Autowired
-	@Qualifier("PlatformInitDatasDaoImpl")
-	private PlatformInitDatasDao platformInitDatasDao;
+	@Qualifier("PlatformVersionsDaoImpl")
+	private BaseMongoDao<PlatformVersions> platformVersionsDao;
+	
+	@Autowired
+	@Qualifier("CatalogIfcDaoImpl")
+	private BaseMongoDao<CatalogIfc> catalogIfcDao;
 	
 	@Autowired
 	@Qualifier("PlatformServer")
@@ -84,28 +91,28 @@ public class PlatformServiceImpl implements InitializingBean, PlatformService {
 	}
 	
 	private void initialize() {
-		initPlatformInitDatas();
-		initIfcClassLookupTable();
+		initPlatformVersions();
+		initCatalogIfcTable();
 	}
 	
-	private void initPlatformInitDatas() {
-		PlatformInitDatasEntity platformInitDatasEntity = platformInitDatasDao.queryPlatformInitDatasEntityByPlatformVersionId(PlatformServerConfig.PLATFORM_VERSION);
-		if (platformInitDatasEntity == null) {
-			createPlatformInitDatas();
+	private void initPlatformVersions() {
+		PlatformVersions platformVersions = platformVersionsDao.findById(PlatformServerConfig.PLATFORM_VERSION);
+		if (platformVersions == null) {
+			createPlatformVersions();
 		} 
 	}
 	
-	private void initIfcClassLookupTable() {
-		List<IfcClassLookupEntity> allLookup = platformInitDatasDao.queryAllIfcClassLookup();
-		if (allLookup.size() > 0) {
-			for (IfcClassLookupEntity ifcClassLookup : allLookup) {
-				String packageClassName = ifcClassLookup.getPackageClassName();
+	private void initCatalogIfcTable() {
+		List<CatalogIfc> catalogIfcList = catalogIfcDao.find(new Query());
+		if (catalogIfcList.size() > 0) {
+			for (CatalogIfc catalogIfc : catalogIfcList) {
+				String packageClassName = catalogIfc.getPackageClassName();
 				String packageName = packageClassName.substring(0, packageClassName.indexOf("_"));
 				String className = packageClassName.substring(packageClassName.indexOf("_") + 1);
 				EClass eClass = (EClass) getEClassifier(packageName, className);
-				cidToEclass[ifcClassLookup.getCid()] = eClass;
-				eClassToCid.put(eClass, ifcClassLookup.getCid());
-				Long oid = ifcClassLookup.getOid();
+				cidToEclass[catalogIfc.getCid()] = eClass;
+				eClassToCid.put(eClass, catalogIfc.getCid());
+				Long oid = catalogIfc.getOid();
 				oidCounters.put(eClass, new AtomicLong(oid));
 			}
 		} else {
@@ -162,38 +169,47 @@ public class PlatformServiceImpl implements InitializingBean, PlatformService {
     	for (PackageMetaData packageMetaData : server.getMetaDataManager().getAll()) {
     		List<EClass> allClass = packageMetaData.getAllClasses();
     		for (EClass eclass : allClass) {
-    			IfcClassLookupEntity ifcClassLookup = new IfcClassLookupEntity();
-    	    	ifcClassLookup.setCid(cidCounter);
-    	    	ifcClassLookup.setPackageClassName(packageMetaData.getEPackage().getName() + "_" + eclass.getName());
+    			CatalogIfc catalogIfc = new CatalogIfc();
+    			catalogIfc.setCid(cidCounter);
+    			catalogIfc.setPackageClassName(packageMetaData.getEPackage().getName() + "_" + eclass.getName());
     	    	eClassToCid.put(eclass, cidCounter);
     	    	cidToEclass[cidCounter] = eclass;
-    	    	ifcClassLookup.setOid(getInitCounter(eclass));
-    	    	platformInitDatasDao.insertIfcClassLookup(ifcClassLookup);
+    	    	catalogIfc.setOid(getInitCounter(eclass));
+    	    	catalogIfcDao.save(catalogIfc);
     	    	cidCounter++;
     		}
     	}
 	}
 	
-	private void createPlatformInitDatas() {
-		PlatformInitDatasEntity platformInitDatasEntity = new PlatformInitDatasEntity();
-		platformInitDatasEntity.setPlatformVersionId(PlatformServerConfig.PLATFORM_VERSION);
-		platformInitDatasEntity.setRevisionId(1);
-		platformInitDatasDao.insertPlatformInitDatasEntity(platformInitDatasEntity);
+	private void createPlatformVersions() {
+		PlatformVersions platformVersions = new PlatformVersions();
+		platformVersions.setPlatformVersionId(PlatformServerConfig.PLATFORM_VERSION);
+		platformVersions.setCurrentTopRevisionId(1);
+		platformVersionsDao.save(platformVersions);
 	}
 
 	public Integer newRevisionId() {
-		PlatformInitDatasEntity platformInitDatasEntity = platformInitDatasDao.findAndIncreateRevisionId(PlatformServerConfig.PLATFORM_VERSION, 1);
-		return platformInitDatasEntity.getRevisionId();
+		Query query = new Query();
+		query.addCriteria(Criteria.where("platformVersionId").is(PlatformServerConfig.PLATFORM_VERSION));
+		Update update = new Update();
+		update.inc("currentTopRevisionId", 1);
+		PlatformVersions platformVersions = platformVersionsDao.update(query, update);
+		return platformVersions.getCurrentTopRevisionId();
 	}
 
 	public void syncOid() {
 		for (EClass eClass : oidChanged.keySet()) {
-			IfcClassLookupEntity ifcClassLookup = new IfcClassLookupEntity();
+			CatalogIfc catalogIfc = new CatalogIfc();
 			Short cid = eClassToCid.get(eClass);
 			AtomicLong oid = oidCounters.get(eClass);
-			ifcClassLookup.setCid(cid);
-			ifcClassLookup.setOid(oid.get());
-			platformInitDatasDao.updateOidInIfcClassLookup(ifcClassLookup);
+			catalogIfc.setCid(cid);
+			catalogIfc.setOid(oid.get());
+			
+			Query query = new Query();
+			query.addCriteria(Criteria.where("cid").is(cid));
+			Update update = new Update();
+			update.set("oid", catalogIfc.getOid());
+			catalogIfcDao.update(query, update);
 		}
 		oidChanged.clear();
 	}
@@ -210,21 +226,29 @@ public class PlatformServiceImpl implements InitializingBean, PlatformService {
 	
 	@Override
 	public void saveBatch(VirtualObject virtualObject) {
-		List<VirtualObject> localBatchList = localBatch.newGet().get(SAVE_BATCH_KEY);
+		Map<String, List<VirtualObject>> localThreadMap = localBatch.newGet();
+		List<VirtualObject> localBatchList = localThreadMap.get(SAVE_BATCH_KEY);
+		if (localBatchList == null) {
+			localBatchList = new ArrayList<>();
+			localThreadMap.put(SAVE_BATCH_KEY, localBatchList);
+		}
 		localBatchList.add(virtualObject);
 		if (localBatchList.size() >= AUTO_COMMIT_SIZE) {
 			ifcModelDao.insertAllVirtualObject(localBatchList);
-			localBatch.get().clear();
+			localBatch.get().get(SAVE_BATCH_KEY).clear();
 		}
 	}
 	
 	
-	@Override
-	public void commitSaveBatch() {
-		List<VirtualObject> localBatchList = localBatch.newGet().get(SAVE_BATCH_KEY);
-		ifcModelDao.insertAllVirtualObject(localBatchList);
-		localBatch.get().clear();
-	}
+//	@Override
+//	public void commitSaveBatch() {
+//		List<VirtualObject> localBatchList = localBatch.newGet().get(SAVE_BATCH_KEY);
+//		if (localBatchList == null || localBatchList.isEmpty()) {
+//			return;
+//		}
+//		ifcModelDao.insertAllVirtualObject(localBatchList);
+//		localBatch.get().clear();
+//	}
 
 	@Override
 	public List<VirtualObject> queryVirtualObject(Integer rid, List<Short> cids) {
@@ -234,16 +258,6 @@ public class PlatformServiceImpl implements InitializingBean, PlatformService {
 	@Override
 	public CloseableIterator<VirtualObject> streamVirtualObjectByRid(Integer rid) {
 		return ifcModelDao.streamVirtualObjectByRid(rid);
-	}
-
-	@Override
-	public void saveIfcHeader(IfcHeader ifcHeader) {
-		ifcModelDao.saveIfcHeader(ifcHeader);
-	}
-
-	@Override
-	public IfcHeader queryIfcHeader(Integer rid) {
-		return ifcModelDao.queryIfcHeader(rid);
 	}
 
 	@Override
@@ -258,24 +272,39 @@ public class PlatformServiceImpl implements InitializingBean, PlatformService {
 
 	@Override
 	public void updateBatch(VirtualObject virtualObject) {
-		List<VirtualObject> localBatchList = localBatch.newGet().get(UPDATE_BATCH_KEY);
+		Map<String, List<VirtualObject>> localThreadMap = localBatch.newGet();
+		List<VirtualObject> localBatchList = localThreadMap.get(UPDATE_BATCH_KEY);
+		if (localBatchList == null) {
+			localBatchList = new ArrayList<>();
+			localThreadMap.put(UPDATE_BATCH_KEY, localBatchList);
+		}
 		localBatchList.add(virtualObject);
 		if (localBatchList.size() >= AUTO_COMMIT_SIZE) {
 			ifcModelDao.updateAllVirtualObject(localBatchList);
-			localBatch.get().clear();
+			localBatch.get().get(UPDATE_BATCH_KEY).clear();
 		}
 	}
 
-	@Override
-	public void commitUpdateBatch() {
-		List<VirtualObject> localBatchList = localBatch.newGet().get(UPDATE_BATCH_KEY);
-		ifcModelDao.updateAllVirtualObject(localBatchList);
-		localBatch.get().clear();
-	}
+//	@Override
+//	public void commitUpdateBatch() {
+//		List<VirtualObject> localBatchList = localBatch.newGet().get(UPDATE_BATCH_KEY);
+//		if (localBatchList == null) {
+//			return;
+//		}
+//		ifcModelDao.updateAllVirtualObject(localBatchList);
+//		localBatch.get().clear();
+//	}
 
 	@Override
 	public void commitAllBatch() {
-		commitUpdateBatch();
-		commitSaveBatch();
+		List<VirtualObject> updateLocalBatchList = localBatch.newGet().get(UPDATE_BATCH_KEY);
+		if (updateLocalBatchList != null && !updateLocalBatchList.isEmpty()) {
+			ifcModelDao.updateAllVirtualObject(updateLocalBatchList);
+		}
+		List<VirtualObject> saveLocalBatchList = localBatch.newGet().get(SAVE_BATCH_KEY);
+		if (saveLocalBatchList != null && !saveLocalBatchList.isEmpty()) {
+			ifcModelDao.insertAllVirtualObject(saveLocalBatchList);
+		}
+		localBatch.get().clear();
 	}
 }

@@ -19,6 +19,7 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 
 import cn.dlb.bim.dao.IfcModelDao;
+import cn.dlb.bim.dao.entity.ConcreteRevision;
 import cn.dlb.bim.dao.entity.IdEObjectEntity;
 import cn.dlb.bim.dao.entity.IfcModelEntity;
 import cn.dlb.bim.dao.entity.ModelLabel;
@@ -152,18 +153,6 @@ public class IfcModelDaoImpl implements IfcModelDao {
 	}
 
 	@Override
-	public void saveIfcHeader(IfcHeader ifcHeader) {
-		mongoTemplate.save(ifcHeader);
-	}
-
-	@Override
-	public IfcHeader queryIfcHeader(Integer rid) {
-		Query query = new Query();
-		query.addCriteria(Criteria.where("rid").is(rid));
-		return mongoTemplate.findOne(query, IfcHeader.class);
-	}
-
-	@Override
 	public VirtualObject queryVirtualObject(Integer rid, Long oid) {
 		Query query = new Query();
 		query.addCriteria(Criteria.where("rid").is(rid).andOperator(Criteria.where("oid").is(oid)));
@@ -234,6 +223,18 @@ public class IfcModelDaoImpl implements IfcModelDao {
 			collName = collName.replaceFirst(collName.substring(0, 1), collName.substring(0, 1).toLowerCase());
 		}
 		return collName;
+	}
+
+	@Override
+	public void saveConcreteRevision(ConcreteRevision concreteRevision) {
+		mongoTemplate.save(concreteRevision);
+	}
+
+	@Override
+	public ConcreteRevision queryConcreteRevisionByRid(Integer rid) {
+		Query query = new Query();
+		query.addCriteria(Criteria.where("revisionId").is(rid));
+		return mongoTemplate.findOne(query, ConcreteRevision.class);
 	}
 
 }

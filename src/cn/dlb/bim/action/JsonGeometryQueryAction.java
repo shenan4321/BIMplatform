@@ -15,7 +15,7 @@ import cn.dlb.bim.vo.ProgressVo;
 import cn.dlb.bim.vo.Vector3f;
 import cn.dlb.bim.web.ResultUtil;
 
-public class LongGeometryQueryAction extends LongAction {
+public class JsonGeometryQueryAction extends LongAction {
 	private static String IFC2X3_SCHEMA_SHORT = "IFC2X3";
 
 //	private static final Logger LOGGER = LoggerFactory.getLogger(LongGeometryQueryAction.class);
@@ -24,7 +24,7 @@ public class LongGeometryQueryAction extends LongAction {
 	private final Integer rid;
 	private int lastPercentProcess = 0;
 	
-	public LongGeometryQueryAction(BimService bimService, Integer rid, WebSocketSession webSocketSession) {
+	public JsonGeometryQueryAction(BimService bimService, Integer rid, WebSocketSession webSocketSession) {
 		super(webSocketSession);
 		this.bimService = bimService;
 		this.rid = rid;

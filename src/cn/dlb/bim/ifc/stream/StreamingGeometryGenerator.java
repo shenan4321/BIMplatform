@@ -88,11 +88,13 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 
 	private int maxObjectsPerFile = 10;
 	private volatile boolean running = true;
+	private final IfcHeader header;
 
-	public StreamingGeometryGenerator(final PlatformServer server, final PlatformService platformService, Integer rid) {
+	public StreamingGeometryGenerator(final PlatformServer server, final PlatformService platformService, Integer rid, IfcHeader header) {
 		this.server = server;
 		this.platformService = platformService;
 		this.rid = rid;
+		this.header = header;
 	}
 
 	public class Runner implements Runnable {
@@ -103,16 +105,18 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 		private GenerateGeometryResult generateGeometryResult;
 		private ObjectProvider objectProvider;
 		private RenderEnginePool renderEnginePool;
+		private IfcHeader header;
 
 		public Runner(EClass eClass, RenderEnginePool renderEnginePool, RenderEngineSettings renderEngineSettings,
 				ObjectProvider objectProvider, RenderEngineFilter renderEngineFilter,
-				GenerateGeometryResult generateGeometryResult) {
+				GenerateGeometryResult generateGeometryResult, IfcHeader header) {
 			this.eClass = eClass;
 			this.renderEnginePool = renderEnginePool;
 			this.renderEngineSettings = renderEngineSettings;
 			this.objectProvider = objectProvider;
 			this.renderEngineFilter = new RenderEngineFilter(true);
 			this.generateGeometryResult = generateGeometryResult;
+			this.header = header;
 		}
 
 		@Override
@@ -147,9 +151,7 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 						}
 					});
 
-					IfcHeader ifcHeader = platformService.queryIfcHeader(rid);
-
-					ifcSerializer.init(platformService, proxy, ifcHeader, packageMetaData);
+					ifcSerializer.init(platformService, proxy, header, packageMetaData);
 
 					ByteArrayOutputStream baos = new ByteArrayOutputStream();
 					IOUtils.copy(ifcSerializer.getInputStream(), baos);
@@ -454,7 +456,7 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 					.getRenderEnginePool(packageMetaData.getSchema());
 
 			//int maxSimultanousThreads = 100;原来100
-			int maxSimultanousThreads = 5;
+			int maxSimultanousThreads = 2;
 			ThreadPoolExecutor executor = new ThreadPoolExecutor(maxSimultanousThreads, maxSimultanousThreads, 24,
 					TimeUnit.HOURS, new ArrayBlockingQueue<Runnable>(10000000));
 
@@ -555,7 +557,7 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 								QueryObjectProvider queryObjectProvider = new QueryObjectProvider(platformService,
 										server, query, rid, packageMetaData);
 
-								Runner runner = new Runner(eClass, renderEnginePool, settings, queryObjectProvider, renderEngineFilter, generateGeometryResult);
+								Runner runner = new Runner(eClass, renderEnginePool, settings, queryObjectProvider, renderEngineFilter, generateGeometryResult, header);
 								executor.submit(runner);
 								jobsTotal.incrementAndGet();
 

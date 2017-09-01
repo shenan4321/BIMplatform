@@ -15,6 +15,8 @@ import cn.dlb.bim.websocket.BinaryGeometryTemplateInterceptor;
 import cn.dlb.bim.websocket.BinaryGeometryTemplateSocketHandler;
 import cn.dlb.bim.websocket.GeometryInterceptor;
 import cn.dlb.bim.websocket.GeometrySocketHandler;
+import cn.dlb.bim.websocket.StreamGeometryInterceptor;
+import cn.dlb.bim.websocket.StreamGeometrySocketHandler;
 
 @Configuration  
 @EnableWebMvc
@@ -22,28 +24,36 @@ import cn.dlb.bim.websocket.GeometrySocketHandler;
 public class WebSocketConfig implements WebSocketConfigurer {
 	
 	@Autowired
-	private PlatformServer server;
+	private BinaryGeometrySocketHandler binaryGeometrySocketHandler;
+	
 	@Autowired
-	@Qualifier("BimServiceImpl")
-	private BimService bimService;
+	private BinaryGeometryTemplateSocketHandler binaryGeometryTemplateSocketHandler;
+	
+	@Autowired
+	private GeometrySocketHandler geometrySocketHandler;
+	
+	@Autowired
+	private StreamGeometrySocketHandler streamGeometrySocketHandler;
 
 	@Override
 	public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         /** 
          * 支持websocket 的 connection 
          */  
-        registry.addHandler(new BinaryGeometrySocketHandler(server, bimService),"/ws/binarygeometry").setAllowedOrigins("*").addInterceptors(new BinaryGeometryInterceptor());  
+        registry.addHandler(binaryGeometrySocketHandler,"/ws/binarygeometry").setAllowedOrigins("*").addInterceptors(new BinaryGeometryInterceptor());  
         
         /** 
          * 支持websocket 的 connection 
          */  
-        registry.addHandler(new BinaryGeometryTemplateSocketHandler(server, bimService),"/ws/binarygeometry/template").setAllowedOrigins("*").addInterceptors(new BinaryGeometryTemplateInterceptor()); 
+        registry.addHandler(binaryGeometryTemplateSocketHandler,"/ws/binarygeometry/template").setAllowedOrigins("*").addInterceptors(new BinaryGeometryTemplateInterceptor()); 
         
         /** 
          * 如不支持websocket的connenction,采用sockjs 
          */  
-        registry.addHandler(new GeometrySocketHandler(server, bimService),"/ws/geometry").setAllowedOrigins("*").addInterceptors(new GeometryInterceptor());
+        registry.addHandler(geometrySocketHandler,"/ws/geometry").setAllowedOrigins("*").addInterceptors(new GeometryInterceptor());
         //.withSockJS();
+        
+      	registry.addHandler(streamGeometrySocketHandler,"/ws/streamgeometry").setAllowedOrigins("*").addInterceptors(new StreamGeometryInterceptor());
 	}
 
 }

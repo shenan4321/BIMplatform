@@ -53,7 +53,6 @@ import cn.dlb.bim.web.ResultUtil;
 public class ModelController {
 	
 	@Autowired
-	@Qualifier("BimServiceImpl")
 	private BimService bimService;
 	
 	@Autowired
@@ -70,7 +69,7 @@ public class ModelController {
 			HttpServletRequest request// , ModelMap model
 	) {
 		ResultUtil result = new ResultUtil();
-//		Long pid = modelInfo.getPid();
+//		Long pid = modelInfo.getPid();·
 //		Project project = projectService.queryProject(pid);
 //		if (project == null) {
 //			result.setSuccess(false);

@@ -8,7 +8,6 @@ import org.springframework.data.util.CloseableIterator;
 
 import cn.dlb.bim.ifc.database.DatabaseException;
 import cn.dlb.bim.ifc.emf.OidProvider;
-import cn.dlb.bim.ifc.model.IfcHeader;
 import cn.dlb.bim.ifc.stream.VirtualObject;
 
 public interface PlatformService extends OidProvider {
@@ -20,15 +19,13 @@ public interface PlatformService extends OidProvider {
 	public void syncOid();
 	void save(VirtualObject virtualObject);
 	public void saveBatch(VirtualObject virtualObject);
-	public void commitSaveBatch();
+//	public void commitSaveBatch();
 	void update(VirtualObject virtualObject);
 	void updateBatch(VirtualObject virtualObject);
-	void commitUpdateBatch();
+//	void commitUpdateBatch();
 	void commitAllBatch();
 	public List<VirtualObject> queryVirtualObject(Integer rid, List<Short> cids);
 	public CloseableIterator<VirtualObject> streamVirtualObject(Integer rid, Short cid);
 	public VirtualObject queryVirtualObject(Integer rid, Long oid);
 	public CloseableIterator<VirtualObject> streamVirtualObjectByRid(Integer rid);
-	public void saveIfcHeader(IfcHeader ifcHeader);
-	public IfcHeader queryIfcHeader(Integer rid);
 }

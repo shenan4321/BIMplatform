@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cache="http://www.springframework.org/schema/cache"
+	xsi:schemaLocation="    
+        http://www.springframework.org/schema/beans    
+        http://www.springframework.org/schema/beans/spring-beans-3.2.xsd    
+        http://www.springframework.org/schema/cache    
+        http://www.springframework.org/schema/cache/spring-cache-3.2.xsd"
+	default-autowire="byName">
+
+	<bean id="memcachedClientBuilder" class="net.rubyeye.xmemcached.XMemcachedClientBuilder">
+		<constructor-arg>
+			<list>
+				<bean class="java.net.InetSocketAddress">
+					<constructor-arg value="${memcache.ip}" />
+					<constructor-arg value="${memcache.port}" />
+				</bean>
+			</list>
+		</constructor-arg>
+		<property name="connectionPoolSize" value="${memcache.pool.size}" />
+		<property name="commandFactory">
+			<bean class="net.rubyeye.xmemcached.command.BinaryCommandFactory" />
+		</property>
+		<property name="transcoder">
+			<bean class="net.rubyeye.xmemcached.transcoders.SerializingTranscoder" />
+		</property>
+	</bean>
+
+	<bean id="memcachedClient" factory-bean="memcachedClientBuilder"
+		factory-method="build" destroy-method="shutdown" />
+
+	<bean id="cacheManager"
+		class="cn.dlb.bim.cache.MemcachedCacheManager">
+		<property name="memcachedClient" ref="memcachedClient" />
+		<property name="configMap">
+			<map>
+				<!-- key：@Cacheable、@CachePut、@CacheEvict等的value属性。value：缓存过期时间(单位：秒)，默认值：0 -->
+				<entry key="defaultCache" value="0" /><!-- 默认缓存区 不过期 -->
+				<entry key="inTimeCache" value="3600" /><!-- 实时缓存区 一小时过期 -->
+				<entry key="virtualObject" value="0" /><!-- virtualObject缓存区 不过期 -->
+			</map>
+		</property>
+	</bean>
+
+	<cache:annotation-driven cache-manager="cacheManager" />
+</beans>  

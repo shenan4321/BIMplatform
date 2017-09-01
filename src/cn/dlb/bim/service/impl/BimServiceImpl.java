@@ -74,7 +74,7 @@ import cn.dlb.bim.vo.ModelInfoVo;
 import cn.dlb.bim.vo.ModelLabelVo;
 import cn.dlb.bim.vo.OutputTemplateVo;
 
-@Service("BimServiceImpl")
+//@Service("BimServiceImpl")
 public class BimServiceImpl implements BimService {
 
 	private static String IFC2X3_SCHEMA_SHORT = "IFC2X3";
@@ -737,12 +737,12 @@ public class BimServiceImpl implements BimService {
 //			System.out.println(isDecomposedBy);
 //		}
 		
-		StreamingCheckinAction action = new StreamingCheckinAction(null, new File("E:\\IFC模型\\世博地下空间+结构+消防.ifc"), server, platformService);
-		try {
-			action.execute();
-		} catch (DatabaseException | IfcModelInterfaceException e) {
-			e.printStackTrace();
-		}
+//		StreamingCheckinAction action = new StreamingCheckinAction(null, new File("E:\\IFC模型\\huahuatest.ifc"), server, platformService);
+//		try {
+//			action.execute();
+//		} catch (DatabaseException | IfcModelInterfaceException e) {
+//			e.printStackTrace();
+//		}
 	}
 	
 	public List<VirtualObject> queryVirtualObject(Integer rid, List<Short> cids) {

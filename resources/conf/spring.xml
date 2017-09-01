@@ -24,6 +24,8 @@
 
 	<!-- 扫描文件（自动将dao层注入） -->
 	<context:component-scan base-package="cn.dlb.bim.dao.impl" />
+	
+	<context:component-scan base-package="cn.dlb.bim.websocket" />
 
 	<!-- spring连接mongodb数据库的配置 -->
 	<mongo:mongo-client host="${mongo.host}" port="${mongo.port}"
@@ -31,7 +33,7 @@
 		<mongo:client-options write-concern="SAFE" />
 	</mongo:mongo-client>
 
-	<mongo:db-factory id="mongoDbFactory" mongo-ref="mongo" />
+	<mongo:db-factory id="mongoDbFactory" dbname="${mongo.dbname}" mongo-ref="mongo" />
 
 	<!-- mongo模板操作对象 -->
 	<bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
@@ -70,5 +72,5 @@
 		<property name="maxPoolSize" value="20" />
 		<property name="WaitForTasksToCompleteOnShutdown" value="true" />
 	</bean>
-
+	
 </beans>

@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,18 +14,22 @@ import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.util.CloseableIterator;
 import org.springframework.stereotype.Service;
 
 import cn.dlb.bim.component.PlatformServer;
-import cn.dlb.bim.dao.IfcModelDao;
-import cn.dlb.bim.dao.OutputTemplateDao;
+import cn.dlb.bim.dao.BaseMongoDao;
+import cn.dlb.bim.dao.VirtualObjectDao;
+import cn.dlb.bim.dao.entity.ConcreteRevision;
 import cn.dlb.bim.ifc.database.DatabaseException;
 import cn.dlb.bim.ifc.deserializers.DeserializeException;
 import cn.dlb.bim.ifc.deserializers.StepParser;
 import cn.dlb.bim.ifc.emf.IfcModelInterface;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
 import cn.dlb.bim.ifc.emf.Schema;
+import cn.dlb.bim.ifc.engine.cells.GenerateGeometryResult;
 import cn.dlb.bim.ifc.engine.cells.Vector3d;
 import cn.dlb.bim.ifc.shared.ProgressReporter;
 import cn.dlb.bim.ifc.stream.GeometryGeneratingException;
@@ -35,6 +41,9 @@ import cn.dlb.bim.ifc.tree.BuildingCellContainer;
 import cn.dlb.bim.ifc.tree.BuildingStorey;
 import cn.dlb.bim.ifc.tree.ProjectTree;
 import cn.dlb.bim.ifc.tree.PropertySet;
+import cn.dlb.bim.ifc.tree.stream.StreamBuildingCellGenerator;
+import cn.dlb.bim.ifc.tree.stream.StreamBuildingStoreyGenerator;
+import cn.dlb.bim.ifc.tree.stream.StreamProjectTreeGenerator;
 import cn.dlb.bim.service.BimService;
 import cn.dlb.bim.service.PlatformService;
 import cn.dlb.bim.vo.GeometryInfoVo;
@@ -43,6 +52,7 @@ import cn.dlb.bim.vo.ModelAndOutputTemplateVo;
 import cn.dlb.bim.vo.ModelInfoVo;
 import cn.dlb.bim.vo.ModelLabelVo;
 import cn.dlb.bim.vo.OutputTemplateVo;
+import cn.dlb.bim.vo.Vector3f;
 
 @Service("StreamBimServiceImpl")
 public class StreamBimServiceImpl implements BimService {
@@ -53,14 +63,14 @@ public class StreamBimServiceImpl implements BimService {
 	@Autowired
 	@Qualifier("PlatformServer")
 	private PlatformServer server;
-
+	
 	@Autowired
-	@Qualifier("IfcModelDaoImpl")
-	private IfcModelDao ifcModelDao;
-
+	@Qualifier("VirtualObjectDaoImpl")
+	private VirtualObjectDao virtualObjectDao;
+	
 	@Autowired
-	@Qualifier("OutputTemplateDaoImpl")
-	private OutputTemplateDao outputTemplateDao;
+	@Qualifier("ConcreteRevisionDaoImpl")
+	private BaseMongoDao<ConcreteRevision> concreteRevisionDao;
 
 	@Autowired
 	@Qualifier("PlatformServiceImpl")
@@ -76,8 +86,18 @@ public class StreamBimServiceImpl implements BimService {
 	public Integer addRevision(ModelInfoVo modelInfo, File modelFile) {
 		Integer rid = -1;
 		try {
+			ConcreteRevision concreteRevision = new ConcreteRevision();
+			concreteRevision.setApplyType(modelInfo.getApplyType());
+			concreteRevision.setDate(modelInfo.getUploadDate());
+			concreteRevision.setFileName(modelInfo.getFileName());
+			concreteRevision.setFileSize(modelInfo.getFileSize());
+			concreteRevision.setName(modelInfo.getName());
+			concreteRevision.setPid(modelInfo.getPid());
+			
 			IfcStepStreamingDeserializer deserializer = new IfcStepStreamingDeserializer();
 			Schema schema = preReadSchema(modelFile);
+			
+			concreteRevision.setSchema(schema.getEPackageName());
 
 			PackageMetaData packageMetaData = server.getMetaDataManager().getPackageMetaData(schema.getEPackageName());
 			deserializer.init(packageMetaData, platformService);
@@ -85,10 +105,27 @@ public class StreamBimServiceImpl implements BimService {
 			
 			rid = deserializer.getRid();
 			fixInverses(packageMetaData, rid);
+			concreteRevision.setRevisionId(rid);
 
-			StreamingGeometryGenerator generator = new StreamingGeometryGenerator(server, platformService, rid);
+			StreamingGeometryGenerator generator = new StreamingGeometryGenerator(server, platformService, rid, deserializer.getIfcHeader());
 			QueryContext queryContext = new QueryContext(platformService, packageMetaData, rid);
-			generator.generateGeometry(queryContext);
+			GenerateGeometryResult result = generator.generateGeometry(queryContext);
+			
+			Double maxX = result.getMaxBoundsAsVector3f().getX();
+			Double maxY = result.getMaxBoundsAsVector3f().getY();
+			Double maxZ = result.getMaxBoundsAsVector3f().getZ();
+			Double minX = result.getMinBoundsAsVector3f().getX();
+			Double minY = result.getMinBoundsAsVector3f().getY();
+			Double minZ = result.getMinBoundsAsVector3f().getZ();
+			Vector3f maxBound = new Vector3f(maxX, maxY, maxZ);
+			Vector3f minBound = new Vector3f(minX, minY, minZ);
+			
+			concreteRevision.setMaxBounds(maxBound);
+			concreteRevision.setMinBounds(minBound);
+			concreteRevision.setIfcHeader(deserializer.getIfcHeader());
+			
+			concreteRevisionDao.save(concreteRevision);
+			
 		} catch (GeometryGeneratingException e) {
 			e.printStackTrace();
 		} catch (DatabaseException e) {
@@ -122,8 +159,23 @@ public class StreamBimServiceImpl implements BimService {
 
 	@Override
 	public List<ModelInfoVo> queryModelInfoByPid(Long pid) {
-		// TODO Auto-generated method stub
-		return null;
+		Query query = new Query();
+		query.addCriteria(Criteria.where("pid").is(pid));
+		List<ConcreteRevision> concreteRevisionList = concreteRevisionDao.find(query);
+		
+		List<ModelInfoVo> result = new ArrayList<>();
+		for (ConcreteRevision concreteRevision : concreteRevisionList) {
+			ModelInfoVo modelInfo = new ModelInfoVo();
+			modelInfo.setName(concreteRevision.getName());
+			modelInfo.setPid(concreteRevision.getPid());
+			modelInfo.setApplyType(concreteRevision.getApplyType());
+			modelInfo.setRid(concreteRevision.getRevisionId());
+			modelInfo.setFileName(concreteRevision.getFileName());
+			modelInfo.setFileSize(concreteRevision.getFileSize());
+			modelInfo.setUploadDate(concreteRevision.getDate());
+			result.add(modelInfo);
+		}
+		return result;
 	}
 
 	@Override
@@ -134,8 +186,18 @@ public class StreamBimServiceImpl implements BimService {
 
 	@Override
 	public ModelInfoVo queryModelInfoByRid(Integer rid) {
-		// TODO Auto-generated method stub
-		return null;
+		Query query = new Query();
+		query.addCriteria(Criteria.where("revisionId").is(rid));
+		ConcreteRevision concreteRevision = concreteRevisionDao.findOne(query);
+		ModelInfoVo modelInfo = new ModelInfoVo();
+		modelInfo.setName(concreteRevision.getName());
+		modelInfo.setPid(concreteRevision.getPid());
+		modelInfo.setApplyType(concreteRevision.getApplyType());
+		modelInfo.setRid(concreteRevision.getRevisionId());
+		modelInfo.setFileName(concreteRevision.getFileName());
+		modelInfo.setFileSize(concreteRevision.getFileSize());
+		modelInfo.setUploadDate(concreteRevision.getDate());
+		return modelInfo;
 	}
 
 	@Override
@@ -170,20 +232,38 @@ public class StreamBimServiceImpl implements BimService {
 
 	@Override
 	public ProjectTree queryModelTree(Integer rid) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		Query concreteRevisionQuery = new Query();
+		concreteRevisionQuery.addCriteria(Criteria.where("revisionId").is(rid));
+		ConcreteRevision concreteRevision = concreteRevisionDao.findOne(concreteRevisionQuery);
+		String schema = concreteRevision.getSchema();
+		PackageMetaData packageMetaData = server.getMetaDataManager().getPackageMetaData(schema);
+		
+		StreamProjectTreeGenerator generator = new StreamProjectTreeGenerator(packageMetaData, platformService, virtualObjectDao, concreteRevision);
+		generator.proccessBuild();
+		return generator.getTree();
 	}
 
 	@Override
 	public List<BuildingStorey> queryModelBuildingStorey(Integer rid) {
-		// TODO Auto-generated method stub
-		return null;
+		Query concreteRevisionQuery = new Query();
+		concreteRevisionQuery.addCriteria(Criteria.where("revisionId").is(rid));
+		ConcreteRevision concreteRevision = concreteRevisionDao.findOne(concreteRevisionQuery);
+		String schema = concreteRevision.getSchema();
+		PackageMetaData packageMetaData = server.getMetaDataManager().getPackageMetaData(schema);
+		StreamBuildingStoreyGenerator generator = new StreamBuildingStoreyGenerator(packageMetaData, platformService, virtualObjectDao, concreteRevision);
+		return generator.proccessBuild();
 	}
 
 	@Override
 	public List<BuildingCellContainer> queryBuildingCells(Integer rid) {
-		// TODO Auto-generated method stub
-		return null;
+		Query concreteRevisionQuery = new Query();
+		concreteRevisionQuery.addCriteria(Criteria.where("revisionId").is(rid));
+		ConcreteRevision concreteRevision = concreteRevisionDao.findOne(concreteRevisionQuery);
+		String schema = concreteRevision.getSchema();
+		PackageMetaData packageMetaData = server.getMetaDataManager().getPackageMetaData(schema);
+		StreamBuildingCellGenerator generator = new StreamBuildingCellGenerator(packageMetaData, platformService, virtualObjectDao, concreteRevision);
+		return generator.proccessBuild();
 	}
 
 	@Override
@@ -298,7 +378,7 @@ public class StreamBimServiceImpl implements BimService {
 		for (VirtualObject referencedObject : cache.values()) {
 			platformService.updateBatch(referencedObject);
 		}
-		platformService.commitUpdateBatch();
+		platformService.commitAllBatch();
 	}
 
 	private void fixInverses(PackageMetaData packageMetaData, Integer rid, Map<Long, VirtualObject> cache,

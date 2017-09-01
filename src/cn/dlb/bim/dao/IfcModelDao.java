@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.util.CloseableIterator;
 
+import cn.dlb.bim.dao.entity.ConcreteRevision;
 import cn.dlb.bim.dao.entity.IdEObjectEntity;
 import cn.dlb.bim.dao.entity.IfcModelEntity;
 import cn.dlb.bim.dao.entity.ModelLabel;
@@ -35,9 +36,10 @@ public interface IfcModelDao {
 	public CloseableIterator<VirtualObject> streamVirtualObjectByRid(Integer rid);
 	public CloseableIterator<VirtualObject> streamVirtualObject(Integer rid, Short cid);
 	
-	public void saveIfcHeader(IfcHeader ifcHeader);
-	public IfcHeader queryIfcHeader(Integer rid);
 	public VirtualObject queryVirtualObject(Integer rid, Long oid);
 	public void updateVirtualObject(VirtualObject virtualObject);
 	public int updateAllVirtualObject(List<VirtualObject> virtualObjects);
+	
+	public void saveConcreteRevision(ConcreteRevision concreteRevision);
+	public ConcreteRevision queryConcreteRevisionByRid(Integer rid);
 }

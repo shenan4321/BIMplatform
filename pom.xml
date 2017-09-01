@@ -22,7 +22,6 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
-
 	<build>
 		<finalName>BIMplatform</finalName>
 		<sourceDirectory>src</sourceDirectory>
@@ -302,6 +301,14 @@
 			<version>2.4.2</version>
 		</dependency>
 		<!-- apache 池化对象支持 end -->
+
+		<!-- memcached 支持 -->
+		<dependency>
+			<groupId>com.googlecode.xmemcached</groupId>
+			<artifactId>xmemcached</artifactId>
+			<version>1.4.0</version>
+		</dependency>
+		<!-- memcached 支持 end -->
 
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>

@@ -131,7 +131,6 @@ public abstract class IfcStepStreamingSerializer
 		this.objectProvider = objectProvider;
 		this.ifcHeader = ifcHeader;
 		this.packageMetaData = packageMetaData;
-		headerSchema = ifcHeader.getIfcSchemaVersion();
 	}
 
 	public void writeToOutputStream(OutputStream outputStream) throws SerializerException, DatabaseException {
@@ -192,8 +191,8 @@ public abstract class IfcStepStreamingSerializer
 					+ ifcHeader.getPreProcessorVersion() + "', '" + ifcHeader.getOriginatingSystem() + "', '"
 					+ ifcHeader.getAuthorization() + "');");
 
-			// println("FILE_SCHEMA (('" + ifcHeader.getIfcSchemaVersion() + "'));");
-			println("FILE_SCHEMA (('" + headerSchema + "'));");
+			println("FILE_SCHEMA (('" + ifcHeader.getIfcSchemaVersion() + "'));");
+//			println("FILE_SCHEMA (('" + headerSchema + "'));");
 		}
 		println("ENDSEC;");
 		println("DATA;");

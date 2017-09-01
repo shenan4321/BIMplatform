@@ -9,6 +9,7 @@ import javax.servlet.ServletContext;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import cn.dlb.bim.utils.PathUtils;
@@ -22,6 +23,7 @@ public class PlatformServerConfig implements InitializingBean {
 	public final static String PLATFORM_VERSION = "0.1";
 	
 	@Autowired
+	@Lazy(true)
 	private ServletContext servletContext;
 	
 	private Path tempDir;

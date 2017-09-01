@@ -26,7 +26,6 @@ import cn.dlb.bim.service.BimService;
 public class RecordSearchManager {
 	
 	@Autowired
-	@Qualifier("BimServiceImpl")
 	private BimService bimService;
 	@Autowired
 	private PlatformServerConfig platformServerConfig;

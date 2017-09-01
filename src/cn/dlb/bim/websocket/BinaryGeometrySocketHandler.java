@@ -5,28 +5,29 @@ import java.util.ArrayList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 
-import cn.dlb.bim.action.BinaryGeometryAction;
+import cn.dlb.bim.action.BinaryGeometryQueryAction;
 import cn.dlb.bim.component.PlatformServer;
 import cn.dlb.bim.service.BimService;
 
+@Component("BinaryGeometrySocketHandler")
 public class BinaryGeometrySocketHandler implements WebSocketHandler {
 	private static final Logger logger = LoggerFactory.getLogger(BinaryGeometrySocketHandler.class);  
     
     private static final ArrayList<WebSocketSession> users = new ArrayList<WebSocketSession>();  
-    private final PlatformServer server;
-    private final BimService bimService;
+    @Autowired
+    private PlatformServer server;
+    @Autowired
+    private BimService bimService;
     
-    public BinaryGeometrySocketHandler(PlatformServer server, BimService bimService) {
-    	this.server = server;
-		this.bimService = bimService;
-	}
-  
     /** 
      * after connection establish 
      */  
@@ -35,7 +36,7 @@ public class BinaryGeometrySocketHandler implements WebSocketHandler {
         users.add(session);  
         String rid = session.getAttributes().get("rid").toString();
         Integer ridInt = Integer.valueOf(rid);
-        BinaryGeometryAction action = new BinaryGeometryAction(bimService, ridInt, session);
+        BinaryGeometryQueryAction action = new BinaryGeometryQueryAction(bimService, ridInt, session);
         server.getLongActionManager().startLongAction(action);
     }  
   

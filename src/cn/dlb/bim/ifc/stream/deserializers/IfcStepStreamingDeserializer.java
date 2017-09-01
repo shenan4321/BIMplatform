@@ -220,13 +220,12 @@ public class IfcStepStreamingDeserializer implements StreamingDeserializer {
 			}
 			if (line.equals("DATA;")) {
 				mode = Mode.DATA;
-				platformService.saveIfcHeader(ifcHeader);
 			}
 			break;
 		case DATA:
 			if (line.equals("ENDSEC;")) {
 				mode = Mode.FOOTER;
-				platformService.commitSaveBatch();
+				platformService.commitAllBatch();
 				try {
 					waitingList.dumpIfNotEmpty();
 				} catch (WaitingListException e) {

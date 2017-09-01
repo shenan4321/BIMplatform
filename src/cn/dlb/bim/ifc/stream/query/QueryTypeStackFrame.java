@@ -36,7 +36,9 @@ public class QueryTypeStackFrame extends DatabaseReadingStackFrame implements Ob
 	
 	@Override
 	boolean process() throws DatabaseException, QueryException, JsonParseException, JsonMappingException, IOException {
-		
+		if (!iterator.hasNext()) {
+			return true;
+		}
 		currentObject = iterator.next();
 		decideUseForSerialization(currentObject);
 		

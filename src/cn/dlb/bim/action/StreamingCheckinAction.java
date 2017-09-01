@@ -4,28 +4,31 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EReference;
 import org.springframework.data.util.CloseableIterator;
 import org.springframework.web.socket.WebSocketSession;
+
 import cn.dlb.bim.component.PlatformServer;
+import cn.dlb.bim.dao.entity.ConcreteRevision;
 import cn.dlb.bim.ifc.database.DatabaseException;
 import cn.dlb.bim.ifc.deserializers.DeserializeException;
 import cn.dlb.bim.ifc.deserializers.StepParser;
 import cn.dlb.bim.ifc.emf.IfcModelInterfaceException;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
 import cn.dlb.bim.ifc.emf.Schema;
+import cn.dlb.bim.ifc.engine.cells.GenerateGeometryResult;
 import cn.dlb.bim.ifc.stream.GeometryGeneratingException;
 import cn.dlb.bim.ifc.stream.StreamingGeometryGenerator;
 import cn.dlb.bim.ifc.stream.VirtualObject;
 import cn.dlb.bim.ifc.stream.deserializers.IfcStepStreamingDeserializer;
 import cn.dlb.bim.ifc.stream.query.QueryContext;
 import cn.dlb.bim.service.PlatformService;
+import cn.dlb.bim.vo.Vector3f;
 
 public class StreamingCheckinAction extends LongAction {
 
@@ -35,13 +38,15 @@ public class StreamingCheckinAction extends LongAction {
 	private final File ifcFile;
 	private final PlatformServer server;
 	private final PlatformService platformService;
+	private final ConcreteRevision concreteRevision;
 
 	public StreamingCheckinAction(WebSocketSession webSocketSession, File ifcFile, PlatformServer server,
-			PlatformService platformService) {
+			PlatformService platformService, ConcreteRevision concreteRevision) {
 		super(webSocketSession);
 		this.ifcFile = ifcFile;
 		this.server = server;
 		this.platformService = platformService;
+		this.concreteRevision = concreteRevision;
 	}
 
 	@Override
@@ -67,10 +72,20 @@ public class StreamingCheckinAction extends LongAction {
 		Integer rid = deserializer.getRid();
 		fixInverses(packageMetaData, rid);
 		
-		StreamingGeometryGenerator generator = new StreamingGeometryGenerator(server, platformService, rid);
+		StreamingGeometryGenerator generator = new StreamingGeometryGenerator(server, platformService, rid, concreteRevision.getIfcHeader());
 		QueryContext queryContext = new QueryContext(platformService, packageMetaData, rid);
 		try {
-			generator.generateGeometry(queryContext);
+			GenerateGeometryResult result = generator.generateGeometry(queryContext);
+			Double maxX = result.getMaxBoundsAsVector3f().getX();
+			Double maxY = result.getMaxBoundsAsVector3f().getY();
+			Double maxZ = result.getMaxBoundsAsVector3f().getZ();
+			Double minX = result.getMinBoundsAsVector3f().getX();
+			Double minY = result.getMinBoundsAsVector3f().getY();
+			Double minZ = result.getMinBoundsAsVector3f().getZ();
+			Vector3f maxBound = new Vector3f(maxX, maxY, maxZ);
+			Vector3f minBound = new Vector3f(minX, minY, minZ);
+			concreteRevision.setMaxBounds(maxBound);
+			concreteRevision.setMinBounds(minBound);
 		} catch (GeometryGeneratingException e) {
 			e.printStackTrace();
 		}
@@ -105,7 +120,7 @@ public class StreamingCheckinAction extends LongAction {
 		for (VirtualObject referencedObject : cache.values()) {
 			platformService.updateBatch(referencedObject);
 		}
-		platformService.commitUpdateBatch();
+		platformService.commitAllBatch();
 	}
 
 	private void fixInverses(PackageMetaData packageMetaData, Integer rid, Map<Long, VirtualObject> cache,

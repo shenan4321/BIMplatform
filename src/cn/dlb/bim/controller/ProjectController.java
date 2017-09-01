@@ -1,12 +1,9 @@
 package cn.dlb.bim.controller;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,12 +14,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
-
 import cn.dlb.bim.dao.entity.Project;
 import cn.dlb.bim.service.BimService;
 import cn.dlb.bim.service.ProjectService;
 import cn.dlb.bim.utils.IdentifyManager;
-import cn.dlb.bim.vo.ModelInfoVo;
 import cn.dlb.bim.web.ResultUtil;
 
 @Controller
@@ -34,10 +29,6 @@ public class ProjectController {
 	@Autowired
 	@Qualifier("ProjectServiceImpl")
 	private ProjectService projectService;
-	
-	@Autowired
-	@Qualifier("BimServiceImpl")
-	private BimService bimService;
 	
 	@RequestMapping(value = "addProject", method = RequestMethod.POST)
 	@ResponseBody

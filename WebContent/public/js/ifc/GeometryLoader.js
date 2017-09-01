@@ -1,10 +1,6 @@
 function GeometryLoader() {
 	var o = this;
 	this.models = {};
-	o.library = scene.addNode({
-		id: "library",
-		type: "library"
-	});
 	o.state = {
 		nrObjectsRead: 0,
 		nrObjects: 0
@@ -22,7 +18,6 @@ function GeometryLoader() {
 		backfaces:true,
 		enable:true
 	};
-	o.library = window.scene.findNode("my-lights");
 	this.setModels = function(data){
 		o.models = data;
 	}
@@ -30,62 +25,13 @@ function GeometryLoader() {
 		return o.models;
 	}
 	this.readObject = function(data, geometryType) {
-		
-        
-		if (geometryType == 5) {
-			
-			data.align8();
-			var rid = data.readLong();
-			var oid = data.readLong();
-			//var ifcname = data.readUTF8();
-			//var material  =  Ifc.Constants.materials[ifcname] || Ifc.Constants.materials['DEFAULT'];
-			//var ifcProductOid = data.readLong();//不同的
-			
-			var modelBounds = data.readDoubleArray(6);
-			o.modelBounds = {
-				min: {x: modelBounds[0], y: modelBounds[1], z: modelBounds[2]},
-				max: {x: modelBounds[3], y: modelBounds[4], z: modelBounds[5]}
-			};
-			
-			var transformationMatrix = data.readDoubleArray(16);
-			
-			var geometryDataOid = data.readLong();
-
-			
-			data.align8();
-			var material = {r:1,b:1,g:1,a:0.6};
-			this.processGeometry(1,geometryDataOid,[geometryDataOid], material, transformationMatrix);
-		}else if(geometryType == 3){	
-			
-			data.align8();
-			var geometryDataOid = data.readLong();
-			console.log('geometryDataOid',geometryDataOid)
-			var nrParts = data.readInt();
-			data.align8();
-			var nodes = [];
-			for (var i=0; i<nrParts; i++) {
-				var coreId = data.readLong();
-				var indices = data.readShortArray((data.readInt()));
-				data.align4();
-				var vertices = data.readFloatArray((data.readInt()));
-				var normals = data.readFloatArray((data.readInt()));
-				var colors = data.readFloatArray((data.readInt()));
-				o.library.addNode({
-					coreId:'geo'+coreId,
-					type:"geometry",
-					primitive:"triangles",
-					positions: vertices,
-					indices: indices,
-					normals: normals,
-					colors:colors
-				});
-			}
-			var material = {r:1,b:1,g:1,a:0.6};
-			this.processGeometry(1,geometryDataOid, [geometryDataOid], material, transformationMatrix)
-		} else if(geometryType == 1){
-			data.align8();
-			var geometryDataOid = data.readLong();
-
+		var ifcname = data.readUTF8();
+		var material  =  Ifc.Constants.materials[ifcname] || Ifc.Constants.materials['DEFAULT'];
+		var ifcProductOid = data.readLong();//不同的
+		data.align8();
+        var transformationMatrix = data.readDoubleArray(16);
+		if (geometryType == 1) {
+			var geometryDataOid = data.readLong(); 
 			var indices = data.readShortArray((data.readInt()));
 			data.align4();
 			var IndicesForLinesWireFrame = data.readShortArray((data.readInt()));
@@ -108,8 +54,38 @@ function GeometryLoader() {
 				indices: IndicesForLinesWireFrame,
 				normals: normals
 			}]);
-			var material = {r:1,b:1,g:1,a:0.6};
-			this.processGeometry(1,geometryDataOid, [geometryDataOid], material, transformationMatrix);
+			this.processGeometry(1,ifcProductOid, [geometryDataOid], material, transformationMatrix)
+		} else if(geometryType == 2){
+			var nrParts = data.readInt();
+			data.align8();
+			var nodes = [];
+			for (var i=0; i<nrParts; i++) {
+				var coreId = data.readLong();
+				var indices = data.readShortArray((data.readInt()));
+				data.align4();
+				var vertices = data.readFloatArray((data.readInt()));
+				var normals = data.readFloatArray((data.readInt()));
+				var colors = data.readFloatArray((data.readInt()));
+				o.library.addNode({
+					type:"geometry",
+					primitive:"triangles",
+					positions: vertices,
+					indices: indices,
+					coreId:'geo'+coreId,
+					normals: normals
+				});
+			}
+		}else if(geometryType == 3){
+            var geometryDataOid = data.readLong();
+            this.processGeometry(3,ifcProductOid, [geometryDataOid], material, transformationMatrix)
+		}else{
+			var arraySize = data.readInt();
+            var coreIds = [];
+            for (var i=0;i<arraySize;i++) {
+            	var coreId = data.readLong();
+                coreIds.push(coreId)
+            }
+            this.processGeometry(4,ifcProductOid, coreIds, material, transformationMatrix);
 		}
 
 		o.state.nrObjectsRead++;
@@ -118,7 +94,6 @@ function GeometryLoader() {
 	};
 
 	this.processGeometry = function(type,ifcProductOid, coreIds, material, transformationMatrix){
-		
 		
 		var coreNodes = [];
 		var coreNodesLine = [];
@@ -138,7 +113,7 @@ function GeometryLoader() {
 		var flags = {
 			type : "flags",
 			flags : flagsObj,
-			//id : "flags"+ifcProductOid,
+			id : "flags"+ifcProductOid,
 			nodes : [{
 				type : "name",
 				name : ifcProductOid,
@@ -150,7 +125,7 @@ function GeometryLoader() {
 						baseColor:{r:material.r,g:material.g,b:material.b},
                         color:{r:material.r,g:material.g,b:material.b},
 						alpha: material.a,
-						//id: ifcProductOid+"geometry",
+						id:ifcProductOid+"geometry",
 						nodes: coreNodes
 					}]
 				}]
@@ -166,7 +141,7 @@ function GeometryLoader() {
 			}
 		}
 		
-		window.scene.findNode("my-lights").addNode(flags);
+		o.models.addNode(flags);
 		flags = null;
 	}
 
@@ -218,6 +193,12 @@ function GeometryLoader() {
 			}); 
 		}
 		o.library = scene.findNode("library");
+		if (o.library == null) {
+			o.library = scene.addNode({
+				id: "library",
+				type: "library"
+			});
+		}
 		o.state.nrObjects = data.readInt();
 		//o.step = o.state.nrObjects<100 ? 1 :~~(o.state.nrObjects/100);
 	};
@@ -227,7 +208,6 @@ function GeometryLoader() {
 		if (messageType == 0) {
 			o.readStart(inputStream);
 		}else{
-			console.log(messageType);
 			o.readObject(inputStream, messageType);
 		}
 	};

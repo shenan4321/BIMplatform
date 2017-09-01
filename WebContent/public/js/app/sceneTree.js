@@ -34,14 +34,16 @@ myApp.controller('myAppCtrl', function ($scope, $http) {
 	
 	$http.get('./model/queryModelAndOutputTemplateMap.do?rid='+string).success(function (data,status) {
     	$scope.majorTypedata = data.data;
-    	$scope.majorTypedata.indexNow = 0; //当前是第几个专业
-    	if(data.data.length!=0){
-    		var luopanData = [];
-	    	$http.get('./model/queryOutputTemplate.do?rid='+string+'&otid='+$scope.majorTypedata[$scope.majorTypedata.indexNow].otid).success(function (res) {
-				$scope.majorTypedata[$scope.majorTypedata.indexNow].ifcTypeSelectorMap = res.data.ifcTypeSelectorMap;
-				checkTree();
-			});
-	    	luopanBox = $.luopan({data:formatterMajorToLuoPan($scope.majorTypedata)});
+    	if(data.data){
+	    	$scope.majorTypedata.indexNow = 0; //当前是第几个专业
+	    	if(data.data.length!=0){
+	    		var luopanData = [];
+		    	$http.get('./model/queryOutputTemplate.do?rid='+string+'&otid='+$scope.majorTypedata[$scope.majorTypedata.indexNow].otid).success(function (res) {
+					$scope.majorTypedata[$scope.majorTypedata.indexNow].ifcTypeSelectorMap = res.data.ifcTypeSelectorMap;
+					checkTree();
+				});
+		    	luopanBox = $.luopan({data:formatterMajorToLuoPan($scope.majorTypedata)});
+	    	}
     	}
     });
 	

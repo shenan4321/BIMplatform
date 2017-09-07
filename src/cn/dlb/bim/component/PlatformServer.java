@@ -36,8 +36,6 @@ public class PlatformServer implements InitializingBean {
 	@Autowired
 	private MongoGridFs mongoGridFs;
 	@Autowired
-	private LongActionManager longActionManager;
-	@Autowired
 	private PlatformServerConfig platformServerConfig;
 	
 	@Override
@@ -68,10 +66,6 @@ public class PlatformServer implements InitializingBean {
 
 	public MongoGridFs getMongoGridFs() {
 		return mongoGridFs;
-	}
-
-	public LongActionManager getLongActionManager() {
-		return longActionManager;
 	}
 
 	public ColladaCacheManager getColladaCacheManager() {

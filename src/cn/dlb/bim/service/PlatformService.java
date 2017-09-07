@@ -16,7 +16,6 @@ public interface PlatformService extends OidProvider {
 	public EClass getEClassForCid(short cid);
 	public EClass getEClassForOid(long oid) throws DatabaseException;
 	public Integer newRevisionId();
-	public void syncOid();
 	void save(VirtualObject virtualObject);
 	public void saveBatch(VirtualObject virtualObject);
 //	public void commitSaveBatch();

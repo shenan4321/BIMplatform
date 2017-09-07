@@ -37,7 +37,7 @@ public class BinaryGeometryTemplateSocketHandler implements WebSocketHandler {
         String rid = session.getAttributes().get("rid").toString();
         String otid = session.getAttributes().get("otid").toString();
         BinaryGeometryOutputTemplateAction action = new BinaryGeometryOutputTemplateAction(bimService, Integer.valueOf(rid), Long.valueOf(otid), session);
-        server.getLongActionManager().startLongAction(action);
+        action.execute();
     }  
   
     /** 

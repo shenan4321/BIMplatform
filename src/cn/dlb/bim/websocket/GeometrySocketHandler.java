@@ -38,8 +38,7 @@ public class GeometrySocketHandler implements WebSocketHandler {
 		logger.info("connect success...");
 		String rid = session.getAttributes().get("rid").toString();
 		JsonGeometryQueryAction longAction = new JsonGeometryQueryAction(bimService, Integer.valueOf(rid), session);
-		server.getLongActionManager().startLongAction(longAction);
-
+		longAction.execute();
 	}
 
 	/**

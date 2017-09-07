@@ -37,7 +37,7 @@ public class BinaryGeometrySocketHandler implements WebSocketHandler {
         String rid = session.getAttributes().get("rid").toString();
         Integer ridInt = Integer.valueOf(rid);
         BinaryGeometryQueryAction action = new BinaryGeometryQueryAction(bimService, ridInt, session);
-        server.getLongActionManager().startLongAction(action);
+        action.execute();
     }  
   
     /** 

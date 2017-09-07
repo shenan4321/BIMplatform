@@ -9,7 +9,6 @@ public class CatalogIfc {
 	@Id
 	private Short cid;
 	private String packageClassName;
-	private Long oid;
 	
 	public Short getCid() {
 		return cid;
@@ -22,12 +21,6 @@ public class CatalogIfc {
 	}
 	public void setPackageClassName(String packageClassName) {
 		this.packageClassName = packageClassName;
-	}
-	public Long getOid() {
-		return oid;
-	}
-	public void setOid(Long oid) {
-		this.oid = oid;
 	}
 	
 }

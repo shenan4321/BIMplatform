@@ -50,7 +50,6 @@ public class PlatformServiceImpl implements InitializingBean, PlatformService {
 	private final EClass[] cidToEclass;
 	private final Map<EClass, Short> eClassToCid;
 	private final Map<EClass, AtomicLong> oidCounters;
-	private final Map<EClass, Boolean> oidChanged;
 	
 	private final BatchThreadLocal<Map<String, List<VirtualObject>>> localBatch;
 	
@@ -79,7 +78,6 @@ public class PlatformServiceImpl implements InitializingBean, PlatformService {
 		this.cidToEclass = new EClass[Short.MAX_VALUE]; 
 		this.eClassToCid = new HashMap<>();
 		this.oidCounters = new HashMap<>();
-		this.oidChanged = new HashMap<>();
 		this.localBatch = new BatchThreadLocal<>(HashMap.class);
 	}
 	
@@ -112,8 +110,7 @@ public class PlatformServiceImpl implements InitializingBean, PlatformService {
 				EClass eClass = (EClass) getEClassifier(packageName, className);
 				cidToEclass[catalogIfc.getCid()] = eClass;
 				eClassToCid.put(eClass, catalogIfc.getCid());
-				Long oid = catalogIfc.getOid();
-				oidCounters.put(eClass, new AtomicLong(oid));
+				oidCounters.put(eClass, new AtomicLong(getInitCounter(eClass)));
 			}
 		} else {
 			createClassLookupTable();
@@ -156,7 +153,6 @@ public class PlatformServiceImpl implements InitializingBean, PlatformService {
 
 	@Override
 	public long newOid(EClass eClass) {
-		oidChanged.put(eClass, true);
 		return oidCounters.get(eClass).addAndGet(65536);
 //		Short cid = getCidOfEClass(eClass);
 //		IfcClassLookupEntity ifcClassLookupEntity = platformInitDatasDao.findAndIncreateOid(cid, 65536);
@@ -174,7 +170,7 @@ public class PlatformServiceImpl implements InitializingBean, PlatformService {
     			catalogIfc.setPackageClassName(packageMetaData.getEPackage().getName() + "_" + eclass.getName());
     	    	eClassToCid.put(eclass, cidCounter);
     	    	cidToEclass[cidCounter] = eclass;
-    	    	catalogIfc.setOid(getInitCounter(eclass));
+    	    	oidCounters.put(eclass, new AtomicLong(getInitCounter(eclass)));
     	    	catalogIfcDao.save(catalogIfc);
     	    	cidCounter++;
     		}
@@ -195,23 +191,6 @@ public class PlatformServiceImpl implements InitializingBean, PlatformService {
 		update.inc("currentTopRevisionId", 1);
 		PlatformVersions platformVersions = platformVersionsDao.update(query, update);
 		return platformVersions.getCurrentTopRevisionId();
-	}
-
-	public void syncOid() {
-		for (EClass eClass : oidChanged.keySet()) {
-			CatalogIfc catalogIfc = new CatalogIfc();
-			Short cid = eClassToCid.get(eClass);
-			AtomicLong oid = oidCounters.get(eClass);
-			catalogIfc.setCid(cid);
-			catalogIfc.setOid(oid.get());
-			
-			Query query = new Query();
-			query.addCriteria(Criteria.where("cid").is(cid));
-			Update update = new Update();
-			update.set("oid", catalogIfc.getOid());
-			catalogIfcDao.update(query, update);
-		}
-		oidChanged.clear();
 	}
 
 	@Override

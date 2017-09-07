@@ -99,7 +99,6 @@ public class IfcModelDbSession extends IfcModelBinary {
 
 		ifcModelDao.insertIfcModelEntity(ifcModelEntity);
 		ifcModelDao.insertAllIdEObjectEntity(idEObjectEntityList);
-		ifcDataBase.syncOid();
 		
 		modelCacheManager.cacheModel(revisionId, model);
 	}

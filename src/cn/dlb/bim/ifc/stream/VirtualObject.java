@@ -22,7 +22,7 @@ public class VirtualObject implements MinimalVirtualObject {
 	private Integer rid;
 	@Indexed
 	private final Short eClassId;
-	private final Map<String, Object> features;
+	private final Map<Integer, Object> features;
 
 	/**
 	 * 用于标注是否序列化输出，但不影响数据库存储
@@ -62,24 +62,24 @@ public class VirtualObject implements MinimalVirtualObject {
 	}
 
 	public Object eGet(EStructuralFeature feature) {
-		return features.get(feature.getName());
+		return features.get(feature.getFeatureID());
 	}
 
 	public void eUnset(EStructuralFeature eStructuralFeature) {
-		features.remove(eStructuralFeature.getName());
+		features.remove(eStructuralFeature.getFeatureID());
 	}
 
 	public boolean eIsSet(EStructuralFeature feature) {
-		return features.containsKey(feature.getName());
+		return features.containsKey(feature.getFeatureID());
 	}
 
 	public void setReference(EStructuralFeature eStructuralFeature, Long oid) {
-		features.put(eStructuralFeature.getName(), oid);
+		features.put(eStructuralFeature.getFeatureID(), oid);
 	}
 
 	public void setAttribute(EStructuralFeature eStructuralFeature, Object value) {
 		if (value != null) {
-			features.put(eStructuralFeature.getName(), value);
+			features.put(eStructuralFeature.getFeatureID(), value);
 		}
 	}
 
@@ -97,10 +97,10 @@ public class VirtualObject implements MinimalVirtualObject {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private List getOrCreateList(EStructuralFeature structuralFeature, int minSize) {
-		List list = (List<?>) features.get(structuralFeature.getName());
+		List list = (List<?>) features.get(structuralFeature.getFeatureID());
 		if (list == null) {
 			list = new ArrayList(minSize == -1 ? 0 : minSize);
-			features.put(structuralFeature.getName(), list);
+			features.put(structuralFeature.getFeatureID(), list);
 		}
 		while (list.size() < minSize) {
 			list.add(null);
@@ -108,16 +108,18 @@ public class VirtualObject implements MinimalVirtualObject {
 		return list;
 	}
 
-	public Map<String, Object> getFeatures() {
+	public Map<Integer, Object> getFeatures() {
 		return features;
 	}
 
-	public Boolean has(String key) {
-		return features.containsKey(key);
+	public Boolean has(String featureName) {
+		EStructuralFeature feature = eClass.getEStructuralFeature(featureName);
+		return features.containsKey(feature.getFeatureID());
 	}
 
-	public Object get(String key) {
-		return features.get(key);
+	public Object get(String featureName) {
+		EStructuralFeature feature = eClass.getEStructuralFeature(featureName);
+		return features.get(feature.getFeatureID());
 	}
 	
 	@SuppressWarnings("unchecked")

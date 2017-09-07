@@ -14,7 +14,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "WrappedVirtualObject")
 public class WrappedVirtualObject implements MinimalVirtualObject {
 	private final Short eClassId;
-	private final Map<String, Object> features = new LinkedHashMap<>();
+	private final Map<Integer, Object> features = new LinkedHashMap<>();
 	
 	/**
 	 * 用于标注是否序列化输出，但不影响数据库存储
@@ -33,30 +33,32 @@ public class WrappedVirtualObject implements MinimalVirtualObject {
 	public Short getEClassId() {
 		return eClassId;
 	}
-	public Map<String, Object> getFeatures() {
+	public Map<Integer, Object> getFeatures() {
 		return features;
 	}
 	public Object eGet(EStructuralFeature feature) {
-		return features.get(feature.getName());
+		return features.get(feature.getFeatureID());
 	}
 	public void eUnset(EStructuralFeature eStructuralFeature) {
-		features.remove(eStructuralFeature.getName());
+		features.remove(eStructuralFeature.getFeatureID());
 	}
 	public boolean eIsSet(EStructuralFeature feature) {
-		return features.containsKey(feature.getName());
+		return features.containsKey(feature.getFeatureID());
 	}
 	public void setAttribute(EStructuralFeature eStructuralFeature, Object value) {
 		if (value != null) {
-			features.put(eStructuralFeature.getName(), value);
+			features.put(eStructuralFeature.getFeatureID(), value);
 		}
 	}
-	public void set(String key, Object value) {
+	public void set(String featureName, Object value) {
 		if (value != null) {
-			features.put(key, value);
+			EStructuralFeature feature = eClass.getEStructuralFeature(featureName);
+			features.put(feature.getFeatureID(), value);
 		}
 	}
-	public Object eGet(String key) {
-		return features.get(key);
+	public Object eGet(String featureName) {
+		EStructuralFeature feature = eClass.getEStructuralFeature(featureName);
+		return features.get(feature.getFeatureID());
 	}
 
 	@SuppressWarnings("unchecked")

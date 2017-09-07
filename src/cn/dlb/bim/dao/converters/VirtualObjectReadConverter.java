@@ -57,8 +57,8 @@ public class VirtualObjectReadConverter implements Converter<DBObject, VirtualOb
 			Object value = originMap.get(key);
 			if (value instanceof BasicDBObject) {
 				WrappedVirtualObject wrappedVirtualObject = convertWrappedVirtualObject((BasicDBObject) value);
-				object.getFeatures().put((String) key, wrappedVirtualObject);
-				EStructuralFeature eStructuralFeature = object.eClass().getEStructuralFeature((String) key);
+				object.getFeatures().put(Integer.valueOf((String) key), wrappedVirtualObject);
+				EStructuralFeature eStructuralFeature = object.eClass().getEStructuralFeature(Integer.valueOf((String) key));
 				object.addUseForSerialization(eStructuralFeature);
 			} else if (value instanceof List) {
 				List originList = (List) value;
@@ -67,16 +67,16 @@ public class VirtualObjectReadConverter implements Converter<DBObject, VirtualOb
 					Object originElement = originList.get(i);
 					if (originElement instanceof BasicDBObject) {
 						WrappedVirtualObject wrappedVirtualInList = convertWrappedVirtualObject((BasicDBObject) originElement);
-						EStructuralFeature eStructuralFeature = object.eClass().getEStructuralFeature((String) key);
+						EStructuralFeature eStructuralFeature = object.eClass().getEStructuralFeature(Integer.valueOf((String) key));
 						object.addUseForSerialization(eStructuralFeature);
 						newList.add(wrappedVirtualInList);
 					} else {
 						newList.add(originElement);
 					}
 				}
-				object.getFeatures().put((String) key, newList);
+				object.getFeatures().put(Integer.valueOf((String) key), newList);
 			} else {
-				object.getFeatures().put((String) key, value);
+				object.getFeatures().put(Integer.valueOf((String) key), value);
 			}
 		}
 	}

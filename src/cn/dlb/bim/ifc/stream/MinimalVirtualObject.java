@@ -15,5 +15,5 @@ public interface MinimalVirtualObject {
 	public void addUseForSerialization(EStructuralFeature eStructuralFeature);
 	public void addUseForSerialization(EStructuralFeature eStructuralFeature, int index);
 	public EClass eClass();
-	public Map<String, Object> getFeatures();
+	public Map<Integer, Object> getFeatures();
 }

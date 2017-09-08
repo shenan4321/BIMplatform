@@ -15,7 +15,7 @@ import org.springframework.web.socket.WebSocketSession;
 
 import cn.dlb.bim.component.PlatformServer;
 import cn.dlb.bim.dao.entity.ConcreteRevision;
-import cn.dlb.bim.ifc.database.DatabaseException;
+import cn.dlb.bim.database.DatabaseException;
 import cn.dlb.bim.ifc.deserializers.DeserializeException;
 import cn.dlb.bim.ifc.deserializers.StepParser;
 import cn.dlb.bim.ifc.emf.IfcModelInterfaceException;

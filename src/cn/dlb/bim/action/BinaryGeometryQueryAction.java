@@ -6,7 +6,8 @@ import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import com.google.gson.Gson;
-import cn.dlb.bim.ifc.database.DatabaseException;
+
+import cn.dlb.bim.database.DatabaseException;
 import cn.dlb.bim.ifc.emf.IfcModelInterface;
 import cn.dlb.bim.ifc.emf.IfcModelInterfaceException;
 import cn.dlb.bim.ifc.serializers.SerializerException;

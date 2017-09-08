@@ -29,10 +29,12 @@ import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.EcorePackage;
 import org.eclipse.emf.ecore.impl.EClassImpl;
 import org.eclipse.emf.ecore.impl.EEnumImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Charsets;
 
-import cn.dlb.bim.ifc.database.DatabaseException;
+import cn.dlb.bim.database.DatabaseException;
 import cn.dlb.bim.ifc.deserializers.DeserializeException;
 import cn.dlb.bim.ifc.deserializers.IfcHeaderParser;
 import cn.dlb.bim.ifc.deserializers.IfcParserWriterUtils;
@@ -44,6 +46,7 @@ import cn.dlb.bim.ifc.shared.ByteProgressReporter;
 import cn.dlb.bim.ifc.stream.VirtualObject;
 import cn.dlb.bim.ifc.stream.WrappedVirtualObject;
 import cn.dlb.bim.service.PlatformService;
+import cn.dlb.bim.service.impl.StreamBimServiceImpl;
 import cn.dlb.bim.utils.FakeClosingInputStream;
 import cn.dlb.bim.utils.StringUtils;
 import nl.tue.buildingsmart.schema.Attribute;
@@ -51,6 +54,8 @@ import nl.tue.buildingsmart.schema.EntityDefinition;
 import nl.tue.buildingsmart.schema.ExplicitAttribute;
 
 public class IfcStepStreamingDeserializer implements StreamingDeserializer {
+	private static final Logger LOGGER = LoggerFactory.getLogger(IfcStepStreamingDeserializer.class);
+	
 	private ByteProgressReporter byteProgressReporter;
 	private PackageMetaData packageMetaData;
 	private static final String WRAPPED_VALUE = "wrappedValue";

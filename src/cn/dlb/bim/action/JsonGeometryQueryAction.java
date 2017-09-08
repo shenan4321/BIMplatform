@@ -6,7 +6,8 @@ import java.util.List;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import com.google.gson.Gson;
-import cn.dlb.bim.ifc.database.DatabaseException;
+
+import cn.dlb.bim.database.DatabaseException;
 import cn.dlb.bim.ifc.emf.IfcModelInterfaceException;
 import cn.dlb.bim.ifc.shared.ProgressReporter;
 import cn.dlb.bim.service.BimService;

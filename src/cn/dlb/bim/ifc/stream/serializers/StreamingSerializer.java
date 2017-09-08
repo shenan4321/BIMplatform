@@ -20,7 +20,7 @@ package cn.dlb.bim.ifc.stream.serializers;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import cn.dlb.bim.ifc.database.DatabaseException;
+import cn.dlb.bim.database.DatabaseException;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
 import cn.dlb.bim.ifc.model.IfcHeader;
 import cn.dlb.bim.ifc.serializers.SerializerException;

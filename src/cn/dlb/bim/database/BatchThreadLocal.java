@@ -1,4 +1,4 @@
-package cn.dlb.bim.ifc.database;
+package cn.dlb.bim.database;
 
 import java.lang.reflect.Constructor;
 

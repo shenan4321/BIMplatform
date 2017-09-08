@@ -309,6 +309,14 @@
 			<version>1.4.0</version>
 		</dependency>
 		<!-- memcached 支持 end -->
+		
+		<!-- BDB 支持 -->
+		<dependency>
+			<groupId>com.sleepycat</groupId>
+			<artifactId>je</artifactId>
+			<version>7.0.6</version>
+		</dependency>
+		<!-- BDB 支持 end-->
 
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>

@@ -17,11 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import cn.dlb.bim.component.PlatformServer;
-import cn.dlb.bim.ifc.database.DatabaseException;
-import cn.dlb.bim.ifc.database.queries.JsonQueryObjectModelConverter;
-import cn.dlb.bim.ifc.database.queries.om.Query;
-import cn.dlb.bim.ifc.database.queries.om.QueryException;
-import cn.dlb.bim.ifc.database.queries.om.QueryPart;
+import cn.dlb.bim.database.DatabaseException;
 import cn.dlb.bim.ifc.emf.MetaDataManager;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
 import cn.dlb.bim.ifc.stream.VirtualObject;

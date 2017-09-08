@@ -5,7 +5,7 @@ import java.util.Map;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EStructuralFeature;
 
-import cn.dlb.bim.ifc.database.DatabaseException;
+import cn.dlb.bim.database.DatabaseException;
 
 public interface MinimalVirtualObject {
 	void setAttribute(EStructuralFeature eStructuralFeature, Object value) throws DatabaseException;

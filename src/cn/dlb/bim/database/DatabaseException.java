@@ -1,4 +1,4 @@
-package cn.dlb.bim.ifc.database;
+package cn.dlb.bim.database;
 
 public class DatabaseException extends Exception {
 

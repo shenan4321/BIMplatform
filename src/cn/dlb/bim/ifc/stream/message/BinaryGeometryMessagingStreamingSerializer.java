@@ -31,13 +31,13 @@ import org.slf4j.LoggerFactory;
 import com.google.common.io.LittleEndianDataOutputStream;
 
 import cn.dlb.bim.dao.entity.ConcreteRevision;
-import cn.dlb.bim.ifc.database.DatabaseException;
-import cn.dlb.bim.ifc.database.queries.om.QueryException;
+import cn.dlb.bim.database.DatabaseException;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
 import cn.dlb.bim.ifc.serializers.SerializerException;
 import cn.dlb.bim.ifc.shared.ProgressReporter;
 import cn.dlb.bim.ifc.stream.VirtualObject;
 import cn.dlb.bim.ifc.stream.WrappedVirtualObject;
+import cn.dlb.bim.ifc.stream.query.QueryException;
 import cn.dlb.bim.ifc.stream.serializers.ObjectProvider;
 import cn.dlb.bim.models.geometry.GeometryPackage;
 import cn.dlb.bim.vo.Vector3f;

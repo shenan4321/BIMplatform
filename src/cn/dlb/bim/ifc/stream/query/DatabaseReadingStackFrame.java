@@ -6,11 +6,7 @@ import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EStructuralFeature;
 
-import cn.dlb.bim.ifc.database.DatabaseException;
-import cn.dlb.bim.ifc.database.queries.om.CanInclude;
-import cn.dlb.bim.ifc.database.queries.om.Include;
-import cn.dlb.bim.ifc.database.queries.om.QueryException;
-import cn.dlb.bim.ifc.database.queries.om.QueryPart;
+import cn.dlb.bim.database.DatabaseException;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
 import cn.dlb.bim.ifc.stream.VirtualObject;
 

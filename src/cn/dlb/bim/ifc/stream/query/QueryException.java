@@ -1,4 +1,4 @@
-package cn.dlb.bim.ifc.database.queries.om;
+package cn.dlb.bim.ifc.stream.query;
 
 public class QueryException extends Exception {
 

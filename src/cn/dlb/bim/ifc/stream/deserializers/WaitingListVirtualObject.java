@@ -28,7 +28,7 @@ import org.eclipse.emf.ecore.EClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cn.dlb.bim.ifc.database.DatabaseException;
+import cn.dlb.bim.database.DatabaseException;
 import cn.dlb.bim.ifc.deserializers.DeserializeException;
 import cn.dlb.bim.ifc.stream.VirtualObject;
 import cn.dlb.bim.service.PlatformService;

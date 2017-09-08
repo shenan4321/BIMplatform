@@ -1,4 +1,4 @@
-package cn.dlb.bim.ifc.database.queries.om;
+package cn.dlb.bim.ifc.stream.query;
 
 import cn.dlb.bim.ifc.engine.cells.AxisAlignedBoundingBox;
 

@@ -6,7 +6,7 @@ import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EClassifier;
 import org.springframework.data.util.CloseableIterator;
 
-import cn.dlb.bim.ifc.database.DatabaseException;
+import cn.dlb.bim.database.DatabaseException;
 import cn.dlb.bim.ifc.emf.OidProvider;
 import cn.dlb.bim.ifc.stream.VirtualObject;
 

@@ -1,4 +1,4 @@
-package cn.dlb.bim.ifc.database.queries;
+package cn.dlb.bim.ifc.stream.query;
 
 import java.io.IOException;
 import java.net.URL;
@@ -19,12 +19,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import cn.dlb.bim.ifc.database.queries.om.CanInclude;
-import cn.dlb.bim.ifc.database.queries.om.InBoundingBox;
-import cn.dlb.bim.ifc.database.queries.om.Include;
-import cn.dlb.bim.ifc.database.queries.om.Query;
-import cn.dlb.bim.ifc.database.queries.om.QueryException;
-import cn.dlb.bim.ifc.database.queries.om.QueryPart;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
 
 public class JsonQueryObjectModelConverter {

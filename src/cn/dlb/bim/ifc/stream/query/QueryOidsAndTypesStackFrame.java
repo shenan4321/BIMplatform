@@ -5,9 +5,7 @@ import java.util.List;
 
 import org.eclipse.emf.ecore.EClass;
 
-import cn.dlb.bim.ifc.database.DatabaseException;
-import cn.dlb.bim.ifc.database.queries.om.QueryException;
-import cn.dlb.bim.ifc.database.queries.om.QueryPart;
+import cn.dlb.bim.database.DatabaseException;
 
 public class QueryOidsAndTypesStackFrame extends DatabaseReadingStackFrame implements ObjectProvidingStackFrame {
 

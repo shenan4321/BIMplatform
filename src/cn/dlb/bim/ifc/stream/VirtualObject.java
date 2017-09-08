@@ -14,12 +14,21 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.sleepycat.persist.model.Entity;
+import com.sleepycat.persist.model.PrimaryKey;
+import com.sleepycat.persist.model.Relationship;
+import com.sleepycat.persist.model.SecondaryKey;
+
+@Entity
 @Document(collection = "VirtualObject")
 public class VirtualObject implements MinimalVirtualObject {
+	@PrimaryKey
 	@Indexed
 	private Long oid;
+	@SecondaryKey(relate = Relationship.MANY_TO_ONE)
 	@Indexed
 	private Integer rid;
+	@SecondaryKey(relate = Relationship.MANY_TO_ONE)
 	@Indexed
 	private final Short eClassId;
 	private final Map<Integer, Object> features;

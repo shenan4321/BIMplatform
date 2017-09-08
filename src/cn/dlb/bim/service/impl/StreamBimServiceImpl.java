@@ -12,6 +12,8 @@ import java.util.Map;
 
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EReference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -23,7 +25,7 @@ import cn.dlb.bim.component.PlatformServer;
 import cn.dlb.bim.dao.BaseMongoDao;
 import cn.dlb.bim.dao.VirtualObjectDao;
 import cn.dlb.bim.dao.entity.ConcreteRevision;
-import cn.dlb.bim.ifc.database.DatabaseException;
+import cn.dlb.bim.database.DatabaseException;
 import cn.dlb.bim.ifc.deserializers.DeserializeException;
 import cn.dlb.bim.ifc.deserializers.StepParser;
 import cn.dlb.bim.ifc.emf.IfcModelInterface;
@@ -56,6 +58,8 @@ import cn.dlb.bim.vo.Vector3f;
 
 @Service("StreamBimServiceImpl")
 public class StreamBimServiceImpl implements BimService {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(StreamBimServiceImpl.class);
 
 	private static String IFC2X3_SCHEMA_SHORT = "IFC2X3";
 	private static String IFC4_SCHEMA_SHORT = "IFC4";
@@ -99,17 +103,35 @@ public class StreamBimServiceImpl implements BimService {
 			
 			concreteRevision.setSchema(schema.getEPackageName());
 
+			Long start = System.nanoTime();
+			LOGGER.info("Deserialising ifc file...");
+			
 			PackageMetaData packageMetaData = server.getMetaDataManager().getPackageMetaData(schema.getEPackageName());
 			deserializer.init(packageMetaData, platformService);
 			deserializer.read(modelFile);
 			
+			Long end = System.nanoTime();
+			LOGGER.info("Deserialise spend time: " + ((end - start) / 1000000) + "ms.");
+			
+			
+			start = System.nanoTime();
+			LOGGER.info("Start fix inverses...");
 			rid = deserializer.getRid();
 			fixInverses(packageMetaData, rid);
+			end = System.nanoTime();
+			LOGGER.info("Fix inverses spend time: " + ((end - start) / 1000000) + "ms.");
+			
 			concreteRevision.setRevisionId(rid);
-
+			
+			start = System.nanoTime();
+			LOGGER.info("Generate geometry...");
+			
 			StreamingGeometryGenerator generator = new StreamingGeometryGenerator(server, platformService, rid, deserializer.getIfcHeader());
 			QueryContext queryContext = new QueryContext(platformService, packageMetaData, rid);
 			GenerateGeometryResult result = generator.generateGeometry(queryContext);
+			
+			end = System.nanoTime();
+			LOGGER.info("Generate spend time: " + ((end - start) / 1000000) + "ms.");
 			
 			Double maxX = result.getMaxBoundsAsVector3f().getX();
 			Double maxY = result.getMaxBoundsAsVector3f().getY();
@@ -125,6 +147,8 @@ public class StreamBimServiceImpl implements BimService {
 			concreteRevision.setIfcHeader(deserializer.getIfcHeader());
 			
 			concreteRevisionDao.save(concreteRevision);
+			
+			LOGGER.info("Add revision over.");
 			
 		} catch (GeometryGeneratingException e) {
 			e.printStackTrace();
@@ -352,6 +376,7 @@ public class StreamBimServiceImpl implements BimService {
 
 	@SuppressWarnings({ "unchecked", "unused" })
 	private void fixInverses(PackageMetaData packageMetaData, Integer rid) throws DatabaseException {
+		
 		Map<Long, VirtualObject> cache = new HashMap<Long, VirtualObject>();
 
 		CloseableIterator<VirtualObject> objectIterator = platformService.streamVirtualObjectByRid(rid);

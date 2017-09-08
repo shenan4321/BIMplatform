@@ -2,8 +2,7 @@ package cn.dlb.bim.ifc.stream.query;
 
 import java.io.IOException;
 
-import cn.dlb.bim.ifc.database.DatabaseException;
-import cn.dlb.bim.ifc.database.queries.om.QueryException;
+import cn.dlb.bim.database.DatabaseException;
 import cn.dlb.bim.ifc.stream.VirtualObject;
 import cn.dlb.bim.ifc.stream.serializers.ObjectProvider;
 

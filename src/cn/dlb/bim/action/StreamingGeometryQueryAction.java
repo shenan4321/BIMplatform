@@ -12,18 +12,18 @@ import com.google.gson.Gson;
 
 import cn.dlb.bim.component.PlatformServer;
 import cn.dlb.bim.dao.entity.ConcreteRevision;
-import cn.dlb.bim.ifc.database.DatabaseException;
-import cn.dlb.bim.ifc.database.queries.om.Include;
-import cn.dlb.bim.ifc.database.queries.om.Query;
-import cn.dlb.bim.ifc.database.queries.om.QueryException;
-import cn.dlb.bim.ifc.database.queries.om.QueryPart;
+import cn.dlb.bim.database.DatabaseException;
 import cn.dlb.bim.ifc.emf.IfcModelInterfaceException;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
 import cn.dlb.bim.ifc.serializers.SerializerException;
 import cn.dlb.bim.ifc.shared.ProgressReporter;
 import cn.dlb.bim.ifc.stream.message.BinaryGeometryMessagingStreamingSerializer;
+import cn.dlb.bim.ifc.stream.query.Include;
+import cn.dlb.bim.ifc.stream.query.Query;
 import cn.dlb.bim.ifc.stream.query.QueryContext;
+import cn.dlb.bim.ifc.stream.query.QueryException;
 import cn.dlb.bim.ifc.stream.query.QueryObjectProvider;
+import cn.dlb.bim.ifc.stream.query.QueryPart;
 import cn.dlb.bim.vo.ProgressVo;
 
 public class StreamingGeometryQueryAction extends LongAction {

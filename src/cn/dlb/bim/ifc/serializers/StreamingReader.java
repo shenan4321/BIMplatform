@@ -2,7 +2,7 @@ package cn.dlb.bim.ifc.serializers;
 
 import java.io.OutputStream;
 
-import cn.dlb.bim.ifc.database.DatabaseException;
+import cn.dlb.bim.database.DatabaseException;
 
 public interface StreamingReader {
 

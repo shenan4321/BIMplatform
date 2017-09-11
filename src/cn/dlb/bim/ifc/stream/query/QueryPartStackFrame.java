@@ -37,7 +37,7 @@ public class QueryPartStackFrame extends StackFrame {
 			Iterator<Long> iterator = oidsList.iterator();
 			while (iterator.hasNext()) {
 				long oid = iterator.next();
-				EClass eClass = queryObjectProvider.getPlatformService().getEClassForOid(oid);
+				EClass eClass = queryObjectProvider.getPlatformService().getEClassForOid(oid, reusable.getRid());
 				List<Long> list = this.oids.get(eClass);
 				if (list == null) {
 					list = new ArrayList<Long>();

@@ -142,7 +142,7 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 					ObjectProviderProxy proxy = new ObjectProviderProxy(objectProvider, new ObjectListener() {
 						@Override
 						public void newObject(VirtualObject next) {
-							EClass nextEclass = platformService.getEClassForCid(next.getEClassId());
+							EClass nextEclass = next.eClass();
 							if (eClass.isSuperTypeOf(nextEclass)) {
 								if (next.eGet(representationFeature) != null) {
 									objects.add(next);
@@ -194,7 +194,7 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 											Short geometryInfoCid = platformService
 													.getCidOfEClass(GeometryPackage.eINSTANCE.getGeometryInfo());
 											Long geometryInfoOid = platformService
-													.newOid(GeometryPackage.eINSTANCE.getGeometryInfo());
+													.newOid(GeometryPackage.eINSTANCE.getGeometryInfo(), rid);
 											VirtualObject geometryInfo = new VirtualObject(rid, geometryInfoCid,
 													geometryInfoOid, GeometryPackage.eINSTANCE.getGeometryInfo());
 
@@ -227,7 +227,7 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 											Short geometryDataCid = platformService
 													.getCidOfEClass(GeometryPackage.eINSTANCE.getGeometryData());
 											Long geometryDataOid = platformService
-													.newOid(GeometryPackage.eINSTANCE.getGeometryData());
+													.newOid(GeometryPackage.eINSTANCE.getGeometryData(), rid);
 											VirtualObject geometryData = new VirtualObject(rid, geometryDataCid,
 													geometryDataOid, GeometryPackage.eINSTANCE.getGeometryData());
 
@@ -384,8 +384,7 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 										// }
 										// }
 										if (!ignoreNotFound) {
-											EClass productEClass = platformService
-													.getEClassForCid(ifcProduct.getEClassId());
+											EClass productEClass = ifcProduct.eClass();
 											LOGGER.warn("Entity not found " + productEClass.getName() + " "
 													+ (expressId) + "/" + ifcProduct.getOid());
 										}
@@ -469,7 +468,7 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 				CloseableIterator<VirtualObject> iterator = platformService.streamVirtualObject(rid, cid);
 				while (iterator.hasNext()) {
 					VirtualObject next = iterator.next();
-					if (next != null && platformService.getEClassForCid(next.getEClassId()) == eClass) {
+					if (next != null && next.eClass() == eClass) {
 						EStructuralFeature feature = eClass.getEStructuralFeature("Representation");
 						Object featureObject = next.eGet(feature);
 						if (featureObject != null) {
@@ -494,7 +493,7 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 								queryPart.addOid(next.getOid());
 								while (iterator.hasNext() && x < maxObjectsPerFile - 1) {
 									next = iterator.next();
-									if (next != null && platformService.getEClassForCid(next.getEClassId()) == eClass) {
+									if (next != null && next.eClass() == eClass) {
 										Object representationRefObject = next.eGet(representationFeature);
 										
 										if (representationRefObject != null) {
@@ -605,7 +604,7 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 		QueryPart queryPart = query.createQueryPart();
 		queryPart.addOid(next.getOid());
 		Include include = queryPart.createInclude();
-		EClass nextEClass = platformService.getEClassForCid(next.getEClassId());
+		EClass nextEClass = next.eClass();
 		include.addType(nextEClass, false);
 		include.addField("Representation");
 		Include representations = include.createInclude();
@@ -618,7 +617,7 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 		try {
 			VirtualObject next2 = queryObjectProvider.next();
 			while (next2 != null) {
-				EClass next2EClass = platformService.getEClassForCid(next2.getEClassId());
+				EClass next2EClass = next2.eClass();
 				if (packageMetaData.getEClass("IfcRepresentationItem").isSuperTypeOf(next2EClass)) {
 					result.add(next2.getOid());
 				}

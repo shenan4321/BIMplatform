@@ -23,7 +23,6 @@ public class VirtualObjectDaoImpl extends AbstractBaseMongoDao<VirtualObject> im
 	}
 
 	@Override
-	@Cacheable(value="virtualObject")  
 	public VirtualObject findOneByRidAndOid(Integer rid, Long oid) {
 		Query query = new Query();
 		query.addCriteria(Criteria.where("oid").is(oid).andOperator(Criteria.where("rid").is(rid)));

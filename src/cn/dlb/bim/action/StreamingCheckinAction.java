@@ -100,9 +100,8 @@ public class StreamingCheckinAction extends LongAction {
 
 		while (objectIterator.hasNext()) {
 			VirtualObject next = objectIterator.next();
-			EClass eclass = platformService.getEClassForCid(next.getEClassId());
-			if (packageMetaData.hasInverses(eclass)) {
-				for (EReference eReference : packageMetaData.getAllHasInverseReferences(eclass)) {
+			if (packageMetaData.hasInverses(next.eClass())) {
+				for (EReference eReference : packageMetaData.getAllHasInverseReferences(next.eClass())) {
 					Object reference = next.eGet(eReference);
 					if (reference != null) {
 						if (eReference.isMany()) {
@@ -129,9 +128,8 @@ public class StreamingCheckinAction extends LongAction {
 		if (referencedObject == null) {
 			referencedObject = platformService.queryVirtualObject(rid, refOid);
 			if (referencedObject == null) {
-				EClass eclass = platformService.getEClassForCid(next.getEClassId());
 				throw new DatabaseException("Referenced object with oid " + refOid + ", referenced from "
-						+ eclass.getName() + " not found");
+						+ next.eClass().getName() + " not found");
 			}
 			cache.put(refOid, referencedObject);
 		}

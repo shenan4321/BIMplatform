@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EClassifier;
@@ -16,7 +16,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.CriteriaDefinition;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.data.util.CloseableIterator;
@@ -49,7 +48,7 @@ public class PlatformServiceImpl implements InitializingBean, PlatformService {
 	
 	private final EClass[] cidToEclass;
 	private final Map<EClass, Short> eClassToCid;
-	private final Map<EClass, AtomicLong> oidCounters;
+	private final Map<EClass, AtomicInteger> oidCounters;
 	
 	private final BatchThreadLocal<Map<String, List<VirtualObject>>> localBatch;
 	
@@ -81,10 +80,10 @@ public class PlatformServiceImpl implements InitializingBean, PlatformService {
 		this.localBatch = new BatchThreadLocal<>(HashMap.class);
 	}
 	
-	private Long getInitCounter(EClass eClass) {
-		ByteBuffer cidBuffer = ByteBuffer.wrap(new byte[8]);
-		cidBuffer.putShort(6, getCidOfEClass(eClass));
-		long startOid = cidBuffer.getLong(0);
+	private Integer getInitCounter(EClass eClass) {
+		ByteBuffer cidBuffer = ByteBuffer.wrap(new byte[4]);
+		cidBuffer.putShort(2, getCidOfEClass(eClass));
+		Integer startOid = cidBuffer.getInt(0);
 		return startOid;
 	}
 	
@@ -110,7 +109,7 @@ public class PlatformServiceImpl implements InitializingBean, PlatformService {
 				EClass eClass = (EClass) getEClassifier(packageName, className);
 				cidToEclass[catalogIfc.getCid()] = eClass;
 				eClassToCid.put(eClass, catalogIfc.getCid());
-				oidCounters.put(eClass, new AtomicLong(getInitCounter(eClass)));
+				oidCounters.put(eClass, new AtomicInteger(getInitCounter(eClass)));
 			}
 		} else {
 			createClassLookupTable();
@@ -142,8 +141,8 @@ public class PlatformServiceImpl implements InitializingBean, PlatformService {
 		return cidToEclass[cid];
 	}
 	
-	public EClass getEClassForOid(long oid) throws DatabaseException {
-		short cid = (short)oid;
+	public EClass getEClassForOid(long oid, Integer rid) throws DatabaseException {
+		short cid = (short)(((int) oid) ^ rid); 
 		EClass eClass = getEClassForCid(cid);
 		if (eClass == null) {
 			throw new DatabaseException("No class for cid " + cid + " (cid came from oid: " + oid  + ")");
@@ -152,11 +151,9 @@ public class PlatformServiceImpl implements InitializingBean, PlatformService {
 	}
 
 	@Override
-	public long newOid(EClass eClass) {
-		return oidCounters.get(eClass).addAndGet(65536);
-//		Short cid = getCidOfEClass(eClass);
-//		IfcClassLookupEntity ifcClassLookupEntity = platformInitDatasDao.findAndIncreateOid(cid, 65536);
-//		return ifcClassLookupEntity.getOid();
+	public long newOid(EClass eClass, Integer rid) {
+		Short cid = getCidOfEClass(eClass);
+		return (cid ^ rid) + (((long) oidCounters.get(eClass).incrementAndGet()) << 32);
 	}
 	
 	public void createClassLookupTable() {
@@ -170,7 +167,7 @@ public class PlatformServiceImpl implements InitializingBean, PlatformService {
     			catalogIfc.setPackageClassName(packageMetaData.getEPackage().getName() + "_" + eclass.getName());
     	    	eClassToCid.put(eclass, cidCounter);
     	    	cidToEclass[cidCounter] = eclass;
-    	    	oidCounters.put(eclass, new AtomicLong(getInitCounter(eclass)));
+    	    	oidCounters.put(eclass, new AtomicInteger(getInitCounter(eclass)));
     	    	catalogIfcDao.save(catalogIfc);
     	    	cidCounter++;
     		}
@@ -286,4 +283,5 @@ public class PlatformServiceImpl implements InitializingBean, PlatformService {
 		}
 		localBatch.get().clear();
 	}
+
 }

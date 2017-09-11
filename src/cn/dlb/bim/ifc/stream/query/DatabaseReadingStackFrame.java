@@ -11,7 +11,7 @@ import cn.dlb.bim.ifc.emf.PackageMetaData;
 import cn.dlb.bim.ifc.stream.VirtualObject;
 
 public abstract class DatabaseReadingStackFrame extends StackFrame implements ObjectProvidingStackFrame {
-	private QueryContext reusable;
+	protected QueryContext reusable;
 	private QueryObjectProvider queryObjectProvider;
 	protected VirtualObject currentObject;
 	private QueryPart queryPart;
@@ -88,7 +88,7 @@ public abstract class DatabaseReadingStackFrame extends StackFrame implements Ob
 						decideUseForSerializationList(object, feature, featureValueList);
 					} else {
 						if (feature instanceof EReference && featureValue instanceof Long) {
-							EClass referenceClass = getReusable().getPlatformService().getEClassForOid((Long) featureValue);
+							EClass referenceClass = getReusable().getPlatformService().getEClassForOid((Long) featureValue, reusable.getRid());
 							if (getQueryObjectProvider().hasReadOrIsGoingToRead(((Long) featureValue))
 									|| getQueryObjectProvider().hasReadOrIsGoingToRead(referenceClass)) {
 								object.addUseForSerialization(feature);
@@ -115,7 +115,7 @@ public abstract class DatabaseReadingStackFrame extends StackFrame implements Ob
 				decideUseForSerializationList((VirtualObject) objectInList, twodimensionalarrayFeature,
 						twodimensionalarray);
 			} else if (feature instanceof EReference && objectInList instanceof Long) {
-				EClass referenceClass = getReusable().getPlatformService().getEClassForOid((Long) objectInList);
+				EClass referenceClass = getReusable().getPlatformService().getEClassForOid((Long) objectInList, reusable.getRid());
 				if (getQueryObjectProvider().hasReadOrIsGoingToRead(((Long) objectInList)) || getQueryObjectProvider().hasReadOrIsGoingToRead(referenceClass)) {
 					object.addUseForSerialization(feature, i);
 				}

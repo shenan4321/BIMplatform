@@ -142,8 +142,7 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 					ObjectProviderProxy proxy = new ObjectProviderProxy(objectProvider, new ObjectListener() {
 						@Override
 						public void newObject(VirtualObject next) {
-							EClass nextEclass = platformService.getEClassForCid(next.getEClassId());
-							if (eClass.isSuperTypeOf(nextEclass)) {
+							if (eClass.isSuperTypeOf(next.eClass())) {
 								if (next.eGet(representationFeature) != null) {
 									objects.add(next);
 								}
@@ -384,9 +383,7 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 										// }
 										// }
 										if (!ignoreNotFound) {
-											EClass productEClass = platformService
-													.getEClassForCid(ifcProduct.getEClassId());
-											LOGGER.warn("Entity not found " + productEClass.getName() + " "
+											LOGGER.warn("Entity not found " + ifcProduct.eClass().getName() + " "
 													+ (expressId) + "/" + ifcProduct.getOid());
 										}
 									} catch (DatabaseException | RenderEngineException e) {
@@ -469,7 +466,7 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 				CloseableIterator<VirtualObject> iterator = platformService.streamVirtualObject(rid, cid);
 				while (iterator.hasNext()) {
 					VirtualObject next = iterator.next();
-					if (next != null && platformService.getEClassForCid(next.getEClassId()) == eClass) {
+					if (next != null && next.eClass() == eClass) {
 						EStructuralFeature feature = eClass.getEStructuralFeature("Representation");
 						Object featureObject = next.eGet(feature);
 						if (featureObject != null) {
@@ -605,8 +602,7 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 		QueryPart queryPart = query.createQueryPart();
 		queryPart.addOid(next.getOid());
 		Include include = queryPart.createInclude();
-		EClass nextEClass = platformService.getEClassForCid(next.getEClassId());
-		include.addType(nextEClass, false);
+		include.addType(next.eClass(), false);
 		include.addField("Representation");
 		Include representations = include.createInclude();
 		representations.addType(packageMetaData.getEClass("IfcProductDefinitionShape"), true);

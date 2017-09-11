@@ -123,12 +123,20 @@ public class VirtualObject implements MinimalVirtualObject {
 
 	public Boolean has(String featureName) {
 		EStructuralFeature feature = eClass.getEStructuralFeature(featureName);
-		return features.containsKey(feature.getFeatureID());
+		if (feature != null) {
+			return features.containsKey(feature.getFeatureID());
+		} else {
+			return false;
+		}
 	}
 
 	public Object get(String featureName) {
 		EStructuralFeature feature = eClass.getEStructuralFeature(featureName);
-		return features.get(feature.getFeatureID());
+		if (feature != null) {
+			return features.get(feature.getFeatureID());
+		} else {
+			return null;
+		}
 	}
 	
 	@SuppressWarnings("unchecked")

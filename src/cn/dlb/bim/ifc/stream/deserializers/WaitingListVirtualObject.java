@@ -81,23 +81,22 @@ public class WaitingListVirtualObject<T> {
 	
 	public void updateNode(T expressId, EClass ec, VirtualObject eObject) throws DeserializeException, DatabaseException {
 		for (WaitingVirtualObject waitingObject : waitingObjects.get(expressId)) {
-			EClass objectEClass = platformService.getEClassForCid(eObject.getEClassId());
 			if (waitingObject.getStructuralFeature().isMany()) {
 				ListWaitingVirtualObject listWaitingObject = (ListWaitingVirtualObject)waitingObject;
-				if (((EClass) waitingObject.getStructuralFeature().getEType()).isSuperTypeOf(objectEClass)) {
+				if (((EClass) waitingObject.getStructuralFeature().getEType()).isSuperTypeOf(eObject.eClass())) {
 					waitingObject.getObject().setListItemReference(waitingObject.getStructuralFeature(), listWaitingObject.getIndex(), eObject.getOid());
 					decrementOpenConnections(waitingObject.getObject());
 				} else {
 					throw new DeserializeException(waitingObject.getLineNumber(), "Field " + waitingObject.getStructuralFeature().getName() + " of "
-							+ waitingObject.getStructuralFeature().getEContainingClass().getName() + " cannot contain a " + objectEClass.getName());
+							+ waitingObject.getStructuralFeature().getEContainingClass().getName() + " cannot contain a " + eObject.eClass().getName());
 				}
 			} else {
-				if (((EClass) waitingObject.getStructuralFeature().getEType()).isSuperTypeOf(objectEClass)) {
+				if (((EClass) waitingObject.getStructuralFeature().getEType()).isSuperTypeOf(eObject.eClass())) {
 					waitingObject.getObject().setReference(waitingObject.getStructuralFeature(), eObject.getOid());
 					decrementOpenConnections(waitingObject.getObject());
 				} else {
 					throw new DeserializeException(waitingObject.getLineNumber(), "Field " + waitingObject.getStructuralFeature().getName() + " of "
-							+ waitingObject.getStructuralFeature().getEContainingClass().getName() + " cannot contain a " + objectEClass.getName() + "/" + eObject.getOid());
+							+ waitingObject.getStructuralFeature().getEContainingClass().getName() + " cannot contain a " + eObject.eClass().getName() + "/" + eObject.getOid());
 				}
 			}
 		}

@@ -14,7 +14,7 @@ public interface PlatformService extends OidProvider {
 	public EClassifier getEClassifier(String packageName, String classifierName);
 	public Short getCidOfEClass(EClass eClass);
 	public EClass getEClassForCid(short cid);
-	public EClass getEClassForOid(long oid, Integer rid) throws DatabaseException;
+	public EClass getEClassForOid(long oid) throws DatabaseException;
 	public Integer newRevisionId();
 	void save(VirtualObject virtualObject);
 	public void saveBatch(VirtualObject virtualObject);

@@ -586,7 +586,7 @@ public abstract class IfcModel implements IfcModelInterface {
 		if (temp.containsValue(idEObject)) {
 			return;
 		}
-		((IdEObjectImpl) idEObject).setOid(oidProvider.newOid(idEObject.eClass(), modelMetaData.getRevisionId()));
+		((IdEObjectImpl) idEObject).setOid(oidProvider.newOid(idEObject.eClass()));
 		if (objects.containsValue(idEObject)) {
 			temp.put(idEObject.getOid(), idEObject);
 		}
@@ -610,7 +610,7 @@ public abstract class IfcModel implements IfcModelInterface {
 		if (temp.containsValue(idEObject)) {
 			return;
 		}
-		((IdEObjectImpl) idEObject).setOid(oidProvider.newOid(idEObject.eClass(), modelMetaData.getRevisionId()));
+		((IdEObjectImpl) idEObject).setOid(oidProvider.newOid(idEObject.eClass()));
 		if (objects.containsValue(idEObject)) {
 			temp.put(idEObject.getOid(), idEObject);
 		}
@@ -918,7 +918,7 @@ public abstract class IfcModel implements IfcModelInterface {
 	@Override
 	public <T extends IdEObject> T create(EClass eClass, OidProvider oidProvider) throws IfcModelInterfaceException {
 		IdEObjectImpl object = (IdEObjectImpl) eClass.getEPackage().getEFactoryInstance().create(eClass);
-		long oid = oidProvider.newOid(eClass, modelMetaData.getRevisionId());
+		long oid = oidProvider.newOid(eClass);
 		((IdEObjectImpl) object).setOid(oid);
 		((IdEObjectImpl) object).setLoadingState(State.LOADED);
 		add(oid, object, false, false);

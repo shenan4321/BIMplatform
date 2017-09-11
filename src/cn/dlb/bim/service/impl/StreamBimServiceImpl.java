@@ -383,7 +383,7 @@ public class StreamBimServiceImpl implements BimService {
 
 		while (objectIterator.hasNext()) {
 			VirtualObject next = objectIterator.next();
-			EClass eclass = next.eClass();
+			EClass eclass = platformService.getEClassForCid(next.getEClassId());
 			if (packageMetaData.hasInverses(eclass)) {
 				for (EReference eReference : packageMetaData.getAllHasInverseReferences(eclass)) {
 					Object reference = next.eGet(eReference);
@@ -412,13 +412,13 @@ public class StreamBimServiceImpl implements BimService {
 		if (referencedObject == null) {
 			referencedObject = platformService.queryVirtualObject(rid, refOid);
 			if (referencedObject == null) {
-				EClass eclass = next.eClass();
+				EClass eclass = platformService.getEClassForCid(next.getEClassId());
 				throw new DatabaseException("Referenced object with oid " + refOid + ", referenced from "
 						+ eclass.getName() + " not found");
 			}
 			cache.put(refOid, referencedObject);
 		}
-		EClass referencedObjectEclass = referencedObject.eClass();
+		EClass referencedObjectEclass = platformService.getEClassForCid(referencedObject.getEClassId());
 		EReference oppositeReference = packageMetaData.getInverseOrOpposite(referencedObjectEclass, eReference);
 		if (oppositeReference == null) {
 			if (eReference.getName().equals("RelatedElements") && referencedObjectEclass.getName().equals("IfcSpace")) {

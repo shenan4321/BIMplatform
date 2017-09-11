@@ -81,7 +81,7 @@ public class WaitingListVirtualObject<T> {
 	
 	public void updateNode(T expressId, EClass ec, VirtualObject eObject) throws DeserializeException, DatabaseException {
 		for (WaitingVirtualObject waitingObject : waitingObjects.get(expressId)) {
-			EClass objectEClass = eObject.eClass();
+			EClass objectEClass = platformService.getEClassForCid(eObject.getEClassId());
 			if (waitingObject.getStructuralFeature().isMany()) {
 				ListWaitingVirtualObject listWaitingObject = (ListWaitingVirtualObject)waitingObject;
 				if (((EClass) waitingObject.getStructuralFeature().getEType()).isSuperTypeOf(objectEClass)) {

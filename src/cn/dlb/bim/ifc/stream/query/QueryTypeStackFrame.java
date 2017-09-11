@@ -50,7 +50,7 @@ public class QueryTypeStackFrame extends DatabaseReadingStackFrame implements Ob
 					processPossibleInclude(canInclude, include);
 				}
 			} else if (canInclude.isIncludeAllFields()) {
-				EClass eclass = currentObject.eClass();
+				EClass eclass = getQueryObjectProvider().getPlatformService().getEClassForCid(currentObject.getEClassId());
 				for (EReference eReference : eclass.getEAllReferences()) {
 					Include include = new Include(getReusable().getPackageMetaData());
 					
@@ -67,7 +67,7 @@ public class QueryTypeStackFrame extends DatabaseReadingStackFrame implements Ob
 	
 	protected void processPossibleInclude(CanInclude previousInclude, Include include) throws QueryException, DatabaseException {
 		if (include.hasTypes()) {
-			EClass eclass = currentObject.eClass();
+			EClass eclass = getReusable().getPlatformService().getEClassForCid(currentObject.getEClassId());
 			for (EClass filterClass : include.getTypes()) {
 				if (!filterClass.isSuperTypeOf(eclass)) {
 //					System.out.println(filterClass.getName() + " / " + currentObject.eClass().getName());

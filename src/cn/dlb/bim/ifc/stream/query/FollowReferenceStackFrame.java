@@ -43,7 +43,7 @@ public class FollowReferenceStackFrame extends DatabaseReadingStackFrame impleme
 	@Override
 	public String toString() {
 		try {
-			EClass eClass = getQueryObjectProvider().getPlatformService().getEClassForOid(oid, getReusable().getRid());
+			EClass eClass = getQueryObjectProvider().getPlatformService().getEClassForOid(oid);
 			return "FollowReferenceStackFrame (" + eClass.getName() + "." + fromReference.getName() + ", " + oid + ")";
 		} catch (DatabaseException e) {
 			e.printStackTrace();

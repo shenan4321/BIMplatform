@@ -37,5 +37,5 @@ import org.eclipse.emf.ecore.EClass;
  *****************************************************************************/
 
 public interface OidProvider {
-	long newOid(EClass eClass, Integer rid);
+	long newOid(EClass eClass);
 }

@@ -210,7 +210,7 @@ public abstract class IfcStepStreamingSerializer
 	}
 
 	private void write(VirtualObject object) throws SerializerException, IOException {
-		EClass eClass = object.eClass();
+		EClass eClass = platformService.getEClassForCid(object.getEClassId());
 		if (eClass.getEAnnotation("hidden") != null) {
 			return;
 		}
@@ -289,7 +289,8 @@ public abstract class IfcStepStreamingSerializer
 	private void writeEClass(VirtualObject object, EStructuralFeature feature) throws SerializerException, IOException {
 		Object referencedObject = object.eGet(feature);
 		if (referencedObject instanceof VirtualObject) {
-			EClass referencedObjectEClass = ((VirtualObject) referencedObject).eClass();
+			EClass referencedObjectEClass = platformService
+					.getEClassForCid(((VirtualObject) referencedObject).getEClassId());
 			if (referencedObjectEClass.getEAnnotation("wrapped") != null) {
 				writeWrappedValue(object, feature, referencedObjectEClass);
 			}
@@ -302,7 +303,7 @@ public abstract class IfcStepStreamingSerializer
 					print(DOLLAR);
 				}
 			} else {
-				EClass objectEClass = object.eClass();
+				EClass objectEClass = platformService.getEClassForCid(object.getEClassId());
 				EntityDefinition entityBN = getSchemaDefinition().getEntityBN(objectEClass.getName());
 				if (entityBN != null && entityBN.isDerived(feature.getName())) {
 					print(ASTERISK);
@@ -345,7 +346,7 @@ public abstract class IfcStepStreamingSerializer
 			if (ref instanceof WrappedVirtualObject) {
 				writeEmbedded((WrappedVirtualObject) ref);
 			} else if (feature.getEType() == ECORE_PACKAGE_INSTANCE.getEDouble()) {
-				EClass objectEClass = object.eClass();
+				EClass objectEClass = platformService.getEClassForCid(object.getEClassId());
 				EStructuralFeature asStringFeature = objectEClass.getEStructuralFeature(feature.getName() + "AsString");
 				String asString = (String) object.eGet(asStringFeature);
 				writeDoubleValue((Double) ref, asString, feature);
@@ -365,7 +366,7 @@ public abstract class IfcStepStreamingSerializer
 	}
 
 	private void writeEmbedded(WrappedVirtualObject eObject) throws SerializerException, IOException {
-		EClass class1 = eObject.eClass();
+		EClass class1 = platformService.getEClassForCid(eObject.getEClassId());
 		print(packageMetaData.getUpperCase(class1));
 		print(OPEN_PAREN);
 		EStructuralFeature structuralFeature = class1.getEStructuralFeature(WRAPPED_VALUE);
@@ -428,7 +429,7 @@ public abstract class IfcStepStreamingSerializer
 							if (listObject instanceof WrappedVirtualObject
 									&& feature.getEType().getEAnnotation("wrapped") != null) {
 								WrappedVirtualObject eObject = (WrappedVirtualObject) listObject;
-								EClass eObjectEClass = eObject.eClass();
+								EClass eObjectEClass = platformService.getEClassForCid(eObject.getEClassId());
 								Object realVal = eObject.eGet(eObjectEClass.getEStructuralFeature("wrappedValue"));
 								if (realVal instanceof Double) {
 									Object stringVal = eObject
@@ -443,7 +444,7 @@ public abstract class IfcStepStreamingSerializer
 								}
 							} else if (listObject instanceof WrappedVirtualObject) {
 								WrappedVirtualObject eObject = (WrappedVirtualObject) listObject;
-								EClass class1 = eObject.eClass();
+								EClass class1 = platformService.getEClassForCid(eObject.getEClassId());
 								EStructuralFeature structuralFeature = class1.getEStructuralFeature(WRAPPED_VALUE);
 								if (structuralFeature != null) {
 									Object realVal = eObject.eGet(structuralFeature);
@@ -460,7 +461,7 @@ public abstract class IfcStepStreamingSerializer
 									print(CLOSE_PAREN);
 								} else {
 									if (feature.getEAnnotation("twodimensionalarray") != null) {
-										EClass eObjectEClass = eObject.eClass();
+										EClass eObjectEClass = platformService.getEClassForCid(eObject.getEClassId());
 										writeList(eObject, eObjectEClass.getEStructuralFeature("List"));
 									} else {
 										// LOGGER.info("Unfollowable reference found from " + object + "(" +
@@ -509,7 +510,7 @@ public abstract class IfcStepStreamingSerializer
 					if ((name.equals(IFC_BOOLEAN) || name.equals(IFC_LOGICAL)) && val == null) {
 						print(BOOLEAN_UNDEFINED);
 					} else if (structuralFeature.getEType() == ECORE_PACKAGE_INSTANCE.getEDouble()) {
-						EClass objectEClass = object.eClass();
+						EClass objectEClass = platformService.getEClassForCid(object.getEClassId());
 						EStructuralFeature asStringFeature = objectEClass
 								.getEStructuralFeature(feature.getName() + "AsString");
 						String asString = (String) betweenObject.eGet(asStringFeature);
@@ -539,7 +540,7 @@ public abstract class IfcStepStreamingSerializer
 					VirtualObject object2 = (VirtualObject) o;
 					Object val = object2.eGet(structuralFeature);
 					if (structuralFeature.getEType() == ECORE_PACKAGE_INSTANCE.getEDouble()) {
-						EClass object2EClass = object2.eClass();
+						EClass object2EClass = platformService.getEClassForCid(object2.getEClassId());
 						EStructuralFeature asStringFeature = object2EClass
 								.getEStructuralFeature(feature.getName() + "AsString");
 						String asString = (String) object2.eGet(asStringFeature);
@@ -557,7 +558,7 @@ public abstract class IfcStepStreamingSerializer
 					|| type == ECORE_PACKAGE_INSTANCE.getEBoolean()) {
 				print(BOOLEAN_UNDEFINED);
 			} else {
-				EClass objectEClass = object.eClass();
+				EClass objectEClass = platformService.getEClassForCid(object.getEClassId());
 				EntityDefinition entityBN = getSchemaDefinition().getEntityBN(objectEClass.getName());
 				if (entityBN != null && entityBN.isDerived(feature.getName())) {
 					print(ASTERISK);

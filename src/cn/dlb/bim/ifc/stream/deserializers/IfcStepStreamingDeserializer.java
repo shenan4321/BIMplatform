@@ -293,7 +293,7 @@ public class IfcStepStreamingDeserializer implements StreamingDeserializer {
 	}
 
 	private VirtualObject newVirtualObject(EClass eClass) {
-		return new VirtualObject(rid, platformService.getCidOfEClass(eClass), platformService.newOid(eClass, rid), eClass);
+		return new VirtualObject(rid, platformService.getCidOfEClass(eClass), platformService.newOid(eClass), eClass);
 	}
 
 	private WrappedVirtualObject newWrappedVirtualObject(EClass eClass) {
@@ -454,7 +454,7 @@ public class IfcStepStreamingDeserializer implements StreamingDeserializer {
 					if (mappedObjects.containsKey(referenceId)) {
 						Long referencedOid = mappedObjects.get(referenceId);
 						if (referencedOid != null) {
-							EClass referenceEClass = platformService.getEClassForOid(referencedOid, rid);
+							EClass referenceEClass = platformService.getEClassForOid(referencedOid);
 							if (((EClass) structuralFeature.getEType()).isSuperTypeOf(referenceEClass)) {
 								// TODO unique checking?
 								object.setListItemReference(structuralFeature, index, referencedOid);

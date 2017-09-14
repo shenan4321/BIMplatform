@@ -44,7 +44,6 @@ import cn.dlb.bim.service.ProjectService;
 import cn.dlb.bim.vo.GlbVo;
 import cn.dlb.bim.vo.ModelAndOutputTemplateVo;
 import cn.dlb.bim.vo.ModelInfoVo;
-import cn.dlb.bim.vo.ModelLabelVo;
 import cn.dlb.bim.vo.OutputTemplateVo;
 import cn.dlb.bim.web.ResultUtil;
 
@@ -310,43 +309,6 @@ public class ModelController {
 		List<IfcProductRecordText> records = recordSearchManager.search(rid, keyword);
 		result.setSuccess(true);
 		result.setData(records);
-		return result.getResult();
-	}
-	
-	@RequestMapping(value = "addModelLabel", method = RequestMethod.GET)
-	@ResponseBody
-	public Map<String, Object> addModelLabel(ModelLabelVo modelLabel) {
-		ResultUtil result = new ResultUtil();
-		bimService.insertModelLabel(modelLabel);
-		result.setSuccess(true);
-		return result.getResult();
-	}
-	
-	@RequestMapping(value = "deleteModelLabel", method = RequestMethod.GET)
-	@ResponseBody
-	public Map<String, Object> deleteModelLabel(Integer labelId) {
-		ResultUtil result = new ResultUtil();
-		bimService.deleteModelLabel(labelId);
-		result.setSuccess(true);
-		return result.getResult();
-	}
-	
-	@RequestMapping(value = "modifyModelLabel", method = RequestMethod.GET)
-	@ResponseBody
-	public Map<String, Object> modifyModelLabel(ModelLabelVo modelLabel) {
-		ResultUtil result = new ResultUtil();
-		bimService.modifyModelLabel(modelLabel);
-		result.setSuccess(true);
-		return result.getResult();
-	}
-	
-	@RequestMapping(value = "queryAllModelLabelByRid", method = RequestMethod.GET)
-	@ResponseBody
-	public Map<String, Object> queryAllModelLabelByRid(Integer rid) {
-		ResultUtil result = new ResultUtil();
-		List<ModelLabelVo> data = bimService.queryAllModelLabelByRid(rid);
-		result.setSuccess(true);
-		result.setData(data);
 		return result.getResult();
 	}
 	

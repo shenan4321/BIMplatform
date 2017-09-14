@@ -1,36 +1,38 @@
 package cn.dlb.bim.ifc.stream;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
+import org.bson.types.ObjectId;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EStructuralFeature;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.sleepycat.persist.model.Entity;
-import com.sleepycat.persist.model.PrimaryKey;
-import com.sleepycat.persist.model.Relationship;
-import com.sleepycat.persist.model.SecondaryKey;
 
 @Entity
 @Document(collection = "VirtualObject")
-public class VirtualObject implements MinimalVirtualObject {
-	@PrimaryKey
+public class VirtualObject extends ReadWriteVirtualObject {
+	
 	@Indexed
 	private Long oid;
-	@SecondaryKey(relate = Relationship.MANY_TO_ONE)
+	
 	@Indexed
 	private Integer rid;
-	@SecondaryKey(relate = Relationship.MANY_TO_ONE)
+	
 	@Indexed
-	private final Short eClassId;
+	private Short eClassId;
+	
 	private final Map<Integer, Object> features;
 
 	/**
@@ -40,6 +42,11 @@ public class VirtualObject implements MinimalVirtualObject {
 	private final Map<EStructuralFeature, Object> useForSerializationFeatures;
 	@Transient
 	private EClass eClass;
+	
+	public VirtualObject() {
+		useForSerializationFeatures = new LinkedHashMap<>();
+		features = new LinkedHashMap<>();
+	}
 
 	public VirtualObject(Integer rid, Short eClassId, Long oid, EClass eClass) {
 		this.rid = rid;
@@ -189,4 +196,44 @@ public class VirtualObject implements MinimalVirtualObject {
 	public EClass eClass() {
 		return eClass;
 	}
+	
+	public void setEClass(EClass eClass) {
+		this.eClass = eClass;
+	}
+
+	public void write(ByteBuffer buffer) {
+		ensureCapacity(buffer, 18);
+		buffer.putShort(eClassId);
+		buffer.putLong(oid);
+		buffer.putInt(rid);
+		buffer.putInt(features.size());
+		
+		for (Entry<Integer, Object> entry : features.entrySet()) {
+			Integer featureId = entry.getKey();
+			Object value = entry.getValue();
+			ensureCapacity(buffer, 4);
+			buffer.putInt(featureId);
+			writeFeature(buffer, value);
+		}
+		
+	}
+
+	@Override
+	public void read(ByteBuffer buffer) {
+		eClassId = buffer.getShort();
+		oid = buffer.getLong();
+		rid = buffer.getInt();
+		int size = buffer.getInt();
+		for (int i = 0; i < size; i++) {
+			Integer featureId = buffer.getInt();
+			Object feature = readFeature(buffer);
+			features.put(featureId, feature);
+		}
+	}
+
+	@Override
+	public ReadWriteVirtualObject createReadWriteVirtualObject() {
+		return new WrappedVirtualObject();
+	}
+	
 }

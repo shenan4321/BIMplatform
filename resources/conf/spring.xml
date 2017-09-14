@@ -65,5 +65,27 @@
 	<mongo:repositories base-package="cn.dlb.bim.dao.impl" />
 
 	<context:annotation-config />
+	
+	<bean id="bdbEnv" class="cn.dlb.bim.database.BDBEnvironment" destroy-method="close">
+		<constructor-arg value="database/"/>
+	</bean>
+	
+	<bean id="bdbDatabase" class="cn.dlb.bim.database.BDBDatabase">
+		<property name="tables">
+			<set>
+				<ref bean="virtualObjectTable"/>
+			</set>
+		</property>
+	</bean>
+	
+	<bean id="virtualObjectTable" class="cn.dlb.bim.database.TableWrapper" destroy-method="close">
+		<constructor-arg ref="bdbEnv"/>
+		<constructor-arg value="true"/>
+		<constructor-arg value="virtualObject"/>
+	</bean>
+	
+	<bean id="virtualObjectBDBAccess" class="cn.dlb.bim.database.VirtualObjectBDBAccess">
+		<property name="database" ref="bdbDatabase"></property>
+	</bean>
 
 </beans>

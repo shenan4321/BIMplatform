@@ -6,17 +6,13 @@ import org.springframework.stereotype.Component;
 
 import cn.dlb.bim.cache.ModelCacheManager;
 import cn.dlb.bim.cache.NewDiskCacheManager;
-import cn.dlb.bim.dao.IfcModelDao;
 import cn.dlb.bim.ifc.SerializationManager;
 import cn.dlb.bim.ifc.collada.ColladaCacheManager;
 import cn.dlb.bim.ifc.collada.ColladaProcessFactory;
 import cn.dlb.bim.ifc.emf.MetaDataManager;
 import cn.dlb.bim.ifc.engine.jvm.JvmRenderEngineFactory;
 import cn.dlb.bim.ifc.engine.pool.CommonsPoolingRenderEnginePoolFactory;
-import cn.dlb.bim.ifc.engine.pool.RenderEnginePoolFactory;
 import cn.dlb.bim.ifc.engine.pool.RenderEnginePools;
-import cn.dlb.bim.service.PlatformService;
-import cn.dlb.bim.service.impl.PlatformServiceImpl;
 
 /**
  * @author shenan4321

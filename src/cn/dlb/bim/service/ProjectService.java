@@ -10,5 +10,4 @@ public interface ProjectService {
 	public void updateProject(Project project);
 	public Project queryProject(Long pid);
 	public List<Project> queryAllProject();
-	public Project queryProjectByRid(Integer rid);
 }

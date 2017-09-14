@@ -1,8 +1,11 @@
 package cn.dlb.bim.ifc.stream;
 
+import java.nio.ByteBuffer;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.emf.ecore.EAttribute;
@@ -11,9 +14,13 @@ import org.eclipse.emf.ecore.EStructuralFeature;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.google.common.base.Charsets;
+
+import cn.dlb.bim.database.DatabaseException;
+
 @Document(collection = "WrappedVirtualObject")
-public class WrappedVirtualObject implements MinimalVirtualObject {
-	private final Short eClassId;
+public class WrappedVirtualObject extends ReadWriteVirtualObject {
+	private Short eClassId;
 	private final Map<Integer, Object> features = new LinkedHashMap<>();
 	
 	/**
@@ -23,6 +30,10 @@ public class WrappedVirtualObject implements MinimalVirtualObject {
 	private final Map<EStructuralFeature, Object> useForSerializationFeatures;
 	@Transient
 	private EClass eClass;
+	
+	public WrappedVirtualObject() {
+		useForSerializationFeatures = new LinkedHashMap<>();
+	}
 	
 	public WrappedVirtualObject(Short eClassId, EClass eClass) {
 		this.eClassId = eClassId;
@@ -112,4 +123,34 @@ public class WrappedVirtualObject implements MinimalVirtualObject {
 	public EClass eClass() {
 		return eClass;
 	}
+	
+	public void write(ByteBuffer buffer) {
+		ensureCapacity(buffer, 6);
+		buffer.putShort(eClassId);
+		buffer.putInt(features.size());
+		for (Entry<Integer, Object> entry : features.entrySet()) {
+			Integer featureId = entry.getKey();
+			Object value = entry.getValue();
+			ensureCapacity(buffer, 4);
+			buffer.putInt(featureId);
+			writeFeature(buffer, value);
+		}
+	}
+	
+	@Override
+	public void read(ByteBuffer buffer) {
+		eClassId = buffer.getShort();
+		int size = buffer.getInt();
+		for (int i = 0; i < size; i++) {
+			Integer featureId = buffer.getInt();
+			Object feature = readFeature(buffer);
+			features.put(featureId, feature);
+		}
+	}
+
+	@Override
+	public ReadWriteVirtualObject createReadWriteVirtualObject() {
+		return new WrappedVirtualObject();
+	}
+	
 }

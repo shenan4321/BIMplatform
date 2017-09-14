@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,7 +51,6 @@ import cn.dlb.bim.vo.GeometryInfoVo;
 import cn.dlb.bim.vo.GlbVo;
 import cn.dlb.bim.vo.ModelAndOutputTemplateVo;
 import cn.dlb.bim.vo.ModelInfoVo;
-import cn.dlb.bim.vo.ModelLabelVo;
 import cn.dlb.bim.vo.OutputTemplateVo;
 import cn.dlb.bim.vo.Vector3f;
 
@@ -228,30 +226,6 @@ public class StreamBimServiceImpl implements BimService {
 	public void setGlbLonlat(Integer rid, Double lon, Double lat) {
 		// TODO Auto-generated method stub
 
-	}
-
-	@Override
-	public void insertModelLabel(ModelLabelVo modelLabel) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void deleteModelLabel(Integer labelId) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void modifyModelLabel(ModelLabelVo modelLabel) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public List<ModelLabelVo> queryAllModelLabelByRid(Integer rid) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override

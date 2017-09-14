@@ -16,7 +16,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.CriteriaDefinition;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.data.util.CloseableIterator;
@@ -25,7 +24,7 @@ import org.springframework.stereotype.Component;
 import cn.dlb.bim.component.PlatformServer;
 import cn.dlb.bim.component.PlatformServerConfig;
 import cn.dlb.bim.dao.BaseMongoDao;
-import cn.dlb.bim.dao.IfcModelDao;
+import cn.dlb.bim.dao.VirtualObjectDao;
 import cn.dlb.bim.dao.entity.CatalogIfc;
 import cn.dlb.bim.dao.entity.PlatformVersions;
 import cn.dlb.bim.database.BatchThreadLocal;
@@ -66,8 +65,8 @@ public class PlatformServiceImpl implements InitializingBean, PlatformService {
 	private PlatformServer server;
 	
 	@Autowired
-	@Qualifier("IfcModelDaoImpl")
-	private IfcModelDao ifcModelDao;
+	@Qualifier("VirtualObjectDaoImpl")
+	private VirtualObjectDao virtualObjectDao;
 	
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -195,12 +194,12 @@ public class PlatformServiceImpl implements InitializingBean, PlatformService {
 
 	@Override
 	public void save(VirtualObject virtualObject) {
-		ifcModelDao.insertVirtualObject(virtualObject);
+		virtualObjectDao.save(virtualObject);
 	}
 
 	@Override
 	public void update(VirtualObject virtualObject) {
-		ifcModelDao.updateVirtualObject(virtualObject);
+		virtualObjectDao.update(virtualObject);
 	}
 	
 	@Override
@@ -213,7 +212,7 @@ public class PlatformServiceImpl implements InitializingBean, PlatformService {
 		}
 		localBatchList.add(virtualObject);
 		if (localBatchList.size() >= AUTO_COMMIT_SIZE) {
-			ifcModelDao.insertAllVirtualObject(localBatchList);
+			virtualObjectDao.saveAll(localBatchList);
 			localBatch.get().get(SAVE_BATCH_KEY).clear();
 		}
 	}
@@ -231,22 +230,22 @@ public class PlatformServiceImpl implements InitializingBean, PlatformService {
 
 	@Override
 	public List<VirtualObject> queryVirtualObject(Integer rid, List<Short> cids) {
-		return ifcModelDao.queryVirtualObject(rid, cids);
+		return virtualObjectDao.findByRidAndCids(rid, cids);
 	}
 	
 	@Override
 	public CloseableIterator<VirtualObject> streamVirtualObjectByRid(Integer rid) {
-		return ifcModelDao.streamVirtualObjectByRid(rid);
+		return virtualObjectDao.streamByRid(rid);
 	}
 
 	@Override
 	public VirtualObject queryVirtualObject(Integer rid, Long oid) {
-		return ifcModelDao.queryVirtualObject(rid, oid);
+		return virtualObjectDao.findOneByRidAndOid(rid, oid);
 	}
 
 	@Override
 	public CloseableIterator<VirtualObject> streamVirtualObject(Integer rid, Short cid) {
-		return ifcModelDao.streamVirtualObject(rid, cid);
+		return virtualObjectDao.streamByRidAndCid(rid, cid);
 	}
 
 	@Override
@@ -259,7 +258,7 @@ public class PlatformServiceImpl implements InitializingBean, PlatformService {
 		}
 		localBatchList.add(virtualObject);
 		if (localBatchList.size() >= AUTO_COMMIT_SIZE) {
-			ifcModelDao.updateAllVirtualObject(localBatchList);
+			virtualObjectDao.updateAllVirtualObject(localBatchList);
 			localBatch.get().get(UPDATE_BATCH_KEY).clear();
 		}
 	}
@@ -278,11 +277,11 @@ public class PlatformServiceImpl implements InitializingBean, PlatformService {
 	public void commitAllBatch() {
 		List<VirtualObject> updateLocalBatchList = localBatch.newGet().get(UPDATE_BATCH_KEY);
 		if (updateLocalBatchList != null && !updateLocalBatchList.isEmpty()) {
-			ifcModelDao.updateAllVirtualObject(updateLocalBatchList);
+			virtualObjectDao.updateAllVirtualObject(updateLocalBatchList);
 		}
 		List<VirtualObject> saveLocalBatchList = localBatch.newGet().get(SAVE_BATCH_KEY);
 		if (saveLocalBatchList != null && !saveLocalBatchList.isEmpty()) {
-			ifcModelDao.insertAllVirtualObject(saveLocalBatchList);
+			virtualObjectDao.saveAll(saveLocalBatchList);
 		}
 		localBatch.get().clear();
 	}

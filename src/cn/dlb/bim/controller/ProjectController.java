@@ -102,15 +102,15 @@ public class ProjectController {
 		return result.getResult();
 	}
 	
-	@RequestMapping(value = "queryProjectByRid", method = RequestMethod.POST)
-	@ResponseBody
-	public Map<String, Object> queryProjectByRid(@RequestParam("rid") Integer rid) {
-		ResultUtil result = new ResultUtil();
-		Project project = projectService.queryProjectByRid(rid);
-		result.setSuccess(true);
-		result.setData(project);
-		return result.getResult();
-	}
+//	@RequestMapping(value = "queryProjectByRid", method = RequestMethod.POST)
+//	@ResponseBody
+//	public Map<String, Object> queryProjectByRid(@RequestParam("rid") Integer rid) {
+//		ResultUtil result = new ResultUtil();
+//		Project project = projectService.queryProjectByRid(rid);
+//		result.setSuccess(true);
+//		result.setData(project);
+//		return result.getResult();
+//	}
 	
 	private boolean isPicture(String picName) {
 		 String imageArray [] = {  

@@ -1,10 +1,14 @@
-package cn.dlb.bim.dao;
+package cn.dlb.bim.service;
 
 import java.util.Collection;
+
 import org.springframework.data.util.CloseableIterator;
+
 import cn.dlb.bim.ifc.stream.VirtualObject;
 
-public interface VirtualObjectDao extends BaseMongoDao<VirtualObject> {
+public interface VirtualObjectService {
+	public void save(VirtualObject virtualObject);
+	public void saveAll(Collection<VirtualObject> virtualObjects);
 	public VirtualObject findOneByRidAndOid(Integer rid, Long oid);
 	public VirtualObject findOneByRidAndCid(Integer rid, Short cid);
 	public Collection<VirtualObject> findByRidAndCid(Integer rid, Short cid);

@@ -1,5 +1,9 @@
 package cn.dlb.bim.ifc.stream;
 
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -9,20 +13,19 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.bson.types.ObjectId;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EStructuralFeature;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.google.common.primitives.Bytes;
 import com.sleepycat.persist.model.Entity;
 
 @Entity
 @Document(collection = "VirtualObject")
-public class VirtualObject extends ReadWriteVirtualObject {
+public class VirtualObject extends ReadWriteVirtualObject implements Externalizable {
 	
 	@Indexed
 	private Long oid;
@@ -201,8 +204,8 @@ public class VirtualObject extends ReadWriteVirtualObject {
 		this.eClass = eClass;
 	}
 
-	public void write(ByteBuffer buffer) {
-		ensureCapacity(buffer, 18);
+	public ByteBuffer write(ByteBuffer buffer) {
+		buffer = ensureCapacity(buffer, 18);
 		buffer.putShort(eClassId);
 		buffer.putLong(oid);
 		buffer.putInt(rid);
@@ -211,11 +214,11 @@ public class VirtualObject extends ReadWriteVirtualObject {
 		for (Entry<Integer, Object> entry : features.entrySet()) {
 			Integer featureId = entry.getKey();
 			Object value = entry.getValue();
-			ensureCapacity(buffer, 4);
+			buffer = ensureCapacity(buffer, 4);
 			buffer.putInt(featureId);
-			writeFeature(buffer, value);
+			buffer = writeFeature(buffer, value);
 		}
-		
+		return buffer;
 	}
 
 	@Override
@@ -234,6 +237,32 @@ public class VirtualObject extends ReadWriteVirtualObject {
 	@Override
 	public ReadWriteVirtualObject createReadWriteVirtualObject() {
 		return new WrappedVirtualObject();
+	}
+
+	@Override
+	public void writeExternal(ObjectOutput out) throws IOException {
+		ByteBuffer buffer = ByteBuffer.allocate(256);
+		buffer = write(buffer);
+		out.write(buffer.array(), 0, buffer.position());
+	}
+
+	@Override
+	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+		if (in.available() <= 0) {
+			return;
+		}
+		int available = in.available();
+		byte[] bytesTotal = new byte[available];
+		in.readFully(bytesTotal);
+		available = in.available();
+		while (available > 0) {
+			byte[] section = new byte[available];
+			in.readFully(section);
+			bytesTotal = Bytes.concat(bytesTotal, section);
+			available = in.available();
+		}
+		ByteBuffer buffer = ByteBuffer.wrap(bytesTotal);
+		read(buffer);
 	}
 	
 }

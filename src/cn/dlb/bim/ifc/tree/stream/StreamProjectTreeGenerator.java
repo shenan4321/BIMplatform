@@ -10,28 +10,29 @@ import cn.dlb.bim.ifc.emf.PackageMetaData;
 import cn.dlb.bim.ifc.stream.VirtualObject;
 import cn.dlb.bim.ifc.tree.ProjectTree;
 import cn.dlb.bim.ifc.tree.TreeItem;
-import cn.dlb.bim.service.PlatformService;
+import cn.dlb.bim.service.CatalogService;
+import cn.dlb.bim.service.VirtualObjectService;
 
 public class StreamProjectTreeGenerator {
 	private PackageMetaData packageMetaData;
-	private PlatformService platformService;
-	private VirtualObjectDao virtualObjectDao;
+	private CatalogService catalogService;
+	private VirtualObjectService virtualObjectService;
 	private ConcreteRevision concreteRevision;
 	private ProjectTree tree = new ProjectTree();
 
-	public StreamProjectTreeGenerator(PackageMetaData packageMetaData, PlatformService platformService,
-			VirtualObjectDao virtualObjectDao, ConcreteRevision concreteRevision) {
+	public StreamProjectTreeGenerator(PackageMetaData packageMetaData, CatalogService catalogService,
+			VirtualObjectService virtualObjectService, ConcreteRevision concreteRevision) {
 		this.packageMetaData = packageMetaData;
-		this.platformService = platformService;
-		this.virtualObjectDao = virtualObjectDao;
+		this.catalogService = catalogService;
+		this.virtualObjectService = virtualObjectService;
 		this.concreteRevision = concreteRevision;
 	}
 
 	public void proccessBuild() {
 		EClass projectEClass = (EClass) packageMetaData.getEClassifierCaseInsensitive("IfcProject");
-		Short cid = platformService.getCidOfEClass(projectEClass);
+		Short cid = catalogService.getCidOfEClass(projectEClass);
 		Integer rid = concreteRevision.getRevisionId();
-		VirtualObject project = virtualObjectDao.findOneByRidAndCid(rid, cid);
+		VirtualObject project = virtualObjectService.findOneByRidAndCid(rid, cid);
 		tree.getTreeRoots().add(buildTreeCell(project));
 	}
 
@@ -53,7 +54,7 @@ public class StreamProjectTreeGenerator {
 		if (ifcProductEclass.isSuperTypeOf(object.eClass())) {
 			Object refGeoId = object.get("geometry");
 			if (refGeoId != null) {
-				VirtualObject geometryInfo = virtualObjectDao.findOneByRidAndOid(rid, (Long) refGeoId);
+				VirtualObject geometryInfo = virtualObjectService.findOneByRidAndOid(rid, (Long) refGeoId);
 				curTree.setGeometryOid(geometryInfo.getOid());
 			}
 
@@ -62,12 +63,12 @@ public class StreamProjectTreeGenerator {
 			if (containsElements != null) {
 				List containsElementsList = (List) containsElements;
 				for (Object containsElementObject : containsElementsList) {
-					VirtualObject containsElement = virtualObjectDao.findOneByRidAndOid(rid, (Long) containsElementObject);
+					VirtualObject containsElement = virtualObjectService.findOneByRidAndOid(rid, (Long) containsElementObject);
 
 					Object relatedElements = containsElement.get("RelatedElements");
 					List relatedElementsList = (List) relatedElements;
 					for (Object relatedElementObject : relatedElementsList) {
-						VirtualObject relatedElement = virtualObjectDao.findOneByRidAndOid(rid, (Long) relatedElementObject);
+						VirtualObject relatedElement = virtualObjectService.findOneByRidAndOid(rid, (Long) relatedElementObject);
 						TreeItem subTree = buildTreeCell(relatedElement);
 						curTree.getContains().add(subTree);
 					}
@@ -83,14 +84,14 @@ public class StreamProjectTreeGenerator {
 			List isDecomposedByList = (List) isDecomposedByObject;
 			
 			for (Object isDecomposedByRef : isDecomposedByList) {
-				VirtualObject isDecomposedBy = virtualObjectDao.findOneByRidAndOid(rid, (Long)isDecomposedByRef);
+				VirtualObject isDecomposedBy = virtualObjectService.findOneByRidAndOid(rid, (Long)isDecomposedByRef);
 				
 				EClass ifcRelAggregatesEclass = packageMetaData.getEClass("IfcRelAggregates");
 				if (ifcRelAggregatesEclass.isSuperTypeOf(isDecomposedBy.eClass())) {
 					Object relatedObjects = isDecomposedBy.get("RelatedObjects");
 					List relatedObjectsList = (List) relatedObjects;
 					for (Object relatedObject : relatedObjectsList) {
-						VirtualObject relatedVirtualObject = virtualObjectDao.findOneByRidAndOid(rid, (Long)relatedObject);
+						VirtualObject relatedVirtualObject = virtualObjectService.findOneByRidAndOid(rid, (Long)relatedObject);
 						TreeItem subTree = buildTreeCell(relatedVirtualObject);
 						curTree.getDecomposition().add(subTree);
 					}

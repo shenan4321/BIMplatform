@@ -82,7 +82,7 @@ public class StreamingGeometryQueryAction extends LongAction {
 			Include include = queryPart.createInclude();
 			include.addType(geometryInfoElcass, false);
 			include.addField("data");
-			QueryObjectProvider queryObjectProvider = new QueryObjectProvider(queryContext.getPlatformService(), server,
+			QueryObjectProvider queryObjectProvider = new QueryObjectProvider(queryContext.getCatalogService(), queryContext.getVirtualObjectService(), server,
 					query, queryContext.getRid(), packageMetaData);
 			BinaryGeometryMessagingStreamingSerializer serializer = new BinaryGeometryMessagingStreamingSerializer();
 			serializer.init(queryObjectProvider, packageMetaData, concreteRevision);

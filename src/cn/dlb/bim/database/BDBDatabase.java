@@ -12,6 +12,7 @@ public class BDBDatabase {
 	private static final Logger LOGGER = LoggerFactory.getLogger(BDBDatabase.class);
 	
 	private Set<TableWrapper> tables = new LinkedHashSet<>();
+	private BDBEnvironment environment;
 	
 	public void close() {
 		for (TableWrapper tableWrapper : tables) {
@@ -34,6 +35,14 @@ public class BDBDatabase {
 
 	public void setTables(Set<TableWrapper> tables) {
 		this.tables = tables;
+	}
+
+	public BDBEnvironment getEnvironment() {
+		return environment;
+	}
+
+	public void setEnvironment(BDBEnvironment environment) {
+		this.environment = environment;
 	}
 	
 }

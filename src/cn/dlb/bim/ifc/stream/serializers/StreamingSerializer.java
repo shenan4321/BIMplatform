@@ -24,10 +24,10 @@ import cn.dlb.bim.database.DatabaseException;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
 import cn.dlb.bim.ifc.model.IfcHeader;
 import cn.dlb.bim.ifc.serializers.SerializerException;
-import cn.dlb.bim.service.PlatformService;
+import cn.dlb.bim.service.CatalogService;
 
 public interface StreamingSerializer {
-	void init(PlatformService platformService, ObjectProvider objectProvider, IfcHeader ifcHeader, PackageMetaData packageMetaData) throws SerializerException;
+	void init(CatalogService catalogService, ObjectProvider objectProvider, IfcHeader ifcHeader, PackageMetaData packageMetaData) throws SerializerException;
 	void writeToOutputStream(OutputStream outputStream) throws SerializerException, DatabaseException;
 	InputStream getInputStream();
 }

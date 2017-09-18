@@ -20,13 +20,12 @@ public class VirtualObjectRidCidKeyCreator implements SecondaryKeyCreator {
 			DatabaseEntry result) {
 		try {
 			byte[] dataBytes = data.getData();
-			VirtualObject object = new VirtualObject();
 			ByteBuffer dataBuffer = ByteBuffer.wrap(dataBytes);
-			object.read(dataBuffer);
 			ByteBuffer secondaryKeyBuffer = ByteBuffer.allocate(6);
-			Integer rid = object.getRid();
+			Short cid = dataBuffer.getShort();
+			dataBuffer.getLong();// oid, but we dont need it
+			Integer rid = dataBuffer.getInt();
 			secondaryKeyBuffer.putInt(rid);
-			Short cid = object.getEClassId();
 			secondaryKeyBuffer.putShort(cid);
 			result.setData(secondaryKeyBuffer.array());
 		} catch (Exception e) {

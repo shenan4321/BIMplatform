@@ -1,11 +1,9 @@
 package cn.dlb.bim.dao;
 
-import java.util.List;
-
+import java.util.Collection;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.data.util.CloseableIterator;
-
 import cn.dlb.bim.dao.impl.BatchUpdateOptions;
 import cn.dlb.bim.utils.Page;
 
@@ -16,7 +14,7 @@ public interface BaseMongoDao<T> {
      *  
      * @param query 
      */  
-    public List<T> find(Query query);  
+    public Collection<T> find(Query query);  
     
     /** 
      * 通过一定的条件查询一个实体 
@@ -48,7 +46,7 @@ public interface BaseMongoDao<T> {
      * @param entity 
      * @return 
      */  
-    public void saveAll(List<T> entityList) ; 
+    public void saveAll(Collection<T> entityList) ; 
   
     /** 
      * 通过ID获取记录 
@@ -95,6 +93,6 @@ public interface BaseMongoDao<T> {
      * @param updates
      * @return
      */
-    public int updateAll(List<BatchUpdateOptions> updates);
+    public int updateAll(Collection<BatchUpdateOptions> updates);
       
 }

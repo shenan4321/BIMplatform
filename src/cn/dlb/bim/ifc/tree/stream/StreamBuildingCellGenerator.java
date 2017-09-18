@@ -13,20 +13,21 @@ import cn.dlb.bim.dao.entity.ConcreteRevision;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
 import cn.dlb.bim.ifc.stream.VirtualObject;
 import cn.dlb.bim.ifc.tree.BuildingCellContainer;
-import cn.dlb.bim.service.PlatformService;
+import cn.dlb.bim.service.CatalogService;
+import cn.dlb.bim.service.VirtualObjectService;
 
 public class StreamBuildingCellGenerator {
 	
 	private PackageMetaData packageMetaData;
-	private PlatformService platformService;
+	private CatalogService catalogService;
 	private ConcreteRevision concreteRevision;
-	private VirtualObjectDao virtualObjectDao;
+	private VirtualObjectService virtualObjectService;
 	
-	public StreamBuildingCellGenerator(PackageMetaData packageMetaData, PlatformService platformService,
-			VirtualObjectDao virtualObjectDao, ConcreteRevision concreteRevision) {
+	public StreamBuildingCellGenerator(PackageMetaData packageMetaData, CatalogService catalogService,
+			VirtualObjectService virtualObjectService, ConcreteRevision concreteRevision) {
 		this.packageMetaData = packageMetaData;
-		this.platformService = platformService;
-		this.virtualObjectDao = virtualObjectDao;
+		this.catalogService = catalogService;
+		this.virtualObjectService = virtualObjectService;
 		this.concreteRevision = concreteRevision;
 	}
 	
@@ -37,8 +38,8 @@ public class StreamBuildingCellGenerator {
 		Map<String, BuildingCellContainer> containers = new HashMap<>();
 		EClass ifcSpaceEClass = packageMetaData.getEClass("IfcSpace");
 		for (EClass eClass : subClasses) {
-			Short cid = platformService.getCidOfEClass(eClass);
-			CloseableIterator<VirtualObject> productIterator = virtualObjectDao.streamByRidAndCid(rid, cid);
+			Short cid = catalogService.getCidOfEClass(eClass);
+			CloseableIterator<VirtualObject> productIterator = virtualObjectService.streamByRidAndCid(rid, cid);
 			while (productIterator.hasNext()) {
 				VirtualObject product = productIterator.next();
 				Object geometryInfo = product.get("geometry");

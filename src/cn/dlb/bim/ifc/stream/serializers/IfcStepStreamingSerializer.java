@@ -46,7 +46,7 @@ import cn.dlb.bim.ifc.serializers.StreamingReader;
 import cn.dlb.bim.ifc.stream.MinimalVirtualObject;
 import cn.dlb.bim.ifc.stream.VirtualObject;
 import cn.dlb.bim.ifc.stream.WrappedVirtualObject;
-import cn.dlb.bim.service.PlatformService;
+import cn.dlb.bim.service.CatalogService;
 import cn.dlb.bim.utils.StringUtils;
 import cn.dlb.bim.utils.UTF8PrintWriter;
 import nl.tue.buildingsmart.schema.EntityDefinition;
@@ -84,7 +84,7 @@ public abstract class IfcStepStreamingSerializer
 	private IfcHeader ifcHeader;
 	private PackageMetaData packageMetaData;
 	private PrintWriter printWriter;
-	private PlatformService platformService;
+	private CatalogService platformService;
 
 	@Override
 	public boolean write(OutputStream outputStream) throws SerializerException, DatabaseException {
@@ -125,7 +125,7 @@ public abstract class IfcStepStreamingSerializer
 	}
 
 	@Override
-	public void init(PlatformService platformService, ObjectProvider objectProvider, IfcHeader ifcHeader,
+	public void init(CatalogService platformService, ObjectProvider objectProvider, IfcHeader ifcHeader,
 			PackageMetaData packageMetaData) throws SerializerException {
 		this.platformService = platformService;
 		this.objectProvider = objectProvider;

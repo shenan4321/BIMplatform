@@ -51,7 +51,7 @@ public class QueryIncludeStackFrame extends DatabaseReadingStackFrame {
 		if (include.getOutputTypes() != null) {
 			this.outputFilterCids = new HashSet<>();
 			for (EClass eClass : include.getOutputTypes()) {
-				short cid = queryObjectProvider.getPlatformService().getCidOfEClass(eClass);
+				short cid = queryObjectProvider.getCatalogService().getCidOfEClass(eClass);
 				outputFilterCids.add(cid);
 			}
 		}

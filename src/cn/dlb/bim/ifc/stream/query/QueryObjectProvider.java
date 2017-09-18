@@ -22,7 +22,8 @@ import cn.dlb.bim.ifc.emf.MetaDataManager;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
 import cn.dlb.bim.ifc.stream.VirtualObject;
 import cn.dlb.bim.ifc.stream.serializers.ObjectProvider;
-import cn.dlb.bim.service.PlatformService;
+import cn.dlb.bim.service.CatalogService;
+import cn.dlb.bim.service.VirtualObjectService;
 
 public class QueryObjectProvider implements ObjectProvider {
 
@@ -34,7 +35,8 @@ public class QueryObjectProvider implements ObjectProvider {
 	// So far 100000 has proven to not be enough for some legit IFC files
 	private static final int MAX_STACK_SIZE = 1000000;
 	private static final Logger LOGGER = LoggerFactory.getLogger(QueryObjectProvider.class);
-	private PlatformService platformService;
+	private CatalogService catalogService;
+	private VirtualObjectService virtualObjectService;
 	private PlatformServer server;
 	
 	private final Set<Long> oidsRead = new HashSet<>();
@@ -50,13 +52,14 @@ public class QueryObjectProvider implements ObjectProvider {
 
 	private PackageMetaData packageMetaData;
 
-	public QueryObjectProvider(PlatformService platformService, PlatformServer server, Query query, Integer rid, PackageMetaData packageMetaData) throws IOException, QueryException {
-		this.platformService = platformService;
+	public QueryObjectProvider(CatalogService catalogService, VirtualObjectService virtualObjectService, PlatformServer server, Query query, Integer rid, PackageMetaData packageMetaData) throws IOException, QueryException {
+		this.catalogService = catalogService;
+		this.virtualObjectService = virtualObjectService;
 		this.server = server;
 		this.query = query;
 		this.rid = rid;
 		this.packageMetaData = packageMetaData;
-		QueryContext queryContext = new QueryContext(platformService, packageMetaData, rid);
+		QueryContext queryContext = new QueryContext(catalogService, virtualObjectService, packageMetaData, rid);
 		stack = new ArrayDeque<StackFrame>();
 		stack.push(new QueryStackFrame(this, rid, queryContext));
 		
@@ -68,22 +71,22 @@ public class QueryObjectProvider implements ObjectProvider {
 	}
 
 	public QueryObjectProvider copy() throws IOException, QueryException {
-		QueryObjectProvider queryObjectProvider = new QueryObjectProvider(platformService, server, query, rid, packageMetaData);
+		QueryObjectProvider queryObjectProvider = new QueryObjectProvider(catalogService, virtualObjectService, server, query, rid, packageMetaData);
 		return queryObjectProvider;
 	}
 	
-	public static QueryObjectProvider fromJsonNode(PlatformService platformService, PlatformServer server, JsonNode fullQuery, Integer rid, PackageMetaData packageMetaData) throws JsonParseException, JsonMappingException, IOException, QueryException {
+	public static QueryObjectProvider fromJsonNode(CatalogService catalogService, VirtualObjectService virtualObjectService, PlatformServer server, JsonNode fullQuery, Integer rid, PackageMetaData packageMetaData) throws JsonParseException, JsonMappingException, IOException, QueryException {
 		if (fullQuery instanceof ObjectNode) {
 			JsonQueryObjectModelConverter converter = new JsonQueryObjectModelConverter(packageMetaData);
 			Query query = converter.parseJson("query", (ObjectNode) fullQuery);
-			return new QueryObjectProvider(platformService, server, query, rid, packageMetaData);
+			return new QueryObjectProvider(catalogService, virtualObjectService, server, query, rid, packageMetaData);
 		} else {
 			throw new QueryException("Query root must be of type object");
 		}
 	}
 	
-	public static QueryObjectProvider fromJsonString(PlatformService platformService, PlatformServer server, String json, Integer rid, PackageMetaData packageMetaData) throws JsonParseException, JsonMappingException, IOException, QueryException {
-		return fromJsonNode(platformService, server, OBJECT_MAPPER.readValue(json, ObjectNode.class), rid, packageMetaData);
+	public static QueryObjectProvider fromJsonString(CatalogService catalogService, VirtualObjectService virtualObjectService, PlatformServer server, String json, Integer rid, PackageMetaData packageMetaData) throws JsonParseException, JsonMappingException, IOException, QueryException {
+		return fromJsonNode(catalogService, virtualObjectService, server, OBJECT_MAPPER.readValue(json, ObjectNode.class), rid, packageMetaData);
 	}
 	
 	public Query getQuery() {
@@ -155,8 +158,12 @@ public class QueryObjectProvider implements ObjectProvider {
 		reads++;
 	}
 
-	public PlatformService getPlatformService() {
-		return platformService;
+	public VirtualObjectService getVirtualObjectService() {
+		return virtualObjectService;
+	}
+	
+	public CatalogService getCatalogService() {
+		return catalogService;
 	}
 
 	public MetaDataManager getMetaDataManager() {

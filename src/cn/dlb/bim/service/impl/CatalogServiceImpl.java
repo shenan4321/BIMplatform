@@ -2,6 +2,7 @@ package cn.dlb.bim.service.impl;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.data.util.CloseableIterator;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import cn.dlb.bim.component.PlatformServer;
 import cn.dlb.bim.component.PlatformServerConfig;
@@ -31,16 +33,16 @@ import cn.dlb.bim.database.BatchThreadLocal;
 import cn.dlb.bim.database.DatabaseException;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
 import cn.dlb.bim.ifc.stream.VirtualObject;
-import cn.dlb.bim.service.PlatformService;
+import cn.dlb.bim.service.CatalogService;
 
 /**
  * @author shenan4321
  *
  */
-@Component("PlatformServiceImpl")
-public class PlatformServiceImpl implements InitializingBean, PlatformService {
+@Service("CatalogServiceImpl")
+public class CatalogServiceImpl implements InitializingBean, CatalogService {
 	
-	private static final Logger LOGGER = LoggerFactory.getLogger(PlatformServiceImpl.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(CatalogServiceImpl.class);
 	
 	private static final int AUTO_COMMIT_SIZE = 1000;
 	private static final String SAVE_BATCH_KEY = "save";
@@ -73,7 +75,7 @@ public class PlatformServiceImpl implements InitializingBean, PlatformService {
 		initialize();
 	}
 	
-	public PlatformServiceImpl() throws NoSuchMethodException, SecurityException {
+	public CatalogServiceImpl() throws NoSuchMethodException, SecurityException {
 		this.cidToEclass = new EClass[Short.MAX_VALUE]; 
 		this.eClassToCid = new HashMap<>();
 		this.oidCounters = new HashMap<>();
@@ -100,7 +102,7 @@ public class PlatformServiceImpl implements InitializingBean, PlatformService {
 	}
 	
 	private void initCatalogIfcTable() {
-		List<CatalogIfc> catalogIfcList = catalogIfcDao.find(new Query());
+		Collection<CatalogIfc> catalogIfcList = catalogIfcDao.find(new Query());
 		if (catalogIfcList.size() > 0) {
 			for (CatalogIfc catalogIfc : catalogIfcList) {
 				String packageClassName = catalogIfc.getPackageClassName();
@@ -192,30 +194,30 @@ public class PlatformServiceImpl implements InitializingBean, PlatformService {
 		return platformVersions.getCurrentTopRevisionId();
 	}
 
-	@Override
-	public void save(VirtualObject virtualObject) {
-		virtualObjectDao.save(virtualObject);
-	}
-
-	@Override
-	public void update(VirtualObject virtualObject) {
-		virtualObjectDao.update(virtualObject);
-	}
+//	@Override
+//	public void save(VirtualObject virtualObject) {
+//		virtualObjectDao.save(virtualObject);
+//	}
+//
+//	@Override
+//	public void update(VirtualObject virtualObject) {
+//		virtualObjectDao.update(virtualObject);
+//	}
 	
-	@Override
-	public void saveBatch(VirtualObject virtualObject) {
-		Map<String, List<VirtualObject>> localThreadMap = localBatch.newGet();
-		List<VirtualObject> localBatchList = localThreadMap.get(SAVE_BATCH_KEY);
-		if (localBatchList == null) {
-			localBatchList = new ArrayList<>();
-			localThreadMap.put(SAVE_BATCH_KEY, localBatchList);
-		}
-		localBatchList.add(virtualObject);
-		if (localBatchList.size() >= AUTO_COMMIT_SIZE) {
-			virtualObjectDao.saveAll(localBatchList);
-			localBatch.get().get(SAVE_BATCH_KEY).clear();
-		}
-	}
+//	@Override
+//	public void saveBatch(VirtualObject virtualObject) {
+//		Map<String, List<VirtualObject>> localThreadMap = localBatch.newGet();
+//		List<VirtualObject> localBatchList = localThreadMap.get(SAVE_BATCH_KEY);
+//		if (localBatchList == null) {
+//			localBatchList = new ArrayList<>();
+//			localThreadMap.put(SAVE_BATCH_KEY, localBatchList);
+//		}
+//		localBatchList.add(virtualObject);
+//		if (localBatchList.size() >= AUTO_COMMIT_SIZE) {
+//			virtualObjectDao.saveAll(localBatchList);
+//			localBatch.get().get(SAVE_BATCH_KEY).clear();
+//		}
+//	}
 	
 	
 //	@Override
@@ -228,40 +230,40 @@ public class PlatformServiceImpl implements InitializingBean, PlatformService {
 //		localBatch.get().clear();
 //	}
 
-	@Override
-	public List<VirtualObject> queryVirtualObject(Integer rid, List<Short> cids) {
-		return virtualObjectDao.findByRidAndCids(rid, cids);
-	}
-	
-	@Override
-	public CloseableIterator<VirtualObject> streamVirtualObjectByRid(Integer rid) {
-		return virtualObjectDao.streamByRid(rid);
-	}
+//	@Override
+//	public List<VirtualObject> queryVirtualObject(Integer rid, List<Short> cids) {
+//		return virtualObjectDao.findByRidAndCids(rid, cids);
+//	}
+//	
+//	@Override
+//	public CloseableIterator<VirtualObject> streamVirtualObjectByRid(Integer rid) {
+//		return virtualObjectDao.streamByRid(rid);
+//	}
+//
+//	@Override
+//	public VirtualObject queryVirtualObject(Integer rid, Long oid) {
+//		return virtualObjectDao.findOneByRidAndOid(rid, oid);
+//	}
+//
+//	@Override
+//	public CloseableIterator<VirtualObject> streamVirtualObject(Integer rid, Short cid) {
+//		return virtualObjectDao.streamByRidAndCid(rid, cid);
+//	}
 
-	@Override
-	public VirtualObject queryVirtualObject(Integer rid, Long oid) {
-		return virtualObjectDao.findOneByRidAndOid(rid, oid);
-	}
-
-	@Override
-	public CloseableIterator<VirtualObject> streamVirtualObject(Integer rid, Short cid) {
-		return virtualObjectDao.streamByRidAndCid(rid, cid);
-	}
-
-	@Override
-	public void updateBatch(VirtualObject virtualObject) {
-		Map<String, List<VirtualObject>> localThreadMap = localBatch.newGet();
-		List<VirtualObject> localBatchList = localThreadMap.get(UPDATE_BATCH_KEY);
-		if (localBatchList == null) {
-			localBatchList = new ArrayList<>();
-			localThreadMap.put(UPDATE_BATCH_KEY, localBatchList);
-		}
-		localBatchList.add(virtualObject);
-		if (localBatchList.size() >= AUTO_COMMIT_SIZE) {
-			virtualObjectDao.updateAllVirtualObject(localBatchList);
-			localBatch.get().get(UPDATE_BATCH_KEY).clear();
-		}
-	}
+//	@Override
+//	public void updateBatch(VirtualObject virtualObject) {
+//		Map<String, List<VirtualObject>> localThreadMap = localBatch.newGet();
+//		List<VirtualObject> localBatchList = localThreadMap.get(UPDATE_BATCH_KEY);
+//		if (localBatchList == null) {
+//			localBatchList = new ArrayList<>();
+//			localThreadMap.put(UPDATE_BATCH_KEY, localBatchList);
+//		}
+//		localBatchList.add(virtualObject);
+//		if (localBatchList.size() >= AUTO_COMMIT_SIZE) {
+//			virtualObjectDao.updateAllVirtualObject(localBatchList);
+//			localBatch.get().get(UPDATE_BATCH_KEY).clear();
+//		}
+//	}
 
 //	@Override
 //	public void commitUpdateBatch() {
@@ -273,16 +275,16 @@ public class PlatformServiceImpl implements InitializingBean, PlatformService {
 //		localBatch.get().clear();
 //	}
 
-	@Override
-	public void commitAllBatch() {
-		List<VirtualObject> updateLocalBatchList = localBatch.newGet().get(UPDATE_BATCH_KEY);
-		if (updateLocalBatchList != null && !updateLocalBatchList.isEmpty()) {
-			virtualObjectDao.updateAllVirtualObject(updateLocalBatchList);
-		}
-		List<VirtualObject> saveLocalBatchList = localBatch.newGet().get(SAVE_BATCH_KEY);
-		if (saveLocalBatchList != null && !saveLocalBatchList.isEmpty()) {
-			virtualObjectDao.saveAll(saveLocalBatchList);
-		}
-		localBatch.get().clear();
-	}
+//	@Override
+//	public void commitAllBatch() {
+//		List<VirtualObject> updateLocalBatchList = localBatch.newGet().get(UPDATE_BATCH_KEY);
+//		if (updateLocalBatchList != null && !updateLocalBatchList.isEmpty()) {
+//			virtualObjectDao.updateAllVirtualObject(updateLocalBatchList);
+//		}
+//		List<VirtualObject> saveLocalBatchList = localBatch.newGet().get(SAVE_BATCH_KEY);
+//		if (saveLocalBatchList != null && !saveLocalBatchList.isEmpty()) {
+//			virtualObjectDao.saveAll(saveLocalBatchList);
+//		}
+//		localBatch.get().clear();
+//	}
 }

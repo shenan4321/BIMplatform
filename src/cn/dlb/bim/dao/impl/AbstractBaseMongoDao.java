@@ -1,6 +1,7 @@
 package cn.dlb.bim.dao.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.dao.InvalidDataAccessApiUsageException;
@@ -9,10 +10,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.data.util.CloseableIterator;
+
 import com.mongodb.BasicDBObject;
 import com.mongodb.CommandResult;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
+
 import cn.dlb.bim.dao.BaseMongoDao;
 import cn.dlb.bim.utils.Page;
 import cn.dlb.bim.utils.ReflectionUtils;
@@ -49,7 +52,7 @@ public abstract class AbstractBaseMongoDao<T> implements BaseMongoDao<T>{
     }  
     
     @Override
-    public void saveAll(List<T> entityList) {
+    public void saveAll(Collection<T> entityList) {
     	mongoTemplate.insertAll(entityList);
     }
   
@@ -85,7 +88,8 @@ public abstract class AbstractBaseMongoDao<T> implements BaseMongoDao<T>{
     	return mongoTemplate.stream(query, this.getEntityClass());
     }
     
-    public int updateAll(List<BatchUpdateOptions> updates) {
+    @Override
+    public int updateAll(Collection<BatchUpdateOptions> updates) {
     	String collectionName = determineCollectionName(ReflectionUtils.getSuperClassGenricType(getClass()));
 		return doBatchUpdate(mongoTemplate.getCollection(collectionName), collectionName, updates, true);
     }
@@ -99,7 +103,7 @@ public abstract class AbstractBaseMongoDao<T> implements BaseMongoDao<T>{
         return ReflectionUtils.getSuperClassGenricType(getClass());  
     }  
     
-    private int doBatchUpdate(DBCollection dbCollection, String collName, List<BatchUpdateOptions> options,
+    private int doBatchUpdate(DBCollection dbCollection, String collName, Collection<BatchUpdateOptions> options,
 			boolean ordered) {
 		DBObject command = new BasicDBObject();
 		command.put("update", collName);

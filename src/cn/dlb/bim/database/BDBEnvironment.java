@@ -23,8 +23,6 @@ public class BDBEnvironment {
 	private boolean isNew;
 	private boolean useTransactions = true;
 	private Environment environment;
-	private CursorConfig safeCursorConfig;
-	private CursorConfig unsafeCursorConfig;
 	
 	public BDBEnvironment(String dataDir) {
 		Path dataPath = Paths.get(dataDir);
@@ -69,11 +67,6 @@ public class BDBEnvironment {
 			LOGGER.error(message);
 		}
 		
-		safeCursorConfig = new CursorConfig();
-		safeCursorConfig.setReadCommitted(true);
-
-		unsafeCursorConfig = new CursorConfig();
-		unsafeCursorConfig.setReadUncommitted(true);
 	}
 
 	public boolean isNew() {
@@ -90,22 +83,6 @@ public class BDBEnvironment {
 
 	public void setUseTransactions(boolean useTransactions) {
 		this.useTransactions = useTransactions;
-	}
-
-	public CursorConfig getSafeCursorConfig() {
-		return safeCursorConfig;
-	}
-
-	public void setSafeCursorConfig(CursorConfig safeCursorConfig) {
-		this.safeCursorConfig = safeCursorConfig;
-	}
-
-	public CursorConfig getUnsafeCursorConfig() {
-		return unsafeCursorConfig;
-	}
-
-	public void setUnsafeCursorConfig(CursorConfig unsafeCursorConfig) {
-		this.unsafeCursorConfig = unsafeCursorConfig;
 	}
 
 	public Environment getEnvironment() {

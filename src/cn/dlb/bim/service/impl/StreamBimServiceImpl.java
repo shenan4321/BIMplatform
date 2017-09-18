@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +23,6 @@ import org.springframework.stereotype.Service;
 
 import cn.dlb.bim.component.PlatformServer;
 import cn.dlb.bim.dao.BaseMongoDao;
-import cn.dlb.bim.dao.VirtualObjectDao;
 import cn.dlb.bim.dao.entity.ConcreteRevision;
 import cn.dlb.bim.database.DatabaseException;
 import cn.dlb.bim.ifc.deserializers.DeserializeException;
@@ -46,7 +46,8 @@ import cn.dlb.bim.ifc.tree.stream.StreamBuildingCellGenerator;
 import cn.dlb.bim.ifc.tree.stream.StreamBuildingStoreyGenerator;
 import cn.dlb.bim.ifc.tree.stream.StreamProjectTreeGenerator;
 import cn.dlb.bim.service.BimService;
-import cn.dlb.bim.service.PlatformService;
+import cn.dlb.bim.service.CatalogService;
+import cn.dlb.bim.service.VirtualObjectService;
 import cn.dlb.bim.vo.GeometryInfoVo;
 import cn.dlb.bim.vo.GlbVo;
 import cn.dlb.bim.vo.ModelAndOutputTemplateVo;
@@ -67,16 +68,14 @@ public class StreamBimServiceImpl implements BimService {
 	private PlatformServer server;
 	
 	@Autowired
-	@Qualifier("VirtualObjectDaoImpl")
-	private VirtualObjectDao virtualObjectDao;
+	private VirtualObjectService virtualObjectService;
 	
 	@Autowired
 	@Qualifier("ConcreteRevisionDaoImpl")
 	private BaseMongoDao<ConcreteRevision> concreteRevisionDao;
 
 	@Autowired
-	@Qualifier("PlatformServiceImpl")
-	private PlatformService platformService;
+	private CatalogService catalogService;
 
 	@Override
 	public List<GeometryInfoVo> queryGeometryInfo(Integer rid, ProgressReporter progressReporter) {
@@ -105,7 +104,7 @@ public class StreamBimServiceImpl implements BimService {
 			LOGGER.info("Deserialising ifc file...");
 			
 			PackageMetaData packageMetaData = server.getMetaDataManager().getPackageMetaData(schema.getEPackageName());
-			deserializer.init(packageMetaData, platformService);
+			deserializer.init(packageMetaData, catalogService, virtualObjectService);
 			deserializer.read(modelFile);
 			
 			Long end = System.nanoTime();
@@ -124,8 +123,8 @@ public class StreamBimServiceImpl implements BimService {
 			start = System.nanoTime();
 			LOGGER.info("Generate geometry...");
 			
-			StreamingGeometryGenerator generator = new StreamingGeometryGenerator(server, platformService, rid, deserializer.getIfcHeader());
-			QueryContext queryContext = new QueryContext(platformService, packageMetaData, rid);
+			StreamingGeometryGenerator generator = new StreamingGeometryGenerator(server, catalogService, virtualObjectService, rid, deserializer.getIfcHeader());
+			QueryContext queryContext = new QueryContext(catalogService, virtualObjectService, packageMetaData, rid);
 			GenerateGeometryResult result = generator.generateGeometry(queryContext);
 			
 			end = System.nanoTime();
@@ -183,7 +182,7 @@ public class StreamBimServiceImpl implements BimService {
 	public List<ModelInfoVo> queryModelInfoByPid(Long pid) {
 		Query query = new Query();
 		query.addCriteria(Criteria.where("pid").is(pid));
-		List<ConcreteRevision> concreteRevisionList = concreteRevisionDao.find(query);
+		Collection<ConcreteRevision> concreteRevisionList = concreteRevisionDao.find(query);
 		
 		List<ModelInfoVo> result = new ArrayList<>();
 		for (ConcreteRevision concreteRevision : concreteRevisionList) {
@@ -237,7 +236,7 @@ public class StreamBimServiceImpl implements BimService {
 		String schema = concreteRevision.getSchema();
 		PackageMetaData packageMetaData = server.getMetaDataManager().getPackageMetaData(schema);
 		
-		StreamProjectTreeGenerator generator = new StreamProjectTreeGenerator(packageMetaData, platformService, virtualObjectDao, concreteRevision);
+		StreamProjectTreeGenerator generator = new StreamProjectTreeGenerator(packageMetaData, catalogService, virtualObjectService, concreteRevision);
 		generator.proccessBuild();
 		return generator.getTree();
 	}
@@ -249,7 +248,7 @@ public class StreamBimServiceImpl implements BimService {
 		ConcreteRevision concreteRevision = concreteRevisionDao.findOne(concreteRevisionQuery);
 		String schema = concreteRevision.getSchema();
 		PackageMetaData packageMetaData = server.getMetaDataManager().getPackageMetaData(schema);
-		StreamBuildingStoreyGenerator generator = new StreamBuildingStoreyGenerator(packageMetaData, platformService, virtualObjectDao, concreteRevision);
+		StreamBuildingStoreyGenerator generator = new StreamBuildingStoreyGenerator(packageMetaData, catalogService, virtualObjectService, concreteRevision);
 		return generator.proccessBuild();
 	}
 
@@ -260,7 +259,7 @@ public class StreamBimServiceImpl implements BimService {
 		ConcreteRevision concreteRevision = concreteRevisionDao.findOne(concreteRevisionQuery);
 		String schema = concreteRevision.getSchema();
 		PackageMetaData packageMetaData = server.getMetaDataManager().getPackageMetaData(schema);
-		StreamBuildingCellGenerator generator = new StreamBuildingCellGenerator(packageMetaData, platformService, virtualObjectDao, concreteRevision);
+		StreamBuildingCellGenerator generator = new StreamBuildingCellGenerator(packageMetaData, catalogService, virtualObjectService, concreteRevision);
 		return generator.proccessBuild();
 	}
 
@@ -353,7 +352,7 @@ public class StreamBimServiceImpl implements BimService {
 		
 		Map<Long, VirtualObject> cache = new HashMap<Long, VirtualObject>();
 
-		CloseableIterator<VirtualObject> objectIterator = platformService.streamVirtualObjectByRid(rid);
+		CloseableIterator<VirtualObject> objectIterator = virtualObjectService.streamByRid(rid);
 
 		while (objectIterator.hasNext()) {
 			VirtualObject next = objectIterator.next();
@@ -373,24 +372,31 @@ public class StreamBimServiceImpl implements BimService {
 				}
 			}
 		}
-		for (VirtualObject referencedObject : cache.values()) {
-			platformService.updateBatch(referencedObject);
+		
+		List<VirtualObject> section = new ArrayList<>();
+		for (VirtualObject virtualObject : cache.values()) {
+			section.add(virtualObject);
+			if (section.size() >= 1000) {
+				virtualObjectService.updateAllVirtualObject(section);
+				section.clear();
+			}
 		}
-		platformService.commitAllBatch();
+		virtualObjectService.updateAllVirtualObject(section);
+		section.clear();
 	}
 
 	private void fixInverses(PackageMetaData packageMetaData, Integer rid, Map<Long, VirtualObject> cache,
 			VirtualObject next, EReference eReference, long refOid) throws DatabaseException {
 		VirtualObject referencedObject = cache.get(refOid);
 		if (referencedObject == null) {
-			referencedObject = platformService.queryVirtualObject(rid, refOid);
+			referencedObject = virtualObjectService.findOneByRidAndOid(rid, refOid);
 			if (referencedObject == null) {
 				throw new DatabaseException("Referenced object with oid " + refOid + ", referenced from "
 						+ next.eClass().getName() + " not found");
 			}
 			cache.put(refOid, referencedObject);
 		}
-		EClass referencedObjectEclass = platformService.getEClassForCid(referencedObject.getEClassId());
+		EClass referencedObjectEclass = catalogService.getEClassForCid(referencedObject.getEClassId());
 		EReference oppositeReference = packageMetaData.getInverseOrOpposite(referencedObjectEclass, eReference);
 		if (oppositeReference == null) {
 			if (eReference.getName().equals("RelatedElements") && referencedObjectEclass.getName().equals("IfcSpace")) {

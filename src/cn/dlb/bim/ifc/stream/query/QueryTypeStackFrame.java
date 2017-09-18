@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 
 import cn.dlb.bim.database.DatabaseException;
 import cn.dlb.bim.ifc.stream.VirtualObject;
-import cn.dlb.bim.service.PlatformService;
+import cn.dlb.bim.service.CatalogService;
 
 public class QueryTypeStackFrame extends DatabaseReadingStackFrame implements ObjectProvidingStackFrame {
 	
@@ -23,10 +23,9 @@ public class QueryTypeStackFrame extends DatabaseReadingStackFrame implements Ob
 		super(reusable, queryObjectProvider, queryPart);
 		this.eClass = eClass;
 		
-		PlatformService platformService = reusable.getPlatformService();
 		Integer rid = reusable.getRid();
-		Short cid = platformService.getCidOfEClass(eClass);
-		iterator = platformService.streamVirtualObject(rid, cid);
+		Short cid = reusable.getCatalogService().getCidOfEClass(eClass);
+		iterator = reusable.getVirtualObjectService().streamByRidAndCid(rid, cid);
 		
 	}
 	

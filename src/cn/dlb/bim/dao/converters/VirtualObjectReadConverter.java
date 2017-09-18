@@ -20,7 +20,7 @@ import cn.dlb.bim.component.PlatformServer;
 import cn.dlb.bim.ifc.stream.MinimalVirtualObject;
 import cn.dlb.bim.ifc.stream.VirtualObject;
 import cn.dlb.bim.ifc.stream.WrappedVirtualObject;
-import cn.dlb.bim.service.PlatformService;
+import cn.dlb.bim.service.CatalogService;
 
 @Component("VirtualObjectReadConverter")
 public class VirtualObjectReadConverter implements Converter<DBObject, VirtualObject>  {
@@ -31,7 +31,7 @@ public class VirtualObjectReadConverter implements Converter<DBObject, VirtualOb
 	private PlatformServer platformServer;
 	@Autowired
 	@Lazy(true)
-	private PlatformService platformService;
+	private CatalogService platformService;
 
 	@SuppressWarnings("rawtypes")
 	@Override

@@ -36,7 +36,7 @@ public class MemcachedCache implements Cache {
 	@Override
 	public void evict(Object key) {
 		try {  
-            memcachedClient.delete((String)key);  
+            memcachedClient.delete(getKey(key));  
         } catch (TimeoutException e) {  
             e.printStackTrace();  
         } catch (InterruptedException e) {  
@@ -49,8 +49,8 @@ public class MemcachedCache implements Cache {
 	@Override
 	public ValueWrapper get(Object key) {
 		Object object = null;  
-        try {  
-            object = memcachedClient.get((String)key);  
+        try {
+            object = memcachedClient.get(getKey(key));  
         } catch (TimeoutException e) {  
             e.printStackTrace();  
         } catch (InterruptedException e) {  
@@ -74,8 +74,7 @@ public class MemcachedCache implements Cache {
 	@Override
 	public void put(Object key, Object value) {
 		try {  
-			key = this.getKey(key);  
-            memcachedClient.setWithNoReply(key.toString(), expire, value);  
+            memcachedClient.setWithNoReply(getKey(key), expire, value);  
         } catch (InterruptedException e) {  
             e.printStackTrace();  
         } catch (MemcachedException e) {  
@@ -88,7 +87,7 @@ public class MemcachedCache implements Cache {
 	public <T> T get(Object key, Class<T> valueClass) {
 		Object object = null;  
         try {  
-            object = memcachedClient.get((String)key);  
+            object = memcachedClient.get(getKey(key));  
         } catch (TimeoutException e) {  
             e.printStackTrace();  
         } catch (InterruptedException e) {  

@@ -29,10 +29,11 @@ import cn.dlb.bim.ifc.emf.IfcModelInterface;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
 import cn.dlb.bim.ifc.model.IfcHeader;
 import cn.dlb.bim.ifc.shared.ByteProgressReporter;
-import cn.dlb.bim.service.PlatformService;
+import cn.dlb.bim.service.CatalogService;
+import cn.dlb.bim.service.VirtualObjectService;
 
 public interface StreamingDeserializer {
-	void init(PackageMetaData packageMetaData, PlatformService platformService);
+	void init(PackageMetaData packageMetaData, CatalogService catalogService, VirtualObjectService virtualObjectService);
 	void setProgressReporter(ByteProgressReporter byteProgressReporter);
 	long read(InputStream inputStream, String fileName, long fileSize) throws DeserializeException;
 	public long read(File sourceFile) throws DeserializeException;

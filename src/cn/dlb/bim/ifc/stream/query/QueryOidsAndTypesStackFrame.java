@@ -28,7 +28,7 @@ public class QueryOidsAndTypesStackFrame extends DatabaseReadingStackFrame imple
 		}
 		long oid = oidIterator.next();
 		if (!getQueryObjectProvider().hasRead(oid)) {
-			currentObject = getReusable().getPlatformService().queryVirtualObject(getReusable().getRid(), oid);
+			currentObject = getReusable().getVirtualObjectService().findOneByRidAndOid(getReusable().getRid(), oid);
 			decideUseForSerialization(currentObject);
 
 		}

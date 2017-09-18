@@ -21,7 +21,8 @@ import cn.dlb.bim.dao.entity.ConcreteRevision;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
 import cn.dlb.bim.ifc.stream.query.QueryContext;
 import cn.dlb.bim.service.BimService;
-import cn.dlb.bim.service.PlatformService;
+import cn.dlb.bim.service.CatalogService;
+import cn.dlb.bim.service.VirtualObjectService;
 
 @Component("StreamGeometrySocketHandler")
 public class StreamGeometrySocketHandler implements WebSocketHandler {
@@ -36,7 +37,10 @@ public class StreamGeometrySocketHandler implements WebSocketHandler {
     private BaseMongoDao<ConcreteRevision> concreteRevisionDao;
     
     @Autowired
-    private PlatformService platformService;
+    private CatalogService catalogService;
+    
+    @Autowired
+    private VirtualObjectService virtualObjectService;
 	
     /** 
      * after connection establish 
@@ -47,7 +51,7 @@ public class StreamGeometrySocketHandler implements WebSocketHandler {
         String rid = session.getAttributes().get("rid").toString();
         ConcreteRevision concreteRevision = concreteRevisionDao.findById(Integer.valueOf(rid));
         PackageMetaData packageMetaData = server.getMetaDataManager().getPackageMetaData(concreteRevision.getSchema());
-        QueryContext queryContext = new QueryContext(platformService, packageMetaData, Integer.valueOf(rid));
+        QueryContext queryContext = new QueryContext(catalogService, virtualObjectService, packageMetaData, Integer.valueOf(rid));
         StreamingGeometryQueryAction action = new StreamingGeometryQueryAction(session, server, queryContext, concreteRevision);
         action.execute();
     }  

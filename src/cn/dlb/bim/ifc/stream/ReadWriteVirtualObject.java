@@ -28,30 +28,30 @@ public abstract class ReadWriteVirtualObject implements MinimalVirtualObject {
 		}
 	}
 	
-	public abstract void write(ByteBuffer buffer);
+	public abstract ByteBuffer write(ByteBuffer buffer);
 	public abstract void read(ByteBuffer buffer);
 	public abstract ReadWriteVirtualObject createReadWriteVirtualObject();
 	
 	@SuppressWarnings({ "rawtypes", "unused" })
-	protected void writeFeature(ByteBuffer buffer, Object value){
+	protected ByteBuffer writeFeature(ByteBuffer buffer, Object value){
 		ReadWriteType type = ReadWriteType.Unkown;
 		if (value instanceof String) {
 			type = ReadWriteType.String;
-			ensureCapacity(buffer, 4);
+			buffer = ensureCapacity(buffer, 4);
 			buffer.putInt(type.getValue());
 			if (value == null) {
-				ensureCapacity(buffer, 4);
+				buffer = ensureCapacity(buffer, 4);
 				buffer.putInt(-1);
 			} else {
 				String stringValue = (String) value;
 				byte[] bytes = stringValue.getBytes(Charsets.UTF_8);
-				ensureCapacity(buffer, 4 + bytes.length);
+				buffer = ensureCapacity(buffer, 4 + bytes.length);
 				buffer.putInt(bytes.length);
 				buffer.put(bytes);
 			}
 		} else if (value instanceof Integer) {
 			type = ReadWriteType.Integer;
-			ensureCapacity(buffer, 8);
+			buffer = ensureCapacity(buffer, 8);
 			buffer.putInt(type.getValue());
 			if (value == null) {
 				buffer.putInt(0);
@@ -60,7 +60,7 @@ public abstract class ReadWriteVirtualObject implements MinimalVirtualObject {
 			}
 		} else if (value instanceof Double) {
 			type = ReadWriteType.Double;
-			ensureCapacity(buffer, 12);
+			buffer = ensureCapacity(buffer, 12);
 			buffer.putInt(type.getValue());
 			if (value == null) {
 				buffer.putDouble(0D);
@@ -69,7 +69,7 @@ public abstract class ReadWriteVirtualObject implements MinimalVirtualObject {
 			}
 		} else if (value instanceof Float) {
 			type = ReadWriteType.Float;
-			ensureCapacity(buffer, 8);
+			buffer = ensureCapacity(buffer, 8);
 			buffer.putInt(type.getValue());
 			if (value == null) {
 				buffer.putFloat(0F);
@@ -78,7 +78,7 @@ public abstract class ReadWriteVirtualObject implements MinimalVirtualObject {
 			}
 		} else if (value instanceof Long) {
 			type = ReadWriteType.Long;
-			ensureCapacity(buffer, 12);
+			buffer = ensureCapacity(buffer, 12);
 			buffer.putInt(type.getValue());
 			if (value == null) {
 				buffer.putLong(0L);
@@ -87,7 +87,7 @@ public abstract class ReadWriteVirtualObject implements MinimalVirtualObject {
 			}
 		} else if (value instanceof Boolean) {
 			type = ReadWriteType.Boolean;
-			ensureCapacity(buffer, 5);
+			buffer = ensureCapacity(buffer, 5);
 			buffer.putInt(type.getValue());
 			if (value == null) {
 				buffer.put((byte) 0);
@@ -96,44 +96,42 @@ public abstract class ReadWriteVirtualObject implements MinimalVirtualObject {
 			}
 		} else if (value instanceof List) {
 			type = ReadWriteType.List;
-			ensureCapacity(buffer, 8);
+			buffer = ensureCapacity(buffer, 8);
 			buffer.putInt(type.getValue());
 			List list = (List) value;
 			buffer.putInt(list.size());
 			for (int i = 0; i < list.size(); i++) {
 				Object valueInList = list.get(i);
-				writeFeature(buffer, valueInList);
+				buffer = writeFeature(buffer, valueInList);
 			}
 		} else if (value instanceof byte[]) {
 			type = ReadWriteType.ByteArray;
-			ensureCapacity(buffer, 4);
+			buffer = ensureCapacity(buffer, 4);
 			buffer.putInt(type.getValue());
 			if (value == null) {
-				ensureCapacity(buffer, 4);
+				buffer = ensureCapacity(buffer, 4);
 				buffer.putInt(0);
 			} else {
 				byte[] valueByte = ((byte[]) value);
-				ensureCapacity(buffer, 4 + valueByte.length);
+				buffer = ensureCapacity(buffer, 4 + valueByte.length);
 				buffer.putInt(valueByte.length);
 				buffer.put(valueByte);
 			}
 		} else if (value instanceof ReadWriteVirtualObject) {
 			type = ReadWriteType.ReadWriteVirtualObject;
-			ensureCapacity(buffer, 4);
+			buffer = ensureCapacity(buffer, 4);
 			buffer.putInt(type.getValue());
-			((ReadWriteVirtualObject) value).write(buffer);
+			buffer = ((ReadWriteVirtualObject) value).write(buffer);
 		} else {
 			System.err.println("unhandled type.");
 		}
+		return buffer;
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected Object readFeature(ByteBuffer buffer) {
 		int typeValue = buffer.getInt();
 		ReadWriteType type = ReadWriteType.getType(typeValue);
-		if (type == null) {
-			System.out.println();
-		}
 		Object value = null;
 		switch (type) {
 			case String:
@@ -185,7 +183,7 @@ public abstract class ReadWriteVirtualObject implements MinimalVirtualObject {
 		return value;
 	}
 	
-	protected void ensureCapacity(ByteBuffer buffer, int sizeToAdd) {
+	protected ByteBuffer ensureCapacity(ByteBuffer buffer, int sizeToAdd) {
 		int currentPos = buffer.position();
 		if (buffer.capacity() < currentPos + sizeToAdd) {
 			int newSize = Math.max(currentPos + sizeToAdd, buffer.capacity() * 2);
@@ -195,5 +193,6 @@ public abstract class ReadWriteVirtualObject implements MinimalVirtualObject {
 			buffer = newBuffer;
 			buffer.position(currentPos);
 		}
+		return buffer;
 	}
 }

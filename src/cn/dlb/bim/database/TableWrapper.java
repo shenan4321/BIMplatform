@@ -4,6 +4,9 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.sleepycat.je.Cursor;
+import com.sleepycat.je.CursorConfig;
 import com.sleepycat.je.Database;
 import com.sleepycat.je.DatabaseConfig;
 import com.sleepycat.je.DatabaseEntry;
@@ -14,6 +17,8 @@ import com.sleepycat.je.SecondaryDatabase;
 import com.sleepycat.je.SecondaryKeyCreator;
 import com.sleepycat.je.Transaction;
 
+import cn.dlb.bim.database.record.RecordIterator;
+
 public class TableWrapper {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(TableWrapper.class);
@@ -23,6 +28,7 @@ public class TableWrapper {
 	private Database database;
 	private final Set<SecondaryDatabase> secondaryDatabases;
 	private boolean transactional;
+	private CursorConfig cursorConfig;
 
 	public TableWrapper(BDBEnvironment environment, boolean transactional, String tableName) {
 		this.environment = environment;
@@ -37,6 +43,13 @@ public class TableWrapper {
 		databaseConfig.setTransactional(transactional);
 		databaseConfig.setSortedDuplicates(false);
 		database = environment.getEnvironment().openDatabase(null, tableName, databaseConfig);
+		
+		cursorConfig = new CursorConfig();
+		if (transactional) {
+			cursorConfig.setReadCommitted(true);
+		} else {
+			cursorConfig.setReadUncommitted(true);
+		}
 	}
 	
 	public void createIndex(String keyName, SecondaryKeyCreator keyCreator) {
@@ -44,6 +57,7 @@ public class TableWrapper {
 		secConfig.setAllowCreate(true);
 		secConfig.setSortedDuplicates(true);
 		secConfig.setKeyCreator(keyCreator);
+		secConfig.setTransactional(transactional);
 //		secConfig.setAllowPopulate(true);
 		SecondaryDatabase secDatabase = environment.getEnvironment().openSecondaryDatabase(null, keyName,
 				database, secConfig);
@@ -98,6 +112,13 @@ public class TableWrapper {
 		if (putNoOverwrite == OperationStatus.KEYEXIST) {
 			LOGGER.error("Key exists");
 		}
+	}
+	
+	public RecordIterator getRecordIterator(String keyName, byte[] key, Transaction transaction) {
+		Database finalDatabase = getDatabase(keyName);
+		Cursor cursor = finalDatabase.openCursor(transaction, cursorConfig);
+		RecordIterator recordIterator = new RecordIterator(cursor, key);
+		return recordIterator;
 	}
 
 	public LockMode getLockMode(Transaction transaction) {

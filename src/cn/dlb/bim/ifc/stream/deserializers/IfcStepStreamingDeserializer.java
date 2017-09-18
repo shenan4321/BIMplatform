@@ -11,6 +11,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -20,7 +22,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import org.bson.types.ObjectId;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EClassifier;
 import org.eclipse.emf.ecore.EDataType;
@@ -46,8 +47,8 @@ import cn.dlb.bim.ifc.model.IfcHeader;
 import cn.dlb.bim.ifc.shared.ByteProgressReporter;
 import cn.dlb.bim.ifc.stream.VirtualObject;
 import cn.dlb.bim.ifc.stream.WrappedVirtualObject;
-import cn.dlb.bim.service.PlatformService;
-import cn.dlb.bim.service.impl.StreamBimServiceImpl;
+import cn.dlb.bim.service.CatalogService;
+import cn.dlb.bim.service.VirtualObjectService;
 import cn.dlb.bim.utils.FakeClosingInputStream;
 import cn.dlb.bim.utils.StringUtils;
 import nl.tue.buildingsmart.schema.Attribute;
@@ -68,10 +69,12 @@ public class IfcStepStreamingDeserializer implements StreamingDeserializer {
 	// ExpressID -> ObjectID
 	// TODO find more efficient implementation
 	private final Map<Integer, Long> mappedObjects = new HashMap<>();
-//	private QueryContext reusable;
 	private IfcHeader ifcHeader;
-	private PlatformService platformService;
+	private CatalogService catalogService;
+	private VirtualObjectService virtualObjectService;
 	private Integer rid;
+	private Collection<VirtualObject> virtualObjectsToSave;
+	private static final Integer batchSaveSize = 1000;
 	
 //	private static MetricCollector metricCollector = new MetricCollector();
 	
@@ -79,12 +82,14 @@ public class IfcStepStreamingDeserializer implements StreamingDeserializer {
 	private final Map<String, AtomicInteger> summaryMap = new TreeMap<>();
 
 	@Override
-	public void init(PackageMetaData packageMetaData, PlatformService platformService) {
+	public void init(PackageMetaData packageMetaData, CatalogService catalogService, VirtualObjectService virtualObjectService) {
 		this.packageMetaData = packageMetaData;
-		this.platformService = platformService;
-		waitingList = new WaitingListVirtualObject<Integer>(platformService);
+		this.catalogService = catalogService;
+		this.virtualObjectService = virtualObjectService;
+		waitingList = new WaitingListVirtualObject<Integer>(this);
 		this.schema = packageMetaData.getSchema();
-		this.rid = platformService.newRevisionId();
+		this.rid = catalogService.newRevisionId();
+		virtualObjectsToSave = Collections.synchronizedList(new ArrayList<>());
 	}
 	
 	@Override
@@ -231,7 +236,8 @@ public class IfcStepStreamingDeserializer implements StreamingDeserializer {
 		case DATA:
 			if (line.equals("ENDSEC;")) {
 				mode = Mode.FOOTER;
-				platformService.commitAllBatch();
+				virtualObjectService.saveAll(virtualObjectsToSave);
+				virtualObjectsToSave.clear();
 				try {
 					waitingList.dumpIfNotEmpty();
 				} catch (WaitingListException e) {
@@ -294,11 +300,11 @@ public class IfcStepStreamingDeserializer implements StreamingDeserializer {
 	}
 
 	private VirtualObject newVirtualObject(EClass eClass) {
-		return new VirtualObject(rid, platformService.getCidOfEClass(eClass), platformService.newOid(eClass), eClass);
+		return new VirtualObject(rid, catalogService.getCidOfEClass(eClass), catalogService.newOid(eClass), eClass);
 	}
 
 	private WrappedVirtualObject newWrappedVirtualObject(EClass eClass) {
-		return new WrappedVirtualObject(platformService.getCidOfEClass(eClass), eClass);
+		return new WrappedVirtualObject(catalogService.getCidOfEClass(eClass), eClass);
 	}
 	
 	public void processRecord(String line) throws DeserializeException, MetaDataException, DatabaseException {
@@ -413,16 +419,12 @@ public class IfcStepStreamingDeserializer implements StreamingDeserializer {
 			}
 
 			if (!openReferences) {
-				getPlatformService().saveBatch(object);
+				addVirtualObjectToSave(object);
 //				metricCollector.collect(line.length(), nrBytes);
 			}
 		}
 	}
 	
-	private PlatformService getPlatformService() {
-		return platformService;
-	}
-
 	private boolean readList(String val, VirtualObject object, EStructuralFeature structuralFeature) throws DeserializeException, MetaDataException, DatabaseException {
 		int index = 0;
 		if (!structuralFeature.isMany()) {
@@ -455,7 +457,7 @@ public class IfcStepStreamingDeserializer implements StreamingDeserializer {
 					if (mappedObjects.containsKey(referenceId)) {
 						Long referencedOid = mappedObjects.get(referenceId);
 						if (referencedOid != null) {
-							EClass referenceEClass = platformService.getEClassForOid(referencedOid);
+							EClass referenceEClass = catalogService.getEClassForOid(referencedOid);
 							if (((EClass) structuralFeature.getEType()).isSuperTypeOf(referenceEClass)) {
 								// TODO unique checking?
 								object.setListItemReference(structuralFeature, index, referencedOid);
@@ -612,6 +614,14 @@ public class IfcStepStreamingDeserializer implements StreamingDeserializer {
 
 	public Integer getRid() {
 		return rid;
+	}
+	
+	public void addVirtualObjectToSave(VirtualObject object) {
+		virtualObjectsToSave.add(object);
+		if (virtualObjectsToSave.size() >= batchSaveSize) {
+			virtualObjectService.saveAll(virtualObjectsToSave);
+			virtualObjectsToSave.clear();
+		}
 	}
 
 }

@@ -34,7 +34,7 @@ public class FollowReferenceStackFrame extends DatabaseReadingStackFrame impleme
 			throw new DatabaseException("Cannot get object for oid " + oid);
 		}
 		Integer rid = getReusable().getRid();
-		currentObject = getQueryObjectProvider().getPlatformService().queryVirtualObject(rid, oid);
+		currentObject = getQueryObjectProvider().getVirtualObjectService().findOneByRidAndOid(rid, oid);
 		decideUseForSerialization(currentObject);
 		processPossibleIncludes(null, include);
 		return true;
@@ -43,7 +43,7 @@ public class FollowReferenceStackFrame extends DatabaseReadingStackFrame impleme
 	@Override
 	public String toString() {
 		try {
-			EClass eClass = getQueryObjectProvider().getPlatformService().getEClassForOid(oid);
+			EClass eClass = getQueryObjectProvider().getCatalogService().getEClassForOid(oid);
 			return "FollowReferenceStackFrame (" + eClass.getName() + "." + fromReference.getName() + ", " + oid + ")";
 		} catch (DatabaseException e) {
 			e.printStackTrace();

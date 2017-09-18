@@ -14,7 +14,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import cn.dlb.bim.dao.BaseMongoDao;
 import cn.dlb.bim.dao.entity.ConcreteRevision;
 import cn.dlb.bim.models.ifc2x3tc1.Ifc2x3tc1Package;
-import cn.dlb.bim.service.impl.PlatformServiceImpl;
+import cn.dlb.bim.service.impl.CatalogServiceImpl;
 
 @RunWith(SpringJUnit4ClassRunner.class)  
 @ContextConfiguration(locations={"classpath:conf/spring.xml"})  

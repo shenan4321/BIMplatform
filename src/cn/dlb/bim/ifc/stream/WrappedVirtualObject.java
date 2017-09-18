@@ -124,17 +124,18 @@ public class WrappedVirtualObject extends ReadWriteVirtualObject {
 		return eClass;
 	}
 	
-	public void write(ByteBuffer buffer) {
-		ensureCapacity(buffer, 6);
+	public ByteBuffer write(ByteBuffer buffer) {
+		buffer = ensureCapacity(buffer, 6);
 		buffer.putShort(eClassId);
 		buffer.putInt(features.size());
 		for (Entry<Integer, Object> entry : features.entrySet()) {
 			Integer featureId = entry.getKey();
 			Object value = entry.getValue();
-			ensureCapacity(buffer, 4);
+			buffer = ensureCapacity(buffer, 4);
 			buffer.putInt(featureId);
-			writeFeature(buffer, value);
+			buffer = writeFeature(buffer, value);
 		}
+		return buffer;
 	}
 	
 	@Override

@@ -31,16 +31,18 @@ import org.slf4j.LoggerFactory;
 import cn.dlb.bim.database.DatabaseException;
 import cn.dlb.bim.ifc.deserializers.DeserializeException;
 import cn.dlb.bim.ifc.stream.VirtualObject;
-import cn.dlb.bim.service.PlatformService;
+import cn.dlb.bim.service.CatalogService;
+import cn.dlb.bim.service.VirtualObjectService;
 
 public class WaitingListVirtualObject<T> {
 	private static final Logger LOGGER = LoggerFactory.getLogger(WaitingListVirtualObject.class);
 	private final Map<T, List<WaitingVirtualObject>> waitingObjects = new HashMap<T, List<WaitingVirtualObject>>();
 	private final Map<Long, AtomicInteger> openConnections = new HashMap<>();
-	private PlatformService platformService;
+	private final IfcStepStreamingDeserializer deserializer;
+//	private VirtualObjectService virtualObjectService;
 	
-	public WaitingListVirtualObject(PlatformService platformService) {
-		this.platformService = platformService;
+	public WaitingListVirtualObject(IfcStepStreamingDeserializer deserializer) {
+		this.deserializer = deserializer;
 	}
 
 	public boolean containsKey(T recordNumber) {
@@ -73,7 +75,7 @@ public class WaitingListVirtualObject<T> {
 		AtomicInteger openConnectionCounter = getOpenConnectionCounter(virtualObject.getOid());
 		int decrementAndGet = openConnectionCounter.decrementAndGet();
 		if (decrementAndGet == 0) {
-			platformService.saveBatch(virtualObject);
+			deserializer.addVirtualObjectToSave(virtualObject);
 		} else if (decrementAndGet < 0) {
 			throw new DatabaseException("Inconsistent state");
 		}

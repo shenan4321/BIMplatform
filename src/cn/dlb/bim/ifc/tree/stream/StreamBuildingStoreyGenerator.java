@@ -12,27 +12,28 @@ import cn.dlb.bim.ifc.emf.IfcModelInterface;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
 import cn.dlb.bim.ifc.stream.VirtualObject;
 import cn.dlb.bim.ifc.tree.BuildingStorey;
-import cn.dlb.bim.service.PlatformService;
+import cn.dlb.bim.service.CatalogService;
+import cn.dlb.bim.service.VirtualObjectService;
 
 public class StreamBuildingStoreyGenerator {
 	private PackageMetaData packageMetaData;
-	private PlatformService platformService;
-	private VirtualObjectDao virtualObjectDao;
+	private CatalogService catalogService;
+	private VirtualObjectService virtualObjectService;
 	private ConcreteRevision concreteRevision;
 
-	public StreamBuildingStoreyGenerator(PackageMetaData packageMetaData, PlatformService platformService,
-			VirtualObjectDao virtualObjectDao, ConcreteRevision concreteRevision) {
+	public StreamBuildingStoreyGenerator(PackageMetaData packageMetaData, CatalogService catalogService,
+			VirtualObjectService virtualObjectService, ConcreteRevision concreteRevision) {
 		this.packageMetaData = packageMetaData;
-		this.platformService = platformService;
-		this.virtualObjectDao = virtualObjectDao;
+		this.catalogService = catalogService;
+		this.virtualObjectService = virtualObjectService;
 		this.concreteRevision = concreteRevision;
 	}
 
 	public List<BuildingStorey> proccessBuild() {
 		EClass ifcBuildingStoreyEclass = packageMetaData.getEClass("IfcBuildingStorey");
 		Integer rid = concreteRevision.getRevisionId();
-		Short cid = platformService.getCidOfEClass(ifcBuildingStoreyEclass);
-		CloseableIterator<VirtualObject> iterator = virtualObjectDao.streamByRidAndCid(rid, cid);
+		Short cid = catalogService.getCidOfEClass(ifcBuildingStoreyEclass);
+		CloseableIterator<VirtualObject> iterator = virtualObjectService.streamByRidAndCid(rid, cid);
 		List<BuildingStorey> result = new ArrayList<>();
 		while (iterator.hasNext()) {
 			VirtualObject buildingStoreyObject = iterator.next();
@@ -59,13 +60,13 @@ public class StreamBuildingStoreyGenerator {
 				List containsElementsList = (List) containsElements;
 				for (Object containsElement : containsElementsList) {
 
-					VirtualObject containsElementObject = virtualObjectDao.findOneByRidAndOid(rid,
+					VirtualObject containsElementObject = virtualObjectService.findOneByRidAndOid(rid,
 							(Long) containsElement);
 					Object relatedElements = containsElementObject.get("RelatedElements");
 					if (relatedElements != null) {
 						List relatedElementsList = (List) relatedElements;
 						for (Object relatedElement : relatedElementsList) {
-							VirtualObject relatedElementObject = virtualObjectDao.findOneByRidAndOid(rid,
+							VirtualObject relatedElementObject = virtualObjectService.findOneByRidAndOid(rid,
 									(Long) relatedElement);
 							collectBuildingStorey(relatedElementObject, buildingStorey);
 							buildingStorey.getOidContains().add(relatedElementObject.getOid());
@@ -82,14 +83,14 @@ public class StreamBuildingStoreyGenerator {
 			List isDecomposedByList = (List) isDecomposedByObject;
 
 			for (Object isDecomposedByRef : isDecomposedByList) {
-				VirtualObject isDecomposedBy = virtualObjectDao.findOneByRidAndOid(rid, (Long) isDecomposedByRef);
+				VirtualObject isDecomposedBy = virtualObjectService.findOneByRidAndOid(rid, (Long) isDecomposedByRef);
 
 				EClass ifcRelAggregatesEclass = packageMetaData.getEClass("IfcRelAggregates");
 				if (ifcRelAggregatesEclass.isSuperTypeOf(isDecomposedBy.eClass())) {
 					Object relatedObjects = isDecomposedBy.get("RelatedObjects");
 					List relatedObjectsList = (List) relatedObjects;
 					for (Object relatedObject : relatedObjectsList) {
-						VirtualObject relatedVirtualObject = virtualObjectDao.findOneByRidAndOid(rid,
+						VirtualObject relatedVirtualObject = virtualObjectService.findOneByRidAndOid(rid,
 								(Long) relatedObject);
 						collectBuildingStorey(relatedVirtualObject, buildingStorey);
 						buildingStorey.getOidContains().add(relatedVirtualObject.getOid());

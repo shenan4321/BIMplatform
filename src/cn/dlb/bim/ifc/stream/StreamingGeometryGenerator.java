@@ -8,8 +8,11 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.DoubleBuffer;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -21,7 +24,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.io.IOUtils;
-import org.bson.types.ObjectId;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.slf4j.Logger;
@@ -61,7 +63,8 @@ import cn.dlb.bim.ifc.stream.serializers.ObjectProvider;
 import cn.dlb.bim.ifc.stream.serializers.OidConvertingSerializer;
 import cn.dlb.bim.ifc.stream.serializers.StreamingSerializer;
 import cn.dlb.bim.models.geometry.GeometryPackage;
-import cn.dlb.bim.service.PlatformService;
+import cn.dlb.bim.service.CatalogService;
+import cn.dlb.bim.service.VirtualObjectService;
 import cn.dlb.bim.utils.Formatters;
 
 public class StreamingGeometryGenerator extends GenericGeometryGenerator {
@@ -71,7 +74,8 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 	private final Map<Integer, Long> hashes = new ConcurrentHashMap<>();
 
 	private final PlatformServer server;
-	private final PlatformService platformService;
+	private final CatalogService catalogService;
+	private final VirtualObjectService virtualObjectService;
 	private EClass productClass;
 	private EStructuralFeature geometryFeature;
 	private EStructuralFeature representationFeature;
@@ -87,15 +91,22 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 	private volatile boolean allJobsPushed;
 	private volatile Integer rid = -1;
 
-	private int maxObjectsPerFile = 10;
+	private int maxObjectsPerFile = 20;
 	private volatile boolean running = true;
 	private final IfcHeader header;
+	
+	private final Collection<VirtualObject> virtualObjectsToSave;
+	private final Collection<VirtualObject> virtualObjectsToUpdate;
+	private static final Integer batchSaveSize = 1000;
 
-	public StreamingGeometryGenerator(final PlatformServer server, final PlatformService platformService, Integer rid, IfcHeader header) {
+	public StreamingGeometryGenerator(final PlatformServer server, final CatalogService catalogService, VirtualObjectService virtualObjectService, Integer rid, IfcHeader header) {
 		this.server = server;
-		this.platformService = platformService;
+		this.catalogService = catalogService;
+		this.virtualObjectService = virtualObjectService;
 		this.rid = rid;
 		this.header = header;
+		virtualObjectsToSave = Collections.synchronizedSet(new LinkedHashSet<>());
+		virtualObjectsToUpdate = Collections.synchronizedSet(new LinkedHashSet<>());
 	}
 
 	public class Runner implements Runnable {
@@ -107,10 +118,13 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 		private ObjectProvider objectProvider;
 		private RenderEnginePool renderEnginePool;
 		private IfcHeader header;
+		private final Collection<VirtualObject> virtualObjectsToSave;
+		private final Collection<VirtualObject> virtualObjectsToUpdate;
 
 		public Runner(EClass eClass, RenderEnginePool renderEnginePool, RenderEngineSettings renderEngineSettings,
 				ObjectProvider objectProvider, RenderEngineFilter renderEngineFilter,
-				GenerateGeometryResult generateGeometryResult, IfcHeader header) {
+				GenerateGeometryResult generateGeometryResult, IfcHeader header, Collection<VirtualObject> virtualObjectsToSave, 
+				Collection<VirtualObject> virtualObjectsToUpdate) {
 			this.eClass = eClass;
 			this.renderEnginePool = renderEnginePool;
 			this.renderEngineSettings = renderEngineSettings;
@@ -118,6 +132,8 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 			this.renderEngineFilter = new RenderEngineFilter(true);
 			this.generateGeometryResult = generateGeometryResult;
 			this.header = header;
+			this.virtualObjectsToSave = virtualObjectsToSave;
+			this.virtualObjectsToUpdate = virtualObjectsToUpdate;
 		}
 
 		@Override
@@ -132,7 +148,7 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 					next = objectProvider.next();
 				}
 				
-				objectProvider = new QueryObjectProvider(platformService, server, query, rid, packageMetaData);
+				objectProvider = new QueryObjectProvider(catalogService, virtualObjectService, server, query, rid, packageMetaData);
 
 				StreamingSerializer ifcSerializer = new IfcStepStreamingSerializer() {};
 				IRenderEngine renderEngine = null;
@@ -151,7 +167,7 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 						}
 					});
 
-					ifcSerializer.init(platformService, proxy, header, packageMetaData);
+					ifcSerializer.init(catalogService, proxy, header, packageMetaData);
 
 					ByteArrayOutputStream baos = new ByteArrayOutputStream();
 					IOUtils.copy(ifcSerializer.getInputStream(), baos);
@@ -191,14 +207,14 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 										boolean translate = true;
 
 										if (geometry != null && geometry.getNrIndices() > 0) {
-											Short geometryInfoCid = platformService
+											Short geometryInfoCid = catalogService
 													.getCidOfEClass(GeometryPackage.eINSTANCE.getGeometryInfo());
-											Long geometryInfoOid = platformService
+											Long geometryInfoOid = catalogService
 													.newOid(GeometryPackage.eINSTANCE.getGeometryInfo());
 											VirtualObject geometryInfo = new VirtualObject(rid, geometryInfoCid,
 													geometryInfoOid, GeometryPackage.eINSTANCE.getGeometryInfo());
 
-											Short vector3fCid = platformService
+											Short vector3fCid = catalogService
 													.getCidOfEClass(GeometryPackage.eINSTANCE.getVector3f());
 											WrappedVirtualObject minBounds = new WrappedVirtualObject(vector3fCid, GeometryPackage.eINSTANCE.getVector3f());
 											WrappedVirtualObject maxBounds = new WrappedVirtualObject(vector3fCid, GeometryPackage.eINSTANCE.getVector3f());
@@ -224,9 +240,9 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 													GeometryPackage.eINSTANCE.getGeometryInfo_Volume(),
 													renderEngineInstance.getVolume());
 
-											Short geometryDataCid = platformService
+											Short geometryDataCid = catalogService
 													.getCidOfEClass(GeometryPackage.eINSTANCE.getGeometryData());
-											Long geometryDataOid = platformService
+											Long geometryDataOid = catalogService
 													.newOid(GeometryPackage.eINSTANCE.getGeometryData());
 											VirtualObject geometryData = new VirtualObject(rid, geometryDataCid,
 													geometryDataOid, GeometryPackage.eINSTANCE.getGeometryData());
@@ -358,15 +374,16 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 												hashes.put(hash, geometryData.getOid());
 												StreamingGeometryGenerator.this.saveableColorBytes
 														.addAndGet(saveableColorBytes);
-												platformService.saveBatch(geometryData);
+												addVirtualObjectToSave(geometryData);
 												// sizes.put(size, ifcProduct);
 											}
-
-											platformService.saveBatch(geometryInfo);
+											addVirtualObjectToSave(geometryInfo);
 											totalBytes.addAndGet(size);
 
 											ifcProduct.setReference(geometryFeature, geometryInfo.getOid());
-											platformService.updateBatch(ifcProduct);
+											
+											addVirtualObjectToUpdate(ifcProduct);
+											
 
 										}
 									} catch (EntityNotFoundException e) {
@@ -393,7 +410,10 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 								}
 							}
 						}
-						platformService.commitAllBatch();
+						virtualObjectService.saveAll(virtualObjectsToSave);
+						virtualObjectsToSave.clear();
+						virtualObjectService.updateAllVirtualObject(virtualObjectsToUpdate);
+						virtualObjectsToUpdate.clear();
 					} finally {
 						try {
 							// if (notFoundsObjects) {
@@ -463,15 +483,15 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 			EClass ifcProductEClass = packageMetaData.getEClass("IfcProduct");
 			Set<EClass> subClasses = packageMetaData.getAllSubClasses(ifcProductEClass);
 			for (EClass eClass : subClasses) {
-				Short cid = platformService.getCidOfEClass(eClass);
-				CloseableIterator<VirtualObject> iterator = platformService.streamVirtualObject(rid, cid);
+				Short cid = catalogService.getCidOfEClass(eClass);
+				CloseableIterator<VirtualObject> iterator = virtualObjectService.streamByRidAndCid(rid, cid);
 				while (iterator.hasNext()) {
 					VirtualObject next = iterator.next();
 					if (next != null && next.eClass() == eClass) {
 						EStructuralFeature feature = eClass.getEStructuralFeature("Representation");
 						Object featureObject = next.eGet(feature);
 						if (featureObject != null) {
-							Set<Long> representationItems = getRepresentationItems(platformService, next);
+							Set<Long> representationItems = getRepresentationItems(catalogService, virtualObjectService, next);
 							for (Long l : representationItems) {
 								AtomicInteger atomicInteger = counters.get(l);
 								if (atomicInteger == null) {
@@ -481,7 +501,7 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 								atomicInteger.incrementAndGet();
 							}
 							Long refOid = (Long) featureObject;
-							VirtualObject representation = platformService.queryVirtualObject(rid, refOid);
+							VirtualObject representation = virtualObjectService.findOneByRidAndOid(rid, refOid);
 							List<Long> representations = (List<Long>) representation.get("Representations");
 
 							if (representations != null && !representations.isEmpty()) {
@@ -492,11 +512,11 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 								queryPart.addOid(next.getOid());
 								while (iterator.hasNext() && x < maxObjectsPerFile - 1) {
 									next = iterator.next();
-									if (next != null && platformService.getEClassForCid(next.getEClassId()) == eClass) {
+									if (next != null && catalogService.getEClassForCid(next.getEClassId()) == eClass) {
 										Object representationRefObject = next.eGet(representationFeature);
 										
 										if (representationRefObject != null) {
-											representation = platformService.queryVirtualObject(rid, (Long) representationRefObject);
+											representation = virtualObjectService.findOneByRidAndOid(rid, (Long) representationRefObject);
 											representations = (List<Long>) representation.get("Representations");
 											if (representations != null && !representations.isEmpty()) {
 												queryPart.addOid(next.getOid());
@@ -552,10 +572,10 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 									// hasFillings.addType(packageMetaData.getEClass("IfcRelFillsElement"), false);
 									// hasFillings.addField("RelatedBuildingElement");
 								}
-								QueryObjectProvider queryObjectProvider = new QueryObjectProvider(platformService,
+								QueryObjectProvider queryObjectProvider = new QueryObjectProvider(catalogService, virtualObjectService,
 										server, query, rid, packageMetaData);
 
-								Runner runner = new Runner(eClass, renderEnginePool, settings, queryObjectProvider, renderEngineFilter, generateGeometryResult, header);
+								Runner runner = new Runner(eClass, renderEnginePool, settings, queryObjectProvider, renderEngineFilter, generateGeometryResult, header, virtualObjectsToSave, virtualObjectsToUpdate);
 								executor.submit(runner);
 								jobsTotal.incrementAndGet();
 
@@ -564,12 +584,12 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 					}
 				}
 			}
-
+			
 			allJobsPushed = true;
 
 			executor.shutdown();
 			executor.awaitTermination(24, TimeUnit.HOURS);
-
+			
 			long end = System.nanoTime();
 			LOGGER.info("Rendertime: " + ((end - start) / 1000000) + "ms, " + "Reused: "
 					+ Formatters.bytesToString(bytesSaved.get()) + ", Total: "
@@ -584,7 +604,7 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 		return generateGeometryResult;
 	}
 
-	private Set<Long> getRepresentationItems(PlatformService platformService, VirtualObject next)
+	private Set<Long> getRepresentationItems(CatalogService catalogService, VirtualObjectService virtualObjectService, VirtualObject next)
 			throws QueryException, IOException {
 		Set<Long> result = new HashSet<>();
 		Query query = new Query("test", packageMetaData);
@@ -610,12 +630,12 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 		representations.addField("Representations");
 		representations.addInclude(representation);
 
-		QueryObjectProvider queryObjectProvider = new QueryObjectProvider(platformService, server, query, rid,
+		QueryObjectProvider queryObjectProvider = new QueryObjectProvider(catalogService, virtualObjectService, server, query, rid,
 				packageMetaData);
 		try {
 			VirtualObject next2 = queryObjectProvider.next();
 			while (next2 != null) {
-				EClass next2EClass = platformService.getEClassForCid(next2.getEClassId());
+				EClass next2EClass = catalogService.getEClassForCid(next2.getEClassId());
 				if (packageMetaData.getEClass("IfcRepresentationItem").isSuperTypeOf(next2EClass)) {
 					result.add(next2.getOid());
 				}
@@ -716,4 +736,21 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 		}
 		geometryInfo.setAttribute(GeometryPackage.eINSTANCE.getGeometryInfo_Transformation(), byteBuffer.array());
 	}
+	
+	public synchronized void addVirtualObjectToSave(VirtualObject object) {
+		virtualObjectsToSave.add(object);
+		if (virtualObjectsToSave.size() >= batchSaveSize) {
+			virtualObjectService.saveAll(virtualObjectsToSave);
+			virtualObjectsToSave.clear();
+		}
+	}
+	
+	public synchronized void addVirtualObjectToUpdate(VirtualObject object) {
+		virtualObjectsToUpdate.add(object);
+		if (virtualObjectsToUpdate.size() >= batchSaveSize) {
+			virtualObjectService.updateAllVirtualObject(virtualObjectsToUpdate);
+			virtualObjectsToUpdate.clear();
+		}
+	}
+	
 }

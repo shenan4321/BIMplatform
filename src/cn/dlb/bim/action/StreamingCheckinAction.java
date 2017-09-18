@@ -27,7 +27,8 @@ import cn.dlb.bim.ifc.stream.StreamingGeometryGenerator;
 import cn.dlb.bim.ifc.stream.VirtualObject;
 import cn.dlb.bim.ifc.stream.deserializers.IfcStepStreamingDeserializer;
 import cn.dlb.bim.ifc.stream.query.QueryContext;
-import cn.dlb.bim.service.PlatformService;
+import cn.dlb.bim.service.CatalogService;
+import cn.dlb.bim.service.VirtualObjectService;
 import cn.dlb.bim.vo.Vector3f;
 
 public class StreamingCheckinAction extends LongAction {
@@ -37,15 +38,17 @@ public class StreamingCheckinAction extends LongAction {
 
 	private final File ifcFile;
 	private final PlatformServer server;
-	private final PlatformService platformService;
 	private final ConcreteRevision concreteRevision;
+	private final VirtualObjectService virtualObjectService;
+	private final CatalogService catalogService;
 
 	public StreamingCheckinAction(WebSocketSession webSocketSession, File ifcFile, PlatformServer server,
-			PlatformService platformService, ConcreteRevision concreteRevision) {
+			VirtualObjectService virtualObjectService, CatalogService catalogService, ConcreteRevision concreteRevision) {
 		super(webSocketSession);
 		this.ifcFile = ifcFile;
 		this.server = server;
-		this.platformService = platformService;
+		this.virtualObjectService = virtualObjectService;
+		this.catalogService = catalogService;
 		this.concreteRevision = concreteRevision;
 	}
 
@@ -63,7 +66,7 @@ public class StreamingCheckinAction extends LongAction {
 		}
 
 		PackageMetaData packageMetaData = server.getMetaDataManager().getPackageMetaData(schema.getEPackageName());
-		deserializer.init(packageMetaData, platformService);
+		deserializer.init(packageMetaData, catalogService, virtualObjectService);
 		try {
 			deserializer.read(ifcFile);
 		} catch (DeserializeException e) {
@@ -72,8 +75,8 @@ public class StreamingCheckinAction extends LongAction {
 		Integer rid = deserializer.getRid();
 		fixInverses(packageMetaData, rid);
 		
-		StreamingGeometryGenerator generator = new StreamingGeometryGenerator(server, platformService, rid, concreteRevision.getIfcHeader());
-		QueryContext queryContext = new QueryContext(platformService, packageMetaData, rid);
+		StreamingGeometryGenerator generator = new StreamingGeometryGenerator(server, catalogService, virtualObjectService, rid, concreteRevision.getIfcHeader());
+		QueryContext queryContext = new QueryContext(catalogService, virtualObjectService, packageMetaData, rid);
 		try {
 			GenerateGeometryResult result = generator.generateGeometry(queryContext);
 			Double maxX = result.getMaxBoundsAsVector3f().getX();
@@ -96,7 +99,7 @@ public class StreamingCheckinAction extends LongAction {
 			throws DatabaseException {
 		Map<Long, VirtualObject> cache = new HashMap<Long, VirtualObject>();
 
-		CloseableIterator<VirtualObject> objectIterator = platformService.streamVirtualObjectByRid(rid);
+		CloseableIterator<VirtualObject> objectIterator = virtualObjectService.streamByRid(rid);
 
 		while (objectIterator.hasNext()) {
 			VirtualObject next = objectIterator.next();
@@ -116,24 +119,21 @@ public class StreamingCheckinAction extends LongAction {
 				}
 			}
 		}
-		for (VirtualObject referencedObject : cache.values()) {
-			platformService.updateBatch(referencedObject);
-		}
-		platformService.commitAllBatch();
+		virtualObjectService.updateAllVirtualObject(cache.values());
 	}
 
 	private void fixInverses(PackageMetaData packageMetaData, Integer rid, Map<Long, VirtualObject> cache,
 			VirtualObject next, EReference eReference, long refOid) throws DatabaseException {
 		VirtualObject referencedObject = cache.get(refOid);
 		if (referencedObject == null) {
-			referencedObject = platformService.queryVirtualObject(rid, refOid);
+			referencedObject = virtualObjectService.findOneByRidAndOid(rid, refOid);
 			if (referencedObject == null) {
 				throw new DatabaseException("Referenced object with oid " + refOid + ", referenced from "
 						+ next.eClass().getName() + " not found");
 			}
 			cache.put(refOid, referencedObject);
 		}
-		EClass referencedObjectEclass = platformService.getEClassForCid(referencedObject.getEClassId());
+		EClass referencedObjectEclass = catalogService.getEClassForCid(referencedObject.getEClassId());
 		EReference oppositeReference = packageMetaData.getInverseOrOpposite(referencedObjectEclass, eReference);
 		if (oppositeReference == null) {
 			if (eReference.getName().equals("RelatedElements")

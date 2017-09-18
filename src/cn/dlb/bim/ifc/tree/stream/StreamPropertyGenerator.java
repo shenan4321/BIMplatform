@@ -11,15 +11,15 @@ import cn.dlb.bim.dao.entity.ConcreteRevision;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
 import cn.dlb.bim.ifc.stream.VirtualObject;
 import cn.dlb.bim.ifc.tree.PropertySet;
-import cn.dlb.bim.service.PlatformService;
+import cn.dlb.bim.service.CatalogService;
 
 public class StreamPropertyGenerator {
 	private PackageMetaData packageMetaData;
-	private PlatformService platformService;
+	private CatalogService platformService;
 	private ConcreteRevision concreteRevision;
 	private BaseMongoDao<VirtualObject> virtualObjectDao;
 	
-	public StreamPropertyGenerator(PackageMetaData packageMetaData, PlatformService platformService,
+	public StreamPropertyGenerator(PackageMetaData packageMetaData, CatalogService platformService,
 			BaseMongoDao<VirtualObject> virtualObjectDao, ConcreteRevision concreteRevision) {
 		this.packageMetaData = packageMetaData;
 		this.platformService = platformService;

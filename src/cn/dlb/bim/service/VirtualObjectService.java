@@ -10,6 +10,7 @@ public interface VirtualObjectService {
 	public void save(VirtualObject virtualObject);
 	public void saveAll(Collection<VirtualObject> virtualObjects);
 	public VirtualObject findOneByRidAndOid(Integer rid, Long oid);
+	public Collection<VirtualObject> findByRidAndOids(Integer rid, Collection<Long> oids);
 	public VirtualObject findOneByRidAndCid(Integer rid, Short cid);
 	public Collection<VirtualObject> findByRidAndCid(Integer rid, Short cid);
 	public CloseableIterator<VirtualObject> streamByRidAndCid(Integer rid, Short cid);

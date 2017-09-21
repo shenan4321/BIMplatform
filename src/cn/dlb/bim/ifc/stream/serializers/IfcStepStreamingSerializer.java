@@ -26,6 +26,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
@@ -87,7 +88,7 @@ public abstract class IfcStepStreamingSerializer
 	private CatalogService platformService;
 
 	@Override
-	public boolean write(OutputStream outputStream) throws SerializerException, DatabaseException {
+	public boolean write(OutputStream outputStream) throws SerializerException, DatabaseException, InterruptedException, ExecutionException {
 		if (this.printWriter == null) {
 			this.printWriter = new UTF8PrintWriter(outputStream);
 		}
@@ -133,7 +134,7 @@ public abstract class IfcStepStreamingSerializer
 		this.packageMetaData = packageMetaData;
 	}
 
-	public void writeToOutputStream(OutputStream outputStream) throws SerializerException, DatabaseException {
+	public void writeToOutputStream(OutputStream outputStream) throws SerializerException, DatabaseException, InterruptedException, ExecutionException {
 		this.printWriter = new UTF8PrintWriter(outputStream);
 		try {
 			while (mode != Mode.FINISHED) {
@@ -144,7 +145,7 @@ public abstract class IfcStepStreamingSerializer
 		}
 	}
 
-	private boolean processMode() throws IOException, DatabaseException, SerializerException {
+	private boolean processMode() throws IOException, DatabaseException, SerializerException, InterruptedException, ExecutionException {
 		if (getMode() == Mode.HEADER) {
 			writeHeader();
 			setMode(Mode.BODY);

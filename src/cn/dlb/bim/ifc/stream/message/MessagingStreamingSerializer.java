@@ -19,6 +19,7 @@ package cn.dlb.bim.ifc.stream.message;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.concurrent.ExecutionException;
 
 import cn.dlb.bim.dao.entity.ConcreteRevision;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
@@ -35,6 +36,8 @@ public interface MessagingStreamingSerializer extends Writer {
 	 * @return true if there are more messages, false if there are no more
 	 * @throws IOException
 	 * @throws SerializerException 
+	 * @throws ExecutionException 
+	 * @throws InterruptedException 
 	 */
-	boolean writeMessage(OutputStream outputStream, ProgressReporter progressReporter) throws IOException, SerializerException;
+	boolean writeMessage(OutputStream outputStream, ProgressReporter progressReporter) throws IOException, SerializerException, InterruptedException, ExecutionException;
 }

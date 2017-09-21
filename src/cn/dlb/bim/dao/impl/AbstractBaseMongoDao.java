@@ -93,6 +93,17 @@ public abstract class AbstractBaseMongoDao<T> implements BaseMongoDao<T>{
     	String collectionName = determineCollectionName(ReflectionUtils.getSuperClassGenricType(getClass()));
 		return doBatchUpdate(mongoTemplate.getCollection(collectionName), collectionName, updates, true);
     }
+    
+    public List<T> batchFind(List<Query> queries) {
+    	String collectionName = determineCollectionName(ReflectionUtils.getSuperClassGenricType(getClass()));
+    	DBObject command = new BasicDBObject();
+    	command.put("find", collectionName);
+    	for (Query query : queries) {
+    		BasicDBObject find = new BasicDBObject();
+    		find.put("q", query.getQueryObject());
+    	}
+		return null;
+    }
   
     /** 
      * 获取需要操作的实体类class 

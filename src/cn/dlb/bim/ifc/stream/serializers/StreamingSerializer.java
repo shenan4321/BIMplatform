@@ -19,6 +19,7 @@ package cn.dlb.bim.ifc.stream.serializers;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.concurrent.ExecutionException;
 
 import cn.dlb.bim.database.DatabaseException;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
@@ -28,6 +29,6 @@ import cn.dlb.bim.service.CatalogService;
 
 public interface StreamingSerializer {
 	void init(CatalogService catalogService, ObjectProvider objectProvider, IfcHeader ifcHeader, PackageMetaData packageMetaData) throws SerializerException;
-	void writeToOutputStream(OutputStream outputStream) throws SerializerException, DatabaseException;
+	void writeToOutputStream(OutputStream outputStream) throws SerializerException, DatabaseException, InterruptedException, ExecutionException;
 	InputStream getInputStream();
 }

@@ -37,6 +37,18 @@ public class VirtualObjectServiceImpl implements VirtualObjectService {
 		virtualObject.setEClass(eClass);
 		return virtualObject;
 	}
+	
+	@Override
+	public Collection<VirtualObject> findByRidAndOids(Integer rid, Collection<Long> oids) {
+		Collection<VirtualObject> result = virtualObjectDao.findByRidAndOids(rid, oids);
+		for (VirtualObject virtualObject : result) {
+			Short cid = virtualObject.getEClassId();
+			EClass eClass = catalogService.getEClassForCid(cid);
+			virtualObject.setEClass(eClass);
+		} 
+		return result;
+	}
+
 
 	@Override
 	public VirtualObject findOneByRidAndCid(Integer rid, Short cid) {

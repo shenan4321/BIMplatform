@@ -23,6 +23,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.concurrent.ExecutionException;
 
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.slf4j.Logger;
@@ -97,7 +98,7 @@ public class BinaryGeometryMessagingStreamingSerializer implements MessagingStre
 
 	@Override
 	public boolean writeMessage(OutputStream outputStream, ProgressReporter progressReporter)
-			throws IOException, SerializerException {
+			throws IOException, SerializerException, InterruptedException, ExecutionException {
 		this.progressReporter = progressReporter;
 		dataOutputStream = new LittleEndianDataOutputStream(outputStream);
 		switch (mode) {
@@ -129,7 +130,7 @@ public class BinaryGeometryMessagingStreamingSerializer implements MessagingStre
 		this.splitGeometry = splitGeometry;
 	}
 
-	private void load() throws SerializerException {
+	private void load() throws SerializerException, InterruptedException, ExecutionException {
 		// long start = System.nanoTime();
 		size = 0;
 		VirtualObject next = null;
@@ -405,6 +406,10 @@ public class BinaryGeometryMessagingStreamingSerializer implements MessagingStre
 		try {
 			next = objectProvider.next();
 		} catch (DatabaseException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
 			e.printStackTrace();
 		}
 		return next != null;

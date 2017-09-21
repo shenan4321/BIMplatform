@@ -1,6 +1,7 @@
 package cn.dlb.bim.ifc.stream.query;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 import cn.dlb.bim.database.DatabaseException;
 import cn.dlb.bim.ifc.stream.VirtualObject;
@@ -17,7 +18,7 @@ public class ObjectProviderProxy implements ObjectProvider {
 	}
 
 	@Override
-	public VirtualObject next() throws DatabaseException {
+	public VirtualObject next() throws DatabaseException, InterruptedException, ExecutionException {
 		VirtualObject next = objectProvider.next();
 		if (next != null) {
 			objectListener.newObject(next);

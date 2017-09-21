@@ -1,45 +1,53 @@
-package cn.dlb.bim.ifc.stream.query;
+package cn.dlb.bim.ifc.stream.query.multithread;
 
 import java.io.IOException;
+import java.util.Collection;
 
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EReference;
-import org.springframework.data.util.CloseableIterator;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
 import cn.dlb.bim.database.DatabaseException;
 import cn.dlb.bim.ifc.stream.VirtualObject;
-import cn.dlb.bim.service.CatalogService;
+import cn.dlb.bim.ifc.stream.query.CanInclude;
+import cn.dlb.bim.ifc.stream.query.Include;
+import cn.dlb.bim.ifc.stream.query.ObjectProvidingStackFrame;
+import cn.dlb.bim.ifc.stream.query.QueryContext;
+import cn.dlb.bim.ifc.stream.query.QueryException;
+import cn.dlb.bim.ifc.stream.query.QueryPart;
 
-public class QueryTypeStackFrame extends DatabaseReadingStackFrame implements ObjectProvidingStackFrame {
+public class RunnableQueryTypeStackFrame extends RunnableDatabaseReadingStackFrame implements ObjectProvidingStackFrame {
 	
-	CloseableIterator<VirtualObject> iterator;
+	private Collection<VirtualObject> virtualObjects;
 	
 	private EClass eClass;
 	
-	public QueryTypeStackFrame(QueryObjectProvider queryObjectProvider, EClass eClass, QueryContext reusable, QueryPart queryPart) {
+	public RunnableQueryTypeStackFrame(MultiThreadQueryObjectProvider queryObjectProvider, EClass eClass, QueryContext reusable, QueryPart queryPart) {
 		super(reusable, queryObjectProvider, queryPart);
 		this.eClass = eClass;
 		
 		Integer rid = reusable.getRid();
 		Short cid = reusable.getCatalogService().getCidOfEClass(eClass);
-		iterator = reusable.getVirtualObjectService().streamByRidAndCid(rid, cid);
+		virtualObjects = reusable.getVirtualObjectService().findByRidAndCid(rid, cid);
 		
 	}
 	
 	@Override
-	public boolean process() throws DatabaseException, QueryException, JsonParseException, JsonMappingException, IOException {
-		if (!iterator.hasNext()) {
-			return true;
+	public boolean process() throws DatabaseException, QueryException, JsonParseException, JsonMappingException, IOException, InterruptedException {
+			
+		for (VirtualObject virtualObject : virtualObjects) {
+			currentObject = virtualObject;
+			
+			decideUseForSerialization(currentObject);
+			
+			processPossibleIncludes(eClass, getQueryPart());
+			
+			getQueryObjectProvider().addToStorage(currentObject);
 		}
-		currentObject = iterator.next();
-		decideUseForSerialization(currentObject);
 		
-		processPossibleIncludes(eClass, getQueryPart());
-		
-		return false;
+		return true;
 	}
 	
 	protected void processPossibleIncludes(EClass previousType, CanInclude canInclude) throws QueryException, DatabaseException {
@@ -87,7 +95,7 @@ public class QueryTypeStackFrame extends DatabaseReadingStackFrame implements Ob
 //			}
 //		}
 
-		getQueryObjectProvider().push(new QueryIncludeStackFrame(getQueryObjectProvider(), getReusable(), previousInclude, include, currentObject, getQueryPart()));
+		getQueryObjectProvider().push(new RunnableQueryIncludeStackFrame(getQueryObjectProvider(), getReusable(), previousInclude, include, currentObject, getQueryPart()));
 	}
 
 	@Override

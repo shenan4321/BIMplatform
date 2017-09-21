@@ -6,7 +6,9 @@ import org.springframework.data.mongodb.core.query.Update;
 public class BatchUpdateOptions {
 	private Query query;
     private Update update;
+    //如果文档中不存在update的记录,是否插入,默认是false,不插入.
     private boolean upsert = false;
+    //只更新找到的第一条记录,如果这个参数为true,就把按条件查出来多条记录全部更新.
     private boolean multi = false;
     
     public BatchUpdateOptions(Query query, Update update, boolean upsert, boolean multi) {

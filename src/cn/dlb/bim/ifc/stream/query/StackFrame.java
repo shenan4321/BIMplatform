@@ -18,5 +18,5 @@ public abstract class StackFrame {
 		this.done = done;
 	}
 	
-	abstract boolean process() throws DatabaseException, QueryException, JsonParseException, JsonMappingException, IOException;
+	public abstract boolean process() throws DatabaseException, QueryException, JsonParseException, JsonMappingException, IOException;
 }

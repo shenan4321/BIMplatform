@@ -18,11 +18,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.antlr.grammar.v3.ANTLRParser.exceptionGroup_return;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EStructuralFeature;
@@ -56,8 +58,9 @@ import cn.dlb.bim.ifc.stream.query.ObjectProviderProxy;
 import cn.dlb.bim.ifc.stream.query.Query;
 import cn.dlb.bim.ifc.stream.query.QueryContext;
 import cn.dlb.bim.ifc.stream.query.QueryException;
-import cn.dlb.bim.ifc.stream.query.QueryObjectProvider;
 import cn.dlb.bim.ifc.stream.query.QueryPart;
+import cn.dlb.bim.ifc.stream.query.multithread.LimitedQueue;
+import cn.dlb.bim.ifc.stream.query.multithread.MultiThreadQueryObjectProvider;
 import cn.dlb.bim.ifc.stream.serializers.IfcStepStreamingSerializer;
 import cn.dlb.bim.ifc.stream.serializers.ObjectProvider;
 import cn.dlb.bim.ifc.stream.serializers.OidConvertingSerializer;
@@ -98,6 +101,9 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 	private final Collection<VirtualObject> virtualObjectsToSave;
 	private final Collection<VirtualObject> virtualObjectsToUpdate;
 	private static final Integer batchSaveSize = 1000;
+	
+	private final ThreadPoolExecutor queryExecutor = new ThreadPoolExecutor(10, 10, 24, TimeUnit.HOURS,
+				new LimitedQueue<Runnable>(10000000));//submit阻塞的线程池
 
 	public StreamingGeometryGenerator(final PlatformServer server, final CatalogService catalogService, VirtualObjectService virtualObjectService, Integer rid, IfcHeader header) {
 		this.server = server;
@@ -107,6 +113,7 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 		this.header = header;
 		virtualObjectsToSave = Collections.synchronizedSet(new LinkedHashSet<>());
 		virtualObjectsToUpdate = Collections.synchronizedSet(new LinkedHashSet<>());
+		
 	}
 
 	public class Runner implements Runnable {
@@ -118,13 +125,15 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 		private ObjectProvider objectProvider;
 		private RenderEnginePool renderEnginePool;
 		private IfcHeader header;
+		private final ThreadPoolExecutor executor;
 		private final Collection<VirtualObject> virtualObjectsToSave;
 		private final Collection<VirtualObject> virtualObjectsToUpdate;
 
-		public Runner(EClass eClass, RenderEnginePool renderEnginePool, RenderEngineSettings renderEngineSettings,
+		public Runner(ThreadPoolExecutor executor, EClass eClass, RenderEnginePool renderEnginePool, RenderEngineSettings renderEngineSettings,
 				ObjectProvider objectProvider, RenderEngineFilter renderEngineFilter,
 				GenerateGeometryResult generateGeometryResult, IfcHeader header, Collection<VirtualObject> virtualObjectsToSave, 
 				Collection<VirtualObject> virtualObjectsToUpdate) {
+			this.executor = executor;
 			this.eClass = eClass;
 			this.renderEnginePool = renderEnginePool;
 			this.renderEngineSettings = renderEngineSettings;
@@ -148,7 +157,7 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 					next = objectProvider.next();
 				}
 				
-				objectProvider = new QueryObjectProvider(catalogService, virtualObjectService, server, query, rid, packageMetaData);
+				objectProvider = new MultiThreadQueryObjectProvider(executor, catalogService, virtualObjectService, server, query, rid, packageMetaData);
 
 				StreamingSerializer ifcSerializer = new IfcStepStreamingSerializer() {};
 				IRenderEngine renderEngine = null;
@@ -572,10 +581,10 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 									// hasFillings.addType(packageMetaData.getEClass("IfcRelFillsElement"), false);
 									// hasFillings.addField("RelatedBuildingElement");
 								}
-								QueryObjectProvider queryObjectProvider = new QueryObjectProvider(catalogService, virtualObjectService,
+								MultiThreadQueryObjectProvider queryObjectProvider = new MultiThreadQueryObjectProvider(queryExecutor, catalogService, virtualObjectService,
 										server, query, rid, packageMetaData);
 
-								Runner runner = new Runner(eClass, renderEnginePool, settings, queryObjectProvider, renderEngineFilter, generateGeometryResult, header, virtualObjectsToSave, virtualObjectsToUpdate);
+								Runner runner = new Runner(queryExecutor, eClass, renderEnginePool, settings, queryObjectProvider, renderEngineFilter, generateGeometryResult, header, virtualObjectsToSave, virtualObjectsToUpdate);
 								executor.submit(runner);
 								jobsTotal.incrementAndGet();
 
@@ -630,7 +639,7 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 		representations.addField("Representations");
 		representations.addInclude(representation);
 
-		QueryObjectProvider queryObjectProvider = new QueryObjectProvider(catalogService, virtualObjectService, server, query, rid,
+		MultiThreadQueryObjectProvider queryObjectProvider = new MultiThreadQueryObjectProvider(queryExecutor, catalogService, virtualObjectService, server, query, rid,
 				packageMetaData);
 		try {
 			VirtualObject next2 = queryObjectProvider.next();
@@ -642,6 +651,10 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 				next2 = queryObjectProvider.next();
 			}
 		} catch (DatabaseException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
 			e.printStackTrace();
 		}
 		return result;

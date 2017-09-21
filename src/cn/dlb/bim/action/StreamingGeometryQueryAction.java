@@ -2,6 +2,9 @@ package cn.dlb.bim.action;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.emf.ecore.EClass;
 import org.springframework.web.socket.BinaryMessage;
@@ -22,8 +25,10 @@ import cn.dlb.bim.ifc.stream.query.Include;
 import cn.dlb.bim.ifc.stream.query.Query;
 import cn.dlb.bim.ifc.stream.query.QueryContext;
 import cn.dlb.bim.ifc.stream.query.QueryException;
-import cn.dlb.bim.ifc.stream.query.QueryObjectProvider;
 import cn.dlb.bim.ifc.stream.query.QueryPart;
+import cn.dlb.bim.ifc.stream.query.multithread.LimitedQueue;
+import cn.dlb.bim.ifc.stream.query.multithread.MultiThreadQueryObjectProvider;
+import cn.dlb.bim.ifc.stream.serializers.ObjectProvider;
 import cn.dlb.bim.vo.ProgressVo;
 
 public class StreamingGeometryQueryAction extends LongAction {
@@ -32,6 +37,8 @@ public class StreamingGeometryQueryAction extends LongAction {
 	private final QueryContext queryContext;
 	private final ConcreteRevision concreteRevision;
 	private int lastPercentProcess = 0;
+	private final ThreadPoolExecutor queryExecutor = new ThreadPoolExecutor(10, 10, 24, TimeUnit.HOURS,
+			new LimitedQueue<Runnable>(10000000));//submit阻塞的线程池
 	
 	public StreamingGeometryQueryAction(WebSocketSession webSocketSession, PlatformServer server,
 			QueryContext queryContext, ConcreteRevision concreteRevision) {
@@ -82,7 +89,7 @@ public class StreamingGeometryQueryAction extends LongAction {
 			Include include = queryPart.createInclude();
 			include.addType(geometryInfoElcass, false);
 			include.addField("data");
-			QueryObjectProvider queryObjectProvider = new QueryObjectProvider(queryContext.getCatalogService(), queryContext.getVirtualObjectService(), server,
+			ObjectProvider queryObjectProvider = new MultiThreadQueryObjectProvider(queryExecutor, queryContext.getCatalogService(), queryContext.getVirtualObjectService(), server,
 					query, queryContext.getRid(), packageMetaData);
 			BinaryGeometryMessagingStreamingSerializer serializer = new BinaryGeometryMessagingStreamingSerializer();
 			serializer.init(queryObjectProvider, packageMetaData, concreteRevision);
@@ -102,6 +109,10 @@ public class StreamingGeometryQueryAction extends LongAction {
 		} catch (QueryException e) {
 			e.printStackTrace();
 		} catch (SerializerException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
 			e.printStackTrace();
 		}
 	}

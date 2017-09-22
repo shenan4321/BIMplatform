@@ -2,6 +2,7 @@ package cn.dlb.bim.action;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -26,7 +27,6 @@ import cn.dlb.bim.ifc.stream.query.Query;
 import cn.dlb.bim.ifc.stream.query.QueryContext;
 import cn.dlb.bim.ifc.stream.query.QueryException;
 import cn.dlb.bim.ifc.stream.query.QueryPart;
-import cn.dlb.bim.ifc.stream.query.multithread.LimitedQueue;
 import cn.dlb.bim.ifc.stream.query.multithread.MultiThreadQueryObjectProvider;
 import cn.dlb.bim.ifc.stream.serializers.ObjectProvider;
 import cn.dlb.bim.vo.ProgressVo;
@@ -38,7 +38,7 @@ public class StreamingGeometryQueryAction extends LongAction {
 	private final ConcreteRevision concreteRevision;
 	private int lastPercentProcess = 0;
 	private final ThreadPoolExecutor queryExecutor = new ThreadPoolExecutor(10, 10, 24, TimeUnit.HOURS,
-			new LimitedQueue<Runnable>(10000000));//submit阻塞的线程池
+			new ArrayBlockingQueue<Runnable>(10000000));//submit阻塞的线程池
 	
 	public StreamingGeometryQueryAction(WebSocketSession webSocketSession, PlatformServer server,
 			QueryContext queryContext, ConcreteRevision concreteRevision) {

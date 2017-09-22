@@ -1,18 +1,18 @@
 package cn.dlb.bim.ifc.stream.query.multithread;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.eclipse.emf.ecore.EClass;
 import org.slf4j.Logger;
@@ -40,34 +40,37 @@ import cn.dlb.bim.service.CatalogService;
 import cn.dlb.bim.service.VirtualObjectService;
 
 public class MultiThreadQueryObjectProvider implements ObjectProvider {
-	
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(MultiThreadQueryObjectProvider.class);
-	
+
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	private static final int MAX_STACK_FRAMES_PROCESSED = 10000;
 	private static final int MAX_STACK_SIZE = 100;
 	private static final int BATCH_QUERY_SIZE = 1000;
-	
+
 	private CatalogService catalogService;
 	private VirtualObjectService virtualObjectService;
 	private PlatformServer server;
 
-	private final Set<Long> oidsRead = Collections.synchronizedSet(new HashSet<>());
-	private final Set<Long> goingToRead = Collections.synchronizedSet(new HashSet<>());
+	private final Set<Long> oidsRead = new ConcurrentSkipListSet<>();
+	private final Set<Long> goingToRead = new ConcurrentSkipListSet<>();
 	private Query query;
 	private Integer rid;
 	private PackageMetaData packageMetaData;
 
 	private final ThreadPoolExecutor executor;
-	
-	private BlockingQueue<VirtualObject> virtualObjectStorage = new LinkedBlockingQueue<VirtualObject>(1000000);
-	
+
+	private Queue<VirtualObject> virtualObjectStorage = new ConcurrentLinkedQueue<>();
+	private ReadWriteLock virtualObjectStorageRwlock = new ReentrantReadWriteLock();
+
 	private Map<RunnableStackFrame, Future<?>> futureMap = new ConcurrentHashMap<>();
 
-	public MultiThreadQueryObjectProvider(ThreadPoolExecutor executor, CatalogService catalogService, VirtualObjectService virtualObjectService,
-			PlatformServer server, Query query, Integer rid, PackageMetaData packageMetaData)
-			throws IOException, QueryException {
+	private AtomicBoolean isDone = new AtomicBoolean(false);
+
+	public MultiThreadQueryObjectProvider(ThreadPoolExecutor executor, CatalogService catalogService,
+			VirtualObjectService virtualObjectService, PlatformServer server, Query query, Integer rid,
+			PackageMetaData packageMetaData) throws IOException, QueryException {
 		this.executor = executor;
 		this.catalogService = catalogService;
 		this.virtualObjectService = virtualObjectService;
@@ -81,49 +84,57 @@ public class MultiThreadQueryObjectProvider implements ObjectProvider {
 				goingToRead.addAll(queryPart.getOids());
 			}
 		}
-		
+
 		QueryContext queryContext = new QueryContext(catalogService, virtualObjectService, packageMetaData, rid);
-		
+
 		push(new RunnableQueryStackFrame(this, rid, queryContext));
-//		try {
-//			executor.awaitTermination(1, TimeUnit.HOURS);
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
+		// try {
+		// executor.awaitTermination(1, TimeUnit.HOURS);
+		// } catch (InterruptedException e) {
+		// e.printStackTrace();
+		// }
 	}
-	
+
 	public void addToStorage(VirtualObject object) throws InterruptedException {
-		synchronized (virtualObjectStorage) {
-			if (!oidsRead.contains(object.getOid())) {
-				oidsRead.add(object.getOid());
-				virtualObjectStorage.put(object);
+		synchronized (oidsRead) {
+			virtualObjectStorageRwlock.writeLock().lock();
+			try {
+				if (!oidsRead.contains(object.getOid())) {
+					oidsRead.add(object.getOid());
+					virtualObjectStorage.add(object);
+					synchronized (this) {
+						this.notifyAll();
+					}
+				}
+			} finally {
+				virtualObjectStorageRwlock.writeLock().unlock();
 			}
 		}
 	}
-	
+
 	public MultiThreadQueryObjectProvider copy() throws IOException, QueryException {
-		MultiThreadQueryObjectProvider queryObjectProvider = new MultiThreadQueryObjectProvider(executor, catalogService,
-				virtualObjectService, server, query, rid, packageMetaData);
+		MultiThreadQueryObjectProvider queryObjectProvider = new MultiThreadQueryObjectProvider(executor,
+				catalogService, virtualObjectService, server, query, rid, packageMetaData);
 		return queryObjectProvider;
 	}
 
-	public static MultiThreadQueryObjectProvider fromJsonNode(ThreadPoolExecutor executor, CatalogService catalogService,
-			VirtualObjectService virtualObjectService, PlatformServer server, JsonNode fullQuery, Integer rid,
-			PackageMetaData packageMetaData)
+	public static MultiThreadQueryObjectProvider fromJsonNode(ThreadPoolExecutor executor,
+			CatalogService catalogService, VirtualObjectService virtualObjectService, PlatformServer server,
+			JsonNode fullQuery, Integer rid, PackageMetaData packageMetaData)
 			throws JsonParseException, JsonMappingException, IOException, QueryException {
 		if (fullQuery instanceof ObjectNode) {
 			JsonQueryObjectModelConverter converter = new JsonQueryObjectModelConverter(packageMetaData);
 			Query query = converter.parseJson("query", (ObjectNode) fullQuery);
-			return new MultiThreadQueryObjectProvider(executor, catalogService, virtualObjectService, server, query, rid,
-					packageMetaData);
+			return new MultiThreadQueryObjectProvider(executor, catalogService, virtualObjectService, server, query,
+					rid, packageMetaData);
 		} else {
 			throw new QueryException("Query root must be of type object");
 		}
 	}
 
-	public static MultiThreadQueryObjectProvider fromJsonString(ThreadPoolExecutor executor, CatalogService catalogService,
-			VirtualObjectService virtualObjectService, PlatformServer server, String json, Integer rid,
-			PackageMetaData packageMetaData)
+	public static MultiThreadQueryObjectProvider fromJsonString(ThreadPoolExecutor executor,
+			CatalogService catalogService, VirtualObjectService virtualObjectService, PlatformServer server,
+			String json, Integer rid, PackageMetaData packageMetaData)
 			throws JsonParseException, JsonMappingException, IOException, QueryException {
 		return fromJsonNode(executor, catalogService, virtualObjectService, server,
 				OBJECT_MAPPER.readValue(json, ObjectNode.class), rid, packageMetaData);
@@ -146,14 +157,16 @@ public class MultiThreadQueryObjectProvider implements ObjectProvider {
 	}
 
 	public boolean hasRead(long oid) {
-		return oidsRead.contains(oid);
+		synchronized (oidsRead) {
+			return oidsRead.contains(oid);
+		}
 	}
 
 	public void push(RunnableStackFrame stackFrame) {
-		if (stackFrame.getStatus() != Status.DONE) {
-			Future<?> future = executor.submit(stackFrame);
-			synchronized (futureMap) {
-				futureMap.putIfAbsent(stackFrame, future);
+		synchronized (futureMap) {
+			if (!isDone.get() && stackFrame.getStatus() != Status.DONE) {
+				Future<?> future = executor.submit(stackFrame);
+				futureMap.put(stackFrame, future);
 			}
 		}
 	}
@@ -178,49 +191,55 @@ public class MultiThreadQueryObjectProvider implements ObjectProvider {
 	}
 
 	public boolean hasReadOrIsGoingToRead(Long oid) {
-		if (oidsRead.contains(oid)) {
-			return true;
+		synchronized (oidsRead) {
+			synchronized (goingToRead) {
+				if (oidsRead.contains(oid)) {
+					return true;
+				}
+				if (goingToRead.contains(oid)) {
+					return true;
+				}
+				return false;
+			}
 		}
-		if (goingToRead.contains(oid)) {
-			return true;
-		}
-		return false;
 	}
 
 	@Override
 	public String toString() {
 		return super.toString();
 	}
-	
+
 	public void removeFuture(RunnableStackFrame stackFrame) {
 		synchronized (futureMap) {
-			if (futureMap.containsKey(stackFrame)) {
-				futureMap.remove(stackFrame);
-			} 
+			futureMap.remove(stackFrame);
+			if (futureMap.isEmpty()) {
+				isDone.set(true);
+				synchronized (this) {
+					this.notifyAll();
+				}
+			}
 		}
 	}
 
 	@Override
 	public VirtualObject next() throws DatabaseException, InterruptedException, ExecutionException {
-		if (virtualObjectStorage.isEmpty()) {
-			while (!futureMap.isEmpty()) {
-				if (!virtualObjectStorage.isEmpty()) {
-					return virtualObjectStorage.poll();
-				} else {
-					synchronized (futureMap) {
-						for (RunnableStackFrame stackFrame : futureMap.keySet()) {
-							Future future = futureMap.get(stackFrame);
-							if (future.isDone()) {
-								futureMap.remove(stackFrame);
-							}
-						}
+		virtualObjectStorageRwlock.readLock().lock();
+		try {
+			while (!isDone.get() || !virtualObjectStorage.isEmpty()) {
+				if (virtualObjectStorage.isEmpty()) {
+					virtualObjectStorageRwlock.readLock().unlock();
+					synchronized (this) {
+						this.wait();
 					}
+					virtualObjectStorageRwlock.readLock().lock();
+				} else {
+					return virtualObjectStorage.poll();
 				}
 			}
-			return null;
-		} else {
-			return virtualObjectStorage.poll();
+		} finally {
+			virtualObjectStorageRwlock.readLock().unlock();
 		}
+		return null;
 	}
 
 }

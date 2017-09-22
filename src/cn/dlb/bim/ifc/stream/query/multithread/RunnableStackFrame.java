@@ -19,7 +19,6 @@ public abstract class RunnableStackFrame implements Runnable {
 	}
 	
 	private Status status;
-	private Map<Long, VirtualObject> queryed = Collections.synchronizedMap(new HashMap<Long, VirtualObject>());
 	private MultiThreadQueryObjectProvider queryObjectProvider;
 	
 	public RunnableStackFrame(MultiThreadQueryObjectProvider queryObjectProvider) {
@@ -54,14 +53,6 @@ public abstract class RunnableStackFrame implements Runnable {
 	
 	public MultiThreadQueryObjectProvider getQueryObjectProvider() {
 		return queryObjectProvider;
-	}
-
-	public void addQueryed(Long oid, VirtualObject virtualObject) {
-		queryed.put(oid, virtualObject);
-	}
-
-	public VirtualObject getQueryed(Long oid) {
-		return queryed.get(oid);
 	}
 
 	public synchronized Status getStatus() {

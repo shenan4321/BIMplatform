@@ -32,6 +32,9 @@ public class VirtualObjectServiceImpl implements VirtualObjectService {
 	@Override
 	public VirtualObject findOneByRidAndOid(Integer rid, Long oid) {
 		VirtualObject virtualObject = virtualObjectDao.findOneByRidAndOid(rid, oid);
+		if (virtualObject == null) {
+			System.out.println();
+		}
 		Short cid = virtualObject.getEClassId();
 		EClass eClass = catalogService.getEClassForCid(cid);
 		virtualObject.setEClass(eClass);

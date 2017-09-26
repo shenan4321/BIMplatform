@@ -2,6 +2,7 @@ package cn.dlb.bim.action;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -22,6 +23,7 @@ import cn.dlb.bim.ifc.emf.PackageMetaData;
 import cn.dlb.bim.ifc.serializers.SerializerException;
 import cn.dlb.bim.ifc.shared.ProgressReporter;
 import cn.dlb.bim.ifc.stream.message.BinaryGeometryMessagingStreamingSerializer;
+import cn.dlb.bim.ifc.stream.message.StreamGeometryMessagingSerializer;
 import cn.dlb.bim.ifc.stream.query.Include;
 import cn.dlb.bim.ifc.stream.query.Query;
 import cn.dlb.bim.ifc.stream.query.QueryContext;
@@ -37,7 +39,7 @@ public class StreamingGeometryQueryAction extends LongAction {
 	private final QueryContext queryContext;
 	private final ConcreteRevision concreteRevision;
 	private int lastPercentProcess = 0;
-	private final ThreadPoolExecutor queryExecutor = new ThreadPoolExecutor(10, 10, 24, TimeUnit.HOURS,
+	private final ThreadPoolExecutor queryExecutor = new ThreadPoolExecutor(20, 20, 24, TimeUnit.HOURS,
 			new ArrayBlockingQueue<Runnable>(10000000));//submit阻塞的线程池
 	
 	public StreamingGeometryQueryAction(WebSocketSession webSocketSession, PlatformServer server,
@@ -84,16 +86,38 @@ public class StreamingGeometryQueryAction extends LongAction {
 			PackageMetaData packageMetaData = queryContext.getPackageMetaData();
 			Query query = new Query(packageMetaData);
 			QueryPart queryPart = query.createQueryPart();
-			EClass geometryInfoElcass = packageMetaData.getEClassIncludingDependencies("GeometryInfo");
-			queryPart.addType(geometryInfoElcass, false);
-			Include include = queryPart.createInclude();
-			include.addType(geometryInfoElcass, false);
-			include.addField("data");
-			ObjectProvider queryObjectProvider = new MultiThreadQueryObjectProvider(queryExecutor, queryContext.getCatalogService(), queryContext.getVirtualObjectService(), server,
+			EClass productClass = packageMetaData.getEClass("IfcProduct");
+			Set<EClass> subClasses = packageMetaData.getAllSubClasses(productClass);
+			for (EClass subClass : subClasses) {
+				if (!packageMetaData.getEClass("IfcSpace").isSuperTypeOf(subClass) 
+						&& !packageMetaData.getEClass("IfcFeatureElementSubtraction").isSuperTypeOf(subClass)) {
+					queryPart.addType(subClass, false);
+					Include include = queryPart.createInclude();
+					include.addType(subClass, false);
+					include.addField("geometry");
+					Include dataInclude = include.createInclude();
+					EClass geometryInfoClass = packageMetaData.getEClassIncludingDependencies("GeometryInfo");
+					dataInclude.addType(geometryInfoClass, false);
+					dataInclude.addField("data");
+				}
+			}
+			ObjectProvider queryObjectProvider = new MultiThreadQueryObjectProvider(queryExecutor, queryContext.getCatalogService(), queryContext.getVirtualObjectService(),
 					query, queryContext.getRid(), packageMetaData);
+			
+//			Query query = new Query(packageMetaData);
+//			QueryPart queryPart = query.createQueryPart();
+//			EClass geometryInfoElcass = packageMetaData.getEClassIncludingDependencies("GeometryInfo");
+//			queryPart.addType(geometryInfoElcass, false);
+//			Include include = queryPart.createInclude();
+//			include.addType(geometryInfoElcass, false);
+//			include.addField("data");
+//			ObjectProvider queryObjectProvider = new MultiThreadQueryObjectProvider(queryExecutor, queryContext.getCatalogService(), queryContext.getVirtualObjectService(),
+//					query, queryContext.getRid(), packageMetaData);
 			BinaryGeometryMessagingStreamingSerializer serializer = new BinaryGeometryMessagingStreamingSerializer();
+//			StreamGeometryMessagingSerializer serializer = new StreamGeometryMessagingSerializer();
 			serializer.init(queryObjectProvider, packageMetaData, concreteRevision);
 			ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
+//			long startTime = System.currentTimeMillis();
 			boolean write = true;
 			do {
 				write = serializer.writeMessage(byteOutputStream, progressReporter);
@@ -103,6 +127,8 @@ public class StreamingGeometryQueryAction extends LongAction {
 				}
 				byteOutputStream.reset();
 			} while (write);
+//			long lastTime = System.currentTimeMillis();
+//			System.out.println("use time : " + (lastTime - startTime) + "ms");
 			webSocketSession.close();
 		} catch (IOException e) {
 			e.printStackTrace();

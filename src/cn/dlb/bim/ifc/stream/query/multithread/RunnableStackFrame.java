@@ -33,21 +33,10 @@ public abstract class RunnableStackFrame implements Runnable {
 			if (done) {
 				setStatus(Status.DONE);
 			} 
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
 			queryObjectProvider.removeFuture(this);
-		} catch (JsonParseException e) {
-			e.printStackTrace();
-		} catch (JsonMappingException e) {
-			e.printStackTrace();
-		} catch (DatabaseException e) {
-			e.printStackTrace();
-		} catch (QueryException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (IllegalMonitorStateException e) {
-			e.printStackTrace();
 		}
 	}
 	

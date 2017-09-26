@@ -66,8 +66,8 @@ public class BinaryGeometryMessagingStreamingSerializer implements MessagingStre
 	}
 
 	private enum MessageType {
-		INIT((byte) 0), GEOMETRY_TRIANGLES_PARTED((byte) 3), GEOMETRY_TRIANGLES((byte) 1), GEOMETRY_INFO((byte) 5), END(
-				(byte) 6);
+		INIT((byte) 0), PRODUCT((byte) 1), GEOMETRY_INFO((byte) 2), GEOMETRY_TRIANGLES((byte) 3), GEOMETRY_TRIANGLES_PARTED((byte) 4), END(
+				(byte) 5);
 
 		private byte id;
 
@@ -87,8 +87,8 @@ public class BinaryGeometryMessagingStreamingSerializer implements MessagingStre
 	private LittleEndianDataOutputStream dataOutputStream;
 	private VirtualObject next;
 	private ProgressReporter progressReporter;
-	private int nrObjectsWritten;
-	private int size;
+//	private int nrObjectsWritten;
+//	private int size;
 
 	@Override
 	public void init(ObjectProvider objectProvider, PackageMetaData packageMetaData, ConcreteRevision concreteRevision) throws SerializerException {
@@ -132,26 +132,22 @@ public class BinaryGeometryMessagingStreamingSerializer implements MessagingStre
 
 	private void load() throws SerializerException, InterruptedException, ExecutionException {
 		// long start = System.nanoTime();
-		size = 0;
-		VirtualObject next = null;
+//		size = 0;
+//		VirtualObject next = null;
+//		try {
+//			next = objectProvider.next();
+//			while (next != null) {
+//				if (next.eClass() == GeometryPackage.eINSTANCE.getGeometryInfo()) {
+//					size++;
+//				}
+//				next = objectProvider.next();
+//			}
+//		} catch (DatabaseException e) {
+//			throw new SerializerException(e);
+//		}
 		try {
-			next = objectProvider.next();
-			while (next != null) {
-				if (next.eClass() == GeometryPackage.eINSTANCE.getGeometryInfo()) {
-					size++;
-				}
-				next = objectProvider.next();
-			}
-		} catch (DatabaseException e) {
-			throw new SerializerException(e);
-		}
-		try {
-			objectProvider = objectProvider.copy();
+//			objectProvider = objectProvider.copy();
 			this.next = objectProvider.next();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (QueryException e) {
-			e.printStackTrace();
 		} catch (DatabaseException e) {
 			e.printStackTrace();
 		}
@@ -222,10 +218,10 @@ public class BinaryGeometryMessagingStreamingSerializer implements MessagingStre
 			dataOutputStream.write((byte[]) transformation);
 			dataOutputStream.writeLong((Long) dataOid);
 
-			nrObjectsWritten++;
-			if (progressReporter != null) {
-				progressReporter.update(nrObjectsWritten, size);
-			}
+//			nrObjectsWritten++;
+//			if (progressReporter != null) {
+//				progressReporter.update(nrObjectsWritten, 0);
+//			}
 		} else if (GeometryPackage.eINSTANCE.getGeometryData() == next.eClass()) {
 			VirtualObject data = next;
 			// This geometry info is pointing to a not-yet-sent geometry data, so we send
@@ -402,6 +398,11 @@ public class BinaryGeometryMessagingStreamingSerializer implements MessagingStre
 					dataOutputStream.writeInt(0);
 				}
 			}
+		} else {
+			VirtualObject product = next;
+			dataOutputStream.write(MessageType.PRODUCT.getId());
+			dataOutputStream.writeUTF(product.eClass().getName());
+			dataOutputStream.writeLong(product.getOid());
 		}
 		try {
 			next = objectProvider.next();

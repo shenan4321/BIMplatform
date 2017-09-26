@@ -158,7 +158,7 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 					next = objectProvider.next();
 				}
 				
-				objectProvider = new MultiThreadQueryObjectProvider(queryExecutor, catalogService, virtualObjectService, server, query, rid, packageMetaData);
+				objectProvider = new MultiThreadQueryObjectProvider(queryExecutor, catalogService, virtualObjectService, query, rid, packageMetaData);
 
 				StreamingSerializer ifcSerializer = new IfcStepStreamingSerializer() {};
 				IRenderEngine renderEngine = null;
@@ -578,7 +578,7 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 
 								}
 								MultiThreadQueryObjectProvider queryObjectProvider = new MultiThreadQueryObjectProvider(queryExecutor, catalogService, virtualObjectService,
-										server, query, rid, packageMetaData);
+										query, rid, packageMetaData);
 
 								Runner runner = new Runner(eClass, renderEnginePool, settings, queryObjectProvider, renderEngineFilter, generateGeometryResult, header, virtualObjectsToSave, virtualObjectsToUpdate);
 								executor.submit(runner);

@@ -23,7 +23,6 @@ import cn.dlb.bim.ifc.emf.PackageMetaData;
 import cn.dlb.bim.ifc.serializers.SerializerException;
 import cn.dlb.bim.ifc.shared.ProgressReporter;
 import cn.dlb.bim.ifc.stream.message.BinaryGeometryMessagingStreamingSerializer;
-import cn.dlb.bim.ifc.stream.message.StreamGeometryMessagingSerializer;
 import cn.dlb.bim.ifc.stream.query.Include;
 import cn.dlb.bim.ifc.stream.query.Query;
 import cn.dlb.bim.ifc.stream.query.QueryContext;

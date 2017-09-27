@@ -1,9 +1,9 @@
 var myApp = angular.module("myApp", []);
 
-var geoList = {};
-var luopanBox;
 
-myApp.controller('myAppCtrl', function ($scope, $http) {
+
+myApp.controller('myAppCtrl', function ($scope, $http,$compile) {
+	
 	
 	$scope.IfcMType = localStorage.getItem("IfcMType") || 1;
 
@@ -16,17 +16,13 @@ myApp.controller('myAppCtrl', function ($scope, $http) {
 		$.each(md,function(index,item){
 			luopanData.push({name:this.name,onClick:function(){
 				$http.get('./model/queryOutputTemplate.do?rid='+string+'&otid='+item.otid).success(function (res) {
-					if($('.svg-item-selected')[0]){
-						$('.svg-item-selected')[0].setAttribute('class','svg-item');
-					}
-					if($('.svg-item').eq(index)[0]){
-						$('.svg-item').eq(index)[0].setAttribute('class','svg-item-selected');
-					}
+					$('.svg-item-selected')[0].setAttribute('class','svg-item');
+					$('.svg-item').eq(index)[0].setAttribute('class','svg-item-selected');
 					$scope.majorTypedata.indexNow = index;
 					$scope.majorTypedata[index].ifcTypeSelectorMap = res.data.ifcTypeSelectorMap;
 					checkTree();
 	    		});
-			},selected: ($scope.majorTypedata.indexNow==index )? true:false});
+			},selected: ($scope.majorTypedata.indexNow== index )? true:false});
     	});
 		return luopanData;
 	}
@@ -35,6 +31,7 @@ myApp.controller('myAppCtrl', function ($scope, $http) {
 	$http.get('./model/queryModelAndOutputTemplateMap.do?rid='+string).success(function (data,status) {
     	$scope.majorTypedata = data.data;
     	$scope.majorTypedata.indexNow = 0; //当前是第几个专业
+    	    	
     	if(data.data.length!=0){
     		var luopanData = [];
 	    	$http.get('./model/queryOutputTemplate.do?rid='+string+'&otid='+$scope.majorTypedata[$scope.majorTypedata.indexNow].otid).success(function (res) {
@@ -42,12 +39,15 @@ myApp.controller('myAppCtrl', function ($scope, $http) {
 				checkTree();
 			});
 	    	luopanBox = $.luopan({data:formatterMajorToLuoPan($scope.majorTypedata)});
+    	}else{
+    		luopanBox = $.luopan();
     	}
     });
 	
 	$scope.menuClick = function(param){
-		$scope[param]($scope, $http);
+		$scope[param]($scope, $http,$compile);
 	}
+	
 	
 	
 	$scope.fileCtrl = function($scope, $http){
@@ -56,9 +56,7 @@ myApp.controller('myAppCtrl', function ($scope, $http) {
 	    }); 
 		$scope.enableTag = function(item){
 			$('#muiSwitch').toggleClass('checked');
-			SceneJS.getScene().getNode("myEnable",function(myEnable){
-				myEnable.setEnabled(!myEnable.getEnabled());
-		   	});
+			$('#myCanvas').toggle();
 		}
 	}
 	
@@ -80,61 +78,67 @@ myApp.controller('myAppCtrl', function ($scope, $http) {
 	    	}
 	    	$scope.treeClick = item;
 	    	item.checked = !item.checked;
-	    	SceneJS.getScene().getNode(item.oid + "geometry",function (material) {
-	            if(hisPick.name){
-	                scene.getNode(hisPick.name + "geometry", function (material) {
-	                    material.setColor(hisPick.color);//之前点过的东西还原
-	                });
-	            }
-	            hisPick = {name:item.oid,color:material.getColor()}
-	            material.setColor({r: 0, g: 1, b: 0});
-	            var pTableScope= $('#pTable').scope();
-	            pTableScope.oid = item.oid ;
-	            $.ajax({
-	          	  url:'./model/queryProperty.do',
-	          	  type:'GET',
-	          	  data:{oid:item.oid,rid:string}
-	            }).done(function(data){
-	          	  pTableScope.list = data.data  
-	          	  $('#pTable').scope().$apply();
-	            })
-	    	});
+            if(hisPick.name){
+            	dlbBIM.chageColor(hisPick.name,hisPick.color);
+            }
+            intersected = dlbBIM.getName('Mesh'+item.oid);
+            if(intersected){
+            	hisPick = {name:'Mesh'+item.oid,color:{
+                	r:intersected.material.color.r,
+    				g:intersected.material.color.g,
+    				b:intersected.material.color.b,
+    				o:intersected.material.opacity
+                }};
+    			dlbBIM.flyTo(intersected);
+            	if(window.tt){
+                	var pTableScope= $('#pTable').scope();
+                    pTableScope.oid = item.oid ;
+                    $.ajax({
+                  	  url:'./model/queryProperty.do',
+                  	  type:'GET',
+                  	  data:{oid:item.oid,rid:string}
+                    }).done(function(data){
+                  	  pTableScope.list = data.data; 
+                  	  $('#pTable').scope().$apply();
+                    })
+                }
+            }
+            
 	    }
 	}
 	
 	
 	$scope.typeCtrl = function($scope, $http){
-		$http.get('./model/queryBuildingCells.do?rid='+string).success(function (data,status) {  
-	    	$scope.typeList = data.data;
-	    }).error(function (data,status) {  
-	    }); 
+		if(!$scope.typeList){
+			$http.get('./model/queryBuildingCells.do?rid='+string).success(function (data,status) {  
+		    	$scope.typeList = data.data;
+		    }).error(function (data,status) {
+		    	
+		    }); 
+		}
 		$scope.typeShowTag = function(item){
 			item.checked = !item.checked;
 			angular.forEach(item.oids, function(data,index,array){
-				scene.getNode("flags"+data,function (myEnable) {
-
-					if(geoList[data]){
-						geoList[data].showType =  !item.checked;
-					}else{
-						geoList[data]={};
-					}
-					
+				var tempMesh = dlbBIM.getName('Mesh'+data);
+				var tempLine = dlbBIM.getName('Line'+data);
+				if(tempMesh){
+					tempMesh.showType = !item.checked;//默认此参数是空，所以某类显示出来的时候
 					if(item.checked){
-						if(!geoList[data].showTypeType && !geoList[data].showType && !geoList[data].showFloor){
-							myEnable.setEnabled(true);
+						if(!tempMesh.showType && !tempMesh.showTypeType && !tempMesh.showFloor){
+							tempMesh.visible = true;
+							if(tempLine) tempLine.visible = true;
 						}
 					}else{
-						myEnable.setEnabled(false);
+						tempMesh.visible = false;
+						if(tempLine) tempLine.visible = false;
 					}
-					
-				});
+				}
+				
 			});
 		}
-		$scope.selectedPlaneBoxList = [];
+		/*$scope.selectedPlaneBoxList = [];
 		$scope.selectedPlaneBoxEventList = [];
-		
 		$scope.typeShowOpearate = function(item){
-			
 			if($scope.selectedPlaneBoxList.indexOf(item.name)==-1){
 					var MenuType = function () {
 			            this.message = "Directional light";
@@ -154,10 +158,10 @@ myApp.controller('myAppCtrl', function ($scope, $http) {
 			            };
 			            update();
 			        };
-			        /*var $closeButton = $('.dg .close-button');
+			        var $closeButton = $('.dg .close-button');
 			        if($closeButton.length==1){
 			        	$closeButton.css('position','relative').after($closeButton.clone().css('position','relative').addClass('cover-button').html('还原'));
-			        }*/
+			        }
 					var menuType = new MenuType();
 					$scope.selectedPlaneBoxList.push(item.name);	
 					var menubox = gui.addFolder(item.name+'类');
@@ -168,46 +172,41 @@ myApp.controller('myAppCtrl', function ($scope, $http) {
 			        menubox.open();
 			}
 			
-		}
+		}*/
 	}
 	
 	$scope.pTableCtrl = function($scope, $http){
-		
 	}
 	
 	$scope.floorCtrl = function($scope, $http){
 		$http.get('./model/queryModelBuildingStorey.do?rid='+string).success(function (data,status) {
 			$scope.floorData = data.data;
-			$scope.enableTag = function(item){
+			
+			/*$scope.enableTag = function(item){
 				$('#muiFloorSwitch').toggleClass('checked');
 				SceneJS.getScene().getNode("myEnable",function(myEnable){
 					myEnable.setEnabled(!myEnable.getEnabled());
 			   	});
-			}
+			}*/
 			$scope.floorClick = function(item,obj){
 				item.isActive = !item.isActive;
 				angular.forEach(item.oidContains, function(data,index,array){
-					
-					  
-					
-					scene.getNode("flags"+data,function (myEnable) {
-						
-						if(geoList[data]){
-							geoList[data].showFloor =  !item.isActive;
-						}else{
-							geoList[data]={};
-						}
-						
+					//和类型不要互相冲突
+					//如果他是true
+					var tempMesh = dlbBIM.getName('Mesh'+data);
+					var tempLine = dlbBIM.getName('Line'+data);
+					if(tempMesh){
+						tempMesh.showFloor = !item.isActive;
 						if(item.isActive){
-							if(!geoList[data].showTypeType && !geoList[data].showType && !geoList[data].showFloor){
-								myEnable.setEnabled(true);
+							if(!tempMesh.showType && !tempMesh.showTypeType && !tempMesh.showFloor){
+								tempMesh.visible = true;
+								if(tempLine) tempLine.visible = true;
 							}
 						}else{
-							myEnable.setEnabled(false);
+							tempMesh.visible = false;
+							if(tempLine) tempLine.visible = false;
 						}
-						
-						
-					});
+					}
 				});
 			}
 	    }); 
@@ -215,41 +214,46 @@ myApp.controller('myAppCtrl', function ($scope, $http) {
 	
 	
 	$scope.searchCtrl = function($scope, $http){
+		$scope.keyword = '墙';
 		$scope.bimSearch = function(){
-			console.log($http);
 			if($.html5Validate.isAllpass($('#searchFrom'))){
-				
 				$http.get('./model/searchRecord.do?rid='+string+'&keyword='+$('#searchText').val()).success(function (data,status) {
 					$scope.searchList = data.data;
 			    }); 
 			}
 			$scope.searchShow = function(item){
 				item.checked = !item.checked;
-				SceneJS.getScene().getNode(item.oid + "geometry",function (material) {
-		            if(hisPick.name){
-		                scene.getNode(hisPick.name + "geometry", function (material) {
-		                    material.setColor(hisPick.color);//之前点过的东西还原
-		                });
-		            }
-		            hisPick = {name:item.oid,color:material.getColor()}
-		            material.setColor({r: 0, g: 1, b: 0});
-		            var pTableScope= $('#pTable').scope();
-		            pTableScope.oid = item.oid ;
-		            $.ajax({
-		          	  url:'./model/queryProperty.do',
-		          	  type:'GET',
-		          	  data:{oid:item.oid,rid:string}
-		            }).done(function(data){
-		          	  pTableScope.list = data.data; 
-		          	  $('#pTable').scope().$apply();
-		            })
-		    	});
-				
+				var intersected = dlbBIM.getName['Mesh'+item.oid];
+				if(hisPick.name){
+	            	dlbBIM.chageColor(hisPick.name,hisPick.color);
+	            }
+	            intersected = dlbBIM.getName('Mesh'+item.oid);
+	            if(intersected){
+	            	hisPick = {name:'Mesh'+item.oid,color:{
+	                	r:intersected.material.color.r,
+	    				g:intersected.material.color.g,
+	    				b:intersected.material.color.b,
+	    				o:intersected.material.opacity
+	                }};
+	    			dlbBIM.flyTo(intersected);
+	            	if(window.tt){
+	                	var pTableScope= $('#pTable').scope();
+	                    pTableScope.oid = item.oid ;
+	                    $.ajax({
+	                  	  url:'./model/queryProperty.do',
+	                  	  type:'GET',
+	                  	  data:{oid:item.oid,rid:string}
+	                    }).done(function(data){
+	                  	  pTableScope.list = data.data; 
+	                  	  $('#pTable').scope().$apply();
+	                    })
+	                }
+	            } 
 			}
 		}
 	}
 	
-	$scope.markCtrl = function($scope, $http){
+	$scope.markCtrl = function($scope, $http,$compile){
 		$scope.changColor=function(){
 			$('.demo').minicolors();
 		}
@@ -283,12 +287,7 @@ myApp.controller('myAppCtrl', function ($scope, $http) {
 			}).done(function(data){
 		    	$scope.majorTypedata.push(data.data);
 		    	$scope.majorTypedata.indexNow = $scope.majorTypedata.length-1;
-		    	if(luopanBox){
-		    		luopanBox.updateDom(formatterMajorToLuoPan($scope.majorTypedata));
-		    	}else{
-		    		luopanBox = $.luopan({data:formatterMajorToLuoPan($scope.majorTypedata)});
-		    	}
-		    	
+		    	luopanBox.updateDom(formatterMajorToLuoPan($scope.majorTypedata));
 				$.ajax({
 					type:"POST",
 					url:'./model/saveOutputTemplate/'+string+'.do',
@@ -324,16 +323,12 @@ myApp.controller('myAppCtrl', function ($scope, $http) {
 						});
 					//});
 				}else{
-					/*var tt = $scope.majorTypedata[$scope.majorTypedata.indexNow].ifcTypeSelectorMap;
-					angular.forEach(tt, function(ttdata,idx){
-						ttdata.selected = false;*/
-						angular.forEach(value.namespaceSelectorMap, function(ttd,i){
-							ttd.selected = false;
-							angular.forEach(ttd.objectTypeContainerMap, function(td){
-								td.selected = false;
-							});
+					angular.forEach(value.namespaceSelectorMap, function(ttd,i){
+						ttd.selected = false;
+						angular.forEach(ttd.objectTypeContainerMap, function(td){
+							td.selected = false;
 						});
-					//});
+					});
 				}
 			}
 
@@ -350,7 +345,11 @@ myApp.controller('myAppCtrl', function ($scope, $http) {
 					});
 				}
 			}
+			
+			
+			
 			checkTree();
+			
 		}
 		
 		$scope.saveMajor = function(){
@@ -365,10 +364,10 @@ myApp.controller('myAppCtrl', function ($scope, $http) {
 			}).done(function(res){
 				if(res.success){
 					QAQ.Dialog.info('修改成功','info');
+					luopanBox.updateDom(formatterMajorToLuoPan($scope.majorTypedata));
 					setTimeout(function(){
 						$('.sb_dialog_modal').remove();
 						$('.qaq').remove();
-						luopanBox.updateDom(formatterMajorToLuoPan($scope.majorTypedata));
 					},1500);
 				}else{
 					QAQ.Dialog.info('增加失败');
@@ -377,19 +376,18 @@ myApp.controller('myAppCtrl', function ($scope, $http) {
 		}
 		
 		$scope.removeMajorType =  function(item,num){
-			QAQ.Dialog.confirm('确认删除?',function(){
+			QAQ.Dialog.confirm('确认不要我了?',function(){
 				$http.post('./model/deleteOutputTemplate.do?rid='+string+'&otid='+item.otid).success(function (res) {
 					if(res.success){
 						QAQ.Dialog.info('删除成功','info');
+						luopanBox.updateDom(formatterMajorToLuoPan($scope.majorTypedata));
 						setTimeout(function(){
 							$('.sb_dialog_modal').remove();
 							$('.qaq').remove();
 							$scope.majorTypedata.splice(num,1);
-							$('.select-down-box').hide();
-							luopanBox.updateDom(formatterMajorToLuoPan($scope.majorTypedata));
 						},1500);
 					}else{
-						QAQ.Dialog.info('删除失败');
+						QAQ.Dialog.info('删除成功');
 					}
 	    		});
 		    });
@@ -455,12 +453,7 @@ myApp.controller('myAppCtrl', function ($scope, $http) {
 		angular.forEach(list, function(item,index,array){
     		angular.forEach(item.oids, function(data,index,array){
     			var mt = Ifc.Constants.materials['Ifc'+item.name] || Ifc.Constants.materials['DEFAULT'];
-    			if(SceneJS.getScene().findNode(data + "geometry")){
-    				SceneJS.getScene().getNode(data + "geometry",function (material) {
-        				material.setColor({r: mt.r, g: mt.g, b: mt.b});
-        				material.setAlpha(mt.a);
-    		    	});
-    			}
+    			dlbBIM.chageColor('Mesh'+data,mt);
 			});
 		});
 	}
@@ -486,24 +479,20 @@ myApp.controller('myAppCtrl', function ($scope, $http) {
 							s2++;
 						}
 						angular.forEach(t.oids, function(data,index,array){
-							
-							scene.getNode("flags"+data,function (myEnable) {
-								
-								if(geoList[data]){
-									geoList[data].showTypeType =  !t.selected;
-								}else{
-									geoList[data]={};
-								}
-								
+							var tempMesh = dlbBIM.getName('Mesh'+data);
+							var tempLine = dlbBIM.getName('Line'+data);
+							if(tempMesh){
+								tempMesh.showTypeType = !t.selected;//默认此参数是空，所以某类显示出来的时候
 								if(t.selected){
-									if(!geoList[data].showTypeType && !geoList[data].showType && !geoList[data].showFloor){
-										myEnable.setEnabled(true);
+									if(!tempMesh.showType && !tempMesh.showTypeType && !tempMesh.showFloor){
+										tempMesh.visible = true;
+										if(tempLine) tempLine.visible = true;
 									}
 								}else{
-									myEnable.setEnabled(false);
+									tempMesh.visible = false;
+									if(tempLine) tempLine.visible = false;
 								}
-								
-							});
+							}
 							
 						});
 					});	
@@ -524,5 +513,5 @@ myApp.controller('myAppCtrl', function ($scope, $http) {
 			}
 		});
 	}
-	
+
 });

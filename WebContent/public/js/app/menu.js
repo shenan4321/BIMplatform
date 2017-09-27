@@ -1,8 +1,10 @@
 function initStart(){
 	var thisTime;
-	
+	window.tt = false;
 	window.asideBoxList = new Array($('.aside-box li').length-1);
+	
 	angular.bootstrap(document,['myApp']);
+	
 	
 	$('.aside-box li').on('click',function(){	
 		var $this = $(this);
@@ -11,6 +13,7 @@ function initStart(){
 		$('.nav-slide').addClass('hover');
 		$('.nav-slide-o').hide().eq(num).show();
 		if(!asideBoxList[num]){
+			window.tt =  true;
 			asideBoxList[num] = num;
 			$this.scope().menuClick($this.attr('data-name'));
 		}

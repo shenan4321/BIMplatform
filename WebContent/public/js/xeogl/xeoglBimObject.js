@@ -73,9 +73,6 @@ xeogl.BIMObject = xeogl.Component.extend({
              this.create({ // http://xeoengine.org/docs/classes/Entity.html
                 type: "xeogl.Entity",
                 id:'ifc'+this.id,
-                meta: {
-                    objectId: cfg.geometryIds[0]
-                },
                 modes:this.modes,
                 lights:lights,
                 camera: camera,
@@ -89,9 +86,6 @@ xeogl.BIMObject = xeogl.Component.extend({
 
         	this.create({ // http://xeoengine.org/docs/classes/Entity.html
                 type: "xeogl.Entity",
-                meta: {
-                    objectId: cfg.geometryIds[0]+'line'
-                },
                 modes:this.modes,
                 lights:lights,
                 camera: camera,

@@ -1,29 +1,112 @@
 function GeometryLoader() {
 	var o = this;
-	this.models = {};
 	o.state = {
 		nrObjectsRead: 0,
 		nrObjects: 0
 	};
-	o.stats = {
-		nrPrimitives: 0,
-		nrVertices: 0,
-		nrNormals: 0,
-		nrColors: 0
-	};
-	o.nodes = [];
-	o.step = 1;
-	var flagsObj = {
-		transparent : true,
-		backfaces:true,
-		enable:true
-	};
-	this.setModels = function(data){
-		o.models = data;
+	
+	o.gId = {};
+	
+	this.createGeometry = function(geometryId,vertices, normals, colors, indices,transformationMatrix,ifcProductOid,material){
+		var geometry = new THREE.BufferGeometry();
+		geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+		geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
+		geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
+		geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
+		var material = new THREE.MeshLambertMaterial( { color: new THREE.Color(material.r,material.g,material.b),opacity:material.a,transparent:true} );
+		object = new THREE.Mesh(geometry,material);
+		geometry.computeBoundingBox();
+		o.gId["Mesh." + geometryId] = object;
 	}
-	this.getModels = function(){
-		return o.models;
+
+	
+	function arrayMax( array ) {
+		if ( array.length === 0 ) return - Infinity;
+		var max = array[ 0 ];
+		for ( var i = 1, l = array.length; i < l; ++ i ) {
+			if ( array[ i ] > max ) max = array[ i ];
+		}
+		return max;
 	}
+	
+	this.createGeometry1 = function(geometryId,vertices, normals, colors, indices,transformationMatrix,ifcProductOid,material){
+		var geometry = new THREE.BufferGeometry();
+		geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array(vertices), 3 ) );
+		geometry.addAttribute( 'normal', new THREE.BufferAttribute( new Float32Array(normals), 3 ) );
+		geometry.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array(colors), 3 ) );
+		if(arrayMax(indices)>65535){
+			geometry.setIndex( new THREE.BufferAttribute( new Uint32Array(indices), 1 ) );
+		}else{
+			geometry.setIndex( new THREE.BufferAttribute( new Uint16Array(indices), 1 ) );
+		}
+		var material = new THREE.MeshLambertMaterial( { color: new THREE.Color(material.r,material.g,material.b),opacity:material.a,transparent:true} );
+		object = new THREE.Mesh(geometry,material);
+		geometry.computeBoundingBox();
+		o.gId["Mesh." + geometryId] = object;
+		
+	}
+	
+	
+	this.createGeometryLine = function(geometryId,vertices,indices){
+		var geometry = new THREE.BufferGeometry();
+		geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+		geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
+		var material = new THREE.LineBasicMaterial({ color: 0x404040, linewidth: 1 ,opacity:.3,transparent:true});
+		object = new THREE.LineSegments(geometry,material);
+		o.gId["Line." + geometryId] = object;
+	}
+	
+	this.createBimObject = function(geometryType , ifcProductOid , geometryDataOid , material, transformationMatrix){
+		var object1 = o.gId["Mesh." + geometryDataOid].clone();
+		object1.name = 'Mesh'+ ifcProductOid;
+		object1.applyMatrix(new THREE.Matrix4().set(
+						transformationMatrix[0],
+						transformationMatrix[4],
+						transformationMatrix[8],
+						transformationMatrix[12],
+						transformationMatrix[1],
+						transformationMatrix[5],
+						transformationMatrix[9],
+						transformationMatrix[13],
+						transformationMatrix[2],
+						transformationMatrix[6],
+						transformationMatrix[10],
+						transformationMatrix[14],
+						transformationMatrix[3],
+						transformationMatrix[7],
+						transformationMatrix[11],
+						transformationMatrix[15]
+		));
+		scene.add(object1);
+	}
+
+	
+	this.createBimLine = function(geometryType , ifcProductOid , geometryDataOid , material, transformationMatrix){
+		var object1 = o.gId["Line." + geometryDataOid].clone();
+		object1.name = 'Line'+ ifcProductOid;
+		object1.applyMatrix(new THREE.Matrix4().set(
+						transformationMatrix[0],
+						transformationMatrix[4],
+						transformationMatrix[8],
+						transformationMatrix[12],
+						transformationMatrix[1],
+						transformationMatrix[5],
+						transformationMatrix[9],
+						transformationMatrix[13],
+						transformationMatrix[2],
+						transformationMatrix[6],
+						transformationMatrix[10],
+						transformationMatrix[14],
+						transformationMatrix[3],
+						transformationMatrix[7],
+						transformationMatrix[11],
+						transformationMatrix[15]
+		));
+		scene.add( object1 );
+	}
+	
+	
+	this.index = 0;
 	this.readObject = function(data, geometryType) {
 		var ifcname = data.readUTF8();
 		var material  =  Ifc.Constants.materials[ifcname] || Ifc.Constants.materials['DEFAULT'];
@@ -32,118 +115,65 @@ function GeometryLoader() {
         var transformationMatrix = data.readDoubleArray(16);
 		if (geometryType == 1) {
 			var geometryDataOid = data.readLong(); 
-			var indices = data.readShortArray((data.readInt()));
+			var indices = data.readUint16Array((data.readInt()));
 			data.align4();
-			var IndicesForLinesWireFrame = data.readShortArray((data.readInt()));
+			var IndicesForLinesWireFrame = data.readUint16Array((data.readInt()));
 			data.align4();
 			var vertices = data.readFloatArray((data.readInt()));
 			var normals = data.readFloatArray((data.readInt()));
 			var colors = data.readFloatArray((data.readInt()));
-			o.library.addNodes([{
-				coreId:'geo'+geometryDataOid,
-			    type : "geometry",
-			    primitive : "triangles",
-			    positions: vertices,
-			    indices: indices,
-			    normals: normals
-			},{
-				coreId:'geoLine'+geometryDataOid,
-				type : "geometry",
-				primitive : "lines",
-				positions: vertices,
-				indices: IndicesForLinesWireFrame,
-				normals: normals
-			}]);
-			this.processGeometry(1,ifcProductOid, [geometryDataOid], material, transformationMatrix)
+//			o.index++;
+			//if(o.index==1){
+				o.createGeometry(geometryDataOid, vertices, normals, colors, indices,transformationMatrix,ifcProductOid,material);
+				o.createGeometryLine(geometryDataOid, vertices, IndicesForLinesWireFrame);
+				//o.createBimObject(geometryType , ifcProductOid ,geometryDataOid, material, transformationMatrix)
+				o.createBimObject(geometryType , ifcProductOid ,geometryDataOid, material, transformationMatrix);
+				o.createBimLine(geometryType , ifcProductOid ,geometryDataOid, material, transformationMatrix);
+			//}
 		} else if(geometryType == 2){
 			var nrParts = data.readInt();
 			data.align8();
-			var nodes = [];
-			for (var i=0; i<nrParts; i++) {
+			var geometryIds = [];
+			var geometryindices = [];
+			var geometryvertices = [];
+			var geometrynormals = [];
+			var geometrycolors = [];
+			var indicesBump;
+			for (var j=0; j<nrParts ;j++) {
 				var coreId = data.readLong();
-				var indices = data.readShortArray((data.readInt()));
+				indicesBump = geometryvertices.length/3;
+				var indices = data.readUint16Array((data.readInt()));
 				data.align4();
 				var vertices = data.readFloatArray((data.readInt()));
 				var normals = data.readFloatArray((data.readInt()));
 				var colors = data.readFloatArray((data.readInt()));
-				o.library.addNode({
-					type:"geometry",
-					primitive:"triangles",
-					positions: vertices,
-					indices: indices,
-					coreId:'geo'+coreId,
-					normals: normals
-				});
+				geometryIds.push(coreId);
+				geometryvertices.push.apply(geometryvertices,vertices);
+				geometrynormals.push.apply(geometrynormals,normals);
+				geometrycolors.push.apply(geometrycolors,colors);
+				for (var i = 0, len = indices.length; i < len; i++) {
+					geometryindices.push(indices[i] + indicesBump);
+                }
 			}
+			o.createGeometry1(geometryIds.toString(), geometryvertices, geometrynormals, geometrycolors, geometryindices,transformationMatrix,ifcProductOid,material);
+			o.createBimObject(geometryType , ifcProductOid ,geometryIds.toString(), material, transformationMatrix);
 		}else if(geometryType == 3){
             var geometryDataOid = data.readLong();
-            this.processGeometry(3,ifcProductOid, [geometryDataOid], material, transformationMatrix)
+            o.createBimObject(geometryType , ifcProductOid ,geometryDataOid, material, transformationMatrix);
+            o.createBimLine(geometryType , ifcProductOid ,geometryDataOid, material, transformationMatrix);
 		}else{
 			var arraySize = data.readInt();
             var coreIds = [];
             for (var i=0;i<arraySize;i++) {
-            	var coreId = data.readLong();
-                coreIds.push(coreId)
+                coreIds.push(data.readLong())
             }
-            this.processGeometry(4,ifcProductOid, coreIds, material, transformationMatrix);
+            o.createBimObject(geometryType , ifcProductOid ,coreIds.toString(), material, transformationMatrix);
 		}
 
 		o.state.nrObjectsRead++;
 		o.updateProgress();
-		
 	};
 
-	this.processGeometry = function(type,ifcProductOid, coreIds, material, transformationMatrix){
-		
-		var coreNodes = [];
-		var coreNodesLine = [];
-		
-		coreIds.forEach(function(coreId){
-			coreNodes.push({
-				type: "geometry",
-				coreId: 'geo'+coreId
-			});
-			if(type==1||type==3){
-				coreNodesLine.push({
-					type: "geometry",
-					coreId: 'geoLine'+coreId
-				});
-			}
-		});
-		var flags = {
-			type : "flags",
-			flags : flagsObj,
-			id : "flags"+ifcProductOid,
-			nodes : [{
-				type : "name",
-				name : ifcProductOid,
-				nodes:[{
-					type: "matrix",
-					elements: transformationMatrix,
-					nodes : [{
-						type : "material",
-						baseColor:{r:material.r,g:material.g,b:material.b},
-                        color:{r:material.r,g:material.g,b:material.b},
-						alpha: material.a,
-						id:ifcProductOid+"geometry",
-						nodes: coreNodes
-					}]
-				}]
-			}]
-		};
-		
-		if(type==1||type==3){
-			flags.nodes[0].nodes[0].nodes[1] = {
-				type : "material",
-	            color:{r:0,g:0,b:0},
-				alpha:0.5,
-				nodes: coreNodesLine
-			}
-		}
-		
-		o.models.addNode(flags);
-		flags = null;
-	}
 
 	this.updateProgress = function() {
 		progress.update({title:'transferring',progress:o.state.nrObjectsRead,max:o.state.nrObjects});
@@ -168,40 +198,29 @@ function GeometryLoader() {
 			min: {x: modelBounds[0], y: modelBounds[1], z: modelBounds[2]},
 			max: {x: modelBounds[3], y: modelBounds[4], z: modelBounds[5]}
 		};
-		o.center = {
-			x: (o.modelBounds.max.x + o.modelBounds.min.x) / 2,
-			y: (o.modelBounds.max.y + o.modelBounds.min.y) / 2,
-			z: (o.modelBounds.max.z + o.modelBounds.min.z) / 2,
-		};
+		o.center = [
+			(o.modelBounds.max.x + o.modelBounds.min.x) / 2,
+			(o.modelBounds.max.y + o.modelBounds.min.y) / 2,
+			(o.modelBounds.max.z + o.modelBounds.min.z) / 2,
+		];
 		var zoom = Math.abs(o.modelBounds.max.x - o.modelBounds.min.x);
-		if (window.scene) {
-			window.scene.getNode("lookAt",function(lookat){
-				var eye = { x: (o.modelBounds.max.x - o.modelBounds.min.x) * 0.5, y: (o.modelBounds.max.y - o.modelBounds.min.y) * -1, z: (o.modelBounds.max.z - o.modelBounds.min.z) * 0.5 };
-				lookat.setEye(eye);
-				lookat.setLook(o.center);
-			});
-			window.scene.getNode("main-camera",function(maincamera){
-				var diagonal = Math.sqrt(Math.pow(o.modelBounds.max.x - o.modelBounds.min.x, 2) + Math.pow(o.modelBounds.max.y - o.modelBounds.min.y, 2) + Math.pow(o.modelBounds.max.z - o.modelBounds.min.z, 2));
-				var far = diagonal * 18; // 5 being a guessed constant that should somehow coincide with the max zoom-out-factor
-				maincamera.setOptics({
-					type: 'perspective',
-					far: far,
-					near: far / 1000,
-					aspect: jQuery(window).width() / jQuery(window).height(),
-					fovy: 37.8493
-				});
-			}); 
-		}
-		o.library = scene.findNode("library");
-		if (o.library == null) {
-			o.library = scene.addNode({
-				id: "library",
-				type: "library"
-			});
-		}
+		o.diagonal = Math.sqrt(Math.pow(o.modelBounds.max.x - o.modelBounds.min.x, 2) + Math.pow(o.modelBounds.max.y - o.modelBounds.min.y, 2) + Math.pow(o.modelBounds.max.z - o.modelBounds.min.z, 2));
+		o.far = o.diagonal * 18; // 5 being a guessed constant that should somehow coincide with the max zoom-out-factor
+	    camera = new THREE.PerspectiveCamera( 37.8493, jQuery(window).width() / jQuery(window).height(), o.far / 1000, o.far );
+		camera.position.x = o.center[0];
+		camera.position.y = o.center[1] - o.diagonal;
+		camera.position.z = o.center[2];
+		camera.lookAt(new THREE.Vector3(o.center[0],o.center[1],o.center[2]));
+		window.center = new THREE.Vector3(o.center[0],o.center[1],o.center[2]);
+		camera.up.x = 0;
+		camera.up.y = 0;
+		camera.up.z = 1;
+		controls = new THREE.OrbitControls( camera, renderer.domElement );
+		controls.target.set(o.center[0],o.center[1],o.center[2]);
+		controls.update();
 		o.state.nrObjects = data.readInt();
-		//o.step = o.state.nrObjects<100 ? 1 :~~(o.state.nrObjects/100);
 	};
+	
 	this.process = function(res){
 		inputStream = new DataInputStream(res);
 		var messageType = inputStream.readByte();
@@ -210,6 +229,7 @@ function GeometryLoader() {
 		}else{
 			o.readObject(inputStream, messageType);
 		}
+		
 	};
 
 }

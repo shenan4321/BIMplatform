@@ -26,3 +26,4 @@ span.ifc{display: inline-block; width: 12px; height: 12px; vertical-align: -1px;
 .nopointer{cursor: default !important;}
 .ptable{margin-left: 20px; padding-top: 20px; padding-bottom: 15px; border-bottom: 1px solid #c3c3c3; font-size: 13px;}
 .blue-txt{color:#569bcd} .location-input-box{font-size: 0;width:260px;margin: 0 auto;display: block;} .location-input{display: inline-block; width: 153px; border: 1px solid #ccc; height: 32px; font: 14px arial; line-height: 22px\9; margin: 0; padding: 2px 10px; background: #fff; outline: 0; -webkit-appearance: none; border-right: 0;}
+.text-label{padding:3px 5px;background:rgba(0,0,0,.6);color:#fff;line-height:22px;height:22px;text-align:center;}

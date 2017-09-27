@@ -28,7 +28,7 @@
     <div  class="tile-choose-box"  ng-show="majorTypedata.length>=1">
         <ul ng-repeat = "(key,value) in majorTypedata[majorTypedata.indexNow].ifcTypeSelectorMap track by $index">
             <li ng-if="key != 'selected'">
-                <span ng-class="{true:'icon-tile-choose',false:'icon-tile-nochoose'}[value.selected]" ng-click="allMajorValue(value)"></span>
+                <span ng-class="{true:'icon-tile-choose',false:'icon-tile-nochoose'}[!!value.selected]" ng-click="allMajorValue(value)"></span>
                 <span class="tile-font">{{key}}</span>
                 <b class="icon-white-down tile-fr" onclick="collosePand(this)"></b>
             </li>
@@ -39,7 +39,7 @@
                 </li>
                 <ul ng-repeat = "(key2,val2) in val1.objectTypeContainerMap">
                     <li>
-                        <span class="icon-tile-choose" ng-class="{true:'icon-tile-choose',false:'icon-tile-nochoose'}[val2.selected]" ng-click="allMajorValue(val2)"></span>
+                        <span class="icon-tile-choose" ng-class="{true:'icon-tile-choose',false:'icon-tile-nochoose'}[!!val2.selected]" ng-click="allMajorValue(val2)"></span>
                         <span class="tile-font">{{key2}}</span>
                     </li>
                 </ul>

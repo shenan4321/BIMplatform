@@ -121,16 +121,6 @@ window.luopanEvent = {};
                 }
             };
 
-
-
-
-            /*$('.svg-item').click(function(){
-             console.log(1);
-             $('.svg-item').each(function(){
-             this.setAttribute("class","svg-item");
-             });
-             this.setAttribute("class","svg-item svg-item-selected");
-             })*/
         }
     });
 

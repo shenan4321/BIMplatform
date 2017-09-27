@@ -21,9 +21,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.google.common.primitives.Bytes;
-import com.sleepycat.persist.model.Entity;
 
-@Entity
 @Document(collection = "VirtualObject")
 public class VirtualObject extends ReadWriteVirtualObject implements Externalizable {
 	

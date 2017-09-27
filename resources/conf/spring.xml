@@ -66,16 +66,4 @@
 
 	<context:annotation-config />
 	
-	<bean id="bdbEnv" class="cn.dlb.bim.database.BDBEnvironment" destroy-method="close">
-		<constructor-arg value="database/"/>
-	</bean>
-	
-	<bean id="bdbDatabase" class="cn.dlb.bim.database.BDBDatabase">
-		<property name="environment" ref="bdbEnv"/>
-	</bean>
-	
-	<bean id="virtualObjectBDBAccess" class="cn.dlb.bim.database.VirtualObjectBDBAccess">
-		<constructor-arg ref="bdbDatabase"/>
-	</bean>
-
 </beans>

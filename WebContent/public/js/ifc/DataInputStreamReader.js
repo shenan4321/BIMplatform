@@ -50,6 +50,11 @@ var DataInputStream = function(arrayBuffer){
 			return value;
 		},
 
+		readShort:function(){
+			var value = $this.dataView.getInt16($this.pos, true);
+			$this.pos += 2;
+			return value;
+		},
 		readInt: function() {
 			var value = $this.dataView.getInt32($this.pos, true);
 			$this.pos += 4;

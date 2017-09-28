@@ -87,7 +87,7 @@ public class BinaryGeometryMessagingStreamingSerializer implements MessagingStre
 	private LittleEndianDataOutputStream dataOutputStream;
 	private VirtualObject next;
 	private ProgressReporter progressReporter;
-	private int nrObjectsWritten;
+//	private int nrObjectsWritten;
 //	private int size;
 
 	@Override
@@ -196,13 +196,16 @@ public class BinaryGeometryMessagingStreamingSerializer implements MessagingStre
 
 			dataOutputStream.writeByte(MessageType.GEOMETRY_INFO.getId());
 			dataOutputStream.write(new byte[7]);
-			dataOutputStream.writeLong(info.getRid());
-			dataOutputStream.writeLong(info.getOid());
+			//dataOutputStream.writeLong(info.getRid());
+			dataOutputStream.writeLong(info.getOid()); //geomotryInfoId ex:45873 
+			
 			WrappedVirtualObject minBounds = (WrappedVirtualObject) info
 					.eGet(info.eClass().getEStructuralFeature("minBounds"));
 			WrappedVirtualObject maxBounds = (WrappedVirtualObject) info
 					.eGet(info.eClass().getEStructuralFeature("maxBounds"));
-			Double minX = (Double) minBounds.eGet("x");
+			
+			//modelBoxBounds min,max
+/*			Double minX = (Double) minBounds.eGet("x");
 			Double minY = (Double) minBounds.eGet("y");
 			Double minZ = (Double) minBounds.eGet("z");
 			Double maxX = (Double) maxBounds.eGet("x");
@@ -214,11 +217,12 @@ public class BinaryGeometryMessagingStreamingSerializer implements MessagingStre
 			dataOutputStream.writeDouble(minZ);
 			dataOutputStream.writeDouble(maxX);
 			dataOutputStream.writeDouble(maxY);
-			dataOutputStream.writeDouble(maxZ);
+			dataOutputStream.writeDouble(maxZ);*/
+			
 			dataOutputStream.write((byte[]) transformation);
-			dataOutputStream.writeLong((Long) dataOid);
+			dataOutputStream.writeLong((Long) dataOid);  //geomotryDataId ex:45873
 
-			nrObjectsWritten++;
+//			nrObjectsWritten++;
 //			if (progressReporter != null) {
 //				progressReporter.update(nrObjectsWritten, 0);
 //			}
@@ -244,7 +248,7 @@ public class BinaryGeometryMessagingStreamingSerializer implements MessagingStre
 			int maxIndexValues = 16389;
 
 			if (totalNrIndices > maxIndexValues) {
-				dataOutputStream.write(MessageType.GEOMETRY_TRIANGLES_PARTED.getId());
+				dataOutputStream.writeByte(MessageType.GEOMETRY_TRIANGLES_PARTED.getId());
 				dataOutputStream.write(new byte[7]);
 				dataOutputStream.writeLong(data.getOid());
 
@@ -350,9 +354,11 @@ public class BinaryGeometryMessagingStreamingSerializer implements MessagingStre
 					}
 				}
 			} else {
-				dataOutputStream.write(MessageType.GEOMETRY_TRIANGLES.getId());
+				dataOutputStream.writeByte(MessageType.GEOMETRY_TRIANGLES.getId());
 				dataOutputStream.write(new byte[7]);
+				
 				dataOutputStream.writeLong(data.getOid());
+				
 
 				ByteBuffer indicesBuffer = ByteBuffer.wrap(indices);
 				indicesBuffer.order(ByteOrder.LITTLE_ENDIAN);
@@ -400,9 +406,14 @@ public class BinaryGeometryMessagingStreamingSerializer implements MessagingStre
 			}
 		} else {
 			VirtualObject product = next;
-			dataOutputStream.write(MessageType.PRODUCT.getId());
-			dataOutputStream.writeUTF(product.eClass().getName());
-			dataOutputStream.writeLong(product.getOid());
+			Object geometryInfoRef = product.get("geometry");
+			if (geometryInfoRef != null) {
+				dataOutputStream.write(MessageType.PRODUCT.getId());
+				dataOutputStream.writeUTF(product.eClass().getName());
+				dataOutputStream.writeLong(product.getOid());
+				dataOutputStream.writeLong((Long) geometryInfoRef);
+				
+			}
 		}
 		try {
 			next = objectProvider.next();

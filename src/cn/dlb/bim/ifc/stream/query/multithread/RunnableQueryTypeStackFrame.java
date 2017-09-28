@@ -1,7 +1,9 @@
 package cn.dlb.bim.ifc.stream.query.multithread;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EReference;
@@ -101,6 +103,17 @@ public class RunnableQueryTypeStackFrame extends RunnableDatabaseReadingStackFra
 	@Override
 	public VirtualObject getCurrentObject() {
 		return currentObject;
+	}
+	
+	@Override
+	public String toString() {
+		return "QueryTypeStackFrame (" + eClass.getName() + ")";
+	}
+
+	@Override
+	public int stackFrameHash() {
+		List<Object> hashElements = Arrays.asList(getClass(), getQueryObjectProvider(), eClass.hashCode(), getQueryPart(), getReusable());
+		return Arrays.hashCode(hashElements.toArray());
 	}
 
 }

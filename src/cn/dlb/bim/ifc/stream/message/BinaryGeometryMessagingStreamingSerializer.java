@@ -87,7 +87,7 @@ public class BinaryGeometryMessagingStreamingSerializer implements MessagingStre
 	private LittleEndianDataOutputStream dataOutputStream;
 	private VirtualObject next;
 	private ProgressReporter progressReporter;
-//	private int nrObjectsWritten;
+	private int nrObjectsWritten;
 //	private int size;
 
 	@Override
@@ -218,7 +218,7 @@ public class BinaryGeometryMessagingStreamingSerializer implements MessagingStre
 			dataOutputStream.write((byte[]) transformation);
 			dataOutputStream.writeLong((Long) dataOid);
 
-//			nrObjectsWritten++;
+			nrObjectsWritten++;
 //			if (progressReporter != null) {
 //				progressReporter.update(nrObjectsWritten, 0);
 //			}

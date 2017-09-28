@@ -1,7 +1,9 @@
 package cn.dlb.bim.ifc.stream.query.multithread;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -34,4 +36,11 @@ public class RunnableQueryStackFrame extends RunnableStackFrame {
 		}
 		return true;
 	}
+	
+	@Override
+	public int stackFrameHash() {
+		List<Object> hashElements = Arrays.asList(getClass(), getQueryObjectProvider(), reusable);
+		return Arrays.hashCode(hashElements.toArray());
+	}
+	
 }

@@ -1,5 +1,8 @@
 package cn.dlb.bim.ifc.stream.query.multithread;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EReference;
 
@@ -26,10 +29,10 @@ public class RunnableFollowReferenceStackFrame extends RunnableDatabaseReadingSt
 
 	@Override
 	public boolean process() throws DatabaseException, QueryException, InterruptedException {
-		if (getQueryObjectProvider().hasRead(oid)) {
-			processPossibleIncludes(null, include);
-			return true;
-		}
+//		if (getQueryObjectProvider().hasRead(oid)) {
+//			processPossibleIncludes(null, include);
+//			return true;
+//		}
 		
 		if (hasRun) {
 			return true;
@@ -55,5 +58,12 @@ public class RunnableFollowReferenceStackFrame extends RunnableDatabaseReadingSt
 			e.printStackTrace();
 		}
 		return "FollowReferenceStackFrame (" + fromReference.getName() + ")";
+	}
+	
+	@Override
+	public int stackFrameHash() {
+		List<Object> hashElements = Arrays.asList(getClass(), getQueryObjectProvider(), getReusable(), getQueryPart(),
+				oid, fromReference, include);
+		return Arrays.hashCode(hashElements.toArray());
 	}
 }

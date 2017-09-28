@@ -1,6 +1,7 @@
 package cn.dlb.bim.ifc.stream.query.multithread;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
@@ -11,6 +12,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -26,7 +28,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import cn.dlb.bim.component.PlatformServer;
 import cn.dlb.bim.database.DatabaseException;
-import cn.dlb.bim.ifc.emf.MetaDataManager;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
 import cn.dlb.bim.ifc.stream.VirtualObject;
 import cn.dlb.bim.ifc.stream.query.JsonQueryObjectModelConverter;
@@ -51,8 +52,8 @@ public class MultiThreadQueryObjectProvider implements ObjectProvider {//TODO Êè
 	private CatalogService catalogService;
 	private VirtualObjectService virtualObjectService;
 
-	private final Set<Long> oidsRead = new ConcurrentSkipListSet<>();
-	private final Set<Long> goingToRead = new ConcurrentSkipListSet<>();
+	private final Set<Long> oidsRead = new HashSet<>();
+	private final Set<Long> goingToRead = new HashSet<>();
 	private Query query;
 	private Integer rid;
 	private PackageMetaData packageMetaData;
@@ -60,10 +61,12 @@ public class MultiThreadQueryObjectProvider implements ObjectProvider {//TODO Êè
 	private final ThreadPoolExecutor executor;
 
 	private Queue<VirtualObject> virtualObjectStorage = new ConcurrentLinkedQueue<>();
+	private ReadWriteLock virtualObjectStorageRwLock = new ReentrantReadWriteLock();
 
 	private Map<RunnableStackFrame, Future<?>> futureMap = new ConcurrentHashMap<>();
+	private Set<Integer> stackFrameHashCodes = new HashSet<>();
 
-	private volatile boolean isDone = false;
+	private AtomicBoolean isDone = new AtomicBoolean(false);
 
 	public MultiThreadQueryObjectProvider(ThreadPoolExecutor executor, CatalogService catalogService,
 			VirtualObjectService virtualObjectService, Query query, Integer rid,
@@ -88,11 +91,18 @@ public class MultiThreadQueryObjectProvider implements ObjectProvider {//TODO Êè
 	}
 
 	public void addToStorage(VirtualObject object) throws InterruptedException {
-		if (!oidsRead.contains(object.getOid())) {
-			oidsRead.add(object.getOid());
-			virtualObjectStorage.add(object);
-			synchronized (this) {
-				this.notifyAll();
+		synchronized (oidsRead) {
+			virtualObjectStorageRwLock.writeLock().lock();
+			try {
+				if (!oidsRead.contains(object.getOid())) {
+					oidsRead.add(object.getOid());
+					virtualObjectStorage.add(object);
+					synchronized (this) {
+						this.notifyAll();
+					}
+				}
+			} finally {
+				virtualObjectStorageRwLock.writeLock().unlock();
 			}
 		}
 	}
@@ -138,14 +148,22 @@ public class MultiThreadQueryObjectProvider implements ObjectProvider {//TODO Êè
 	}
 
 	public boolean hasRead(long oid) {
-		return oidsRead.contains(oid);
+		synchronized (oidsRead) {
+			return oidsRead.contains(oid);
+		}
 	}
 
 	public void push(RunnableStackFrame stackFrame) {
 		synchronized (futureMap) {
-			if (!isDone && stackFrame.getStatus() != Status.DONE) {
-				Future<?> future = executor.submit(stackFrame);
-				futureMap.put(stackFrame, future);
+			synchronized (executor) {
+				synchronized (stackFrameHashCodes) {
+					int hashCode = stackFrame.stackFrameHash();
+					if (!stackFrameHashCodes.contains(hashCode) && !isDone.get() && stackFrame.getStatus() != Status.DONE) {
+						Future<?> future = executor.submit(stackFrame);
+						futureMap.put(stackFrame, future);
+						stackFrameHashCodes.add(hashCode);
+					} 
+				}
 			}
 		}
 	}
@@ -170,13 +188,17 @@ public class MultiThreadQueryObjectProvider implements ObjectProvider {//TODO Êè
 	}
 
 	public boolean hasReadOrIsGoingToRead(Long oid) {
-		if (oidsRead.contains(oid)) {
-			return true;
+		synchronized (oidsRead) {
+			synchronized (goingToRead) {
+				if (oidsRead.contains(oid)) {
+					return true;
+				}
+				if (goingToRead.contains(oid)) {
+					return true;
+				}
+				return false;
+			}
 		}
-		if (goingToRead.contains(oid)) {
-			return true;
-		}
-		return false;
 	}
 
 	@Override
@@ -188,33 +210,35 @@ public class MultiThreadQueryObjectProvider implements ObjectProvider {//TODO Êè
 		synchronized (futureMap) {
 			futureMap.remove(stackFrame);
 			if (futureMap.isEmpty()) {
-				isDone = true;
+				isDone.set(true);
 				synchronized (this) {
 					this.notifyAll();
 				}
 			}
-			
 		}
-		
-		
 	}
 
 	@Override
 	public VirtualObject next() throws DatabaseException, InterruptedException, ExecutionException {
-		
-		while (!isDone || !virtualObjectStorage.isEmpty()) {
-			if (virtualObjectStorage.isEmpty()) {
-				synchronized (this) {
-					if (!isDone && virtualObjectStorage.isEmpty()) {
-						this.wait();
+		virtualObjectStorageRwLock.readLock().lock();
+		try {
+			while (!isDone.get() || !virtualObjectStorage.isEmpty()) {
+				if (virtualObjectStorage.isEmpty()) {
+					if (!isDone.get() && virtualObjectStorage.isEmpty()) {
+						virtualObjectStorageRwLock.readLock().unlock();
+						synchronized (this) {
+							this.wait();
+						}
+						virtualObjectStorageRwLock.readLock().lock();
 					}
+				} else {
+					return virtualObjectStorage.poll();
 				}
-			} else {
-				return virtualObjectStorage.poll();
 			}
+			return null;
+		} finally {
+			virtualObjectStorageRwLock.readLock().unlock();
 		}
-		
-		return null;
 	}
 
 	/**
@@ -223,12 +247,12 @@ public class MultiThreadQueryObjectProvider implements ObjectProvider {//TODO Êè
 	 * @throws InterruptedException 
 	 */
 	public boolean isDoneBlock() throws InterruptedException {
-		while (!isDone) {
+		while (!isDone.get()) {
 			synchronized (this) {
 				this.wait();
 			}
 		}
-		return isDone;
+		return isDone.get();
 	}
 
 }

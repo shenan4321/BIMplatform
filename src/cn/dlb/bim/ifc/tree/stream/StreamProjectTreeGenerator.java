@@ -1,28 +1,21 @@
 package cn.dlb.bim.ifc.tree.stream;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.emf.ecore.EClass;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-
 import cn.dlb.bim.dao.entity.ConcreteRevision;
-import cn.dlb.bim.database.DatabaseException;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
 import cn.dlb.bim.ifc.stream.VirtualObject;
 import cn.dlb.bim.ifc.stream.query.Query;
-import cn.dlb.bim.ifc.stream.query.QueryException;
+import cn.dlb.bim.ifc.stream.query.QueryObjectProvider;
 import cn.dlb.bim.ifc.stream.query.multithread.MultiThreadQueryObjectProvider;
-import cn.dlb.bim.ifc.stream.serializers.ObjectProvider;
 import cn.dlb.bim.ifc.tree.ProjectTree;
 import cn.dlb.bim.ifc.tree.TreeItem;
 import cn.dlb.bim.service.CatalogService;
@@ -38,7 +31,7 @@ public class StreamProjectTreeGenerator {
 	private Map<Short, List<VirtualObject>> cidContainer = new HashMap<>();
 	private Map<Long, VirtualObject> oidContainer = new HashMap<>();
 	
-	private final ThreadPoolExecutor queryExecutor = new ThreadPoolExecutor(10, 10, 24, TimeUnit.HOURS,
+	private final ThreadPoolExecutor queryExecutor = new ThreadPoolExecutor(20, 20, 24, TimeUnit.HOURS,
 			new ArrayBlockingQueue<Runnable>(10000000));
 
 	public StreamProjectTreeGenerator(PackageMetaData packageMetaData, CatalogService catalogService,
@@ -47,43 +40,44 @@ public class StreamProjectTreeGenerator {
 		this.catalogService = catalogService;
 		this.virtualObjectService = virtualObjectService;
 		this.concreteRevision = concreteRevision;
-		
+		int testCount = 1;
 		try {
+			long start = System.currentTimeMillis();
 			StreamProjectTreeScript streamProjectTreeScript = new StreamProjectTreeScript(packageMetaData);
 			Query query = streamProjectTreeScript.getQuery();
-			ObjectProvider objectProvider = new MultiThreadQueryObjectProvider(queryExecutor, catalogService, virtualObjectService, query, concreteRevision.getRevisionId(), packageMetaData);
-			VirtualObject next = null;
-			while ((next = objectProvider.next()) != null) {
-				if (cidContainer.containsKey(next.getEClassId())) {
-					cidContainer.get(next.getEClassId()).add(next);
-				} else {
+			MultiThreadQueryObjectProvider objectProvider = new MultiThreadQueryObjectProvider(queryExecutor, catalogService, virtualObjectService, query, concreteRevision.getRevisionId(), packageMetaData);
+			VirtualObject next = objectProvider.next();
+			while (next != null) {
+				if (!cidContainer.containsKey(next.getEClassId())) {
 					cidContainer.put(next.getEClassId(), new ArrayList<>());
-					cidContainer.get(next.getEClassId()).add(next);
 				}
-				oidContainer.putIfAbsent(next.getOid(), next);
+				cidContainer.get(next.getEClassId()).add(next);
+				oidContainer.put(next.getOid(), next);
+				next = objectProvider.next();
 			}
-		} catch (JsonParseException e) {
-			// TODO Auto-generated catch block
+			long end = System.currentTimeMillis();
+			System.out.println("test MultiThreadQueryObjectProvider oidContainer size: " + oidContainer.size() + " time: " + (end - start));
+			start = System.currentTimeMillis();
+			QueryObjectProvider objectProvider2 = new QueryObjectProvider(catalogService, virtualObjectService, null, query, concreteRevision.getRevisionId(), packageMetaData);
+			next = objectProvider2.next();
+			while (next != null) {
+				if (!cidContainer.containsKey(next.getEClassId())) {
+					cidContainer.put(next.getEClassId(), new ArrayList<>());
+				}
+				cidContainer.get(next.getEClassId()).add(next);
+//				if (!oidContainer.containsKey(next.getOid())) {
+//					System.err.println("lost oid : " +next.getOid() + ", type :" + next.eClass().getName());
+//				}
+				oidContainer.put(next.getOid(), next);
+				next = objectProvider2.next();
+			}
+			end = System.currentTimeMillis();
+			System.out.println("test QueryObjectProvider oidContainer size: " + oidContainer.size() + " time: " + (end - start));
+				
+		} catch (Exception e) {
 			e.printStackTrace();
-		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (QueryException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} 
+		
 	}
 
 	public void proccessBuild() {
@@ -117,11 +111,6 @@ public class StreamProjectTreeGenerator {
 		if (ifcProductEclass.isSuperTypeOf(object.eClass())) {
 			Object refGeoId = object.get("geometry");
 			if (refGeoId != null) {
-//				VirtualObject geometryInfo = oidContainer.get((Long) refGeoId);
-////				VirtualObject geometryInfo = virtualObjectService.findOneByRidAndOid(rid, (Long) refGeoId);
-//				if (geometryInfo == null) {
-//					System.out.println();
-//				}
 				curTree.setGeometryOid((Long) refGeoId);
 			}
 

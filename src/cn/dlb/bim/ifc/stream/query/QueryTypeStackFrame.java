@@ -94,5 +94,10 @@ public class QueryTypeStackFrame extends DatabaseReadingStackFrame implements Ob
 	public VirtualObject getCurrentObject() {
 		return currentObject;
 	}
+	
+	@Override
+	public String toString() {
+		return "QueryTypeStackFrame (" + eClass.getName() + ")";
+	}
 
 }

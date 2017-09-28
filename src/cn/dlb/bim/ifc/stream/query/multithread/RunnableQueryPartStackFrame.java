@@ -1,6 +1,7 @@
 package cn.dlb.bim.ifc.stream.query.multithread;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -107,4 +108,11 @@ public class RunnableQueryPartStackFrame extends RunnableStackFrame {
 		
 		return true;
 	}
+	
+	@Override
+	public int stackFrameHash() {
+		List<Object> hashElements = Arrays.asList(getClass(), getQueryObjectProvider(), reusable, partialQuery);
+		return Arrays.hashCode(hashElements.toArray());
+	}
+	
 }

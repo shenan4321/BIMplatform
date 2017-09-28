@@ -93,4 +93,9 @@ public class QueryIncludeStackFrame extends DatabaseReadingStackFrame {
 			}
 		}
 	}
+	
+	@Override
+	public String toString() {
+		return "RunnableQueryIncludeStackFrame (eClass: " + currentObject.eClass().getName() + ", oid: " + currentObject.getOid() + ")";
+	}
 }

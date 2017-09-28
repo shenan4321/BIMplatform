@@ -1,5 +1,7 @@
 package cn.dlb.bim.ifc.stream.query.multithread;
 
+import java.util.Arrays;
+
 /******************************************************************************
  * Copyright (C) 2009-2016  BIMserver.org
  * 
@@ -39,11 +41,13 @@ public class RunnableQueryIncludeStackFrame extends RunnableDatabaseReadingStack
 
 	private Set<Short> outputFilterCids;
 	private Iterator<EReference> featureIterator;
+	private CanInclude previousInclude;
 	private Include include;
 	private EReference feature;
 
 	public RunnableQueryIncludeStackFrame(MultiThreadQueryObjectProvider queryObjectProvider, QueryContext queryContext, CanInclude previousInclude, Include include, VirtualObject currentObject, QueryPart queryPart) throws QueryException, DatabaseException {
 		super(queryContext, queryObjectProvider, queryPart);
+		this.previousInclude = previousInclude;
 		this.include = include;
 		this.currentObject = currentObject;
 		
@@ -69,6 +73,7 @@ public class RunnableQueryIncludeStackFrame extends RunnableDatabaseReadingStack
 		
 		while (featureIterator.hasNext()) {
 			feature = featureIterator.next();
+			
 			Object value = currentObject.eGet(feature);
 			
 			if (value != null) {
@@ -97,9 +102,20 @@ public class RunnableQueryIncludeStackFrame extends RunnableDatabaseReadingStack
 
 	private void processReference(long refOid) {
 		if (outputFilterCids == null || outputFilterCids.contains((short)refOid)) {
-			if (!getQueryObjectProvider().hasRead(refOid)) {
-				getQueryObjectProvider().push(new RunnableFollowReferenceStackFrame(getQueryObjectProvider(), refOid, getReusable(), getQueryPart(), feature, include));
-			}
+			getQueryObjectProvider().push(new RunnableFollowReferenceStackFrame(getQueryObjectProvider(), refOid, getReusable(), getQueryPart(), feature, include));
 		}
 	}
+	
+	@Override
+	public String toString() {
+		return "RunnableQueryIncludeStackFrame (eClass: " + currentObject.eClass().getName() + ", oid: " + currentObject.getOid() + ")";
+	}
+	
+	@Override
+	public int stackFrameHash() {
+		List<Object> hashElements = Arrays.asList(getClass(), getQueryObjectProvider(), getReusable(), getQueryPart(),
+				previousInclude, include, currentObject.getOid());
+		return Arrays.hashCode(hashElements.toArray());
+	}
+	
 }

@@ -39,7 +39,7 @@ public class StreamingGeometryQueryAction extends LongAction {
 	private final ConcreteRevision concreteRevision;
 	private int lastPercentProcess = 0;
 	private final ThreadPoolExecutor queryExecutor = new ThreadPoolExecutor(20, 20, 24, TimeUnit.HOURS,
-			new ArrayBlockingQueue<Runnable>(10000000));//submit阻塞的线程池
+			new ArrayBlockingQueue<Runnable>(10000000));
 	
 	public StreamingGeometryQueryAction(WebSocketSession webSocketSession, PlatformServer server,
 			QueryContext queryContext, ConcreteRevision concreteRevision) {
@@ -103,20 +103,9 @@ public class StreamingGeometryQueryAction extends LongAction {
 			ObjectProvider queryObjectProvider = new MultiThreadQueryObjectProvider(queryExecutor, queryContext.getCatalogService(), queryContext.getVirtualObjectService(),
 					query, queryContext.getRid(), packageMetaData);
 			
-//			Query query = new Query(packageMetaData);
-//			QueryPart queryPart = query.createQueryPart();
-//			EClass geometryInfoElcass = packageMetaData.getEClassIncludingDependencies("GeometryInfo");
-//			queryPart.addType(geometryInfoElcass, false);
-//			Include include = queryPart.createInclude();
-//			include.addType(geometryInfoElcass, false);
-//			include.addField("data");
-//			ObjectProvider queryObjectProvider = new MultiThreadQueryObjectProvider(queryExecutor, queryContext.getCatalogService(), queryContext.getVirtualObjectService(),
-//					query, queryContext.getRid(), packageMetaData);
 			BinaryGeometryMessagingStreamingSerializer serializer = new BinaryGeometryMessagingStreamingSerializer();
-//			StreamGeometryMessagingSerializer serializer = new StreamGeometryMessagingSerializer();
 			serializer.init(queryObjectProvider, packageMetaData, concreteRevision);
 			ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
-//			long startTime = System.currentTimeMillis();
 			boolean write = true;
 			do {
 				write = serializer.writeMessage(byteOutputStream, progressReporter);
@@ -126,8 +115,6 @@ public class StreamingGeometryQueryAction extends LongAction {
 				}
 				byteOutputStream.reset();
 			} while (write);
-//			long lastTime = System.currentTimeMillis();
-//			System.out.println("use time : " + (lastTime - startTime) + "ms");
 			webSocketSession.close();
 		} catch (IOException e) {
 			e.printStackTrace();

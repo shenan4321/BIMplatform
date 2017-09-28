@@ -36,4 +36,9 @@ public class QueryOidsAndTypesStackFrame extends DatabaseReadingStackFrame imple
 		return false;
 	}
 	
+	@Override
+	public String toString() {
+		return "QueryOidsAndTypesStackFrame (" + eClass.getName() + ")";
+	}
+	
 }

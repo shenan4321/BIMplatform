@@ -11,7 +11,6 @@ function GeometryLoader() {
 	
 	this.createGeometry = function(geometryId,vertices, normals, colors, indices){
 		var geometry = new THREE.BufferGeometry();
-		
 		geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
 		geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
 		geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
@@ -30,6 +29,7 @@ function GeometryLoader() {
 		}
 		return max;
 	}
+	
 	
 	this.createGeometry1 = function(geometryId,vertices, normals, colors, indices){
 		var geometry = new THREE.BufferGeometry();
@@ -140,42 +140,44 @@ function GeometryLoader() {
 				};*/
 				
 			}else if(geometryType == 4){
-				console.log(4);
-				data.align8();
-				var geometryDataOid = data.readLong();
-				var nrParts = data.readInt();
+				
 				data.align8();
 				
-				/*var geometryIds = [];
+				var geometryDataOid = data.readLong();
+				
+				var nrParts = data.readInt();
+				
+				
+				var geometryIds = [];
 				var geometryindices = [];
 				var geometryvertices = [];
 				var geometrynormals = [];
 				var geometrycolors = [];
-				var indicesBump;*/
+				var indicesBump;
 				
 				for (var i=0; i<nrParts; i++) {
 					var coreId = data.readLong();
 					indicesBump = geometryvertices.length/3;
-					var indices = data.readShortArray((data.readShort()));
-					
+					var indices = data.readShortArray((data.readInt()));
 					data.align4();
 					
 					var vertices = data.readFloatArray((data.readInt()));
+					
 					var normals = data.readFloatArray((data.readInt()));
+					
 					var colors = data.readFloatArray((data.readInt()));
-					
-					
-					o.createGeometry(geometryDataOid, vertices, normals, colors, indices);
-					/*geometryIds.push(coreId);
 					geometryvertices.push.apply(geometryvertices,vertices);
 					geometrynormals.push.apply(geometrynormals,normals);
 					geometrycolors.push.apply(geometrycolors,colors);
 					
 					for (var i = 0, len = indices.length; i < len; i++) {
 						geometryindices.push(indices[i] + indicesBump);
-	                }*/
+	                }
+					
 				}
-				//o.createGeometry1(geometryIds.toString(), geometryvertices, geometrynormals, geometrycolors, geometryindices);
+
+				
+				o.createGeometry1(geometryDataOid, geometryvertices, geometrynormals, geometrycolors, geometryindices);
 				
 			} else if(geometryType == 3){
 				data.align8();
@@ -196,19 +198,14 @@ function GeometryLoader() {
 			
 				var ifcname = data.readUTF8();
 				var material  =  Ifc.Constants.materials[ifcname] || Ifc.Constants.materials['DEFAULT'];
-				
-				var material = new THREE.MeshLambertMaterial({color: new THREE.Color(material.r,
+				material = new THREE.MeshLambertMaterial({color: new THREE.Color(material.r,
             			material.g,
             			material.b),
            			opacity:material.a,
            			transparent:true});
 				
 				var oid = data.readLong();//不同的
-				
 				var gid = data.readLong();
-				console.log('ifcTypeoid',oid);
-				
-				console.log('ifcTypegid',gid);
 				o.gList[oid] = {};
 				o.gList[oid].gInfoId = gid;
 				o.gList[oid].gMaterial = material;
@@ -233,7 +230,6 @@ function GeometryLoader() {
 			return false;
 		}
 		var version = data.readByte();
-		console.log(version);
 		/*if (version != 6) {
 			console.log("Unimplemented version");
 			return false;

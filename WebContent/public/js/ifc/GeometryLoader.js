@@ -208,7 +208,7 @@ function GeometryLoader() {
 			
 				var ifcname = data.readUTF8();
 				var material  =  Ifc.Constants.materials[ifcname] || Ifc.Constants.materials['DEFAULT'];
-				material = new THREE.MeshPhoneMaterial({color: new THREE.Color(material.r,
+				material = new THREE.MeshLambertMaterial({color: new THREE.Color(material.r,
             			material.g,
             			material.b),
            			opacity:material.a,

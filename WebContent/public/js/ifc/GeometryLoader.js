@@ -134,12 +134,11 @@ function GeometryLoader() {
 					min: {x: modelBounds[0], y: modelBounds[1], z: modelBounds[2]},
 					max: {x: modelBounds[3], y: modelBounds[4], z: modelBounds[5]}
 				};*/
-				var transformationMatrix = data.readDoubleArray(16);
-				var geometryDataOid = data.readLong();
 				data.align8();
 				o.geoList[oid] = {};
-				o.geoList[oid].geometryDataOid =  geometryDataOid;
-				o.geoList[oid].transformationMatrix = transformationMatrix;
+				o.geoList[oid].transformationMatrix =  data.readDoubleArray(16);
+				o.geoList[oid].geometryDataOid = data.readLong();
+				
 				/*o.geoList[oid].modelBounds = {
 					min: {x: modelBounds[0], y: modelBounds[1], z: modelBounds[2]},
 					max: {x: modelBounds[3], y: modelBounds[4], z: modelBounds[5]}
@@ -208,11 +207,14 @@ function GeometryLoader() {
 			
 				var ifcname = data.readUTF8();
 				var material  =  Ifc.Constants.materials[ifcname] || Ifc.Constants.materials['DEFAULT'];
-				material = new THREE.MeshLambertMaterial({color: new THREE.Color(material.r,
+				material = new THREE.MeshPhongMaterial({color: new THREE.Color(material.r,
             			material.g,
             			material.b),
+            			specular:new THREE.Color(material.r,
+                    			material.g,
+                    			material.b),
            			opacity:material.a,
-           			transparent:false});
+           			transparent:true});
 				var oid = data.readLong();//不同的
 				var gid = data.readLong();
 				o.gList[oid] = {};

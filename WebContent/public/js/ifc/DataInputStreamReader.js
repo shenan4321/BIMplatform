@@ -133,6 +133,16 @@ var DataInputStream = function(arrayBuffer){
 			} catch (e) {
 				console.error(e, $this.pos, length);
 			}
+		},
+		
+		readUint32Array: function(length) {
+			try {
+				var result = new Uint16Array($this.arrayBuffer, $this.pos, length);
+				$this.pos += length * 2;
+				return result;
+			} catch (e) {
+				console.error(e, $this.pos, length);
+			}
 		}
 	
 	}

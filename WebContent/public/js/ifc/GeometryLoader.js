@@ -48,18 +48,17 @@ function GeometryLoader() {
 	
 	this.createGeometryLine = function(geometryId,vertices,indices){
 		var geometry = new THREE.BufferGeometry();
-		geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
-		geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
-		var material = new THREE.LineBasicMaterial({ color: 0x404040, linewidth: 1 ,opacity:.3,transparent:true});
-		object = new THREE.LineSegments(geometry,material);
-		o.gId["Line." + geometryId] = object;
+		geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array(vertices) , 3 ) );
+		if(arrayMax(indices)>65535){
+			geometry.setIndex( new THREE.BufferAttribute( new Uint32Array(indices), 1 ) );
+		}else{
+			geometry.setIndex( new THREE.BufferAttribute( new Uint16Array(indices), 1 ) );
+		}
+		o.gId["Line." + geometryId] = geometry;
 	}
 	
 	this.createBimObject = function(ifcProductOid , geometryDataOid , material, transformationMatrix,boundingBox){
-		console.log('geometryDataOidgeometryDataOid',geometryDataOid);
-		console.log('geometryDataOidsss',o.gId["Mesh." + geometryDataOid]);
-		
-		
+
 		
 		var geometry = o.gId["Mesh." + geometryDataOid].clone();
 		
@@ -92,28 +91,35 @@ function GeometryLoader() {
 	}
 
 	
-	this.createBimLine = function(ifcProductOid , geometryDataOid , material, transformationMatrix){
-		var object1 = o.gId["Line." + geometryDataOid].clone();
-		object1.name = 'Line'+ ifcProductOid;
-		object1.applyMatrix(new THREE.Matrix4().set(
-						transformationMatrix[0],
-						transformationMatrix[4],
-						transformationMatrix[8],
-						transformationMatrix[12],
-						transformationMatrix[1],
-						transformationMatrix[5],
-						transformationMatrix[9],
-						transformationMatrix[13],
-						transformationMatrix[2],
-						transformationMatrix[6],
-						transformationMatrix[10],
-						transformationMatrix[14],
-						transformationMatrix[3],
-						transformationMatrix[7],
-						transformationMatrix[11],
-						transformationMatrix[15]
-		));
-		scene.add( object1 );
+	this.createBimLine = function(ifcProductOid , geometryDataOid ,transformationMatrix){
+		if(o.gId["Line." + geometryDataOid]){
+			var geometry = o.gId["Line." + geometryDataOid].clone();
+			var material =  new THREE.LineBasicMaterial({ color: 0x404040, linewidth: 1 ,opacity:.3,transparent:true});
+			var object = new THREE.LineSegments(geometry,material);
+			object.name = 'Line'+ ifcProductOid;
+			object.applyMatrix(new THREE.Matrix4().set(
+							transformationMatrix[0],
+							transformationMatrix[4],
+							transformationMatrix[8],
+							transformationMatrix[12],
+							transformationMatrix[1],
+							transformationMatrix[5],
+							transformationMatrix[9],
+							transformationMatrix[13],
+							transformationMatrix[2],
+							transformationMatrix[6],
+							transformationMatrix[10],
+							transformationMatrix[14],
+							transformationMatrix[3],
+							transformationMatrix[7],
+							transformationMatrix[11],
+							transformationMatrix[15]
+			));
+			
+			scene.add( object );
+			
+		}
+		
 	}
 	
 	
@@ -138,7 +144,6 @@ function GeometryLoader() {
 					min: {x: modelBounds[0], y: modelBounds[1], z: modelBounds[2]},
 					max: {x: modelBounds[3], y: modelBounds[4], z: modelBounds[5]}
 				};*/
-				
 			}else if(geometryType == 4){
 				
 				data.align8();
@@ -166,31 +171,36 @@ function GeometryLoader() {
 					var normals = data.readFloatArray((data.readInt()));
 					
 					var colors = data.readFloatArray((data.readInt()));
+					
 					geometryvertices.push.apply(geometryvertices,vertices);
 					geometrynormals.push.apply(geometrynormals,normals);
 					geometrycolors.push.apply(geometrycolors,colors);
 					
-					for (var i = 0, len = indices.length; i < len; i++) {
-						geometryindices.push(indices[i] + indicesBump);
+					for (var j = 0, len = indices.length; j < len; j++) {
+						geometryindices.push(indices[j] + indicesBump);
 	                }
 					
 				}
-
 				
 				o.createGeometry1(geometryDataOid, geometryvertices, geometrynormals, geometrycolors, geometryindices);
 				
 			} else if(geometryType == 3){
 				data.align8();
 				var geometryDataOid = data.readLong();
+				
+				
 				var indices = data.readShortArray((data.readInt()));
+				
 				data.align4();
+				
 				var IndicesForLinesWireFrame = data.readShortArray((data.readInt()));
 				data.align4();
+				
+				
 				var vertices = data.readFloatArray((data.readInt()));
 				var normals = data.readFloatArray((data.readInt()));
 				var colors = data.readFloatArray((data.readInt()));
-				console.log('geometryDataOid',geometryDataOid);
-				
+				//var colors = data.readInt();
 				o.createGeometry(geometryDataOid, vertices, normals, colors, indices);
 				o.createGeometryLine(geometryDataOid, vertices, IndicesForLinesWireFrame);
 				
@@ -198,19 +208,16 @@ function GeometryLoader() {
 			
 				var ifcname = data.readUTF8();
 				var material  =  Ifc.Constants.materials[ifcname] || Ifc.Constants.materials['DEFAULT'];
-				material = new THREE.MeshLambertMaterial({color: new THREE.Color(material.r,
+				material = new THREE.MeshPhoneMaterial({color: new THREE.Color(material.r,
             			material.g,
             			material.b),
            			opacity:material.a,
-           			transparent:true});
-				
+           			transparent:false});
 				var oid = data.readLong();//不同的
 				var gid = data.readLong();
 				o.gList[oid] = {};
 				o.gList[oid].gInfoId = gid;
 				o.gList[oid].gMaterial = material;
-				
-				
 			}
 			o.state.nrObjectsRead++;
 			o.updateProgress();

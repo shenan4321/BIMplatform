@@ -195,7 +195,7 @@
         }
     }
     
-    renderer = new THREE.WebGLRenderer( {alpha:true, antialias: true } );
+    renderer = new THREE.WebGLRenderer( {alpha:true, antialias: true,depth:false,stencil:false } );
 	renderer.setPixelRatio( window.devicePixelRatio );
 	renderer.setClearColor(0x61656a,0); 
 	//设置渲染器的清除色
@@ -210,7 +210,6 @@
     var spotLight = new THREE.DirectionalLight(0x999999, 1);
     spotLight.position.set(1000, -1000, 1000);
     scene.add(spotLight);
-	
     setTimeout(start,300)
     
     function start(){
@@ -237,6 +236,8 @@
                 	var temp = geomotryLoad.gList[oid];
                 	var info = geomotryLoad.geoList[temp.gInfoId];
                 	geomotryLoad.createBimObject(oid ,info.geometryDataOid, temp.gMaterial,info.transformationMatrix);
+                		geomotryLoad.createBimLine(oid ,info.geometryDataOid,info.transformationMatrix);
+                	
                 }
     
                 animate();
@@ -263,8 +264,8 @@
 					
 					renderer.render( scene, camera );
 				}
-				renderer.domElement.addEventListener( 'mousedown', function(){
-					dlbBIM.onMouseDown()
+				renderer.domElement.addEventListener( 'mouseup', function(){
+					dlbBIM.onMouseUp()
 				}, false );
                 $('.aside-menu-box').show();
                 $('#luopanBox1').show();

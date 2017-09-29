@@ -214,7 +214,7 @@ function GeometryLoader() {
                     			material.g,
                     			material.b),
            			opacity:material.a,
-           			transparent:true});
+           			transparent:true,side:THREE.DoubleSide});
 				var oid = data.readLong();//不同的
 				var gid = data.readLong();
 				o.gList[oid] = {};

@@ -1,4 +1,4 @@
-**BIMplatfrom**
+# **BIMplatfrom**
 
 BIMplatform提供了对BIM建筑信息模型的分布式存储和管理，在浏览器上可对3维BIM模型进行可视化操作。   
 

@@ -38,7 +38,7 @@ dlbBIM.flyToByName = function(name){
  
  */
 dlbBIM.flyTo = function(obj){
-	obj.material = new THREE.MeshLambertMaterial( { color: new THREE.Color(0,1,1),opacity:0.5,transparent:true} );
+	obj.material = new THREE.MeshLambertMaterial( { color: new THREE.Color(0,1,1),opacity:0.5,transparent:true,side:THREE.DoubleSide} );
 	var vec = new THREE.Vector3(camera.position.x, camera.position.y, camera.position.z).sub(center).normalize();
     var diag = this.getAABB3Diag(obj.geometry.boundingBox);
     var sca = Math.abs((diag) /  Math.tan(45*0.0174532925) );

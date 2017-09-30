@@ -156,7 +156,6 @@ public class MultiThreadQueryObjectProvider implements ObjectProvider {
 				if (!futureMap.containsKey(stackFrame) && !isDone.get() && stackFrame.getStatus() != Status.DONE) {
 					Future<?> future = executor.submit(stackFrame);
 					futureMap.put(stackFrame, future);
-					LOGGER.info("push stackFrame : " + stackFrame.toString());
 				} 
 			}
 		}

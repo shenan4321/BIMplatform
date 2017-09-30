@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EReference;
 
@@ -111,11 +112,36 @@ public class RunnableQueryIncludeStackFrame extends RunnableDatabaseReadingStack
 		return "RunnableQueryIncludeStackFrame (eClass: " + currentObject.eClass().getName() + ", oid: " + currentObject.getOid() + ")";
 	}
 	
+	public CanInclude getPreviousInclude() {
+		return previousInclude;
+	}
+
+	public Include getInclude() {
+		return include;
+	}
+
 	@Override
-	public int stackFrameHash() {
-		List<Object> hashElements = Arrays.asList(getClass(), getQueryObjectProvider(), getReusable(), getQueryPart(),
-				previousInclude, include, currentObject.getOid());
-		return Arrays.hashCode(hashElements.toArray());
+	public int hashCode() {
+		HashCodeBuilder hashCodeBuilder = new HashCodeBuilder();
+		hashCodeBuilder.append(getClass()).append(getQueryObjectProvider()).append(getReusable()).append(getQueryPart()).append(previousInclude)
+		.append(include).append(currentObject.getOid());
+		return hashCodeBuilder.toHashCode();
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof RunnableQueryIncludeStackFrame) {
+			RunnableQueryIncludeStackFrame stackFrame = (RunnableQueryIncludeStackFrame) o;
+			if (stackFrame.getQueryObjectProvider() == getQueryObjectProvider() && stackFrame.getReusable() == getReusable() 
+					&& stackFrame.getQueryPart() == getQueryPart() && stackFrame.getPreviousInclude() == getPreviousInclude() 
+					&& stackFrame.getInclude() == getInclude() && currentObject.getOid() == getCurrentObject().getOid()) {
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
 	}
 	
 }

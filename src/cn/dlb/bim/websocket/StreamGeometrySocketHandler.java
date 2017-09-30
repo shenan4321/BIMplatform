@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketHandler;
@@ -22,6 +23,7 @@ import cn.dlb.bim.ifc.emf.PackageMetaData;
 import cn.dlb.bim.ifc.stream.query.QueryContext;
 import cn.dlb.bim.service.BimService;
 import cn.dlb.bim.service.CatalogService;
+import cn.dlb.bim.service.ConcreteRevisionService;
 import cn.dlb.bim.service.VirtualObjectService;
 
 @Component("StreamGeometrySocketHandler")
@@ -33,14 +35,17 @@ public class StreamGeometrySocketHandler implements WebSocketHandler {
 	private PlatformServer server;
     
     @Autowired
-    @Qualifier("ConcreteRevisionDaoImpl")
-    private BaseMongoDao<ConcreteRevision> concreteRevisionDao;
+    private ConcreteRevisionService concreteRevisionService;
     
     @Autowired
     private CatalogService catalogService;
     
     @Autowired
     private VirtualObjectService virtualObjectService;
+    
+    @Autowired
+	@Qualifier("queryExecutor")
+	private ThreadPoolTaskExecutor threadPoolTaskExecutor;
 	
     /** 
      * after connection establish 
@@ -49,10 +54,10 @@ public class StreamGeometrySocketHandler implements WebSocketHandler {
     	users.add(session);
         logger.info("connect success...");  
         String rid = session.getAttributes().get("rid").toString();
-        ConcreteRevision concreteRevision = concreteRevisionDao.findById(Integer.valueOf(rid));
+        ConcreteRevision concreteRevision = concreteRevisionService.findByRid(Integer.valueOf(rid));
         PackageMetaData packageMetaData = server.getMetaDataManager().getPackageMetaData(concreteRevision.getSchema());
         QueryContext queryContext = new QueryContext(catalogService, virtualObjectService, packageMetaData, Integer.valueOf(rid));
-        StreamingGeometryQueryAction action = new StreamingGeometryQueryAction(session, server, queryContext, concreteRevision);
+        StreamingGeometryQueryAction action = new StreamingGeometryQueryAction(threadPoolTaskExecutor, session, queryContext, concreteRevision);
         action.execute();
     }  
   

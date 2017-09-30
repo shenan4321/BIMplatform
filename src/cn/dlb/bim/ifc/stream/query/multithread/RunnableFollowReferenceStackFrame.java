@@ -3,6 +3,7 @@ package cn.dlb.bim.ifc.stream.query.multithread;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EReference;
 
@@ -60,10 +61,39 @@ public class RunnableFollowReferenceStackFrame extends RunnableDatabaseReadingSt
 		return "FollowReferenceStackFrame (" + fromReference.getName() + ")";
 	}
 	
+	public long getOid() {
+		return oid;
+	}
+
+	public Include getInclude() {
+		return include;
+	}
+
+	public EReference getFromReference() {
+		return fromReference;
+	}
+
 	@Override
-	public int stackFrameHash() {
-		List<Object> hashElements = Arrays.asList(getClass(), getQueryObjectProvider(), getReusable(), getQueryPart(),
-				oid, fromReference, include);
-		return Arrays.hashCode(hashElements.toArray());
+	public int hashCode() {
+		HashCodeBuilder hashCodeBuilder = new HashCodeBuilder();
+		hashCodeBuilder.append(getClass()).append(getQueryObjectProvider()).append(getReusable()).append(getQueryPart()).append(fromReference)
+		.append(include).append(oid);
+		return hashCodeBuilder.toHashCode();
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof RunnableFollowReferenceStackFrame) {
+			RunnableFollowReferenceStackFrame stackFrame = (RunnableFollowReferenceStackFrame) o;
+			if (stackFrame.getQueryObjectProvider() == getQueryObjectProvider() && stackFrame.getReusable() == getReusable() 
+					&& stackFrame.getQueryPart() == getQueryPart() && stackFrame.getFromReference() == getFromReference()
+					&& stackFrame.getInclude() == getInclude() && stackFrame.getOid() == getOid()) {
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
 	}
 }

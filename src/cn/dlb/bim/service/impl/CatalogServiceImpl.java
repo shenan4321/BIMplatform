@@ -44,10 +44,6 @@ public class CatalogServiceImpl implements InitializingBean, CatalogService {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(CatalogServiceImpl.class);
 	
-	private static final int AUTO_COMMIT_SIZE = 1000;
-	private static final String SAVE_BATCH_KEY = "save";
-	private static final String UPDATE_BATCH_KEY = "update";
-	
 	private final EClass[] cidToEclass;
 	private final Map<EClass, Short> eClassToCid;
 	private final Map<EClass, AtomicLong> oidCounters;

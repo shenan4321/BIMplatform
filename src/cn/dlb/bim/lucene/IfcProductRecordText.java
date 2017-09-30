@@ -2,7 +2,6 @@ package cn.dlb.bim.lucene;
 
 public class IfcProductRecordText {
 	private String oid;
-	private String location;
 	private String type;
 	private String name;
 	private String detail;
@@ -12,12 +11,6 @@ public class IfcProductRecordText {
 	}
 	public void setOid(String oid) {
 		this.oid = oid;
-	}
-	public String getLocation() {
-		return location;
-	}
-	public void setLocation(String location) {
-		this.location = location;
 	}
 	public String getType() {
 		return type;

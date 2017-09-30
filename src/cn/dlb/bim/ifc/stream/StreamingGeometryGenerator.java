@@ -34,6 +34,7 @@ import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import cn.dlb.bim.component.PlatformServer;
 import cn.dlb.bim.database.DatabaseException;
@@ -104,10 +105,10 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 	private final Collection<VirtualObject> virtualObjectsToUpdate;
 	private static final Integer batchSaveSize = 1000;
 	
-	private final ThreadPoolExecutor queryExecutor = new ThreadPoolExecutor(10, 10, 24, TimeUnit.HOURS,
-				new ArrayBlockingQueue<Runnable>(10000000));//submit阻塞的线程池
+	private final ThreadPoolTaskExecutor queryExecutor;//submit阻塞的线程池
 
-	public StreamingGeometryGenerator(final PlatformServer server, final CatalogService catalogService, VirtualObjectService virtualObjectService, Integer rid, IfcHeader header) {
+	public StreamingGeometryGenerator(final ThreadPoolTaskExecutor executor, final PlatformServer server, final CatalogService catalogService, VirtualObjectService virtualObjectService, Integer rid, IfcHeader header) {
+		this.queryExecutor = executor;
 		this.server = server;
 		this.catalogService = catalogService;
 		this.virtualObjectService = virtualObjectService;

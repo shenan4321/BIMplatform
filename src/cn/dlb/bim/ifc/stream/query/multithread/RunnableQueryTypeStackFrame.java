@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EReference;
 
@@ -105,15 +106,35 @@ public class RunnableQueryTypeStackFrame extends RunnableDatabaseReadingStackFra
 		return currentObject;
 	}
 	
+	public EClass getEClass() {
+		return eClass;
+	}
+
 	@Override
 	public String toString() {
 		return "QueryTypeStackFrame (" + eClass.getName() + ")";
 	}
 
 	@Override
-	public int stackFrameHash() {
-		List<Object> hashElements = Arrays.asList(getClass(), getQueryObjectProvider(), eClass.hashCode(), getQueryPart(), getReusable());
-		return Arrays.hashCode(hashElements.toArray());
+	public int hashCode() {
+		HashCodeBuilder hashCodeBuilder = new HashCodeBuilder();
+		hashCodeBuilder.append(getClass()).append(getQueryObjectProvider()).append(eClass).append(getQueryPart()).append(getReusable());
+		return hashCodeBuilder.toHashCode();
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof RunnableQueryTypeStackFrame) {
+			RunnableQueryTypeStackFrame stackFrame = (RunnableQueryTypeStackFrame) o;
+			if (stackFrame.getQueryObjectProvider() == getQueryObjectProvider() && stackFrame.getReusable() == getReusable() 
+					&& stackFrame.getQueryPart() == getQueryPart() && stackFrame.getEClass() == getEClass()) {
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
 	}
 
 }

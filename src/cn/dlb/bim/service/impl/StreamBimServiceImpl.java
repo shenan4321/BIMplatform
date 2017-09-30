@@ -19,15 +19,15 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.util.CloseableIterator;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
 import cn.dlb.bim.component.PlatformServer;
-import cn.dlb.bim.dao.BaseMongoDao;
+import cn.dlb.bim.dao.ConcreteRevisionDao;
 import cn.dlb.bim.dao.entity.ConcreteRevision;
 import cn.dlb.bim.database.DatabaseException;
 import cn.dlb.bim.ifc.deserializers.DeserializeException;
 import cn.dlb.bim.ifc.deserializers.StepParser;
-import cn.dlb.bim.ifc.emf.IfcModelInterface;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
 import cn.dlb.bim.ifc.emf.Schema;
 import cn.dlb.bim.ifc.engine.cells.GenerateGeometryResult;
@@ -45,6 +45,7 @@ import cn.dlb.bim.ifc.tree.PropertySet;
 import cn.dlb.bim.ifc.tree.stream.StreamBuildingCellGenerator;
 import cn.dlb.bim.ifc.tree.stream.StreamBuildingStoreyGenerator;
 import cn.dlb.bim.ifc.tree.stream.StreamProjectTreeGenerator;
+import cn.dlb.bim.ifc.tree.stream.StreamPropertyGenerator;
 import cn.dlb.bim.service.BimService;
 import cn.dlb.bim.service.CatalogService;
 import cn.dlb.bim.service.VirtualObjectService;
@@ -71,11 +72,14 @@ public class StreamBimServiceImpl implements BimService {
 	private VirtualObjectService virtualObjectService;
 	
 	@Autowired
-	@Qualifier("ConcreteRevisionDaoImpl")
-	private BaseMongoDao<ConcreteRevision> concreteRevisionDao;
+	private ConcreteRevisionDao oncreteRevisionDao;
 
 	@Autowired
 	private CatalogService catalogService;
+	
+	@Autowired
+	@Qualifier("queryExecutor")
+	private ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
 	@Override
 	public List<GeometryInfoVo> queryGeometryInfo(Integer rid, ProgressReporter progressReporter) {
@@ -123,7 +127,7 @@ public class StreamBimServiceImpl implements BimService {
 			start = System.nanoTime();
 			LOGGER.info("Generate geometry...");
 			
-			StreamingGeometryGenerator generator = new StreamingGeometryGenerator(server, catalogService, virtualObjectService, rid, deserializer.getIfcHeader());
+			StreamingGeometryGenerator generator = new StreamingGeometryGenerator(threadPoolTaskExecutor, server, catalogService, virtualObjectService, rid, deserializer.getIfcHeader());
 			QueryContext queryContext = new QueryContext(catalogService, virtualObjectService, packageMetaData, rid);
 			GenerateGeometryResult result = generator.generateGeometry(queryContext);
 			
@@ -143,7 +147,7 @@ public class StreamBimServiceImpl implements BimService {
 			concreteRevision.setMinBounds(minBound);
 			concreteRevision.setIfcHeader(deserializer.getIfcHeader());
 			
-			concreteRevisionDao.save(concreteRevision);
+			oncreteRevisionDao.save(concreteRevision);
 			
 			LOGGER.info("Add revision over.");
 			
@@ -173,17 +177,8 @@ public class StreamBimServiceImpl implements BimService {
 	}
 
 	@Override
-	public IfcModelInterface queryModelByRid(Integer rid, ProgressReporter progressReporter) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public List<ModelInfoVo> queryModelInfoByPid(Long pid) {
-		Query query = new Query();
-		query.addCriteria(Criteria.where("pid").is(pid));
-		Collection<ConcreteRevision> concreteRevisionList = concreteRevisionDao.find(query);
-		
+		Collection<ConcreteRevision> concreteRevisionList = oncreteRevisionDao.findByPid(pid);
 		List<ModelInfoVo> result = new ArrayList<>();
 		for (ConcreteRevision concreteRevision : concreteRevisionList) {
 			ModelInfoVo modelInfo = new ModelInfoVo();
@@ -201,15 +196,12 @@ public class StreamBimServiceImpl implements BimService {
 
 	@Override
 	public void deleteModel(Integer rid) {
-		// TODO Auto-generated method stub
-
+		oncreteRevisionDao.deleteByRid(rid);
 	}
 
 	@Override
 	public ModelInfoVo queryModelInfoByRid(Integer rid) {
-		Query query = new Query();
-		query.addCriteria(Criteria.where("revisionId").is(rid));
-		ConcreteRevision concreteRevision = concreteRevisionDao.findOne(query);
+		ConcreteRevision concreteRevision = oncreteRevisionDao.findByRid(rid);
 		ModelInfoVo modelInfo = new ModelInfoVo();
 		modelInfo.setName(concreteRevision.getName());
 		modelInfo.setPid(concreteRevision.getPid());
@@ -230,33 +222,27 @@ public class StreamBimServiceImpl implements BimService {
 	@Override
 	public ProjectTree queryModelTree(Integer rid) {
 		
-		Query concreteRevisionQuery = new Query();
-		concreteRevisionQuery.addCriteria(Criteria.where("revisionId").is(rid));
-		ConcreteRevision concreteRevision = concreteRevisionDao.findOne(concreteRevisionQuery);
+		ConcreteRevision concreteRevision = oncreteRevisionDao.findByRid(rid);
 		String schema = concreteRevision.getSchema();
 		PackageMetaData packageMetaData = server.getMetaDataManager().getPackageMetaData(schema);
 		
-		StreamProjectTreeGenerator generator = new StreamProjectTreeGenerator(packageMetaData, catalogService, virtualObjectService, concreteRevision);
+		StreamProjectTreeGenerator generator = new StreamProjectTreeGenerator(threadPoolTaskExecutor, packageMetaData, catalogService, virtualObjectService, concreteRevision);
 		generator.proccessBuild();
 		return generator.getTree();
 	}
 
 	@Override
 	public List<BuildingStorey> queryModelBuildingStorey(Integer rid) {
-		Query concreteRevisionQuery = new Query();
-		concreteRevisionQuery.addCriteria(Criteria.where("revisionId").is(rid));
-		ConcreteRevision concreteRevision = concreteRevisionDao.findOne(concreteRevisionQuery);
+		ConcreteRevision concreteRevision = oncreteRevisionDao.findByRid(rid);
 		String schema = concreteRevision.getSchema();
 		PackageMetaData packageMetaData = server.getMetaDataManager().getPackageMetaData(schema);
-		StreamBuildingStoreyGenerator generator = new StreamBuildingStoreyGenerator(packageMetaData, catalogService, virtualObjectService, concreteRevision);
+		StreamBuildingStoreyGenerator generator = new StreamBuildingStoreyGenerator(threadPoolTaskExecutor, packageMetaData, catalogService, virtualObjectService, concreteRevision);
 		return generator.proccessBuild();
 	}
 
 	@Override
 	public List<BuildingCellContainer> queryBuildingCells(Integer rid) {
-		Query concreteRevisionQuery = new Query();
-		concreteRevisionQuery.addCriteria(Criteria.where("revisionId").is(rid));
-		ConcreteRevision concreteRevision = concreteRevisionDao.findOne(concreteRevisionQuery);
+		ConcreteRevision concreteRevision = oncreteRevisionDao.findByRid(rid);
 		String schema = concreteRevision.getSchema();
 		PackageMetaData packageMetaData = server.getMetaDataManager().getPackageMetaData(schema);
 		StreamBuildingCellGenerator generator = new StreamBuildingCellGenerator(packageMetaData, catalogService, virtualObjectService, concreteRevision);
@@ -265,8 +251,12 @@ public class StreamBimServiceImpl implements BimService {
 
 	@Override
 	public List<PropertySet> queryProperty(Integer rid, Long oid) {
-		// TODO Auto-generated method stub
-		return null;
+		ConcreteRevision concreteRevision = oncreteRevisionDao.findByRid(rid);
+		String schema = concreteRevision.getSchema();
+		PackageMetaData packageMetaData = server.getMetaDataManager().getPackageMetaData(schema);
+		VirtualObject product = virtualObjectService.findOneByRidAndOid(rid, oid);
+		StreamPropertyGenerator generator = new StreamPropertyGenerator(threadPoolTaskExecutor, packageMetaData, catalogService, virtualObjectService, concreteRevision, product);
+		return generator.getProperty();
 	}
 
 	@Override

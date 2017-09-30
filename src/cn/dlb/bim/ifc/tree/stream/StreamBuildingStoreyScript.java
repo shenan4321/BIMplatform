@@ -13,9 +13,9 @@ import cn.dlb.bim.ifc.stream.query.JsonQueryObjectModelConverter;
 import cn.dlb.bim.ifc.stream.query.Query;
 import cn.dlb.bim.ifc.stream.query.QueryException;
 
-public class StreamProjectTreeScript {
+public class StreamBuildingStoreyScript {
 	private final Query query;
-	public StreamProjectTreeScript(PackageMetaData packageMetaData) throws JsonParseException, JsonMappingException, IOException, QueryException {
+	public StreamBuildingStoreyScript(PackageMetaData packageMetaData) throws JsonParseException, JsonMappingException, IOException, QueryException {
 		JsonQueryObjectModelConverter converter = new JsonQueryObjectModelConverter(packageMetaData);
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
@@ -54,7 +54,7 @@ public class StreamProjectTreeScript {
 				"	},\r\n" + 
 				"	\"queries\": [\r\n" + 
 				"		{\r\n" + 
-				"			\"type\": \"IfcProject\",\r\n" + 
+				"			\"type\": \"IfcBuildingStorey\",\r\n" + 
 				"			\"includes\": [\r\n" + 
 				"				\"IsDecomposedByDefine\",\r\n" + 
 				"				\"ContainsElementsDefine\"\r\n" + 
@@ -70,5 +70,4 @@ public class StreamProjectTreeScript {
 	public Query getQuery() {
 		return query;
 	}
-	
 }

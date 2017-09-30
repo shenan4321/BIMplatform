@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.eclipse.emf.ecore.EClass;
 
 import cn.dlb.bim.database.DatabaseException;
@@ -109,10 +110,34 @@ public class RunnableQueryPartStackFrame extends RunnableStackFrame {
 		return true;
 	}
 	
+	public QueryContext getReusable() {
+		return reusable;
+	}
+
+	public QueryPart getPartialQuery() {
+		return partialQuery;
+	}
+
 	@Override
-	public int stackFrameHash() {
-		List<Object> hashElements = Arrays.asList(getClass(), getQueryObjectProvider(), reusable, partialQuery);
-		return Arrays.hashCode(hashElements.toArray());
+	public int hashCode() {
+		HashCodeBuilder hashCodeBuilder = new HashCodeBuilder();
+		hashCodeBuilder.append(getClass()).append(getQueryObjectProvider()).append(reusable).append(partialQuery);
+		return hashCodeBuilder.toHashCode();
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof RunnableQueryPartStackFrame) {
+			RunnableQueryPartStackFrame stackFrame = (RunnableQueryPartStackFrame) o;
+			if (stackFrame.getQueryObjectProvider() == getQueryObjectProvider() && stackFrame.getReusable() == getReusable() 
+					&& stackFrame.getPartialQuery() == getPartialQuery()) {
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
 	}
 	
 }

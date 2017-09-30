@@ -94,5 +94,11 @@ public interface BaseMongoDao<T> {
      * @return
      */
     public int updateAll(Collection<BatchUpdateOptions> updates);
+    
+    /**
+     * 根据id删除
+     * @param t
+     */
+    public void findAndDelete(Query query);
       
 }

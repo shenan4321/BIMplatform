@@ -61,5 +61,7 @@ public abstract class RunnableStackFrame implements Runnable {
 	public abstract boolean process() throws InterruptedException, DatabaseException, QueryException,
 			JsonParseException, JsonMappingException, IOException;
 	
-	public abstract int stackFrameHash();
+	public abstract int hashCode();
+	
+	public abstract boolean equals(Object o);
 }

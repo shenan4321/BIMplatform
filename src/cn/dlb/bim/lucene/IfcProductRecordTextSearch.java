@@ -15,7 +15,6 @@ import org.apache.lucene.search.ScoreDoc;
 public class IfcProductRecordTextSearch extends AbstractLuceneSearch<IfcProductRecordText> {
 	
 	public static final String Key_Oid = "oid";
-	public static final String Key_Location = "location";
 	public static final String Key_Type = "type";
 	public static final String Key_Name = "name";
 	public static final String Key_Detail = "detail";
@@ -42,13 +41,11 @@ public class IfcProductRecordTextSearch extends AbstractLuceneSearch<IfcProductR
         	Document doc = new Document();
         	
         	Field oid = genStringFieldCheckNull(Key_Oid, record.getOid(), unTokeType);
-        	Field location = genStringFieldCheckNull(Key_Location, record.getLocation(), storedType);
         	Field type = genStringFieldCheckNull(Key_Type, record.getType(), storedType);
         	Field name = genStringFieldCheckNull(Key_Name, record.getName(), storedType);
         	Field detail = genStringFieldCheckNull(Key_Detail, record.getDetail(), storedType);
         	
         	doc.add(oid);
-        	doc.add(location);
         	doc.add(type);
         	doc.add(name);
         	doc.add(detail);
@@ -69,14 +66,12 @@ public class IfcProductRecordTextSearch extends AbstractLuceneSearch<IfcProductR
 				ScoreDoc scoreDoc = hits[i];
 				Document hitDoc = indexSearcher.doc(scoreDoc.doc);
 				String oid = hitDoc.get(Key_Oid);
-				String location = hitDoc.get(Key_Location);
 				String type = hitDoc.get(Key_Type);
 				String name = hitDoc.get(Key_Name);
 				String detail = hitDoc.get(Key_Detail);
 	
 				IfcProductRecordText record = new IfcProductRecordText();
 				record.setOid(oid);
-				record.setLocation(location);
 				record.setType(type);
 				record.setName(name);
 				record.setDetail(detail);

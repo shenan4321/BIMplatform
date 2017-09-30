@@ -19,6 +19,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.eclipse.emf.ecore.EClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -40,14 +41,11 @@ import cn.dlb.bim.ifc.stream.serializers.ObjectProvider;
 import cn.dlb.bim.service.CatalogService;
 import cn.dlb.bim.service.VirtualObjectService;
 
-public class MultiThreadQueryObjectProvider implements ObjectProvider {//TODO ÊèêÈ´òÂêûÂêêÈáè
+public class MultiThreadQueryObjectProvider implements ObjectProvider {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MultiThreadQueryObjectProvider.class);
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-
-	private static final int MAX_STACK_FRAMES_PROCESSED = 10000;
-	private static final int MAX_STACK_SIZE = 100;
 
 	private CatalogService catalogService;
 	private VirtualObjectService virtualObjectService;
@@ -58,17 +56,16 @@ public class MultiThreadQueryObjectProvider implements ObjectProvider {//TODO Êè
 	private Integer rid;
 	private PackageMetaData packageMetaData;
 
-	private final ThreadPoolExecutor executor;
+	private final ThreadPoolTaskExecutor executor;
 
 	private Queue<VirtualObject> virtualObjectStorage = new ConcurrentLinkedQueue<>();
 	private ReadWriteLock virtualObjectStorageRwLock = new ReentrantReadWriteLock();
 
 	private Map<RunnableStackFrame, Future<?>> futureMap = new ConcurrentHashMap<>();
-	private Set<Integer> stackFrameHashCodes = new HashSet<>();
 
 	private AtomicBoolean isDone = new AtomicBoolean(false);
 
-	public MultiThreadQueryObjectProvider(ThreadPoolExecutor executor, CatalogService catalogService,
+	public MultiThreadQueryObjectProvider(ThreadPoolTaskExecutor executor, CatalogService catalogService,
 			VirtualObjectService virtualObjectService, Query query, Integer rid,
 			PackageMetaData packageMetaData) throws IOException, QueryException {
 		this.executor = executor;
@@ -113,7 +110,7 @@ public class MultiThreadQueryObjectProvider implements ObjectProvider {//TODO Êè
 		return queryObjectProvider;
 	}
 
-	public static MultiThreadQueryObjectProvider fromJsonNode(ThreadPoolExecutor executor,
+	public static MultiThreadQueryObjectProvider fromJsonNode(ThreadPoolTaskExecutor executor,
 			CatalogService catalogService, VirtualObjectService virtualObjectService, PlatformServer server,
 			JsonNode fullQuery, Integer rid, PackageMetaData packageMetaData)
 			throws JsonParseException, JsonMappingException, IOException, QueryException {
@@ -127,7 +124,7 @@ public class MultiThreadQueryObjectProvider implements ObjectProvider {//TODO Êè
 		}
 	}
 
-	public static MultiThreadQueryObjectProvider fromJsonString(ThreadPoolExecutor executor,
+	public static MultiThreadQueryObjectProvider fromJsonString(ThreadPoolTaskExecutor executor,
 			CatalogService catalogService, VirtualObjectService virtualObjectService, PlatformServer server,
 			String json, Integer rid, PackageMetaData packageMetaData)
 			throws JsonParseException, JsonMappingException, IOException, QueryException {
@@ -156,14 +153,11 @@ public class MultiThreadQueryObjectProvider implements ObjectProvider {//TODO Êè
 	public void push(RunnableStackFrame stackFrame) {
 		synchronized (futureMap) {
 			synchronized (executor) {
-				synchronized (stackFrameHashCodes) {
-					int hashCode = stackFrame.stackFrameHash();
-					if (!stackFrameHashCodes.contains(hashCode) && !isDone.get() && stackFrame.getStatus() != Status.DONE) {
-						Future<?> future = executor.submit(stackFrame);
-						futureMap.put(stackFrame, future);
-						stackFrameHashCodes.add(hashCode);
-					} 
-				}
+				if (!futureMap.containsKey(stackFrame) && !isDone.get() && stackFrame.getStatus() != Status.DONE) {
+					Future<?> future = executor.submit(stackFrame);
+					futureMap.put(stackFrame, future);
+					LOGGER.info("push stackFrame : " + stackFrame.toString());
+				} 
 			}
 		}
 	}
@@ -227,7 +221,7 @@ public class MultiThreadQueryObjectProvider implements ObjectProvider {//TODO Êè
 					if (!isDone.get() && virtualObjectStorage.isEmpty()) {
 						virtualObjectStorageRwLock.readLock().unlock();
 						synchronized (this) {
-							this.wait();
+							this.wait(10);
 						}
 						virtualObjectStorageRwLock.readLock().lock();
 					}

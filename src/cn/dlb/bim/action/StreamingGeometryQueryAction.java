@@ -9,6 +9,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.emf.ecore.EClass;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -34,19 +35,17 @@ import cn.dlb.bim.vo.ProgressVo;
 
 public class StreamingGeometryQueryAction extends LongAction {
 
-	private final PlatformServer server;
 	private final QueryContext queryContext;
 	private final ConcreteRevision concreteRevision;
 	private int lastPercentProcess = 0;
-	private final ThreadPoolExecutor queryExecutor = new ThreadPoolExecutor(20, 20, 24, TimeUnit.HOURS,
-			new ArrayBlockingQueue<Runnable>(10000000));
+	private final ThreadPoolTaskExecutor executor;
 	
-	public StreamingGeometryQueryAction(WebSocketSession webSocketSession, PlatformServer server,
+	public StreamingGeometryQueryAction(ThreadPoolTaskExecutor executor, WebSocketSession webSocketSession,
 			QueryContext queryContext, ConcreteRevision concreteRevision) {
 		super(webSocketSession);
-		this.server = server;
 		this.queryContext = queryContext;
 		this.concreteRevision = concreteRevision;
+		this.executor = executor;
 	}
 
 	@Override
@@ -100,7 +99,7 @@ public class StreamingGeometryQueryAction extends LongAction {
 					dataInclude.addField("data");
 				}
 			}
-			ObjectProvider queryObjectProvider = new MultiThreadQueryObjectProvider(queryExecutor, queryContext.getCatalogService(), queryContext.getVirtualObjectService(),
+			ObjectProvider queryObjectProvider = new MultiThreadQueryObjectProvider(executor, queryContext.getCatalogService(), queryContext.getVirtualObjectService(),
 					query, queryContext.getRid(), packageMetaData);
 			
 			BinaryGeometryMessagingStreamingSerializer serializer = new BinaryGeometryMessagingStreamingSerializer();

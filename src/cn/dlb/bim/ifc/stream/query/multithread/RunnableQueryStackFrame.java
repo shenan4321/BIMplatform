@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
@@ -37,10 +39,29 @@ public class RunnableQueryStackFrame extends RunnableStackFrame {
 		return true;
 	}
 	
+	public QueryContext getReusable() {
+		return reusable;
+	}
+
 	@Override
-	public int stackFrameHash() {
-		List<Object> hashElements = Arrays.asList(getClass(), getQueryObjectProvider(), reusable);
-		return Arrays.hashCode(hashElements.toArray());
+	public int hashCode() {
+		HashCodeBuilder hashCodeBuilder = new HashCodeBuilder();
+		hashCodeBuilder.append(getClass()).append(getQueryObjectProvider()).append(reusable);
+		return hashCodeBuilder.toHashCode();
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof RunnableQueryStackFrame) {
+			RunnableQueryStackFrame stackFrame = (RunnableQueryStackFrame) o;
+			if (stackFrame.getQueryObjectProvider() == getQueryObjectProvider() && stackFrame.getReusable() == getReusable()) {
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
 	}
 	
 }

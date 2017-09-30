@@ -1,32 +1,60 @@
 package cn.dlb.bim.component;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import org.eclipse.emf.ecore.EClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
+import cn.dlb.bim.dao.entity.ConcreteRevision;
+import cn.dlb.bim.database.DatabaseException;
 import cn.dlb.bim.ifc.emf.IdEObject;
 import cn.dlb.bim.ifc.emf.IfcModelInterface;
+import cn.dlb.bim.ifc.emf.PackageMetaData;
+import cn.dlb.bim.ifc.stream.VirtualObject;
+import cn.dlb.bim.ifc.stream.query.Query;
+import cn.dlb.bim.ifc.stream.query.QueryException;
+import cn.dlb.bim.ifc.stream.query.QueryPart;
+import cn.dlb.bim.ifc.stream.query.multithread.MultiThreadQueryObjectProvider;
 import cn.dlb.bim.ifc.tree.BuildingStorey;
 import cn.dlb.bim.ifc.tree.BuildingStoreyGenerator;
 import cn.dlb.bim.ifc.tree.PropertyGenerator;
 import cn.dlb.bim.ifc.tree.PropertySet;
+import cn.dlb.bim.ifc.tree.stream.StreamPropertyGenerator;
 import cn.dlb.bim.lucene.IfcProductRecordText;
 import cn.dlb.bim.lucene.IfcProductRecordTextSearch;
 import cn.dlb.bim.service.BimService;
+import cn.dlb.bim.service.CatalogService;
+import cn.dlb.bim.service.ConcreteRevisionService;
+import cn.dlb.bim.service.VirtualObjectService;
 
 @Component("RecordSearchManager")
 public class RecordSearchManager {
 	
 	@Autowired
-	private BimService bimService;
+	private PlatformServer server;
+	
+	@Autowired
+	private VirtualObjectService virtualObjectService;//queryExecutor
+	
+	@Autowired
+	@Qualifier("queryExecutor")
+	private ThreadPoolTaskExecutor threadPoolTaskExecutor;
+	
+	@Autowired
+	private CatalogService catalogService;
+	
+	@Autowired
+	private ConcreteRevisionService concreteRevisionService;
 	@Autowired
 	private PlatformServerConfig platformServerConfig;
 	
@@ -41,12 +69,12 @@ public class RecordSearchManager {
 		}
 	}
 	
-	public List<IfcProductRecordText> search(Integer rid, String keyword) {
+	public List<IfcProductRecordText> search(Integer rid, String keyword) throws IOException, QueryException, DatabaseException, InterruptedException, ExecutionException {
 		List<IfcProductRecordText> result = new ArrayList<>();
+		ConcreteRevision concreteRevision = concreteRevisionService.findByRid(rid);
 		if (!isBuildedIndex(rid)) {
-			IfcModelInterface model = bimService.queryModelByRid(rid, null);
-			if (model != null) {
-				buildIndex(rid, model);
+			if (concreteRevision != null) {
+				buildIndex(rid, concreteRevision);
 			} else {
 				return result;
 			}
@@ -55,43 +83,45 @@ public class RecordSearchManager {
 		IfcProductRecordTextSearch search = new IfcProductRecordTextSearch(indexPath.toFile());
 		String[] fields = new String[]{
 				IfcProductRecordTextSearch.Key_Oid, 
-				IfcProductRecordTextSearch.Key_Location, 
 				IfcProductRecordTextSearch.Key_Type, 
 				IfcProductRecordTextSearch.Key_Name, 
 				IfcProductRecordTextSearch.Key_Detail};
-		
-		for (String field : fields) {
-			result.addAll(search.search(keyword, field, Record_Limit));
+		try {
+			for (String field : fields) {
+				result.addAll(search.search(keyword, field, Record_Limit));
+			}
+		} catch (Exception e) {
+			buildIndex(rid, concreteRevision);//重建索引
 		}
+		
 		return result;
 	}
 	
-	public void buildIndex(Integer rid, IfcModelInterface model) {
+	public void buildIndex(Integer rid, ConcreteRevision concreteRevision) throws IOException, QueryException, DatabaseException, InterruptedException, ExecutionException {
 		Path indexPath = getIndexPath(rid);
-		if (!indexPath.toFile().isDirectory()) {
-			indexPath.toFile().mkdirs();
-		}
+		indexPath.toFile().delete();
+		indexPath.toFile().mkdirs();
+		
 		IfcProductRecordTextSearch search = new IfcProductRecordTextSearch(indexPath.toFile());
 		
-		EClass productClass = (EClass) model.getPackageMetaData().getEClass("IfcProduct");
-		List<IdEObject> productList = model.getAllWithSubTypes(productClass);
+		String schema = concreteRevision.getSchema();
+		PackageMetaData packageMetaData = server.getMetaDataManager().getPackageMetaData(schema);
 		
-		BuildingStoreyGenerator generator = new BuildingStoreyGenerator(model.getPackageMetaData());
-		List<BuildingStorey> buildingStoreys = generator.generateBuildingStorey(model);
-		BiMap<String, Long> buildingStoreyMap = HashBiMap.create();
-		for (BuildingStorey buildingStorey : buildingStoreys) {
-			List<Long> oidList = buildingStorey.getOidContains();
-			for (Long oid : oidList) {
-				buildingStoreyMap.put(buildingStorey.getName(), oid);
-			}
-		}
+		EClass productClass = packageMetaData.getEClass("IfcProduct");
+		Query query = new Query(packageMetaData);
+		QueryPart queryPart = query.createQueryPart();
+		queryPart.addType(productClass, true);
+		MultiThreadQueryObjectProvider objectProvider = new MultiThreadQueryObjectProvider(threadPoolTaskExecutor, catalogService, virtualObjectService, query, rid, packageMetaData);
+		
 		List<IfcProductRecordText> records = new ArrayList<>();
-		for (IdEObject ifcProduct : productList) {
-			String name = (String) ifcProduct.eGet(ifcProduct.eClass().getEStructuralFeature("Name"));
-			String floorName = buildingStoreyMap.inverse().get(ifcProduct.getOid());
+		
+		VirtualObject next = objectProvider.next();
+		while (next != null) {
+			String name = (String) next.get("Name");
 			
-			PropertyGenerator propertyGenerator = new PropertyGenerator();
-			List<PropertySet> porpertySetList = propertyGenerator.getProperty(model.getPackageMetaData(), ifcProduct);
+			StreamPropertyGenerator propertyGenerator = new StreamPropertyGenerator(threadPoolTaskExecutor, packageMetaData, catalogService, virtualObjectService, concreteRevision, next);
+			
+			List<PropertySet> porpertySetList = propertyGenerator.getProperty();
 			
 			String detail = "";
 			for (PropertySet propertySet : porpertySetList) {
@@ -99,13 +129,13 @@ public class RecordSearchManager {
 			}
 			
 			IfcProductRecordText record = new IfcProductRecordText();
-			record.setOid(String.valueOf(ifcProduct.getOid()));
+			record.setOid(String.valueOf(next.getOid()));
 			record.setName(name);
-			record.setType(ifcProduct.eClass().getName());
-			record.setLocation(floorName);
+			record.setType(next.eClass().getName());
 			record.setDetail(detail);
 			
 			records.add(record);
+			next = objectProvider.next();
 		}
 		
 		search.createIndex(records);

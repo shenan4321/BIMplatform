@@ -87,7 +87,6 @@
 	<servlet-mapping>
 		<servlet-name>spring</servlet-name>
 		<url-pattern>*.do</url-pattern>
-		<url-pattern>ws/binarygeometry/*</url-pattern>
 		<url-pattern>ws/streamgeometry/*</url-pattern>
 		<url-pattern>ws/binarygeometry/template/*</url-pattern>
 		<url-pattern>ws/geometry/*</url-pattern>

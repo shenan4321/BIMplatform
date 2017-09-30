@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -14,7 +13,6 @@ import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 
-import cn.dlb.bim.action.BinaryGeometryOutputTemplateAction;
 import cn.dlb.bim.component.PlatformServer;
 import cn.dlb.bim.service.BimService;
 
@@ -36,8 +34,8 @@ public class BinaryGeometryTemplateSocketHandler implements WebSocketHandler {
         users.add(session);  
         String rid = session.getAttributes().get("rid").toString();
         String otid = session.getAttributes().get("otid").toString();
-        BinaryGeometryOutputTemplateAction action = new BinaryGeometryOutputTemplateAction(bimService, Integer.valueOf(rid), Long.valueOf(otid), session);
-        action.execute();
+//        BinaryGeometryOutputTemplateAction action = new BinaryGeometryOutputTemplateAction(bimService, Integer.valueOf(rid), Long.valueOf(otid), session);
+//        action.execute();
     }  
   
     /** 

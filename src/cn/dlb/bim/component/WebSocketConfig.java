@@ -1,16 +1,12 @@
 package cn.dlb.bim.component;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 
-import cn.dlb.bim.service.BimService;
-import cn.dlb.bim.websocket.BinaryGeometryInterceptor;
-import cn.dlb.bim.websocket.BinaryGeometrySocketHandler;
 import cn.dlb.bim.websocket.BinaryGeometryTemplateInterceptor;
 import cn.dlb.bim.websocket.BinaryGeometryTemplateSocketHandler;
 import cn.dlb.bim.websocket.GeometryInterceptor;
@@ -24,9 +20,6 @@ import cn.dlb.bim.websocket.StreamGeometrySocketHandler;
 public class WebSocketConfig implements WebSocketConfigurer {
 	
 	@Autowired
-	private BinaryGeometrySocketHandler binaryGeometrySocketHandler;
-	
-	@Autowired
 	private BinaryGeometryTemplateSocketHandler binaryGeometryTemplateSocketHandler;
 	
 	@Autowired
@@ -37,10 +30,6 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
 	@Override
 	public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        /** 
-         * 支持websocket 的 connection 
-         */  
-        registry.addHandler(binaryGeometrySocketHandler,"/ws/binarygeometry").setAllowedOrigins("*").addInterceptors(new BinaryGeometryInterceptor());  
         
         /** 
          * 支持websocket 的 connection 

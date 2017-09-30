@@ -66,4 +66,20 @@
 
 	<context:annotation-config />
 	
+	<!-- spring thread pool executor -->           
+    <bean id="queryExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+        <!-- 线程池维护线程的最少数量 -->
+        <property name="corePoolSize" value="20" />
+        <!-- 允许的空闲时间 -->
+        <property name="keepAliveSeconds" value="3600" />
+        <!-- 线程池维护线程的最大数量 -->
+        <property name="maxPoolSize" value="20" />
+        <!-- 缓存队列 -->
+        <property name="queueCapacity" value="10000000" />
+        <!-- 对拒绝task的处理策略 -->
+        <property name="rejectedExecutionHandler">
+            <bean class="java.util.concurrent.ThreadPoolExecutor$CallerRunsPolicy" />
+        </property>
+    </bean>
+	
 </beans>

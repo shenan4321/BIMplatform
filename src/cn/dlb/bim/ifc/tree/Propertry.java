@@ -18,6 +18,10 @@ public class Propertry {
 	}
 	
 	public String text() {
-		return name + ":" + value.toString();
+		if (value != null) {
+			return name + ":" + value.toString();
+		} else {
+			return name;
+		}
 	}
 }

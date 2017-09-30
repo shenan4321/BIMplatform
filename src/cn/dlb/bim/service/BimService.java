@@ -21,7 +21,6 @@ public interface BimService {
 	public Integer addRevision(ModelInfoVo modelInfo, File modelFile);
 	public GlbVo queryGlbByRid(Integer rid);
 	public Vector3d queryGlbLonlatByRid(Integer rid);
-	public IfcModelInterface queryModelByRid(Integer rid, ProgressReporter progressReporter);
 	public List<ModelInfoVo> queryModelInfoByPid(Long pid);
 	public void deleteModel(Integer rid);
 	public ModelInfoVo queryModelInfoByRid(Integer rid);

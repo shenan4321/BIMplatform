@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -26,12 +27,14 @@ import org.springframework.web.multipart.MultipartFile;
 import cn.dlb.bim.component.RecordSearchManager;
 import cn.dlb.bim.dao.entity.ModelAndOutputTemplateMap;
 import cn.dlb.bim.dao.entity.OutputTemplate;
+import cn.dlb.bim.database.DatabaseException;
 import cn.dlb.bim.ifc.collada.KmzSerializer;
 import cn.dlb.bim.ifc.emf.IdEObject;
 import cn.dlb.bim.ifc.emf.IfcModelInterface;
 import cn.dlb.bim.ifc.emf.ProjectInfo;
 import cn.dlb.bim.ifc.engine.cells.Vector3d;
 import cn.dlb.bim.ifc.serializers.SerializerException;
+import cn.dlb.bim.ifc.stream.query.QueryException;
 import cn.dlb.bim.ifc.tree.BuildingCellContainer;
 import cn.dlb.bim.ifc.tree.BuildingStorey;
 import cn.dlb.bim.ifc.tree.Material;
@@ -236,33 +239,6 @@ public class ModelController {
 		return result.getResult();
 	}
 	
-	@RequestMapping(value = "queryMaterial", method = RequestMethod.GET)
-	@ResponseBody
-	public Map<String, Object> queryMaterial(@RequestParam("rid")Integer rid//, @RequestParam("oid")Long oid
-			) {
-		ResultUtil result = new ResultUtil();
-		IfcModelInterface model = bimService.queryModelByRid(rid, null);
-		EClass productClass = (EClass) model.getPackageMetaData().getEClass("IfcProduct");
-		List<IdEObject> projectList = model.getAllWithSubTypes(productClass);
-		
-		MaterialGenerator materialGetter = new MaterialGenerator(model);
-		for (IdEObject ifcProject : projectList) {
-			Material material = materialGetter.getMaterial(ifcProject);
-			if (material != null) {
-				System.out.println("type : " + ifcProject.eClass().getName() 
-						+ " color : r " + material.getAmbient().r
-						+ " g " + material.getAmbient().g
-						+ " b " + material.getAmbient().b
-						+ " a " + material.getTransparency());
-			} else {
-				System.out.println("type : " + ifcProject.eClass().getName() + "no material.");
-			}
-			
-		}
-		result.setSuccess(true);
-		return result.getResult();
-	}
-	
 	@RequestMapping(value = "queryGlbByRid", method = RequestMethod.GET)
 	public void queryGlbByRid(@RequestParam("rid")Integer rid, HttpServletResponse response) {
 		GlbVo glbVo = bimService.queryGlbByRid(rid);
@@ -306,9 +282,15 @@ public class ModelController {
 	@ResponseBody
 	public Map<String, Object> searchRecord(@RequestParam("rid")Integer rid, @RequestParam("keyword")String keyword) {
 		ResultUtil result = new ResultUtil();
-		List<IfcProductRecordText> records = recordSearchManager.search(rid, keyword);
-		result.setSuccess(true);
-		result.setData(records);
+		List<IfcProductRecordText> records = null;
+		try {
+			records = recordSearchManager.search(rid, keyword);
+			result.setSuccess(true);
+			result.setData(records);
+		} catch (Exception e) {
+			result.setSuccess(false);
+			e.printStackTrace();
+		} 
 		return result.getResult();
 	}
 	
@@ -368,21 +350,6 @@ public class ModelController {
 		bimService.deleteModelAndOutputTemplateMap(rid, otid);
 		result.setSuccess(true);
 		return result.getResult();
-	}
-	
-	@RequestMapping(value = "kml", method = RequestMethod.GET)
-	public void kml(@RequestParam("rid")Integer rid) {
-		IfcModelInterface model = bimService.queryModelByRid(rid, null);
-		KmzSerializer serializer = new KmzSerializer();
-		ProjectInfo projectInfo = new ProjectInfo();
-		projectInfo.setName("bim");
-		projectInfo.setAuthorName("linfujun");
-		try {
-			serializer.init(model, projectInfo, true);
-			serializer.writeToFile(new File("test.kmz").toPath(), null);
-		} catch (SerializerException e) {
-			e.printStackTrace();
-		}
 	}
 	
 }

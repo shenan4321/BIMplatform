@@ -17,9 +17,10 @@
 	$.progress = function(options){
         	var $this = this;
         	var opts = $.extend({}, defaluts, options);
+//        	/<span id="progressTotal">0</span>
 			if($(".progress").length!=1){
-				var boxHTML = '<div class="progressbars"><div class="progressdiv" id="progressDIV"><div class="text"><span id="progressTitle">loading</span> (<span id="progressNum">0</span>/<span id="progressTotal">0</span>)</div>'+
-		        	'<div class="progress">'+
+				var boxHTML = '<div class="progressbars"><div class="progressdiv" id="progressDIV"><div class="text"><span id="progressTitle">loading</span> (<span id="progressNum">0</span>)</div>'+
+		        	'<div class="progress" style="display:none">'+
 		            '<div class="progress-striped"  style="width:0%;" id="progressStriped">'+
 		            '<div class="progress-bar"></div>'+
 		            '</div></div></div></div>';

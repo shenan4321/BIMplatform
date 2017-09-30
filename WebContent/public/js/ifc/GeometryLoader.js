@@ -203,6 +203,7 @@ function GeometryLoader() {
 				o.createGeometry(geometryDataOid, vertices, normals, colors, indices);
 				o.createGeometryLine(geometryDataOid, vertices, IndicesForLinesWireFrame);
 				
+				
 			}else if(geometryType == 1){
 			
 				var ifcname = data.readUTF8();
@@ -217,9 +218,19 @@ function GeometryLoader() {
            			transparent:true,side:THREE.DoubleSide});
 				var oid = data.readLong();//不同的
 				var gid = data.readLong();
-				o.gList[oid] = {};
-				o.gList[oid].gInfoId = gid;
-				o.gList[oid].gMaterial = material;
+				
+				
+				if(o.geoList[gid]){
+					var info = o.geoList[gid];
+	            	o.createBimObject(oid ,info.geometryDataOid, material , info.transformationMatrix);
+	            	o.createBimLine(oid ,info.geometryDataOid, info.transformationMatrix);	            	
+				}else{
+					o.gList[oid] = {};
+					o.gList[oid].gInfoId = gid;
+					o.gList[oid].gMaterial = material;
+				}
+            	
+				
 			}
 			o.state.nrObjectsRead++;
 			o.updateProgress();

@@ -213,6 +213,9 @@ dlbBIM.onMouseUp = function(ev){
 		if ( intersected != intersections[ 0 ].object ) {
 			dlbBIM.chageColor(hisPick.name,hisPick.color);
 			intersected = intersections[ 0 ].object;
+			if(intersected.name.indexOf('line')>-1 && intersections[ 1 ]){
+				intersected = intersections[ 1 ].object;
+			}
 			window.hisPick={
 				name:intersected.name,	
 				color:{
@@ -229,7 +232,7 @@ dlbBIM.onMouseUp = function(ev){
 	        	});
 			}
 		}else {  
-            if (intersected) intersectedmaterial = new THREE.MeshLambertMaterial({color: new THREE.Color(hisPick.color.r,hisPick.color.g,hisPick.color.b),opacity:window.hisPick.color.o,transparent:true})
+            if (intersected) intersectedmaterial = new THREE.MeshLambertMaterial({color: new THREE.Color(hisPick.color.r,hisPick.color.g,hisPick.color.b),opacity:window.hisPick.color.o,transparent:true,side:THREE.DoubleSide})
             intersected = null;  
         }  
 		document.body.style.cursor = 'pointer';

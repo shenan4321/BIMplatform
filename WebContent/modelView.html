@@ -226,20 +226,19 @@
                 }
             },
             onclose:function(){
-            	//scene.add( lod );
                 progress.hide();
                 websocket = null;
-                console.log(geomotryLoad);
-                //geomotryLoad = null;
-                //geomotryLoad.gId = null;
                 for(var oid in geomotryLoad.gList){
                 	var temp = geomotryLoad.gList[oid];
                 	var info = geomotryLoad.geoList[temp.gInfoId];
                 	geomotryLoad.createBimObject(oid ,info.geometryDataOid, temp.gMaterial,info.transformationMatrix);
-                		geomotryLoad.createBimLine(oid ,info.geometryDataOid,info.transformationMatrix);
-                	
-                }
-    
+                	geomotryLoad.createBimLine(oid ,info.geometryDataOid,info.transformationMatrix);
+                	temp = null;
+                	info = null;
+                } 
+                geomotryLoad.gList = null;
+                geomotryLoad.geoList = null;
+                geomotryLoad.gId = null;
                 animate();
 	
 				 function animate() {
@@ -261,7 +260,6 @@
 							dlbBIM.textlabels[i].updatePosition();
 						}
 					}
-					
 					renderer.render( scene, camera );
 				}
 				renderer.domElement.addEventListener( 'mouseup', function(){

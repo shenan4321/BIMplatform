@@ -23,7 +23,7 @@ dlbBIM.getName = function(name){
  
  */
 dlbBIM.flyToByName = function(name){
-	 var t = this.getName(hisPick.name);
+	 var t = this.getName(name);
 	 if(t){
 		 this.flyTo(t);
 	 }
@@ -48,7 +48,7 @@ dlbBIM.flyTo = function(obj){
     newCaram.x = t1.x + (vec.x * sca);
     newCaram.y = t1.y + (vec.y * sca);
     newCaram.z = t1.z + (vec.z * sca);
-	dlbBIM.moveAndLookAt(camera, newCaram, t1, {duration: 1000}); 
+	dlbBIM.moveAndLookAt(camera, newCaram, t1, {duration: 800}); 
 }
 /**
 
@@ -83,8 +83,8 @@ dlbBIM.moveAndLookAt = function (camera, dstpos, dstlookat, options) {
 	    y: dstpos.y,
 	    z: dstpos.z
 	  }, options.duration).onUpdate(function () {
-	     THREE.Quaternion.slerp(qa, qb, qm,t);
-	     camera.quaternion.set(qm.x, qm.y, qm.z, qm.w);
+	     /*THREE.Quaternion.slerp(qa, qb, qm,t);
+	     camera.quaternion.set(qm.x, qm.y, qm.z, qm.w);*/
 	 }).start().onComplete(function(){
 		  controls.target.set(dstlookat.x, dstlookat.y, dstlookat.z);
 		  controls.update();
@@ -204,17 +204,33 @@ dlbBIM.getAABBCenter =  function (aabb) {
  */
 dlbBIM.onMouseUp = function(ev){
 	event.preventDefault();
+	
+	
+	var mouse = new THREE.Vector3(0, 0, 0);
+	
 	mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
 	mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-	var vector = new THREE.Vector3( mouse.x, mouse.y, 0.5).unproject( camera );
-	raycaster = new THREE.Raycaster(camera.position,vector.sub(new THREE.Vector3( camera.position.x, camera.position.y, camera.position.z)).normalize() );
+	
+	 
+    mouse.unproject(camera);
+
+    var raycaster = new THREE.Raycaster(camera.position, mouse.sub(new THREE.Vector3( camera.position.x, camera.position.y, camera.position.z)).normalize(),geomotryLoad.far / 1000, geomotryLoad.far);
+
 	var intersections = raycaster.intersectObjects( scene.children );
 	if ( intersections.length > 0 ) {
 		if ( intersected != intersections[ 0 ].object ) {
 			dlbBIM.chageColor(hisPick.name,hisPick.color);
-			intersected = intersections[ 0 ].object;
-			if(intersected.name.indexOf('line')>-1 && intersections[ 1 ]){
-				intersected = intersections[ 1 ].object;
+			var num = 0;
+			var a = true;
+			while(a){
+				if(intersections[ num ].object.name.indexOf('Line')>-1 && intersections[ (num+1) ]){	
+					intersected = intersections[ (num+1) ].object;
+					num++;
+				}else{
+					intersected = intersections[ num ].object;
+					a = false;
+				}
+				
 			}
 			window.hisPick={
 				name:intersected.name,	

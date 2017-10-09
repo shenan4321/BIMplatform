@@ -28,13 +28,12 @@
 			}
         	$this.progressTitle = document.getElementById('progressTitle');
         	$this.progressNum = document.getElementById('progressNum');
-        	$this.progressTotal = document.getElementById('progressTotal');
+        	//$this.progressTotal = document.getElementById('progressTotal');
         	$this.progressStriped = document.getElementById('progressStriped');
         	return {
         		update:function(options){
         			$this.progressTitle.innerHTML=options.title;
         			$this.progressNum.innerHTML=options.progress;
-        			$this.progressTotal.innerHTML=options.max;
         			$this.progressStriped.style.width = (~~(options.progress/options.max*100))+'%';
         		},
         		hide:function(){

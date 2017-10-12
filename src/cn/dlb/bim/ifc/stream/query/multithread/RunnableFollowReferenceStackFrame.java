@@ -54,7 +54,8 @@ public class RunnableFollowReferenceStackFrame extends RunnableDatabaseReadingSt
 	public String toString() {
 		try {
 			EClass eClass = getQueryObjectProvider().getCatalogService().getEClassForOid(oid);
-			return "FollowReferenceStackFrame (" + eClass.getName() + "." + fromReference.getName() + ", " + oid + ")";
+			return "FollowReferenceStackFrame (" + eClass.getName() + "." + fromReference.getName() + ", " + oid + ")" + 
+					" QueryPart" + getQueryPart().hashCode() + " Include : " + include.hashCode();
 		} catch (DatabaseException e) {
 			e.printStackTrace();
 		}

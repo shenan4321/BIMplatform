@@ -2,9 +2,6 @@ package cn.dlb.bim.ifc.stream;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -18,16 +15,15 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.eclipse.emf.ecore.EClass;
@@ -61,7 +57,6 @@ import cn.dlb.bim.ifc.stream.query.ObjectListener;
 import cn.dlb.bim.ifc.stream.query.ObjectProviderProxy;
 import cn.dlb.bim.ifc.stream.query.Query;
 import cn.dlb.bim.ifc.stream.query.QueryContext;
-import cn.dlb.bim.ifc.stream.query.QueryException;
 import cn.dlb.bim.ifc.stream.query.QueryPart;
 import cn.dlb.bim.ifc.stream.query.multithread.MultiThreadQueryObjectProvider;
 import cn.dlb.bim.ifc.stream.serializers.IfcStepStreamingSerializer;
@@ -72,6 +67,7 @@ import cn.dlb.bim.models.geometry.GeometryPackage;
 import cn.dlb.bim.service.CatalogService;
 import cn.dlb.bim.service.VirtualObjectService;
 import cn.dlb.bim.utils.Formatters;
+import cn.dlb.bim.utils.GzipUtils;
 
 public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 
@@ -297,18 +293,20 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 //											int[] indices = geometry.getIndices();
 											geometryData.setAttribute(
 													GeometryPackage.eINSTANCE.getGeometryData_Indices(),
-													intArrayToByteArray(trimIndicesForFaces));
+													GzipUtils.zipBytes(intArrayToByteArray(trimIndicesForFaces)));
+											
 											float[] vertices = geometry.getVertices();
 											geometryData.setAttribute(
 													GeometryPackage.eINSTANCE.getGeometryData_Vertices(),
-													floatArrayToByteArray(vertices));
+													GzipUtils.zipBytes(floatArrayToByteArray(vertices)));
 											// geometryData.setAttribute(GeometryPackage.eINSTANCE.getGeometryData_MaterialIndices(),
 											// intArrayToByteArray(geometry.getMaterialIndices()));
 											geometryData.setAttribute(
 													GeometryPackage.eINSTANCE.getGeometryData_Normals(),
-													floatArrayToByteArray(geometry.getNormals()));
+													GzipUtils.zipBytes(floatArrayToByteArray(geometry.getNormals())));
 											
-											geometryData.setAttribute(GeometryPackage.eINSTANCE.getGeometryData_WireFrameIndices(), intArrayToByteArray(trimIndicesForLinesWireFrame));
+											geometryData.setAttribute(GeometryPackage.eINSTANCE.getGeometryData_WireFrameIndices(), 
+													GzipUtils.zipBytes(intArrayToByteArray(trimIndicesForLinesWireFrame)));
 
 											geometryInfo.setAttribute(
 													GeometryPackage.eINSTANCE.getGeometryInfo_PrimitiveCount(),
@@ -346,7 +344,7 @@ public class StreamingGeometryGenerator extends GenericGeometryGenerator {
 												if (hasMaterial) {
 													geometryData.setAttribute(
 															GeometryPackage.eINSTANCE.getGeometryData_Materials(),
-															floatArrayToByteArray(vertex_colors));
+															GzipUtils.zipBytes(floatArrayToByteArray(vertex_colors)));
 												}
 											}
 

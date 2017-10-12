@@ -21,27 +21,27 @@ public class ConcreteRevisionDaoImpl extends AbstractBaseMongoDao<ConcreteRevisi
     
     @Override
 	public ConcreteRevision save(ConcreteRevision concreteRevision) {
-		return save(concreteRevision);
+		return super.save(concreteRevision);
 	}
 
 	@Override
 	public Collection<ConcreteRevision> findByPid(Long pid) {
 		Query query = new Query();
 		query.addCriteria(Criteria.where("pid").is(pid));
-		return find(query);
+		return super.find(query);
 	}
 
 	@Override
 	public void deleteByRid(Integer rid) {
 		Query query = new Query();
 		query.addCriteria(Criteria.where("revisionId").is(rid));
-		findAndDelete(query);
+		super.findAndDelete(query);
 	}
 
 	@Override
 	public ConcreteRevision findByRid(Integer rid) {
 		Query concreteRevisionQuery = new Query();
 		concreteRevisionQuery.addCriteria(Criteria.where("revisionId").is(rid));
-		return findOne(concreteRevisionQuery);
+		return super.findOne(concreteRevisionQuery);
 	}
 }

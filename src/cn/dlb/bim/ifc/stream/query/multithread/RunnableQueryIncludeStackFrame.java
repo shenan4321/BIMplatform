@@ -1,7 +1,5 @@
 package cn.dlb.bim.ifc.stream.query.multithread;
 
-import java.util.Arrays;
-
 /******************************************************************************
  * Copyright (C) 2009-2016  BIMserver.org
  * 
@@ -23,16 +21,13 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EReference;
-
 import cn.dlb.bim.database.DatabaseException;
 import cn.dlb.bim.ifc.stream.VirtualObject;
 import cn.dlb.bim.ifc.stream.WrappedVirtualObject;
 import cn.dlb.bim.ifc.stream.query.CanInclude;
-import cn.dlb.bim.ifc.stream.query.FollowReferenceStackFrame;
 import cn.dlb.bim.ifc.stream.query.Include;
 import cn.dlb.bim.ifc.stream.query.QueryContext;
 import cn.dlb.bim.ifc.stream.query.QueryException;
@@ -109,7 +104,8 @@ public class RunnableQueryIncludeStackFrame extends RunnableDatabaseReadingStack
 	
 	@Override
 	public String toString() {
-		return "RunnableQueryIncludeStackFrame (eClass: " + currentObject.eClass().getName() + ", oid: " + currentObject.getOid() + ")";
+		return "RunnableQueryIncludeStackFrame (eClass: " + currentObject.eClass().getName() + ", oid: " + currentObject.getOid() + ")" +
+				" QueryPart: " + (getQueryPart() == null ? "null" : getQueryPart().hashCode()) + " PreviousInclude : " + (getPreviousInclude() == null ? "null" : getPreviousInclude().hashCode()) + " Include: " + (getInclude() == null ? "null" : String.valueOf(getInclude().hashCode()));
 	}
 	
 	public CanInclude getPreviousInclude() {

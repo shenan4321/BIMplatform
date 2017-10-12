@@ -41,6 +41,7 @@ import cn.dlb.bim.ifc.stream.WrappedVirtualObject;
 import cn.dlb.bim.ifc.stream.query.QueryException;
 import cn.dlb.bim.ifc.stream.serializers.ObjectProvider;
 import cn.dlb.bim.models.geometry.GeometryPackage;
+import cn.dlb.bim.utils.GzipUtils;
 import cn.dlb.bim.vo.Vector3f;
 
 public class BinaryGeometryMessagingStreamingSerializer implements MessagingStreamingSerializer {
@@ -238,11 +239,11 @@ public class BinaryGeometryMessagingStreamingSerializer implements MessagingStre
 			EStructuralFeature materialsFeature = data.eClass().getEStructuralFeature("materials");
 			EStructuralFeature indicesForLinesWireFrameFeature = data.eClass().getEStructuralFeature("indicesForLinesWireFrame");
 
-			byte[] indices = (byte[]) data.eGet(indicesFeature);
-			byte[] vertices = (byte[]) data.eGet(verticesFeature);
-			byte[] normals = (byte[]) data.eGet(normalsFeature);
-			byte[] materials = (byte[]) data.eGet(materialsFeature);
-			byte[] indicesForLinesWire = (byte[]) data.eGet(indicesForLinesWireFrameFeature);
+			byte[] indices = GzipUtils.unzipBytes((byte[]) data.eGet(indicesFeature));
+			byte[] vertices = GzipUtils.unzipBytes((byte[]) data.eGet(verticesFeature));
+			byte[] normals = GzipUtils.unzipBytes((byte[]) data.eGet(normalsFeature));
+			byte[] materials = GzipUtils.unzipBytes((byte[]) data.eGet(materialsFeature));
+			byte[] indicesForLinesWire = GzipUtils.unzipBytes((byte[]) data.eGet(indicesForLinesWireFrameFeature));
 
 			int totalNrIndices = indices.length / 4;
 			int maxIndexValues = 16389;

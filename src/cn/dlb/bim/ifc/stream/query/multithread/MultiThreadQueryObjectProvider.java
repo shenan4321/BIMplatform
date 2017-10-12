@@ -62,6 +62,7 @@ public class MultiThreadQueryObjectProvider implements ObjectProvider {
 	private ReadWriteLock virtualObjectStorageRwLock = new ReentrantReadWriteLock();
 
 	private Map<RunnableStackFrame, Future<?>> futureMap = new ConcurrentHashMap<>();
+	private Set<RunnableStackFrame> pushedFrame = new HashSet<>();
 
 	private AtomicBoolean isDone = new AtomicBoolean(false);
 
@@ -153,10 +154,14 @@ public class MultiThreadQueryObjectProvider implements ObjectProvider {
 	public void push(RunnableStackFrame stackFrame) {
 		synchronized (futureMap) {
 			synchronized (executor) {
-				if (!futureMap.containsKey(stackFrame) && !isDone.get() && stackFrame.getStatus() != Status.DONE) {
-					Future<?> future = executor.submit(stackFrame);
-					futureMap.put(stackFrame, future);
-				} 
+				synchronized (pushedFrame) {
+					if (!pushedFrame.contains(stackFrame) && !isDone.get() && stackFrame.getStatus() != Status.DONE) {
+						Future<?> future = executor.submit(stackFrame);
+						futureMap.put(stackFrame, future);
+						pushedFrame.add(stackFrame);
+//						LOGGER.error("push : " + stackFrame.toString());
+					} 
+				}
 			}
 		}
 	}
@@ -202,6 +207,7 @@ public class MultiThreadQueryObjectProvider implements ObjectProvider {
 	public void removeFuture(RunnableStackFrame stackFrame) {
 		synchronized (futureMap) {
 			futureMap.remove(stackFrame);
+//			LOGGER.info("removeFuture : " + stackFrame.toString());
 			if (futureMap.isEmpty()) {
 				isDone.set(true);
 				synchronized (this) {
